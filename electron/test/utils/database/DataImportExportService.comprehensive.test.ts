@@ -529,6 +529,85 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             }
         });
 
+        it("should serialize monitor lastChecked dates as importable ISO strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Export", "category");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("@shared/utils/jsonSafety");
+            const safeJsonStringifyWithFallbackMock = vi.mocked(
+                safeJsonStringifyWithFallback
+            );
+            const lastChecked = new Date("2026-07-08T12:34:56.789Z");
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([
+                {
+                    identifier: "site-1",
+                    monitoring: true,
+                    name: "Site 1",
+                },
+            ]);
+            mockRepositories.monitor.findBySiteIdentifier.mockResolvedValue([
+                {
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    lastChecked,
+                    monitoring: true,
+                    responseTime: 123,
+                    retryAttempts: 3,
+                    status: "up",
+                    timeout: 5000,
+                    type: "http",
+                    url: "https://example.com",
+                },
+            ]);
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported":true}'
+            );
+
+            await service.exportAllData();
+
+            const [payload] =
+                safeJsonStringifyWithFallbackMock.mock.calls[0] ?? [];
+            const exportedMonitor = (
+                payload as { sites: [{ monitors: [{ lastChecked: string }] }] }
+            ).sites[0].monitors[0];
+            expect(exportedMonitor.lastChecked).toBe(
+                "2026-07-08T12:34:56.789Z"
+            );
+        });
+
+        it("should fail instead of returning normalized export data that still violates the schema", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Export", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("@shared/utils/jsonSafety");
+            const safeJsonStringifyWithFallbackMock = vi.mocked(
+                safeJsonStringifyWithFallback
+            );
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([]);
+            mockRepositories.settings.getAll.mockResolvedValue({
+                "   ": "value",
+            });
+
+            await expect(service.exportAllData()).rejects.toThrow(
+                "Export data payload did not match export schema after normalization."
+            );
+            expect(safeJsonStringifyWithFallbackMock).not.toHaveBeenCalled();
+        });
+
         it("should handle export errors and emit database error event", async ({
             task,
             annotate,

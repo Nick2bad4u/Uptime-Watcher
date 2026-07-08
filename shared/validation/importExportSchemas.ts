@@ -1,12 +1,12 @@
 import type { Site } from "@shared/types";
 
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import * as z from "zod";
 
 import { monitorSchema } from "./monitorSchemas";
 import { siteIdentifierSchema, siteNameSchema } from "./siteFieldSchemas";
-import { siteSchema } from "./siteSchemas";
 
 /**
  * Current supported import/export version.
@@ -15,6 +15,55 @@ import { siteSchema } from "./siteSchemas";
  * This is used for user-driven JSON import/export flows (not cloud backup).
  */
 const importExportVersionSchema: z.ZodLiteral<"1.0"> = z.literal("1.0");
+
+const isoLastCheckedSchema = z
+    .string()
+    .trim()
+    .pipe(z.iso.datetime())
+    .transform((value) => new Date(value));
+
+function normalizeSerializedMonitorDates(value: unknown): unknown {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return value;
+    }
+
+    const descriptor = Object.getOwnPropertyDescriptor(value, "lastChecked");
+    if (
+        !descriptor?.enumerable ||
+        !("value" in descriptor) ||
+        typeof descriptor.value !== "string"
+    ) {
+        return value;
+    }
+
+    const parsedLastChecked = isoLastCheckedSchema.safeParse(descriptor.value);
+    if (!parsedLastChecked.success) {
+        return value;
+    }
+
+    const normalized = createNullPrototypeObject<Record<string, unknown>>();
+    for (const key of Object.keys(value)) {
+        const entry = Object.getOwnPropertyDescriptor(value, key);
+        if (!entry?.enumerable || !("value" in entry)) {
+            continue;
+        }
+
+        Object.defineProperty(normalized, key, {
+            configurable: true,
+            enumerable: true,
+            value:
+                key === "lastChecked" ? parsedLastChecked.data : entry.value,
+            writable: true,
+        });
+    }
+
+    return normalized;
+}
+
+const importExportMonitorSchema: z.ZodType<Site["monitors"][0]> = z.preprocess(
+    normalizeSerializedMonitorDates,
+    monitorSchema
+);
 
 /**
  * Type for a site record inside import payloads.
@@ -38,8 +87,17 @@ const importSiteSchema: z.ZodType<ImportSite> = z
     .object({
         identifier: siteIdentifierSchema,
         monitoring: z.boolean().optional(),
-        monitors: z.array(monitorSchema).optional(),
+        monitors: z.array(importExportMonitorSchema).optional(),
         name: siteNameSchema.optional(),
+    })
+    .strict();
+
+const exportSiteSchema = z
+    .object({
+        identifier: siteIdentifierSchema,
+        monitoring: z.boolean(),
+        monitors: z.array(importExportMonitorSchema),
+        name: siteNameSchema,
     })
     .strict();
 
@@ -88,7 +146,7 @@ const exportDataSchema: z.ZodType<ExportData> = z
     .object({
         exportedAt: z.string().trim().min(1),
         settings: settingsSchema.optional(),
-        sites: z.array(siteSchema),
+        sites: z.array(exportSiteSchema),
         version: importExportVersionSchema,
     })
     .strict();

@@ -4,7 +4,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { createSiteSnapshot } from "../fixtures/siteFactories";
+import {
+    createMonitorSnapshot,
+    createSiteSnapshot,
+} from "../fixtures/siteFactories";
 import {
     validateExportData,
     validateImportData,
@@ -149,6 +152,51 @@ describe("importExportSchemas", () => {
         });
 
         expect(result).toBeTruthy();
+    });
+
+    it("accepts exported sites with empty monitor arrays", () => {
+        const result = validateExportData({
+            exportedAt: "2026-07-02T00:00:00.000Z",
+            settings: {},
+            sites: [
+                {
+                    identifier: "example.com",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Example",
+                },
+            ],
+            version: "1.0",
+        });
+
+        expect(result).toBeTruthy();
+    });
+
+    it("normalizes serialized monitor lastChecked values for JSON payloads", () => {
+        const lastChecked = "2026-07-08T12:34:56.789Z";
+        const result = validateImportData({
+            sites: [
+                {
+                    identifier: "example.com",
+                    monitors: [
+                        createMonitorSnapshot({
+                            lastChecked:
+                                lastChecked as unknown as Date,
+                        }),
+                    ],
+                },
+            ],
+        });
+
+        expect(result.ok).toBeTruthy();
+        if (!result.ok) {
+            throw new Error(result.error.message);
+        }
+
+        const parsedLastChecked =
+            result.value.sites[0]?.monitors?.[0]?.lastChecked;
+        expect(parsedLastChecked).toBeInstanceOf(Date);
+        expect(parsedLastChecked?.toISOString()).toBe(lastChecked);
     });
 
     it("rejects blank export setting keys", () => {

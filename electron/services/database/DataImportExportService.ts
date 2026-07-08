@@ -120,6 +120,10 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
         return value.map((entry) => toJsonifiable(entry));
     }
 
+    if (value instanceof Date) {
+        return value.toISOString();
+    }
+
     if (typeof value === "object") {
         const result = createNullPrototypeObject<Record<string, Jsonifiable>>();
         for (const [key, nested] of objectEntries(value)) {
@@ -254,6 +258,11 @@ export class DataImportExportService {
             }
 
             const exportData = toJsonifiable(exportPayload);
+            if (!validateExportData(exportData)) {
+                throw new Error(
+                    "Export data payload did not match export schema after normalization."
+                );
+            }
 
             const json = safeJsonStringifyWithFallback(exportData, "{}", 2);
             const bytes = getUtfByteLength(json);
