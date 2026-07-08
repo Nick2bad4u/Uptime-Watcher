@@ -1,8 +1,27 @@
 import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import * as path from "node:path";
 
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}\-._]/gu;
+const MAX_FILE_NAME_BYTES = 200;
+
+function truncateToUtf8ByteLength(value: string, maxBytes: number): string {
+    let result = "";
+    let byteLength = 0;
+
+    for (const character of value) {
+        const characterByteLength = getUtfByteLength(character);
+        if (byteLength + characterByteLength > maxBytes) {
+            break;
+        }
+
+        result += character;
+        byteLength += characterByteLength;
+    }
+
+    return result;
+}
 
 /**
  * Produces a filesystem-safe file name.
@@ -13,7 +32,6 @@ const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}\-._]/gu;
  * and invalid/reserved filenames (especially on Windows).
  */
 export function createSanitizedFileName(fileName: string): string {
-    const MAX_FILE_NAME_LENGTH = 200;
     const fallback = "backup.sqlite";
 
     const rawBase = path.posix.basename(
@@ -44,17 +62,17 @@ export function createSanitizedFileName(fileName: string): string {
         : baseName;
 
     const candidate = `${safeBaseName}${ext}`;
-    if (candidate.length <= MAX_FILE_NAME_LENGTH) {
+    if (getUtfByteLength(candidate) <= MAX_FILE_NAME_BYTES) {
         return candidate;
     }
 
-    if (ext.length >= MAX_FILE_NAME_LENGTH) {
-        return candidate.slice(0, MAX_FILE_NAME_LENGTH);
+    if (getUtfByteLength(ext) >= MAX_FILE_NAME_BYTES) {
+        return truncateToUtf8ByteLength(candidate, MAX_FILE_NAME_BYTES);
     }
 
-    const shortenedBase = safeBaseName.slice(
-        0,
-        MAX_FILE_NAME_LENGTH - ext.length
+    const shortenedBase = truncateToUtf8ByteLength(
+        safeBaseName,
+        MAX_FILE_NAME_BYTES - getUtfByteLength(ext)
     );
 
     return `${shortenedBase}${ext}`;

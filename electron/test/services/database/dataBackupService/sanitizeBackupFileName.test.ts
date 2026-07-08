@@ -1,3 +1,4 @@
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { describe, expect, it } from "vitest";
 
 import { createSanitizedFileName } from "../../../../services/database/dataBackupService/sanitizeBackupFileName";
@@ -37,5 +38,12 @@ describe(createSanitizedFileName, () => {
 
         expect(result).toHaveLength(200);
         expect(result.startsWith("backup.")).toBeTruthy();
+    });
+
+    it("limits multibyte file names by UTF-8 byte length while preserving the extension", () => {
+        const result = createSanitizedFileName(`${"測".repeat(100)}.sqlite`);
+
+        expect(getUtfByteLength(result)).toBeLessThanOrEqual(200);
+        expect(result.endsWith(".sqlite")).toBeTruthy();
     });
 });
