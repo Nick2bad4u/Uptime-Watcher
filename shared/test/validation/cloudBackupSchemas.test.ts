@@ -5,6 +5,7 @@
 import {
     validateCloudBackupEntry,
     validateCloudBackupEntryArray,
+    validateCloudBackupKey,
 } from "@shared/validation/cloudBackupSchemas";
 import { describe, expect, it } from "vitest";
 
@@ -28,6 +29,30 @@ describe("cloudBackupSchemas", () => {
         });
 
         expect(parsed.success).toBeTruthy();
+    });
+
+    it("validates canonical backup object keys", () => {
+        expect(validateCloudBackupKey("backups/backup.sqlite").success).toBe(
+            true
+        );
+    });
+
+    it("rejects metadata sidecar keys", () => {
+        const parsed = validateCloudBackupKey(
+            "backups/backup.sqlite.metadata.json"
+        );
+
+        expect(parsed.success).toBe(false);
+        if (!parsed.success) {
+            expect(parsed.error.issues).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        message:
+                            "Cloud backup key must reference the backup object, not metadata",
+                    }),
+                ])
+            );
+        }
     });
 
     it("rejects non-canonical CloudBackupEntry identity fields", () => {
@@ -60,6 +85,12 @@ describe("cloudBackupSchemas", () => {
                 encrypted: false,
                 fileName: "backup.sqlite",
                 key: "sync/backup.sqlite",
+                metadata: createMetadata(),
+            },
+            {
+                encrypted: false,
+                fileName: "backup.sqlite.metadata.json",
+                key: "backups/backup.sqlite.metadata.json",
                 metadata: createMetadata(),
             },
             {

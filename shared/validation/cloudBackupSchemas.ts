@@ -81,6 +81,13 @@ const cloudBackupKeySchema = z
         if (key.includes(":")) {
             addIssue(context, "Cloud backup key must not contain drive tokens");
         }
+
+        if (key.endsWith(".metadata.json")) {
+            addIssue(
+                context,
+                "Cloud backup key must reference the backup object, not metadata"
+            );
+        }
     });
 
 /**
@@ -124,6 +131,14 @@ export const validateCloudBackupEntry = (
     value: unknown
 ): ReturnType<typeof cloudBackupEntrySchema.safeParse> =>
     cloudBackupEntrySchema.safeParse(value);
+
+/**
+ * Validates a canonical provider backup object key.
+ */
+export const validateCloudBackupKey = (
+    value: unknown
+): ReturnType<typeof cloudBackupKeySchema.safeParse> =>
+    cloudBackupKeySchema.safeParse(value);
 
 /**
  * Schema for a list of {@link CloudBackupEntry} values.

@@ -128,6 +128,7 @@ describe("CloudService", () => {
             },
         });
         mockElectronAPI.cloud.listBackups.mockResolvedValue([]);
+        mockElectronAPI.cloud.deleteBackup.mockResolvedValue([]);
         mockElectronAPI.cloud.requestSyncNow.mockResolvedValue(undefined);
         const migrationResult: CloudBackupMigrationResult = {
             completedAt: 10,
@@ -278,6 +279,26 @@ describe("CloudService", () => {
         expect(mockElectronAPI.cloud.listBackups).toHaveBeenCalledTimes(1);
     });
 
+    it("deletes backups with a validated backup object key", async () => {
+        await expect(
+            CloudService.deleteBackup("backups/backup.sqlite")
+        ).resolves.toEqual([]);
+
+        expect(mockElectronAPI.cloud.deleteBackup).toHaveBeenCalledWith(
+            "backups/backup.sqlite"
+        );
+    });
+
+    it("rejects invalid delete keys before invoking Electron", async () => {
+        await expect(
+            CloudService.deleteBackup("backups/backup.sqlite.metadata.json")
+        ).rejects.toThrow(
+            "Invalid cloud backup key for deleteBackup: Cloud backup key must reference the backup object, not metadata"
+        );
+
+        expect(mockElectronAPI.cloud.deleteBackup).not.toHaveBeenCalled();
+    });
+
     it("rejects invalid backup list payloads", async () => {
         mockElectronAPI.cloud.listBackups.mockResolvedValue([
             {
@@ -338,6 +359,17 @@ describe("CloudService", () => {
 
     it("rejects empty restore key", async () => {
         await expect(CloudService.restoreBackup("")).rejects.toThrow(TypeError);
+        expect(mockElectronAPI.cloud.restoreBackup).not.toHaveBeenCalled();
+    });
+
+    it("rejects metadata restore keys before invoking Electron", async () => {
+        await expect(
+            CloudService.restoreBackup("backups/backup.sqlite.metadata.json")
+        ).rejects.toThrow(
+            "Invalid cloud backup key for restoreBackup: Cloud backup key must reference the backup object, not metadata"
+        );
+
+        expect(mockElectronAPI.cloud.restoreBackup).not.toHaveBeenCalled();
     });
 
     it("connects Dropbox", async () => {

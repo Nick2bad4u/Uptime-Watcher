@@ -38,6 +38,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import {
     validateCloudBackupEntry,
     validateCloudBackupEntryArray,
+    validateCloudBackupKey,
 } from "@shared/validation/cloudBackupSchemas";
 import {
     validateCloudStatusSummary,
@@ -142,6 +143,21 @@ const parseCloudStatus = (
         serviceName: "CloudService",
     });
 
+const parseCloudBackupKey = (operation: string, key: unknown): string => {
+    const parsed = validateCloudBackupKey(key);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    const issues = arrayJoin(
+        parsed.error.issues.map(({ message }) => message),
+        ", "
+    );
+
+    throw new TypeError(`Invalid cloud backup key for ${operation}: ${issues}`);
+};
+
 /**
  * Service for interacting with cloud providers through Electron IPC.
  *
@@ -175,9 +191,13 @@ export const CloudService: CloudServiceContract = {
         )
     ),
 
-    deleteBackup: wrap("deleteBackup", async (api, key) =>
-        parseBackupEntries("deleteBackup", await api.cloud.deleteBackup(key))
-    ),
+    deleteBackup: wrap("deleteBackup", async (api, key) => {
+        const backupKey = parseCloudBackupKey("deleteBackup", key);
+        return parseBackupEntries(
+            "deleteBackup",
+            await api.cloud.deleteBackup(backupKey)
+        );
+    }),
 
     disconnect: wrap("disconnect", async (api) =>
         parseCloudStatus("disconnect", await api.cloud.disconnect())
@@ -237,20 +257,18 @@ export const CloudService: CloudServiceContract = {
     ),
 
     restoreBackup: wrap("restoreBackup", async (api, key) => {
-        if (typeof key !== "string" || key.length === 0) {
-            throw new TypeError("Backup key must be a non-empty string");
-        }
+        const backupKey = parseCloudBackupKey("restoreBackup", key);
 
         const result = validateServicePayload(
             validateSerializedDatabaseRestoreResult,
-            await api.cloud.restoreBackup(key),
+            await api.cloud.restoreBackup(backupKey),
             {
                 operation: "restoreBackup",
                 serviceName: "CloudService",
             }
         );
         logger.info("Cloud backup restore completed", {
-            key,
+            key: backupKey,
             restoredAt: result.restoredAt,
         });
         return result;
