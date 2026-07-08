@@ -252,7 +252,7 @@ export function createSuccessResponse<T>(
     }
 
     if (isDefined(metadata)) {
-        response.metadata = metadata;
+        response.metadata = normalizeIpcResponseMetadata(metadata);
     }
 
     if (isDefined(warnings) && warnings.length > 0) {

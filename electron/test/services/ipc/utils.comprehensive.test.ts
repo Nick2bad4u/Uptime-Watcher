@@ -1186,6 +1186,32 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
+            it("should redact secret values in success response metadata", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                const result = createSuccessResponse("ok", {
+                    callback:
+                        "https://example.com/callback?access_token=SUPER_SECRET",
+                    refreshToken: "REFRESH_SECRET",
+                    validationErrors: [
+                        "refresh_token=VERY_SECRET_REFRESH_TOKEN accepted",
+                    ],
+                });
+
+                expect(result.metadata).toEqual({
+                    callback:
+                        "https://example.com/callback?access_token=[redacted]",
+                    refreshToken: "[redacted]",
+                    validationErrors: ["refresh_token=[redacted]"],
+                });
+            });
+
             it("should create success response with data, metadata, and warnings", async ({
                 task,
                 annotate,
