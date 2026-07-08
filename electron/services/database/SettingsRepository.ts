@@ -161,7 +161,6 @@ export class SettingsRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.bulkInsertInternal(db, settings);
-                    return Promise.resolve();
                 }),
             "settings-bulk-insert",
             undefined,
@@ -189,7 +188,6 @@ export class SettingsRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteInternal(db, key);
-                    return Promise.resolve();
                 }),
             "settings-delete",
             undefined,
@@ -215,7 +213,6 @@ export class SettingsRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "settings-delete-all"
         );
@@ -307,7 +304,6 @@ export class SettingsRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.setInternal(db, key, value);
-                    return Promise.resolve();
                 }),
             "settings-set",
             undefined,

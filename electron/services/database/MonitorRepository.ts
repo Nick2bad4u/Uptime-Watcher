@@ -260,8 +260,6 @@ export class MonitorRepository {
                         // should echo it back.
                         createdMonitors.push(monitor);
                     }
-
-                    return Promise.resolve();
                 });
 
                 logger.info(
@@ -302,7 +300,6 @@ export class MonitorRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.clearActiveOperationsInternal(db, monitorId);
-                    return Promise.resolve();
                 }),
             "MonitorRepository.clearActiveOperations"
         );
@@ -335,9 +332,7 @@ export class MonitorRepository {
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(
-                        this.createInternal(db, siteIdentifier, monitor)
-                    )
+                    this.createInternal(db, siteIdentifier, monitor)
                 ),
             "monitor-create",
             undefined,
@@ -390,7 +385,7 @@ export class MonitorRepository {
                         );
                     }
 
-                    return Promise.resolve(isResult);
+                    return isResult;
                 }),
             "monitor-delete",
             undefined,
@@ -419,7 +414,6 @@ export class MonitorRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "monitor-delete-all"
         );
@@ -463,8 +457,6 @@ export class MonitorRepository {
                             }
                         );
                     }
-
-                    return Promise.resolve();
                 }),
             "monitor-delete-by-site",
             undefined,
@@ -611,7 +603,6 @@ export class MonitorRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.updateInternal(db, monitorId, monitor);
-                    return Promise.resolve();
                 }),
             "monitor-update",
             undefined,
