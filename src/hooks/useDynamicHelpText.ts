@@ -45,6 +45,7 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { useEffect, useMemo, useState } from "react";
 
 import { logger } from "../services/logger";
+import { fireAndForget } from "../utils/async/fireAndForget";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**
@@ -133,7 +134,14 @@ export function useDynamicHelpText(
                 }
             };
 
-            void loadHelpTexts();
+            fireAndForget(loadHelpTexts, {
+                onError: (loadError) => {
+                    logger.warn(
+                        "Unexpected failure while loading help texts",
+                        loadError
+                    );
+                },
+            });
 
             return (): void => {
                 controller.abort("Component unmounted or monitor type changed");

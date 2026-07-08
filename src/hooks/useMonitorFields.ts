@@ -42,12 +42,15 @@
 
 import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { useCallback, useEffect } from "react";
 
 import type { ErrorStore } from "../stores/error/types";
 
+import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
+import { fireAndForget } from "../utils/async/fireAndForget";
 
 const selectMonitorTypesError = (state: ErrorStore): string | undefined =>
     state.getStoreError("monitor-types");
@@ -93,7 +96,14 @@ export function useMonitorFields(): UseMonitorFieldsResult {
         function loadMonitorFieldTypes() {
             // Load monitor types when hook is first used
             if (!isLoaded && !monitorTypesError) {
-                void loadMonitorTypes();
+                fireAndForget(loadMonitorTypes, {
+                    onError: (error) => {
+                        logger.error(
+                            "Failed to load monitor field definitions",
+                            ensureError(error)
+                        );
+                    },
+                });
             }
         },
         [
