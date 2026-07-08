@@ -470,5 +470,49 @@ describe("HTTP Client Utils", () => {
             // The error should have been modified with response time
             expect(error.responseTime).toBe(750); // 1750 - 1000
         });
+
+        it("does not invoke accessor-backed error timing fields", async () => {
+            const getter = vi.fn(() => {
+                throw new Error("timing getter should not run");
+            });
+            const config = {};
+            Object.defineProperty(config, "metadata", {
+                enumerable: true,
+                get: getter,
+            });
+            const error = { config };
+
+            const { responseErrorHandler } = setupClientAndGetInterceptors();
+
+            await expect(responseErrorHandler(error)).rejects.toThrow();
+            expect(getter).not.toHaveBeenCalled();
+            expect(error).not.toHaveProperty("responseTime");
+        });
+
+        it("does not invoke accessor-backed redirect option fields", () => {
+            const getter = vi.fn(() => {
+                throw new Error("redirect getter should not run");
+            });
+            createHttpClient({});
+            const beforeRedirect =
+                mockAxiosCreate.mock.calls.at(-1)?.[0]?.beforeRedirect;
+            expect(beforeRedirect).toBeTypeOf("function");
+            const options = {};
+            Object.defineProperties(options, {
+                auth: {
+                    enumerable: true,
+                    get: getter,
+                },
+                protocol: {
+                    enumerable: true,
+                    get: getter,
+                },
+            });
+
+            expect(() => {
+                beforeRedirect?.(options);
+            }).not.toThrow();
+            expect(getter).not.toHaveBeenCalled();
+        });
     });
 });

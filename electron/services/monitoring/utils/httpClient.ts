@@ -16,8 +16,9 @@ import {
     normalizePositiveInteger,
     readBoundedPositiveIntegerEnv,
 } from "@shared/utils/environment";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
-import { ensureRecordLike, isRecord } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
@@ -49,6 +50,28 @@ function ensureErrorInstance(error: unknown): Error {
     return Error.isError(error)
         ? error
         : new Error(getUserFacingErrorDetail(error));
+}
+
+function getOwnRecordDataProperty(value: unknown, key: PropertyKey): unknown {
+    if (!isRecord(value)) {
+        return undefined;
+    }
+
+    const property = getOwnDataProperty(value, key);
+    return property.found ? property.value : undefined;
+}
+
+function getOwnStringDataProperty(value: unknown, key: PropertyKey): string {
+    const property = getOwnRecordDataProperty(value, key);
+    return typeof property === "string" ? property : "";
+}
+
+function getTimingStartTime(error: unknown): number | undefined {
+    const config = getOwnRecordDataProperty(error, "config");
+    const metadata = getOwnRecordDataProperty(config, "metadata");
+    const startTime = getOwnRecordDataProperty(metadata, "startTime");
+
+    return typeof startTime === "number" ? startTime : undefined;
 }
 
 /**
@@ -105,21 +128,11 @@ function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
         },
         (error) => {
             // Also calculate timing for error responses
-            const errorRecord = ensureRecordLike(error);
-            const config = errorRecord
-                ? ensureRecordLike(errorRecord["config"])
-                : undefined;
-            const metadata = config
-                ? ensureRecordLike(config["metadata"])
-                : undefined;
-            const startTime =
-                metadata && typeof metadata["startTime"] === "number"
-                    ? metadata["startTime"]
-                    : undefined;
+            const startTime = getTimingStartTime(error);
 
-            if (isDefined(startTime) && errorRecord) {
+            if (isDefined(startTime) && isRecord(error)) {
                 const duration = performance.now() - startTime;
-                Reflect.set(errorRecord, "responseTime", Math.round(duration));
+                Reflect.set(error, "responseTime", Math.round(duration));
             }
 
             const normalizedError = ensureErrorInstance(error);
@@ -266,9 +279,8 @@ function enforceRedirectSafety(options: unknown): void {
         return;
     }
 
-    const protocol =
-        typeof options["protocol"] === "string" ? options["protocol"] : "";
-    const auth = typeof options["auth"] === "string" ? options["auth"] : "";
+    const protocol = getOwnStringDataProperty(options, "protocol");
+    const auth = getOwnStringDataProperty(options, "auth");
 
     if (protocol.length > 0 && !setHas(ALLOWED_REDIRECT_PROTOCOLS, protocol)) {
         const error = new Error(`Unsupported redirect protocol: ${protocol}`);
