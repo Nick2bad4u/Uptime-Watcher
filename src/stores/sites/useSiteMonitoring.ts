@@ -20,6 +20,7 @@ import type { SitesTelemetryPayload } from "./utils/siteTelemetryTypes";
 
 import { logger } from "../../services/logger";
 import { MonitoringService } from "../../services/MonitoringService";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { applyStatusUpdateSnapshot } from "./utils/statusUpdateSnapshot";
@@ -105,13 +106,16 @@ const noopRegisterMonitoringLock: NonNullable<
  * @returns The same promise instance, so callers can still await or chain it.
  */
 const trackStorePromise = <T>(promise: Promise<T>): Promise<T> => {
-    void (async (): Promise<void> => {
-        try {
+    fireAndForget(
+        async () => {
             await promise;
-        } catch {
-            // Intentionally ignored – the returned promise still rejects for awaiting callers.
+        },
+        {
+            onError: () => {
+                // Intentionally ignored – the returned promise still rejects for awaiting callers.
+            },
         }
-    })();
+    );
 
     return promise;
 };

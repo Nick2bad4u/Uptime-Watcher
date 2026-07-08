@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
+import { fireAndForget } from "../utils/async/fireAndForget";
 import { subscribeToGlobalEvent } from "../utils/dom/eventListeners";
 
 const noop = (): void => undefined;
@@ -71,15 +72,20 @@ export function useBackendFocusSync(enabled = false): void {
                 // Note: Error handling is managed internally by
                 // fullResyncSites through the store's withErrorHandling
                 // wrapper, so void is safe here
-                void (async (): Promise<void> => {
-                    try {
-                        await fullResyncSites();
-                    } catch {
-                        // Focus sync should not crash the renderer focus handler.
-                    } finally {
-                        isFocusSyncInFlightRef.current = false;
+                fireAndForget(
+                    async () => {
+                        try {
+                            await fullResyncSites();
+                        } finally {
+                            isFocusSyncInFlightRef.current = false;
+                        }
+                    },
+                    {
+                        onError: () => {
+                            // Focus sync should not crash the renderer focus handler.
+                        },
                     }
-                })();
+                );
             };
 
             return subscribeToGlobalEvent("window", "focus", handleFocus);

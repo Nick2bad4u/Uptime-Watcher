@@ -18,6 +18,7 @@ import { EventsService } from "../services/EventsService";
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
+import { fireAndForget } from "./async/fireAndForget";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
 
 /**
@@ -186,8 +187,8 @@ export function setupCacheSync(): () => void {
         }
     };
 
-    void (async (): Promise<void> => {
-        try {
+    fireAndForget(
+        async () => {
             const serviceCleanup =
                 await EventsService.onCacheInvalidated(handleInvalidation);
 
@@ -197,13 +198,16 @@ export function setupCacheSync(): () => void {
             }
 
             cleanupHandler = serviceCleanup;
-        } catch (error) {
-            logger.warn(
-                "Cache invalidation events not available - frontend cache sync disabled",
-                ensureError(error)
-            );
+        },
+        {
+            onError: (error) => {
+                logger.warn(
+                    "Cache invalidation events not available - frontend cache sync disabled",
+                    ensureError(error)
+                );
+            },
         }
-    })();
+    );
 
     logger.debug("[CacheSync] Cache synchronization enabled");
     return (): void => {
