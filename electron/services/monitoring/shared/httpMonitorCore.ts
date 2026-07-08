@@ -20,10 +20,7 @@ import {
 } from "@shared/utils/logTemplates";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
-import {
-    defineOwnEnumerableDataProperties,
-    safeObjectOmit,
-} from "@shared/utils/objectSafety";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
@@ -51,7 +48,11 @@ import {
     type MonitorByType,
 } from "./monitorCoreHelpers";
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
-import { copyMonitorServiceConfig } from "./monitorServiceConfigMerging";
+import {
+    copyMonitorServiceConfig,
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./monitorServiceConfigMerging";
 import {
     createMonitorErrorResult,
     normalizeResponseTime,
@@ -374,12 +375,11 @@ export function createHttpMonitorService<
         }
 
         public constructor(config: MonitorServiceConfig = {}) {
-            const configOverrides = safeObjectOmit(config, []);
-            const nextConfig: MonitorServiceConfig = {
-                timeout: DEFAULT_REQUEST_TIMEOUT,
-                userAgent: USER_AGENT,
-                ...configOverrides,
-            };
+            const nextConfig = createDefaultMonitorServiceConfig({
+                config,
+                defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+                defaultUserAgent: USER_AGENT,
+            });
 
             const axiosInstance = createHttpClient({
                 timeout: nextConfig.timeout ?? DEFAULT_REQUEST_TIMEOUT,
@@ -398,7 +398,9 @@ export function createHttpMonitorService<
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
-            let nextConfig: MonitorServiceConfig = { ...this.config };
+            let nextConfig: MonitorServiceConfig = copyMonitorServiceConfig(
+                this.config
+            );
             const remaining = safeObjectOmit(
                 config,
                 RESERVED_HTTP_MONITOR_CONFIG_UPDATE_KEYS
@@ -439,7 +441,10 @@ export function createHttpMonitorService<
                 }
             }
 
-            defineOwnEnumerableDataProperties(nextConfig, remaining);
+            nextConfig = mergeMonitorServiceConfig({
+                currentConfig: nextConfig,
+                update: remaining,
+            });
 
             this.config = nextConfig;
 

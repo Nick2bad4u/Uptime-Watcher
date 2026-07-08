@@ -215,6 +215,53 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 userAgent: "UptimeWatcher/1.0",
             });
         });
+
+        it("should not retain caller-owned mutable constructor config values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Constructor", "type");
+
+            const history: MonitorServiceConfig["history"] = [
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1,
+                },
+            ];
+            const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+
+            const monitor = new HttpMonitor({
+                history,
+                lastChecked,
+            });
+
+            history.push({
+                responseTime: 200,
+                status: "down",
+                timestamp: 2,
+            });
+            if (history[0]) {
+                history[0].responseTime = 999;
+            }
+            lastChecked.setUTCFullYear(2030);
+
+            expect(monitor.getConfig()).toEqual(
+                expect.objectContaining({
+                    history: [
+                        {
+                            responseTime: 100,
+                            status: "up",
+                            timestamp: 1,
+                        },
+                    ],
+                    lastChecked: new Date("2026-01-01T00:00:00.000Z"),
+                })
+            );
+        });
     });
 
     describe("getType", () => {
@@ -328,6 +375,55 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             const config = httpMonitor.getConfig();
             expect(config.timeout).toBe(12_000);
             expect(config.userAgent).toBe("UptimeWatcher/1.0");
+        });
+
+        it("should not retain caller-owned mutable update config values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
+            const history: MonitorServiceConfig["history"] = [
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1,
+                },
+            ];
+            const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+
+            httpMonitor.updateConfig({
+                history,
+                lastChecked,
+            });
+
+            history.push({
+                responseTime: 200,
+                status: "down",
+                timestamp: 2,
+            });
+            if (history[0]) {
+                history[0].responseTime = 999;
+            }
+            lastChecked.setUTCFullYear(2030);
+
+            expect(httpMonitor.getConfig()).toEqual(
+                expect.objectContaining({
+                    history: [
+                        {
+                            responseTime: 100,
+                            status: "up",
+                            timestamp: 1,
+                        },
+                    ],
+                    lastChecked: new Date("2026-01-01T00:00:00.000Z"),
+                    timeout: 5000,
+                    userAgent: "UptimeWatcher/1.0",
+                })
+            );
         });
 
         it("should recreate axios instance on config update", async ({
