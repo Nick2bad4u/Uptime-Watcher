@@ -18,6 +18,7 @@ import type { MonitorRepository } from "../database/MonitorRepository";
 import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
 import { monitorLogger as logger } from "../../utils/logger";
+import { fireAndForget } from "../../utils/fireAndForget";
 
 const MAX_SAFE_TIMER_DELAY_MS = 2_147_483_647;
 
@@ -138,7 +139,20 @@ export class OperationTimeoutManager {
         const delayMs = normalizeTimerDelayMs(timeoutMs);
 
         const timeout = setTimeout(() => {
-            void this.handleTimeout(operationId);
+            fireAndForget(
+                async () => {
+                    await this.handleTimeout(operationId);
+                },
+                {
+                    onError: (error) => {
+                        logger.error(
+                            "Unexpected operation timeout handler failure",
+                            error,
+                            { operationId }
+                        );
+                    },
+                }
+            );
         }, delayMs);
 
         // Avoid keeping the Node/Electron process alive solely because of an operation timeout timer.

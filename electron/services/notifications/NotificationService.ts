@@ -12,6 +12,7 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { logger } from "../../utils/logger";
+import { fireAndForget } from "../../utils/fireAndForget";
 import { MIN_CHECK_INTERVAL } from "../monitoring/constants";
 
 const LOG_TEMPLATES = {
@@ -497,7 +498,19 @@ export class NotificationService {
             }
         );
 
-        void this.emitNotificationSentEvent(context);
+        fireAndForget(
+            async () => {
+                await this.emitNotificationSentEvent(context);
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[NotificationService] Unexpected notification event dispatch failure",
+                        error
+                    );
+                },
+            }
+        );
     }
 
     private composeDownBody(context: NotificationContext): string {
