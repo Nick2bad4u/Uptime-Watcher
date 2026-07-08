@@ -164,7 +164,18 @@ const serializedDatabaseBackupResultSchema: z.ZodType<{
         fileName: z.string(),
         metadata: serializedDatabaseBackupMetadataSchema,
     })
-    .strict();
+    .strict()
+    .superRefine((result, context) => {
+        const bufferByteLength = getNativeArrayBufferByteLength(result.buffer);
+        if (result.metadata.sizeBytes !== bufferByteLength) {
+            context.addIssue({
+                code: "custom",
+                message:
+                    "Backup metadata sizeBytes must match buffer byteLength",
+                path: ["metadata", "sizeBytes"],
+            });
+        }
+    });
 
 const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatabaseBackupSaveResult> =
     z

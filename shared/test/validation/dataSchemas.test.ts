@@ -71,6 +71,18 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeFalsy();
     });
 
+    it("rejects serialized backup results whose metadata size does not match the buffer", () => {
+        const buffer = new ArrayBuffer(8);
+
+        const parsed = validateSerializedDatabaseBackupResult({
+            buffer,
+            fileName: "backup.sqlite",
+            metadata: createMetadata(buffer.byteLength + 1),
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
     it("accepts blank backup filenames for renderer fallback behavior", () => {
         const buffer = new ArrayBuffer(8);
 
