@@ -12,6 +12,30 @@ vi.mock("../../../components/AddSiteForm/Submit", () => ({
     handleSubmit: vi.fn(),
 }));
 
+vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+    useDelayedButtonLoading: vi.fn(() => false),
+}));
+
+vi.mock("../../../hooks/useDynamicHelpText", () => ({
+    useDynamicHelpText: vi.fn(() => ({
+        primary: "Primary guidance",
+        secondary: "Secondary guidance",
+    })),
+}));
+
+vi.mock("../../../hooks/useMonitorTypes", () => ({
+    useMonitorTypes: vi.fn(() => ({
+        error: undefined,
+        isLoading: false,
+        options: [
+            { label: "HTTP", value: "http" },
+            { label: "Port", value: "port" },
+            { label: "Ping", value: "ping" },
+        ],
+        refresh: vi.fn(),
+    })),
+}));
+
 const monitorFieldErrorState = vi.hoisted(() => ({
     shouldError: false,
 }));
