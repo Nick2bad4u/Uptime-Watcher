@@ -27,8 +27,12 @@ interface WindowStub {
 
 describe(RendererEventBridge, () => {
     const STATE_SYNC_BUDGET_ENV_KEY = "UPTIME_STATE_SYNC_EVENT_MAX_BYTES";
+    const STATE_SYNC_DIAGNOSTICS_ENV_KEY =
+        "UPTIME_STATE_SYNC_PAYLOAD_DIAGNOSTICS";
     const DEFAULT_TEST_BUDGET_BYTES = "2000000";
     const originalStateSyncBudgetEnv = process.env[STATE_SYNC_BUDGET_ENV_KEY];
+    const originalStateSyncDiagnosticsEnv =
+        process.env[STATE_SYNC_DIAGNOSTICS_ENV_KEY];
 
     const createWindow = (): WindowStub => {
         const isDestroyed = vi.fn(() => false);
@@ -131,6 +135,7 @@ describe(RendererEventBridge, () => {
         // The production budget may be higher (and configurable), but these
         // tests validate the compaction/truncation behavior under a known cap.
         process.env[STATE_SYNC_BUDGET_ENV_KEY] = DEFAULT_TEST_BUDGET_BYTES;
+        Reflect.deleteProperty(process.env, STATE_SYNC_DIAGNOSTICS_ENV_KEY);
 
         mockWindowService = {
             getAllWindows: vi.fn(() => []),
@@ -148,10 +153,18 @@ describe(RendererEventBridge, () => {
     afterEach(() => {
         if (originalStateSyncBudgetEnv === undefined) {
             Reflect.deleteProperty(process.env, STATE_SYNC_BUDGET_ENV_KEY);
+        } else {
+            process.env[STATE_SYNC_BUDGET_ENV_KEY] =
+                originalStateSyncBudgetEnv;
+        }
+
+        if (originalStateSyncDiagnosticsEnv === undefined) {
+            Reflect.deleteProperty(process.env, STATE_SYNC_DIAGNOSTICS_ENV_KEY);
             return;
         }
 
-        process.env[STATE_SYNC_BUDGET_ENV_KEY] = originalStateSyncBudgetEnv;
+        process.env[STATE_SYNC_DIAGNOSTICS_ENV_KEY] =
+            originalStateSyncDiagnosticsEnv;
     });
 
     it("broadcasts state sync events to all active windows", () => {
@@ -326,6 +339,56 @@ describe(RendererEventBridge, () => {
             expect.objectContaining({
                 channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
                 revision: payload.revision,
+            })
+        );
+    });
+
+    it("redacts URL-like strings from opt-in state sync diagnostics", () => {
+        const firstWindow = createWindow();
+        mockWindowService.getAllWindows.mockReturnValue([firstWindow]);
+        process.env[STATE_SYNC_DIAGNOSTICS_ENV_KEY] = "1";
+
+        const payload = createUpdatePayloadWithHistory(1);
+        const monitor = payload.delta.updatedSites[0]?.monitors[0];
+        if (!monitor) {
+            throw new Error("Expected monitor in state sync payload");
+        }
+
+        monitor.url = `https://user:password@example.com/status?token=${"a".repeat(510_000)}#secret`;
+
+        bridge.sendStateSyncEvent(payload);
+
+        expect(logger.warn).toHaveBeenCalledWith(
+            "[RendererEventBridge] State-sync payload diagnostics",
+            expect.objectContaining({
+                topDetailsStrings: expect.arrayContaining([
+                    expect.objectContaining({
+                        path: "delta.updatedSites[0].monitors[0].url",
+                        preview: "https://example.com/status",
+                    }),
+                ]),
+                topDetailsStringsSummary: expect.arrayContaining([
+                    expect.stringContaining(
+                        "delta.updatedSites[0].monitors[0].url | https://example.com/status"
+                    ),
+                ]),
+            })
+        );
+
+        expect(logger.warn).not.toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                topDetailsStringsSummary: expect.arrayContaining([
+                    expect.stringContaining("password"),
+                ]),
+            })
+        );
+        expect(logger.warn).not.toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({
+                topDetailsStringsSummary: expect.arrayContaining([
+                    expect.stringContaining("token="),
+                ]),
             })
         );
     });

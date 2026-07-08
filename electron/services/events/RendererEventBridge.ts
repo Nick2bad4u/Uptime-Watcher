@@ -17,6 +17,7 @@ import {
     isJsonByteBudgetExceeded,
 } from "@shared/utils/jsonByteBudget";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isDefined, objectEntries } from "ts-extras";
 
@@ -32,6 +33,7 @@ const STATE_SYNC_PAYLOAD_DIAGNOSTICS_THROTTLE_MS = 5e3;
 const STATE_SYNC_PAYLOAD_DIAGNOSTICS_TRIGGER_BYTES = 5e5;
 const STATE_SYNC_PAYLOAD_DIAGNOSTICS_TOP_COUNT = 5;
 const STATE_SYNC_PAYLOAD_DIAGNOSTICS_STRING_PREVIEW_CHARS = 160;
+const URL_SCHEME_PREFIX_PATTERN = /^[a-z][\d+\-.a-z]*:/iu;
 
 const stateSyncPayloadDiagnosticsState: { lastLoggedAt: number } = {
     lastLoggedAt: 0,
@@ -210,7 +212,11 @@ function shouldLogStateSyncPayloadDiagnostics(estimatedBytes: number): boolean {
 }
 
 function toStringPreview(value: string): string {
-    const preview = value.slice(
+    const trimmedValue = value.trim();
+    const safeValue = URL_SCHEME_PREFIX_PATTERN.test(trimmedValue)
+        ? getSafeUrlForLogging(trimmedValue)
+        : value;
+    const preview = safeValue.slice(
         0,
         STATE_SYNC_PAYLOAD_DIAGNOSTICS_STRING_PREVIEW_CHARS
     );
