@@ -273,12 +273,6 @@ export function useOverflowMarquee<
 
     useEffect(
         function manageOverflowObservation() {
-            // Explicitly depend on the serialized dependencies so the observer
-            // is re-attached when upstream callers change the dependency list.
-            if (dependencyFingerprint === "[unserializable-dependencies]") {
-                // no-op
-            }
-
             const evaluateOverflow = (): void => {
                 const element = containerRef.current;
                 const isNext = measureOverflow(element);
