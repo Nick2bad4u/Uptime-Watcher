@@ -408,8 +408,6 @@ export class DownloadBackupCommand extends DatabaseCommand<DatabaseBackupResult>
         /** Boolean indicating whether validation passed */
         isValid: boolean;
     }> {
-        // No specific validation needed for backup
-        await Promise.resolve();
         return { errors: [], isValid: true };
     }
 
@@ -435,7 +433,6 @@ export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetad
     }
 
     public async validate(): Promise<{ errors: string[]; isValid: boolean }> {
-        await Promise.resolve();
         return { errors: [], isValid: true };
     }
 
@@ -488,8 +485,6 @@ export class ExportDataCommand extends DatabaseCommand<string> {
         /** Boolean indicating whether validation passed */
         isValid: boolean;
     }> {
-        // No specific validation needed for export
-        await Promise.resolve();
         return { errors: [], isValid: true };
     }
 
@@ -599,7 +594,6 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         for (const site of this.backupSites) {
             this.cache.set(site.identifier, structuredClone(site));
         }
-        await Promise.resolve();
     }
 
     public async validate(): Promise<{
@@ -642,8 +636,6 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             }
         }
 
-        // Use microtask to satisfy async requirement
-        await Promise.resolve();
         return {
             errors,
             isValid: isEmpty(errors),
@@ -866,7 +858,6 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
             errors.push("Backup payload cannot be empty");
         }
 
-        await Promise.resolve();
         return {
             errors,
             isValid: isEmpty(errors),
