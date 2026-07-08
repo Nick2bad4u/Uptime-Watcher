@@ -1,6 +1,10 @@
 import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import {
+    assertCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "@shared/utils/cloudKeyNormalization";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -15,6 +19,38 @@ import {
 } from "./cloudBackupIo";
 import { listBackupsFromMetadataObjects } from "./cloudBackupListing";
 import { CloudProviderOperationError } from "./cloudProviderErrors";
+
+function assertCanonicalBackupObjectKey(
+    rawKey: string,
+    backupsPrefix: string
+): string {
+    const normalized = normalizeProviderObjectKey(rawKey);
+    assertCloudObjectKey(normalized);
+
+    if (normalized !== rawKey) {
+        throw new Error("Backup key must be a canonical provider object key");
+    }
+
+    if (!normalized.startsWith(backupsPrefix)) {
+        throw new Error(`Backup key must start with '${backupsPrefix}'`);
+    }
+
+    if (normalized === backupsPrefix || normalized.endsWith("/")) {
+        throw new Error("Backup key must reference a backup object key");
+    }
+
+    if (normalized.endsWith(".metadata.json")) {
+        throw new Error(
+            "Backup key must reference the backup object, not metadata"
+        );
+    }
+
+    if (normalized.includes(":")) {
+        throw new Error("Backup key must not contain drive tokens");
+    }
+
+    return normalized;
+}
 
 /**
  * Base class implementing the shared backup IO surface for cloud providers.
@@ -55,10 +91,15 @@ export abstract class BaseCloudStorageProvider implements Pick<
         key: string
     ): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
         try {
+            const normalizedKey = assertCanonicalBackupObjectKey(
+                key,
+                this.backupsPrefix
+            );
+
             return await downloadBackupWithMetadata({
                 downloadObject: (downloadKey) =>
                     this.downloadObject(downloadKey),
-                key,
+                key: normalizedKey,
             });
         } catch (error) {
             const code = tryGetErrorCode(error);
