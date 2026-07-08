@@ -41,6 +41,29 @@ describe("json byte budget helpers", () => {
         expect(toISOString).not.toHaveBeenCalled();
     });
 
+    it("does not invoke patched Date prototype methods while counting dates", () => {
+        const date = new Date("2025-01-02T03:04:05.000Z");
+        const getTime = vi.spyOn(Date.prototype, "getTime");
+        const toISOString = vi.spyOn(Date.prototype, "toISOString");
+        getTime.mockImplementation(() => {
+            throw new Error("Date prototype getTime should not run");
+        });
+        toISOString.mockImplementation(() => {
+            throw new Error("Date prototype toISOString should not run");
+        });
+
+        try {
+            expect(getJsonByteLengthUpTo(date, 100)).toBe(
+                JSON.stringify("2025-01-02T03:04:05.000Z").length
+            );
+            expect(getTime).not.toHaveBeenCalled();
+            expect(toISOString).not.toHaveBeenCalled();
+        } finally {
+            getTime.mockRestore();
+            toISOString.mockRestore();
+        }
+    });
+
     it("handles invalid Date values without throwing", () => {
         const invalidDate = new Date(Number.NaN);
 
@@ -107,6 +130,23 @@ describe("json byte budget helpers", () => {
             JSON.stringify("https://example.com/path?token=secret").length
         );
         expect(toString).not.toHaveBeenCalled();
+    });
+
+    it("does not invoke patched URL prototype toString while counting URLs", () => {
+        const url = new URL("https://example.com/path?token=secret");
+        const toString = vi.spyOn(URL.prototype, "toString");
+        toString.mockImplementation(() => {
+            throw new Error("URL prototype toString should not run");
+        });
+
+        try {
+            expect(getJsonByteLengthUpTo(url, 100)).toBe(
+                JSON.stringify("https://example.com/path?token=secret").length
+            );
+            expect(toString).not.toHaveBeenCalled();
+        } finally {
+            toString.mockRestore();
+        }
     });
 
     it("does not invoke shadowed ArrayBuffer byteLength accessors", () => {

@@ -82,6 +82,10 @@ function getNativeMethod(
     return undefined;
 }
 
+const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
+const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
+
 interface JsonByteBudgetState {
     bytes: number;
     readonly maxBytes: number;
@@ -302,15 +306,13 @@ function getJsonBytesForNumber(value: number): number {
 }
 
 function getJsonBytesForDate(value: Date): number {
-    const getTime = getNativeMethod(Date.prototype, "getTime");
-    const toISOString = getNativeMethod(Date.prototype, "toISOString");
-    if (!getTime || !toISOString) {
+    if (!DATE_GET_TIME || !DATE_TO_ISO_STRING) {
         return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
     }
 
     let timestamp: unknown;
     try {
-        timestamp = Reflect.apply(getTime, value, []);
+        timestamp = Reflect.apply(DATE_GET_TIME, value, []);
     } catch {
         return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
     }
@@ -320,7 +322,11 @@ function getJsonBytesForDate(value: Date): number {
     }
 
     try {
-        const serialized: unknown = Reflect.apply(toISOString, value, []);
+        const serialized: unknown = Reflect.apply(
+            DATE_TO_ISO_STRING,
+            value,
+            []
+        );
         return getJsonBytesForString(
             typeof serialized === "string"
                 ? serialized
@@ -332,13 +338,12 @@ function getJsonBytesForDate(value: Date): number {
 }
 
 function getJsonBytesForUrl(value: URL): number {
-    const toString = getNativeMethod(URL.prototype, "toString");
-    if (!toString) {
+    if (!URL_TO_STRING) {
         return getJsonBytesForString(UNSERIALIZABLE_OBJECT_JSON_VALUE);
     }
 
     try {
-        const serialized: unknown = Reflect.apply(toString, value, []);
+        const serialized: unknown = Reflect.apply(URL_TO_STRING, value, []);
         return getJsonBytesForString(
             typeof serialized === "string"
                 ? serialized
