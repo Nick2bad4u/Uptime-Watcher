@@ -136,6 +136,18 @@ function isCloudSyncSizeLimitError(error: unknown): boolean {
     return ensureError(error) instanceof CloudSyncSizeLimitError;
 }
 
+function assertCloudSyncObjectWithinSizeLimit(args: {
+    actualBytes: number;
+    maxBytes: number;
+    objectKind: "manifest" | "snapshot";
+}): void {
+    if (args.actualBytes <= args.maxBytes) {
+        return;
+    }
+
+    throw new CloudSyncSizeLimitError(args);
+}
+
 function parseRemoteJson(args: {
     key: string;
     kind: CloudSyncCorruptRemoteObjectError["kind"];
@@ -552,13 +564,11 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         try {
             const buffer = await this.provider.downloadObject(MANIFEST_KEY);
             const maxBytes = getMaxManifestBytes();
-            if (buffer.byteLength > maxBytes) {
-                throw new CloudSyncSizeLimitError({
-                    actualBytes: buffer.byteLength,
-                    maxBytes,
-                    objectKind: "manifest",
-                });
-            }
+            assertCloudSyncObjectWithinSizeLimit({
+                actualBytes: buffer.byteLength,
+                maxBytes,
+                objectKind: "manifest",
+            });
 
             const rawOrNull = ((): null | string => {
                 try {
@@ -715,13 +725,11 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         try {
             const buffer = await this.provider.downloadObject(key);
             const maxBytes = getMaxSnapshotBytes();
-            if (buffer.byteLength > maxBytes) {
-                throw new CloudSyncSizeLimitError({
-                    actualBytes: buffer.byteLength,
-                    maxBytes,
-                    objectKind: "snapshot",
-                });
-            }
+            assertCloudSyncObjectWithinSizeLimit({
+                actualBytes: buffer.byteLength,
+                maxBytes,
+                objectKind: "snapshot",
+            });
 
             const raw = ((): string => {
                 try {
@@ -790,8 +798,14 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         const parsedManifest = parseCloudSyncManifest(manifest);
         validateManifestSnapshotKey(parsedManifest);
         const json = JSON.stringify(parsedManifest, null, 2);
+        const buffer = encodeUtf8(json);
+        assertCloudSyncObjectWithinSizeLimit({
+            actualBytes: buffer.byteLength,
+            maxBytes: getMaxManifestBytes(),
+            objectKind: "manifest",
+        });
         await this.provider.uploadObject({
-            buffer: encodeUtf8(json),
+            buffer,
             key: MANIFEST_KEY,
             overwrite: true,
         });
@@ -802,8 +816,14 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     ): Promise<CloudObjectEntry> {
         const parsedSnapshot = parseCloudSyncSnapshot(snapshot);
         const json = JSON.stringify(parsedSnapshot, null, 2);
+        const buffer = encodeUtf8(json);
+        assertCloudSyncObjectWithinSizeLimit({
+            actualBytes: buffer.byteLength,
+            maxBytes: getMaxSnapshotBytes(),
+            objectKind: "snapshot",
+        });
         return this.provider.uploadObject({
-            buffer: encodeUtf8(json),
+            buffer,
             key: createSnapshotKey(snapshot.createdAt),
             overwrite: false,
         });

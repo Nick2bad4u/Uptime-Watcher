@@ -583,6 +583,35 @@ describe("ProviderCloudSyncTransport outbound artifact validation", () => {
         expect(uploaded).toBeFalsy();
     });
 
+    it("rejects oversized manifests before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "manifest.json",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const manifest = {
+            devices: {},
+            manifestVersion: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        } satisfies CloudSyncManifest;
+
+        await withEnvVar("UW_CLOUD_SYNC_MAX_MANIFEST_BYTES", "1", async () => {
+            await expect(transport.writeManifest(manifest)).rejects.toThrow(
+                /manifest exceeds size limit/i
+            );
+        });
+
+        expect(uploaded).toBeFalsy();
+    });
+
     it("validates snapshots before upload", async () => {
         let uploaded = false;
         const provider = createProvider({
@@ -607,6 +636,36 @@ describe("ProviderCloudSyncTransport outbound artifact validation", () => {
         await expect(
             transport.writeSnapshot(invalidSnapshot)
         ).rejects.toThrow();
+
+        expect(uploaded).toBeFalsy();
+    });
+
+    it("rejects oversized snapshots before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "snapshot.json",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const snapshot = {
+            createdAt: 1,
+            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+            state: { monitor: {}, settings: {}, site: {} },
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        } satisfies CloudSyncSnapshot;
+
+        await withEnvVar("UW_CLOUD_SYNC_MAX_SNAPSHOT_BYTES", "1", async () => {
+            await expect(transport.writeSnapshot(snapshot)).rejects.toThrow(
+                /snapshot exceeds size limit/i
+            );
+        });
 
         expect(uploaded).toBeFalsy();
     });
