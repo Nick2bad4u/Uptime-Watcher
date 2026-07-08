@@ -567,6 +567,8 @@ export const createSiteSyncActions = (
             // ADR-003 "Store Error Handling Contexts" for the rationale.
             await withErrorHandling(
                 async () => {
+                    const startRevision = deps.getSitesRevision();
+
                     logStoreAction("SitesStore", "syncSites", {
                         status: "pending",
                     });
@@ -581,6 +583,34 @@ export const createSiteSyncActions = (
                             source,
                             synchronized,
                         } = fullSyncResult;
+
+                        const currentRevision = deps.getSitesRevision();
+                        if (currentRevision !== startRevision) {
+                            logger.warn(
+                                "Skipping stale full sync response because site state changed during request",
+                                {
+                                    completedAt,
+                                    currentRevision,
+                                    originalSitesCount: siteCount,
+                                    source,
+                                    startRevision,
+                                }
+                            );
+                            logStoreAction("SitesStore", "syncSites", {
+                                completedAt,
+                                currentRevision,
+                                message:
+                                    "Skipped stale backend full sync response because local state changed during request",
+                                originalSitesCount: siteCount,
+                                skipReason: "stale-sites-revision",
+                                skipped: true,
+                                source,
+                                startRevision,
+                                status: "success",
+                                success: true,
+                            });
+                            return;
+                        }
 
                         const snapshot = deriveSiteSnapshot(sites);
                         if (snapshot.duplicates.length > 0) {

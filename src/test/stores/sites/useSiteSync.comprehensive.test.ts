@@ -152,6 +152,7 @@ describe("useSiteSync", () => {
 
         mockDeps = {
             getSites: vi.fn(() => mockSites),
+            getSitesRevision: vi.fn(() => 0),
             setSites: vi.fn(),
             setStatusSubscriptionSummary: vi.fn(),
             onSiteDelta: vi.fn(),
@@ -984,6 +985,57 @@ describe("useSiteSync", () => {
                 status: "success",
                 success: true,
             });
+        });
+
+        it("skips stale full sync responses when local sites changed during the request", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Data Integrity", "category");
+            await annotate("Type: Race Condition", "type");
+
+            let sitesRevision = 10;
+            mockDeps.getSitesRevision.mockImplementation(() => sitesRevision);
+            mockStateSyncService.requestFullSync.mockImplementationOnce(
+                async () => {
+                    sitesRevision = 11;
+                    return {
+                        completedAt: Date.now(),
+                        revision: 31,
+                        siteCount: 1,
+                        sites: [buildSite("stale-site")],
+                        source: "database" as const,
+                        synchronized: true,
+                    };
+                }
+            );
+
+            await syncActions.syncSites();
+
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Skipping stale full sync response because site state changed during request",
+                expect.objectContaining({
+                    currentRevision: 11,
+                    originalSitesCount: 1,
+                    source: "database",
+                    startRevision: 10,
+                })
+            );
+            expect(logStoreActionMock).toHaveBeenCalledWith(
+                "SitesStore",
+                "syncSites",
+                expect.objectContaining({
+                    currentRevision: 11,
+                    skipReason: "stale-sites-revision",
+                    skipped: true,
+                    startRevision: 10,
+                    status: "success",
+                    success: true,
+                })
+            );
         });
 
         it("deduplicates backend sync responses while logging duplicates", async ({

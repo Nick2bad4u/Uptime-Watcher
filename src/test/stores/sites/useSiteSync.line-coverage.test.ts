@@ -140,6 +140,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
         mockDeps = {
             getSites: vi.fn(() => mockSites),
+            getSitesRevision: vi.fn(() => 0),
             setSites: vi.fn(),
             setStatusSubscriptionSummary: vi.fn(),
             onSiteDelta: vi.fn(),
