@@ -43,6 +43,23 @@ describe("shared/utils/retry", () => {
         expect(vi.mocked(sleepUnref)).not.toHaveBeenCalled();
     });
 
+    it("returns immediately when a synchronous attempt succeeds", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: retry", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Success", "type");
+
+        const operation = vi.fn(() => "ok");
+
+        await expect(withRetry(operation)).resolves.toBe("ok");
+        expect(operation).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(sleep)).not.toHaveBeenCalled();
+        expect(vi.mocked(sleepUnref)).not.toHaveBeenCalled();
+    });
+
     it("retries with the configured delay and eventually succeeds", async ({
         task,
         annotate,

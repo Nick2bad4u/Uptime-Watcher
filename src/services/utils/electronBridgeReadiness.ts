@@ -261,10 +261,10 @@ export async function waitForElectronBridge(
                 );
 
                 if (evaluation.isReady) {
-                    return Promise.resolve();
+                    return;
                 }
 
-                return Promise.reject(new BridgeNotReadyYetError(evaluation));
+                throw new BridgeNotReadyYetError(evaluation);
             },
             {
                 delayMs: ({ attempt }) =>

@@ -8,6 +8,7 @@
 
 import { sleep, sleepUnref } from "@shared/utils/abortUtils";
 import { arrayAt, isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import type { Promisable } from "type-fest";
 
 function wrapNonErrorThrownValue(value: unknown): Error {
     return new Error("[withRetry] Operation threw a non-Error value", {
@@ -185,7 +186,7 @@ async function waitBeforeRetry(args: {
  * @typeParam T - Return type of the operation
  */
 export async function withRetry<T>(
-    operation: () => Promise<T>,
+    operation: () => Promisable<T>,
     options: RetryOptions = {}
 ): Promise<T> {
     const {
