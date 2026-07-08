@@ -20,7 +20,8 @@ const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
 // const jsonReporter = (runDetails: any) => {
 //   // e.g., write to a log file or console as JSON for CI parsing
-//   // require('fs').appendFileSync('fc-report.json', JSON.stringify(runDetails) + '\n');
+//   // import appendFileSync from node:fs at module scope if file output is needed.
+//   // appendFileSync("fc-report.json", `${JSON.stringify(runDetails)}\n`);
 //   if (runDetails.failed) {
 //     // default behavior is to throw; you can customize here if you prefer
 //     throw new Error(`Property failed: seed=${runDetails.seed} path=${runDetails.path}`);
