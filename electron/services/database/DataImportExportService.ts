@@ -63,6 +63,7 @@ import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { createMonitorConfig } from "../monitoring/createMonitorConfig";
 import { DataImportExportError } from "./interfaces";
 import { createImportTransactionAdapters } from "./transactionAdapters";
+import { parseHistoryLimitSetting } from "./utils/historyLimitSettingParser";
 
 /**
  * Configuration for data import/export operations.
@@ -166,6 +167,8 @@ export class DataImportExportService {
      * be transferred via the user-facing JSON import/export flow.
      */
     private static readonly CLOUD_SETTINGS_PREFIX = "cloud." as const;
+
+    private static readonly HISTORY_LIMIT_SETTINGS_KEY = "historyLimit" as const;
 
     private static isProtectedSettingsKey(key: string): boolean {
         return (
@@ -467,19 +470,37 @@ export class DataImportExportService {
             | "persist"
     ): Record<string, string> {
         const result = createNullPrototypeObject<Record<string, string>>();
+        const invalidKeys: string[] = [];
         const strippedKeys: string[] = [];
 
         for (const [key, value] of objectEntries(settings)) {
             if (DataImportExportService.isProtectedSettingsKey(key)) {
                 strippedKeys.push(key);
-            } else {
+                continue;
+            }
+
+            if (key === DataImportExportService.HISTORY_LIMIT_SETTINGS_KEY) {
+                const parsedHistoryLimit = parseHistoryLimitSetting(value);
+                if (!isDefined(parsedHistoryLimit)) {
+                    invalidKeys.push(key);
+                    continue;
+                }
+
                 Object.defineProperty(result, key, {
                     configurable: true,
                     enumerable: true,
-                    value,
+                    value: String(parsedHistoryLimit),
                     writable: true,
                 });
+                continue;
             }
+
+            Object.defineProperty(result, key, {
+                configurable: true,
+                enumerable: true,
+                value,
+                writable: true,
+            });
         }
 
         if (strippedKeys.length > 0) {
@@ -487,6 +508,15 @@ export class DataImportExportService {
                 `[DataImportExportService] Stripped ${strippedKeys.length} protected settings keys during ${context}`,
                 {
                     keysPreview: strippedKeys.slice(0, 5),
+                }
+            );
+        }
+
+        if (invalidKeys.length > 0) {
+            this.logger.warn(
+                `[DataImportExportService] Stripped ${invalidKeys.length} invalid settings keys during ${context}`,
+                {
+                    keysPreview: invalidKeys.slice(0, 5),
                 }
             );
         }

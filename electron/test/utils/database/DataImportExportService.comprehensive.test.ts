@@ -1027,6 +1027,66 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
+        it("should strip malformed imported history limit settings before persistence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+
+            mockRepositories.settings.getAll.mockResolvedValue({
+                historyLimit: "1000",
+            });
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData([], {
+                historyLimit: "1e3",
+                theme: "dark",
+            });
+
+            expect(
+                mockRepositories.settings.deleteInternal
+            ).toHaveBeenCalledWith(mockDatabase, "historyLimit");
+            expect(
+                mockRepositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDatabase, { theme: "dark" });
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataImportExportService] Stripped 1 invalid settings keys during persist",
+                { keysPreview: ["historyLimit"] }
+            );
+        });
+
+        it("should canonicalize valid imported history limit settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData([], {
+                historyLimit: " 00500 ",
+            });
+
+            expect(
+                mockRepositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDatabase, { historyLimit: "500" });
+        });
+
         it("should preserve protected existing settings while replacing import-managed settings", async ({
             task,
             annotate,
