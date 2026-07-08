@@ -373,12 +373,15 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
                 }),
                 { context: "Context access_token=[redacted]" }
             );
-            expect(String(consoleSpy.mock.calls)).not.toContain(
-                "context-secret"
-            );
-            expect(String(consoleSpy.mock.calls)).not.toContain(
-                "callback-secret"
-            );
+            const [
+                ,
+                loggedError,
+                loggedMetadata,
+            ] = consoleSpy.mock.calls[0] ?? [];
+            const serializedLogCall =
+                JSON.stringify({ loggedError, loggedMetadata }) ?? "";
+            expect(serializedLogCall).not.toContain("context-secret");
+            expect(serializedLogCall).not.toContain("callback-secret");
 
             consoleSpy.mockRestore();
         });

@@ -279,33 +279,19 @@ export function safeObjectOmit<T extends object, K extends PropertyKey>(
     //   own property.
     //
     const result = createNullPrototypeObject<Except<T, Extract<K, keyof T>>>();
-    // Copy enumerable string/number properties
     for (const [key, value] of getOwnEnumerableDataEntries(obj)) {
-        if (typeof key === "string" && !setHas(stringKeysToOmit, key)) {
-            Object.defineProperty(result, key, {
-                configurable: true,
-                enumerable: true,
-                value,
-                writable: true,
-            });
-        }
-    }
-
-    // Copy symbol properties
-    for (const symbol of Object.getOwnPropertySymbols(obj)) {
-        if (setHas(symbolKeysToOmit, symbol)) {
+        if (typeof key === "symbol") {
+            if (setHas(symbolKeysToOmit, key)) {
+                continue;
+            }
+        } else if (setHas(stringKeysToOmit, key)) {
             continue;
         }
 
-        const property = getOwnDataProperty(obj, symbol);
-        if (!property.found) {
-            continue;
-        }
-
-        Object.defineProperty(result, symbol, {
+        Object.defineProperty(result, key, {
             configurable: true,
             enumerable: true,
-            value: property.value,
+            value,
             writable: true,
         });
     }

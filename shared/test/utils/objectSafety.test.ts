@@ -627,6 +627,25 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             expect(getterCalls).toBe(0);
         });
 
+        it("does not copy non-enumerable symbol data during safeObjectOmit", () => {
+            const hiddenSymbol = Symbol("hidden");
+            const input = {
+                stable: "value",
+            };
+
+            Object.defineProperty(input, hiddenSymbol, {
+                enumerable: false,
+                value: "SECRET",
+            });
+
+            const result = objectSafetyModule.safeObjectOmit(input, []);
+
+            expect(result).toEqual({
+                stable: "value",
+            });
+            expect(Object.hasOwn(result, hiddenSymbol)).toBeFalsy();
+        });
+
         it("does not invoke accessors during safeObjectPick", () => {
             let getterCalls = 0;
             const input = {
