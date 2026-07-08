@@ -348,11 +348,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         // Compute effective history limit - use user preference or auto-calculated
         // value
-        const safeHistoryLength = selectedMonitor.history.length || 0;
         const autoLimit = Math.min(
             50,
             backendLimit,
-            Math.max(1, safeHistoryLength)
+            Math.max(1, historyLength)
         );
 
         // Use user preference if set, otherwise use auto-calculated limit
