@@ -11,6 +11,7 @@ import type {
     SyncMaintenanceCopyResult,
 } from "./SyncMaintenancePanel.model";
 
+import { fireAndForget } from "../../../utils/async/fireAndForget";
 import { AppIcons, getIconSize } from "../../../utils/icons";
 import { SyncMaintenanceDangerZoneCard } from "./SyncMaintenancePanel.DangerZoneCard";
 import { SyncMaintenanceDeviceIdsDetails } from "./SyncMaintenancePanel.DeviceIdsDetails";
@@ -195,13 +196,24 @@ export const SyncMaintenancePanel = ({
         }
     }, [buildCurrentDiagnostics]);
 
+    const observeCopyTask = useCallback((task: () => Promise<void>): void => {
+        fireAndForget(task, {
+            onError: (error: unknown) => {
+                setCopyResult({
+                    kind: "error",
+                    message: getUserFacingErrorDetail(error),
+                });
+            },
+        });
+    }, []);
+
     const handleCopyDiagnostics = useCallback((): void => {
-        void copyDiagnostics();
-    }, [copyDiagnostics]);
+        observeCopyTask(copyDiagnostics);
+    }, [copyDiagnostics, observeCopyTask]);
 
     const handleCopyDiagnosticsJson = useCallback((): void => {
-        void copyDiagnosticsJson();
-    }, [copyDiagnosticsJson]);
+        observeCopyTask(copyDiagnosticsJson);
+    }, [copyDiagnosticsJson, observeCopyTask]);
 
     const previewGeneratedAtEpochMs = useMemo(() => {
         if (preview) {

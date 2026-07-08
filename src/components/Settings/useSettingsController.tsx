@@ -30,6 +30,7 @@ import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
 import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
 import { useSettingsModel } from "./useSettingsModel";
 import { tryBuildSerializedDatabaseRestorePayloadFromFile } from "./utils/sqliteRestorePayload";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import {
     clampNormalizedVolume,
     convertNormalizedVolumeToSliderPercent,
@@ -164,6 +165,20 @@ export const useSettingsController = ({
             )
         );
 
+    const observeSettingsTask = useCallback(
+        (task: () => Promise<void>, failureMessage: string): void => {
+            fireAndForget(task, {
+                onError: (error: unknown) => {
+                    logger.error(failureMessage, ensureError(error));
+                    setError(
+                        `${failureMessage}: ${getUserFacingErrorDetail(error)}`
+                    );
+                },
+            });
+        },
+        [setError]
+    );
+
     const handleHistoryLimitChange = useCallback(
         async (limit: number) => {
             try {
@@ -230,9 +245,12 @@ export const useSettingsController = ({
             }
 
             const selectedLimit = Number(value);
-            void handleHistoryLimitChange(selectedLimit);
+            observeSettingsTask(
+                () => handleHistoryLimitChange(selectedLimit),
+                "Failed to update history limit from settings"
+            );
         },
-        [handleHistoryLimitChange]
+        [handleHistoryLimitChange, observeSettingsTask]
     );
 
     const handleInAppAlertsChange = useCallback(
@@ -653,9 +671,12 @@ export const useSettingsController = ({
 
     const handleRestoreInputChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            void handleRestoreFileChange(event);
+            observeSettingsTask(
+                () => handleRestoreFileChange(event),
+                "Failed to restore SQLite backup"
+            );
         },
-        [handleRestoreFileChange]
+        [handleRestoreFileChange, observeSettingsTask]
     );
 
     const handleCloseButtonClick = useCallback(() => {
@@ -663,20 +684,23 @@ export const useSettingsController = ({
     }, [handleClose]);
 
     const handleSyncNowClick = useCallback(() => {
-        void handleSyncNow();
-    }, [handleSyncNow]);
+        observeSettingsTask(handleSyncNow, "Failed to sync data from backend");
+    }, [handleSyncNow, observeSettingsTask]);
 
     const handleDownloadSQLiteClick = useCallback(() => {
-        void handleDownloadSQLite();
-    }, [handleDownloadSQLite]);
+        observeSettingsTask(
+            handleDownloadSQLite,
+            "Failed to save SQLite backup"
+        );
+    }, [handleDownloadSQLite, observeSettingsTask]);
 
     const handleRestoreSQLiteClick = useCallback(() => {
         restoreFileInputRef.current?.click();
     }, []);
 
     const handleResetClick = useCallback(() => {
-        void handleReset();
-    }, [handleReset]);
+        observeSettingsTask(handleReset, "Failed to reset settings");
+    }, [handleReset, observeSettingsTask]);
 
     const DownloadIcon = AppIcons.actions.download;
     const UploadIcon = AppIcons.actions.upload;
