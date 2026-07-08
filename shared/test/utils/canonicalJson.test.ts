@@ -26,6 +26,15 @@ describe(stringifyJsonValueStable, () => {
         );
     });
 
+    it("uses locale-independent code-unit key ordering", () => {
+        const value = {
+            a: 1,
+            Z: 2,
+        };
+
+        expect(stringifyJsonValueStable(value)).toBe('{"Z":2,"a":1}');
+    });
+
     it("preserves prototype-named keys as canonical JSON data", () => {
         const value = Object.create(null) as JsonValue &
             Record<string, JsonValue>;
