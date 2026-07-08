@@ -13,6 +13,7 @@ import {
     getCallableDataProperty,
     getOwnPropertyValue,
 } from "@shared/utils/errorPropertyAccess";
+import { arrayJoin } from "ts-extras";
 
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable" as const;
@@ -21,7 +22,7 @@ const STANDARD_UUID_PATTERN =
     /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
 
 type RandomUuid = () => string;
-type GetRandomValues = (values: Uint32Array) => void;
+type GetRandomValues = (values: Uint8Array) => void;
 
 const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
@@ -54,7 +55,7 @@ function getCryptoRandomValues(
         return undefined;
     }
 
-    return (values: Uint32Array): void => {
+    return (values: Uint8Array): void => {
         Reflect.apply(candidate, cryptoObject, [values]);
     };
 }
@@ -64,18 +65,18 @@ function getCryptoRandomValues(
  *
  * @remarks
  * When crypto.randomUUID is available, returns a standard UUID. When
- * unavailable, falls back to a custom ID format backed by
- * `crypto.getRandomValues`: `site-{random}`.
+ * unavailable, falls back to a UUID v4 generated from
+ * `crypto.getRandomValues`.
  *
  * @example
  *
  * ```typescript
  * const id = generateUuid();
  * // Returns: "123e4567-e89b-12d3-a456-426614174000" (when crypto is available)
- * // or: "site-abc123def456" (getRandomValues fallback)
+ * // or: "f47ac10b-58cc-4372-a567-0e02b2c3d479" (getRandomValues fallback)
  * ```
  *
- * @returns A UUID string in standard format or secure fallback format.
+ * @returns A UUID string in standard format.
  *
  * @throws Error when neither `crypto.randomUUID` nor `crypto.getRandomValues`
  *   is available.
@@ -100,14 +101,29 @@ export function generateUuid(): string {
 
     const randomPart = tryGenerateCryptoFallbackId();
     if (randomPart) {
-        return `site-${randomPart}`;
+        return randomPart;
     }
 
     throw new Error(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
 }
 
-function toBaseThirtySixSixChars(value: number): string {
-    return value.toString(36).padStart(6, "0").slice(-6);
+function formatUuidV4(bytes: Uint8Array): string {
+    const uuidBytes = new Uint8Array(bytes);
+    uuidBytes[6] = ((uuidBytes[6] ?? 0) % 16) + 0x40;
+    uuidBytes[8] = ((uuidBytes[8] ?? 0) % 64) + 0x80;
+
+    const hex = Array.from(uuidBytes, (byte) =>
+        byte.toString(16).padStart(2, "0")
+    );
+    const groups = [
+        arrayJoin(hex.slice(0, 4), ""),
+        arrayJoin(hex.slice(4, 6), ""),
+        arrayJoin(hex.slice(6, 8), ""),
+        arrayJoin(hex.slice(8, 10), ""),
+        arrayJoin(hex.slice(10, 16), ""),
+    ];
+
+    return arrayJoin(groups, "-");
 }
 
 function tryGenerateCryptoFallbackId(): string | undefined {
@@ -120,12 +136,9 @@ function tryGenerateCryptoFallbackId(): string | undefined {
     }
 
     try {
-        const values = new Uint32Array(2);
+        const values = new Uint8Array(16);
         getRandomValues(values);
-        return (
-            toBaseThirtySixSixChars(values[0] ?? 0) +
-            toBaseThirtySixSixChars(values[1] ?? 0)
-        );
+        return formatUuidV4(values);
     } catch {
         return undefined;
     }

@@ -17,16 +17,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import utilities to test
 import { generateUuid } from "../utils/data/generateUuid";
 
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const FALLBACK_ID_REGEX =
+    /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/v;
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable";
 
 const createMockGetRandomValues = () => {
     let callCount = 0;
-    return vi.fn((buffer: Uint32Array): Uint32Array => {
+    return vi.fn((buffer: Uint8Array): Uint8Array => {
         callCount += 1;
-        buffer[0] = callCount;
-        buffer[1] = callCount + 1000;
+        let remaining = callCount;
+        for (let index = buffer.length - 1; index >= 0; index -= 1) {
+            buffer[index] = remaining % 256;
+            remaining = Math.floor(remaining / 256);
+        }
         return buffer;
     });
 };

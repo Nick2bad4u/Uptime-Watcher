@@ -3,19 +3,20 @@
  */
 
 import { webcrypto } from "node:crypto";
-import { stringSplit } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../../../utils/data/generateUuid";
 
 const originalCrypto = crypto;
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const FALLBACK_ID_REGEX =
+    /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/v;
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable";
 const createMockGetRandomValues = (): Crypto["getRandomValues"] =>
-    ((array: Uint32Array): Uint32Array => {
-        array[0] = 1;
-        array[1] = 1000;
+    ((array: Uint8Array): Uint8Array => {
+        for (const [index] of array.entries()) {
+            array[index] = index + 1;
+        }
         return array;
     }) as Crypto["getRandomValues"];
 
@@ -164,7 +165,6 @@ describe(generateUuid, () => {
             const result = generateUuid();
 
             expect(result).toMatch(FALLBACK_ID_REGEX);
-            expect(result.startsWith("site-")).toBe(true);
         });
 
         it("should use fallback when crypto.randomUUID is not a function", async ({
@@ -182,11 +182,8 @@ describe(generateUuid, () => {
             });
 
             const result = generateUuid();
-            const parts = stringSplit(result, "-");
 
-            expect(parts).toHaveLength(2);
-            expect(parts[1]).toMatch(/^[\da-z]+$/v);
-            expect(parts[1]).toHaveLength(12);
+            expect(result).toMatch(FALLBACK_ID_REGEX);
         });
 
         it("should use consistent secure fallback format across calls", async ({

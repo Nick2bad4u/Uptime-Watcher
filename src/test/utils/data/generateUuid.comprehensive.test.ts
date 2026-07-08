@@ -11,15 +11,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../../../utils/data/generateUuid";
 
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const FALLBACK_ID_REGEX =
+    /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/v;
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable";
 
-const toBaseThirtySixSixChars = (value: number): string =>
-    value.toString(36).padStart(6, "0").slice(-6);
-
 interface CryptoLike {
-    getRandomValues?: (array: Uint32Array) => Uint32Array;
+    getRandomValues?: (array: Uint8Array) => Uint8Array;
     randomUUID?: () => string;
 }
 
@@ -85,9 +83,8 @@ describe(generateUuid, () => {
             const randomUUID = vi.fn().mockReturnValue("");
             const getRandomValues = vi
                 .fn()
-                .mockImplementation((array: Uint32Array) => {
-                    array[0] = 1;
-                    array[1] = 2;
+                .mockImplementation((array: Uint8Array) => {
+                    array.fill(1);
                     return array;
                 });
             const { restore } = installCryptoMock({
@@ -116,9 +113,8 @@ describe(generateUuid, () => {
             const randomUUID = vi.fn().mockReturnValue("not-a-real-uuid");
             const getRandomValues = vi
                 .fn()
-                .mockImplementation((array: Uint32Array) => {
-                    array[0] = 3;
-                    array[1] = 4;
+                .mockImplementation((array: Uint8Array) => {
+                    array.fill(3);
                     return array;
                 });
             const { restore } = installCryptoMock({
@@ -204,18 +200,30 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const partA = 0x12_34_56_78;
-            const partB = 0x9a_bc_de_f0;
-            const expectedRandomPart = `${toBaseThirtySixSixChars(partA)}${toBaseThirtySixSixChars(partB)}`;
-
             const randomUUID = vi.fn(() => {
                 throw new Error("randomUUID failure");
             });
             const getRandomValues = vi
                 .fn()
-                .mockImplementation((array: Uint32Array) => {
-                    array[0] = partA;
-                    array[1] = partB;
+                .mockImplementation((array: Uint8Array) => {
+                    array.set([
+                        0x12,
+                        0x34,
+                        0x56,
+                        0x78,
+                        0x9a,
+                        0xbc,
+                        0xde,
+                        0xf0,
+                        0x01,
+                        0x23,
+                        0x45,
+                        0x67,
+                        0x89,
+                        0xab,
+                        0xcd,
+                        0xef,
+                    ]);
                     return array;
                 });
 
@@ -230,7 +238,7 @@ describe(generateUuid, () => {
                 expect(randomUUID).toHaveBeenCalledTimes(1);
                 expect(getRandomValues).toHaveBeenCalledTimes(1);
                 expect(result).toMatch(FALLBACK_ID_REGEX);
-                expect(result).toBe(`site-${expectedRandomPart}`);
+                expect(result).toBe("12345678-9abc-4ef0-8123-456789abcdef");
             } finally {
                 restore();
             }
@@ -277,10 +285,13 @@ describe(generateUuid, () => {
             let counter = 0;
             const getRandomValues = vi
                 .fn()
-                .mockImplementation((array: Uint32Array) => {
+                .mockImplementation((array: Uint8Array) => {
                     counter += 1;
-                    array[0] = counter;
-                    array[1] = counter + 1000;
+                    let remaining = counter;
+                    for (let index = array.length - 1; index >= 0; index -= 1) {
+                        array[index] = remaining % 256;
+                        remaining = Math.floor(remaining / 256);
+                    }
                     return array;
                 });
 

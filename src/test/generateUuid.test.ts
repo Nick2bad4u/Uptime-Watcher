@@ -4,22 +4,25 @@
 
 import { fc, test } from "@fast-check/vitest";
 import { webcrypto } from "node:crypto";
-import { arrayFirst, stringSplit } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
 
 const cryptoBaseline = webcrypto;
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const FALLBACK_ID_REGEX =
+    /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/v;
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable";
 
 const createMockGetRandomValues = () => {
     let callCount = 0;
-    return vi.fn((buffer: Uint32Array): Uint32Array => {
+    return vi.fn((buffer: Uint8Array): Uint8Array => {
         callCount += 1;
-        buffer[0] = callCount;
-        buffer[1] = callCount + 1000;
+        let remaining = callCount;
+        for (let index = buffer.length - 1; index >= 0; index -= 1) {
+            buffer[index] = remaining % 256;
+            remaining = Math.floor(remaining / 256);
+        }
         return buffer;
     });
 };
@@ -313,10 +316,7 @@ describe("UUID Generation", () => {
                 expect(id).toMatch(FALLBACK_ID_REGEX);
             }
 
-            // Should have different random parts (high probability)
-            const randomParts = ids.map((id) => id.split("-", 2)[1]);
-            const uniqueRandomParts = new Set(randomParts);
-            expect(uniqueRandomParts.size).toBeGreaterThan(1);
+            expect(new Set(ids).size).toBe(ids.length);
         });
     });
 
@@ -431,12 +431,8 @@ describe("UUID Generation", () => {
             });
 
             const uuid = generateUuid();
-            const parts = stringSplit(uuid, "-");
 
-            expect(parts).toHaveLength(2);
-            expect(arrayFirst(parts)).toBe("site");
-            expect(parts[1]).toMatch(/^[\da-z]+$/v);
-            expect(parts[1]?.length).toBe(12); // Two random parts of 6 chars each = 12 characters
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
     });
 
