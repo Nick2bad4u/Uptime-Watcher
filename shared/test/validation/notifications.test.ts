@@ -3,6 +3,7 @@
  */
 
 import { SITE_IDENTIFIER_MAX_LENGTH } from "@shared/validation/siteFieldConstants";
+import { MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS } from "@shared/types/notifications";
 import {
     parseNotificationPreferenceUpdate,
     validateNotificationPreferenceUpdate,
@@ -35,6 +36,19 @@ describe("notification preference validation", () => {
 
             expect(parsed.success).toBeFalsy();
         }
+    });
+
+    it("rejects too many muted site identifiers", () => {
+        const parsed = validateNotificationPreferenceUpdate({
+            systemNotificationsEnabled: true,
+            systemNotificationsSoundEnabled: false,
+            mutedSiteNotificationIdentifiers: Array.from(
+                { length: MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS + 1 },
+                (_, index) => `site-${index}`
+            ),
+        });
+
+        expect(parsed.success).toBeFalsy();
     });
 
     it("parseNotificationPreferenceUpdate returns a typed object", () => {

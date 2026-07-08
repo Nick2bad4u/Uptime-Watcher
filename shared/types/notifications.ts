@@ -7,6 +7,12 @@
  */
 
 /**
+ * Maximum number of site identifiers accepted in a notification preference
+ * update.
+ */
+export const MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS = 1000;
+
+/**
  * Payload for requesting a generic app notification.
  *
  * @remarks

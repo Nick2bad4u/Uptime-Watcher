@@ -4,6 +4,7 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS } from "@shared/types/notifications";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeNumberConversion } from "@shared/utils/safeConversions";
 import { isValidSiteIdentifier } from "@shared/validation/identifierValidation";
@@ -111,7 +112,7 @@ const normalizeMutedSiteIdentifiers = (
     value === undefined || value === fallback
         ? fallback
         : isMutedSiteIdentifierArray(value)
-          ? [...value]
+          ? [...new Set(value)].slice(0, MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS)
           : fallback;
 
 const normalizeThemeSetting = (

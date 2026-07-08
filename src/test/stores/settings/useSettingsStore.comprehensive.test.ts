@@ -4,6 +4,7 @@
 
 import { fc, test } from "@fast-check/vitest";
 import { normalizeHistoryLimit } from "@shared/constants/history";
+import { MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS } from "@shared/types/notifications";
 import {
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
@@ -377,6 +378,36 @@ describe(useSettingsStore, () => {
                     fallback
                 ).mutedSiteNotificationIdentifiers
             ).toEqual(["site-1"]);
+        });
+
+        it("should dedupe and cap muted site identifiers during normalization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const identifiers = [
+                "site-duplicate",
+                "site-duplicate",
+                ...Array.from(
+                    { length: MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS + 5 },
+                    (_, index) => `site-${index}`
+                ),
+            ];
+
+            const normalized = normalizeAppSettings({
+                mutedSiteNotificationIdentifiers: identifiers,
+            }).mutedSiteNotificationIdentifiers;
+
+            expect(normalized).toHaveLength(
+                MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS
+            );
+            expect(normalized[0]).toBe("site-duplicate");
+            expect(normalized[1]).toBe("site-0");
+            expect(new Set(normalized)).toHaveLength(normalized.length);
         });
 
         it("should update settings", async ({ task, annotate }) => {

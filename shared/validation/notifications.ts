@@ -3,6 +3,7 @@ import type {
     NotificationPreferenceUpdate,
 } from "@shared/types/notifications";
 
+import { MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS } from "@shared/types/notifications";
 import * as z from "zod";
 
 import { siteIdentifierSchema } from "./siteFieldSchemas";
@@ -15,7 +16,7 @@ const notificationPreferenceUpdateSchema: z.ZodType<NotificationPreferenceUpdate
         .object({
             mutedSiteNotificationIdentifiers: z
                 .array(siteIdentifierSchema)
-                .max(1000)
+                .max(MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS)
                 .readonly()
                 .optional(),
             systemNotificationsEnabled: z.boolean(),
