@@ -58,6 +58,7 @@ import type {
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { buildSiteSelectionTelemetry } from "../sites/utils/siteTelemetry";
 import { createPersistConfig, logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
@@ -506,8 +507,8 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     return;
                 }
 
-                void (async (): Promise<void> => {
-                    try {
+                fireAndForget(
+                    async () => {
                         await withErrorHandling(async () => {
                             try {
                                 await SystemService.openExternal(
@@ -526,18 +527,23 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                                 }),
                             });
                         }, errorHandler);
-                    } catch (error: unknown) {
-                        const normalizedError = ensureError(error);
-                        const underlyingCause =
-                            getOwnDataCause(normalizedError) ?? normalizedError;
+                    },
+                    {
+                        onError: (error) => {
+                            const normalizedError = ensureError(error);
+                            const underlyingCause =
+                                getOwnDataCause(normalizedError) ??
+                                normalizedError;
 
-                        // Prefer logging the underlying cause when we wrap an
-                        // error for user-facing messaging.
-                        const underlyingError = ensureError(underlyingCause);
+                            // Prefer logging the underlying cause when we wrap an
+                            // error for user-facing messaging.
+                            const underlyingError =
+                                ensureError(underlyingCause);
 
-                        logOpenExternalFailure(underlyingError);
+                            logOpenExternalFailure(underlyingError);
+                        },
                     }
-                })();
+                );
             },
             selectedSiteIdentifier: undefined,
             selectSite: (site: Site | undefined): void => {

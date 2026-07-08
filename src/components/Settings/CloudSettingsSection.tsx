@@ -15,6 +15,7 @@ import {
 } from "../../stores/cloud/useCloudStore";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { fireAndForget as runBackgroundTask } from "../../utils/async/fireAndForget";
 import { AppIcons } from "../../utils/icons";
 import { CloudSection } from "./cloud/CloudSection";
 
@@ -118,13 +119,16 @@ export const CloudSettingsSection = (): JSX.Element => {
 
     const fireAndForget = useCallback(
         (action: () => Promise<unknown>): void => {
-            void (async (): Promise<void> => {
-                try {
+            runBackgroundTask(
+                async () => {
                     await action();
-                } catch {
-                    // Errors are already routed through the shared error handling.
+                },
+                {
+                    onError: () => {
+                        // Errors are already routed through the shared error handling.
+                    },
                 }
-            })();
+            );
         },
         []
     );
