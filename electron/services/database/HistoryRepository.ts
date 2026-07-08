@@ -178,7 +178,6 @@ export class HistoryRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.addEntryInternal(db, monitorId, entry, details);
-                    return Promise.resolve();
                 }),
             "history-add-entry",
             undefined,
@@ -260,8 +259,6 @@ export class HistoryRepository {
                     } finally {
                         stmt.finalize();
                     }
-
-                    return Promise.resolve();
                 }),
             "history-bulk-insert",
             undefined,
@@ -338,7 +335,6 @@ export class HistoryRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "history-delete-all"
         );
@@ -381,7 +377,6 @@ export class HistoryRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteByMonitorIdInternal(db, monitorId);
-                    return Promise.resolve();
                 }),
             "history-delete-by-monitor",
             undefined,
@@ -536,7 +531,6 @@ export class HistoryRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.pruneAllHistoryInternal(db, limit);
-                    return Promise.resolve();
                 }),
             "history-prune-all",
             undefined,

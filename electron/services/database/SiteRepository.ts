@@ -198,7 +198,6 @@ export class SiteRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.bulkInsertInternal(db, sites);
-                    return Promise.resolve();
                 }),
             "site-bulk-insert",
             undefined,
@@ -229,7 +228,7 @@ export class SiteRepository {
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(this.deleteInternal(db, identifier))
+                    this.deleteInternal(db, identifier)
                 ),
             "site-delete",
             undefined,
@@ -259,7 +258,6 @@ export class SiteRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "site-delete-all"
         );
@@ -396,7 +394,6 @@ export class SiteRepository {
             () =>
                 this.databaseService.executeTransaction((db) => {
                     this.upsertInternal(db, site);
-                    return Promise.resolve();
                 }),
             "site-upsert",
             undefined,
