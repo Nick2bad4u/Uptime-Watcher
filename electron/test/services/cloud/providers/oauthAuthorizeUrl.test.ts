@@ -16,6 +16,29 @@ describe("validateOAuthAuthorizeUrl()", () => {
         });
     });
 
+    it("accepts URLs from an allowed OAuth provider host", () => {
+        expect(
+            validateOAuthAuthorizeUrl({
+                allowedHosts: ["accounts.google.com"],
+                providerName: "Test",
+                url: "https://accounts.google.com/o/oauth2/v2/auth?x=1",
+            })
+        ).toEqual({
+            normalizedUrl: "https://accounts.google.com/o/oauth2/v2/auth?x=1",
+            urlForLog: "https://accounts.google.com/o/oauth2/v2/auth",
+        });
+    });
+
+    it("rejects URLs from unexpected OAuth provider hosts", () => {
+        expect(() =>
+            validateOAuthAuthorizeUrl({
+                allowedHosts: ["accounts.google.com"],
+                providerName: "Test",
+                url: "https://example.com/oauth?x=1",
+            })
+        ).toThrow(/unexpected.*oauth url host/iv);
+    });
+
     it("rejects http URLs", () => {
         const insecureUrl = new URL("https://example.com/oauth?x=1");
         insecureUrl.protocol = "http";

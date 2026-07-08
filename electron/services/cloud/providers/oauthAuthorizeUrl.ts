@@ -24,6 +24,7 @@ import {
  * @param args - Provider name and candidate URL.
  */
 export function validateOAuthAuthorizeUrl(args: {
+    allowedHosts?: readonly string[];
     providerName: string;
     url: string;
 }): {
@@ -44,6 +45,18 @@ export function validateOAuthAuthorizeUrl(args: {
         throw new Error(
             `Refusing to open disallowed ${args.providerName} OAuth URL: ${validation.safeUrlForLogging}`
         );
+    }
+
+    const allowedHosts = args.allowedHosts?.map((host) => host.toLowerCase());
+    if (allowedHosts && allowedHosts.length > 0) {
+        const parsed = new URL(validation.normalizedUrl);
+        const hostname = parsed.hostname.toLowerCase();
+
+        if (!allowedHosts.includes(hostname)) {
+            throw new Error(
+                `Refusing to open unexpected ${args.providerName} OAuth URL host: ${validation.safeUrlForLogging}`
+            );
+        }
     }
 
     return {

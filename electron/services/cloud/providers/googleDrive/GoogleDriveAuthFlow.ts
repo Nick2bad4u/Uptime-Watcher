@@ -86,6 +86,7 @@ export class GoogleDriveAuthFlow {
             const authorizeUrl = authorizationUrl.toString();
 
             const { normalizedUrl, urlForLog } = validateOAuthAuthorizeUrl({
+                allowedHosts: ["accounts.google.com"],
                 providerName: "Google",
                 url: authorizeUrl,
             });

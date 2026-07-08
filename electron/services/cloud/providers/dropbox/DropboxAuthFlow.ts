@@ -116,6 +116,7 @@ export class DropboxAuthFlow {
 
             const { normalizedUrl, urlForLog: authorizeUrlForLog } =
                 validateOAuthAuthorizeUrl({
+                    allowedHosts: ["www.dropbox.com", "dropbox.com"],
                     providerName: "Dropbox",
                     url: authorizeUrl,
                 });

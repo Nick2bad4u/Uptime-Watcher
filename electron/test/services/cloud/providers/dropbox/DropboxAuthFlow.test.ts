@@ -10,7 +10,7 @@ import { DropboxAuthFlow } from "@electron/services/cloud/providers/dropbox/Drop
 import type { DropboxResponse } from "dropbox";
 import * as http from "node:http";
 import * as https from "node:https";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const openExternalMock = vi.hoisted(() => vi.fn(async (_url: string) => true));
 
@@ -19,6 +19,10 @@ vi.mock("electron", () => ({
         openExternal: openExternalMock,
     },
 }));
+
+beforeEach(() => {
+    openExternalMock.mockReset();
+});
 
 async function httpGet(
     url: string
@@ -183,7 +187,9 @@ describe(DropboxAuthFlow, () => {
             setClientId: vi.fn(),
             getAuthenticationUrl: vi.fn(
                 async (redirectUri: string, state?: string) => {
-                    const url = new URL("https://example.test");
+                    const url = new URL(
+                        "https://www.dropbox.com/oauth2/authorize"
+                    );
                     url.searchParams.set("redirect_uri", redirectUri);
                     url.searchParams.set("state", state ?? "");
                     return url.toString();
@@ -229,7 +235,9 @@ describe(DropboxAuthFlow, () => {
             setClientId: vi.fn(),
             getAuthenticationUrl: vi.fn(
                 async (redirectUri: string, state?: string) => {
-                    const url = new URL("https://example.test");
+                    const url = new URL(
+                        "https://www.dropbox.com/oauth2/authorize"
+                    );
                     url.searchParams.set("redirect_uri", redirectUri);
                     url.searchParams.set("state", state ?? "");
                     return url.toString();
@@ -291,7 +299,9 @@ describe(DropboxAuthFlow, () => {
             setClientId: vi.fn(),
             getAuthenticationUrl: vi.fn(
                 async (redirectUri: string, state?: string) => {
-                    const url = new URL("https://example.test");
+                    const url = new URL(
+                        "https://www.dropbox.com/oauth2/authorize"
+                    );
                     url.searchParams.set("redirect_uri", redirectUri);
                     url.searchParams.set("state", state ?? "");
                     return url.toString();
@@ -325,6 +335,33 @@ describe(DropboxAuthFlow, () => {
         await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow(
             "Dropbox OAuth state mismatch"
         );
+        expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
+    });
+
+    it("rejects unexpected authorization URL hosts before opening the browser", async () => {
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi.fn(
+                async (redirectUri: string, state?: string) => {
+                    const url = new URL("https://example.test/oauth2");
+                    url.searchParams.set("redirect_uri", redirectUri);
+                    url.searchParams.set("state", state ?? "");
+                    return url.toString();
+                }
+            ),
+            getAccessTokenFromCode: vi.fn(),
+        };
+
+        const flow = new DropboxAuthFlow({
+            appKey: "app-key",
+            authFactory: () => auth,
+            loopbackPort: 0,
+        });
+
+        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow(
+            /unexpected dropbox oauth url host/iu
+        );
+        expect(openExternalMock).not.toHaveBeenCalled();
         expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
     });
 });
