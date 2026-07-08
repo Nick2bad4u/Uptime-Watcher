@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
+import { logger } from "../../services/logger";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { useMount } from "../useMount";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
 
@@ -68,13 +72,23 @@ export function useDelayedClose({
         hasRequestedCloseRef.current = true;
         setIsClosing(true);
 
-        void (async (): Promise<void> => {
-            await waitForAnimation(delayMs);
+        fireAndForget(
+            async () => {
+                await waitForAnimation(delayMs);
 
-            if (isMountedRef.current) {
-                onCloseRef.current();
+                if (isMountedRef.current) {
+                    onCloseRef.current();
+                }
+            },
+            {
+                onError: (error) => {
+                    logger.warn(
+                        "Delayed close callback failed",
+                        ensureError(error)
+                    );
+                },
             }
-        })();
+        );
     }, [delayMs]);
 
     return {

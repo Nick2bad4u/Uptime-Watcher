@@ -4,6 +4,7 @@ import { objectHasOwn } from "ts-extras";
 import type { SettingsStore } from "./types";
 
 import { logger } from "../../services/logger";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 /**
  * Utilities for synchronizing the settings store after persistence hydration.
  */
@@ -87,35 +88,47 @@ export const syncSettingsAfterRehydration = (
     resetSettingsHydrationTimer();
 
     settingsSyncTimer.current = setTimeout(() => {
-        void (async (): Promise<void> => {
-            try {
-                logger.info(
-                    "[SettingsHydration] fetching history limit for sync"
-                );
-                const historyLimit = await SettingsService.getHistoryLimit();
-                logger.debug(
-                    "[SettingsHydration] applying backend history limit",
-                    {
-                        historyLimit,
-                    }
-                );
-                state.updateSettings({ historyLimit });
-            } catch (error) {
-                logger.warn(
-                    "Failed to sync settings after rehydration:",
-                    ensureError(error)
-                );
-                logger.debug(
-                    "[SettingsHydration] applying fallback history limit",
-                    {
+        fireAndForget(
+            async () => {
+                try {
+                    logger.info(
+                        "[SettingsHydration] fetching history limit for sync"
+                    );
+                    const historyLimit =
+                        await SettingsService.getHistoryLimit();
+                    logger.debug(
+                        "[SettingsHydration] applying backend history limit",
+                        {
+                            historyLimit,
+                        }
+                    );
+                    state.updateSettings({ historyLimit });
+                } catch (error) {
+                    logger.warn(
+                        "Failed to sync settings after rehydration:",
+                        ensureError(error)
+                    );
+                    logger.debug(
+                        "[SettingsHydration] applying fallback history limit",
+                        {
+                            historyLimit: defaultSettings.historyLimit,
+                        }
+                    );
+                    state.updateSettings({
                         historyLimit: defaultSettings.historyLimit,
-                    }
-                );
-                state.updateSettings({
-                    historyLimit: defaultSettings.historyLimit,
-                });
+                    });
+                } finally {
+                    settingsSyncTimer.current = null;
+                }
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "Unexpected settings hydration sync failure",
+                        ensureError(error)
+                    );
+                },
             }
-            settingsSyncTimer.current = null;
-        })();
+        );
     }, 100);
 };

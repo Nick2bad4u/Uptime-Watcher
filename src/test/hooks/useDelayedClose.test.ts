@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useDelayedClose } from "../../hooks/ui/useDelayedClose";
+import { logger } from "../../services/logger";
 
 describe(useDelayedClose, () => {
     beforeEach(() => {
@@ -9,6 +10,7 @@ describe(useDelayedClose, () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
@@ -57,5 +59,30 @@ describe(useDelayedClose, () => {
         });
 
         expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("logs delayed close callback failures", async () => {
+        const closeError = new Error("close failed");
+        const warnSpy = vi.spyOn(logger, "warn").mockReturnValue(undefined);
+        const { result } = renderHook(() =>
+            useDelayedClose({
+                onClose: () => {
+                    throw closeError;
+                },
+            })
+        );
+
+        act(() => {
+            result.current.requestClose();
+        });
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(300);
+        });
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            "Delayed close callback failed",
+            closeError
+        );
     });
 });
