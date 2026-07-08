@@ -277,7 +277,7 @@ describe("SystemService", () => {
             );
 
             await expect(SystemService.quitAndInstall()).rejects.toThrow(
-                /Invalid response received from quitAndInstall/v
+                "[SystemService] quitAndInstall returned invalid boolean response"
             );
         });
 
@@ -589,7 +589,7 @@ describe("SystemService", () => {
                 await expect(
                     SystemService.openExternal("https://example.com")
                 ).rejects.toThrow(
-                    "Electron declined to open external URL: https://example.com"
+                    "[SystemService] openExternal returned invalid boolean response"
                 );
                 expect(
                     mockElectronAPI.system.openExternal

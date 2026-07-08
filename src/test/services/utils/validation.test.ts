@@ -2,7 +2,10 @@ import type { UnknownRecord } from "type-fest";
 
 import { describe, expect, it } from "vitest";
 
-import { validateServicePayload } from "../../../services/utils/validation";
+import {
+    parseServiceStringResponse,
+    validateServicePayload,
+} from "../../../services/utils/validation";
 
 describe(validateServicePayload, () => {
     it("returns parsed data when validation succeeds", () => {
@@ -228,5 +231,47 @@ describe(validateServicePayload, () => {
             })
         ).toThrow(/fallback reason/v);
         expect(getterCalls).toBe(0);
+    });
+});
+
+describe(parseServiceStringResponse, () => {
+    it("returns string responses unchanged", () => {
+        expect(
+            parseServiceStringResponse("formatThing", "", {
+                serviceName: "TestService",
+            })
+        ).toBe("");
+        expect(
+            parseServiceStringResponse("formatThing", "value", {
+                serviceName: "TestService",
+            })
+        ).toBe("value");
+    });
+
+    it("throws an ApplicationError with operation diagnostics for non-strings", () => {
+        try {
+            parseServiceStringResponse("formatThing", 42, {
+                details: { type: "http" },
+                serviceName: "TestService",
+            });
+            throw new Error("Expected parseServiceStringResponse to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(Error);
+
+            const thrown = error as Error & {
+                code?: string;
+                details?: UnknownRecord;
+            };
+            expect(thrown.message).toBe(
+                "[TestService] formatThing returned invalid string response"
+            );
+            expect(thrown.code).toBe("RENDERER_SERVICE_INVALID_PAYLOAD");
+            expect(thrown.details).toEqual({
+                operation: "formatThing",
+                receivedType: "number",
+                serviceName: "TestService",
+                type: "http",
+            });
+        }
     });
 });

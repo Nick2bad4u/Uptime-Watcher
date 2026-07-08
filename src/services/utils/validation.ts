@@ -333,3 +333,38 @@ export function parseServiceBooleanResponse(
         message: `[${context.serviceName}] ${operation} returned invalid boolean response`,
     });
 }
+
+/**
+ * Validates a renderer service response that should be a string.
+ *
+ * @param operation - Logical operation name used in diagnostics.
+ * @param value - Raw value returned by the preload bridge.
+ * @param context - Service-specific diagnostics.
+ *
+ * @returns The string value when valid.
+ *
+ * @throws `ApplicationError` when the response is not a string.
+ */
+export function parseServiceStringResponse(
+    operation: string,
+    value: unknown,
+    context: {
+        readonly details?: UnknownRecord;
+        readonly serviceName: string;
+    }
+): string {
+    if (typeof value === "string") {
+        return value;
+    }
+
+    throw new ApplicationError({
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...context.details,
+            operation,
+            receivedType: typeof value,
+            serviceName: context.serviceName,
+        },
+        message: `[${context.serviceName}] ${operation} returned invalid string response`,
+    });
+}

@@ -22,7 +22,10 @@ import {
 } from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
-import { validateServicePayload } from "./utils/validation";
+import {
+    parseServiceStringResponse,
+    validateServicePayload,
+} from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
@@ -97,18 +100,15 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorDetail: wrap(
         "formatMonitorDetail",
-        async (api, type: MonitorType, details: string) => {
-            const result = await api.monitorTypes.formatMonitorDetail(
-                type,
-                details
-            );
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorDetail must return a formatted string"
-                );
-            }
-            return result;
-        }
+        async (api, type: MonitorType, details: string) =>
+            parseServiceStringResponse(
+                "formatMonitorDetail",
+                await api.monitorTypes.formatMonitorDetail(type, details),
+                {
+                    details: { type },
+                    serviceName: "MonitorTypesService",
+                }
+            )
     ),
 
     /**
@@ -133,18 +133,15 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      */
     formatMonitorTitleSuffix: wrap(
         "formatMonitorTitleSuffix",
-        async (api, type: MonitorType, monitor: Monitor) => {
-            const result = await api.monitorTypes.formatMonitorTitleSuffix(
-                type,
-                monitor
-            );
-            if (typeof result !== "string") {
-                throw new TypeError(
-                    "formatMonitorTitleSuffix must return a formatted string"
-                );
-            }
-            return result;
-        }
+        async (api, type: MonitorType, monitor: Monitor) =>
+            parseServiceStringResponse(
+                "formatMonitorTitleSuffix",
+                await api.monitorTypes.formatMonitorTitleSuffix(type, monitor),
+                {
+                    details: { monitorId: monitor.id, type },
+                    serviceName: "MonitorTypesService",
+                }
+            )
     ),
 
     /**

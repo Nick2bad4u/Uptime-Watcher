@@ -473,13 +473,13 @@ describe("DataService", () => {
             expect(result.length).toBeGreaterThan(10_000);
         });
 
-        it("throws TypeError when backend returns non-string payload", async () => {
+        it("rejects invalid backend export payloads with operation context", async () => {
             mockElectronAPI.data.exportData.mockResolvedValueOnce(
                 123 as unknown as string
             );
 
             await expect(DataService.exportData()).rejects.toThrow(
-                "Export data payload must be a string"
+                "[DataService] exportData returned invalid string response"
             );
         });
     });
@@ -588,13 +588,13 @@ describe("DataService", () => {
             expect(isResult).toBeTruthy();
         });
 
-        it("throws TypeError when backend returns non-boolean result", async () => {
+        it("rejects invalid backend import results with operation context", async () => {
             mockElectronAPI.data.importData.mockResolvedValueOnce(
                 "yes" as unknown as boolean
             );
 
             await expect(DataService.importData("{}")).rejects.toThrow(
-                "Import data response must be a boolean"
+                "[DataService] importData returned invalid boolean response"
             );
         });
     });

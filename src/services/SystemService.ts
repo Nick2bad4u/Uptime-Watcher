@@ -23,6 +23,7 @@ import type { ElectronAPI } from "../types";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { parseServiceBooleanResponse } from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
@@ -119,20 +120,22 @@ export const SystemService: SystemServiceContract = {
             const isOpened = await api.system.openExternal(
                 validation.normalizedUrl
             );
+            const parsedIsOpened = parseServiceBooleanResponse(
+                "openExternal",
+                isOpened,
+                {
+                    details: { url: urlForMessage },
+                    serviceName: "SystemService",
+                }
+            );
 
-            if (typeof isOpened !== "boolean") {
-                throw new TypeError(
-                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof isOpened})`
-                );
-            }
-
-            if (!isOpened) {
+            if (!parsedIsOpened) {
                 throw new Error(
                     `Electron declined to open external URL: ${urlForMessage}`
                 );
             }
 
-            return isOpened;
+            return parsedIsOpened;
         }
     ),
 
@@ -146,13 +149,11 @@ export const SystemService: SystemServiceContract = {
      * unavailable or the main-process handler reports failure.
      */
     quitAndInstall: wrap("quitAndInstall", async (api): Promise<void> => {
-        const isResult = await api.system.quitAndInstall();
-
-        if (typeof isResult !== "boolean") {
-            throw new TypeError(
-                `Invalid response received from quitAndInstall: ${typeof isResult}`
-            );
-        }
+        const isResult = parseServiceBooleanResponse(
+            "quitAndInstall",
+            await api.system.quitAndInstall(),
+            { serviceName: "SystemService" }
+        );
 
         if (!isResult) {
             throw new Error(
@@ -186,14 +187,13 @@ export const SystemService: SystemServiceContract = {
             }
 
             const isResult = await api.system.writeClipboardText(text);
+            const parsedIsResult = parseServiceBooleanResponse(
+                "writeClipboardText",
+                isResult,
+                { serviceName: "SystemService" }
+            );
 
-            if (typeof isResult !== "boolean") {
-                throw new TypeError(
-                    `Invalid response received from writeClipboardText: ${typeof isResult}`
-                );
-            }
-
-            if (!isResult) {
+            if (!parsedIsResult) {
                 throw new Error("Electron declined to write clipboard text");
             }
         }

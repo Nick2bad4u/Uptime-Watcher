@@ -33,7 +33,11 @@ import {
 } from "@shared/validation/dataSchemas";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
-import { validateServicePayload } from "./utils/validation";
+import {
+    parseServiceBooleanResponse,
+    parseServiceStringResponse,
+    validateServicePayload,
+} from "./utils/validation";
 
 interface DataServiceContract {
     readonly downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
@@ -124,21 +128,18 @@ export const DataService: DataServiceContract = {
      * @returns A promise that resolves with a JSON string representing the
      *   exported data set.
      *
-     * @throws {@link TypeError} When the backend returns a non-string payload
-     *   for the export operation.
+     * @throws When the backend returns a non-string payload for the export
+     *   operation.
      * @throws {@link Error} For transport failures or unexpected backend
      *   errors.
      */
-    exportData: wrap("exportData", async (api) => {
-        const payload = await api.data.exportData();
-        if (typeof payload !== "string") {
-            throw new TypeError(
-                "Export data payload must be a string representing serialized backup JSON"
-            );
-        }
-
-        return payload;
-    }),
+    exportData: wrap("exportData", async (api) =>
+        parseServiceStringResponse(
+            "exportData",
+            await api.data.exportData(),
+            { serviceName: "DataService" }
+        )
+    ),
 
     /**
      * Imports a JSON data snapshot previously produced by
@@ -150,22 +151,19 @@ export const DataService: DataServiceContract = {
      *   successful import, or `false` when the import completes but is
      *   explicitly rejected by the backend.
      *
-     * @throws {@link TypeError} When the backend returns a non-boolean result
-     *   for the import operation.
+     * @throws When the backend returns a non-boolean result for the import
+     *   operation.
      * @throws {@link Error} When the IPC bridge fails, the payload cannot be
      *   processed, or an unexpected backend error occurs.
      */
     importData: wrap("importData", async (api, payload: string) => {
         assertJsonImportPayloadWithinIpcBudget(payload);
 
-        const isResult = await api.data.importData(payload);
-        if (typeof isResult !== "boolean") {
-            throw new TypeError(
-                "Import data response must be a boolean indicating success"
-            );
-        }
-
-        return isResult;
+        return parseServiceBooleanResponse(
+            "importData",
+            await api.data.importData(payload),
+            { serviceName: "DataService" }
+        );
     }),
     initialize: ensureInitialized,
 
