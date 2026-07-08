@@ -54,7 +54,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                     badgeSize: "2.25rem",
                     dotSize: "18px",
                     fontSize: currentTheme.typography.fontSize.base,
-                    iconSize: "22px",
+                    iconPixelSize: 22,
                 } as const;
             }
 
@@ -63,7 +63,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                     badgeSize: "1.5rem",
                     dotSize: "10px",
                     fontSize: currentTheme.typography.fontSize.xs,
-                    iconSize: "14px",
+                    iconPixelSize: 14,
                 } as const;
             }
 
@@ -71,7 +71,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                 badgeSize: "1.85rem",
                 dotSize: "14px",
                 fontSize: currentTheme.typography.fontSize.sm,
-                iconSize: "18px",
+                iconPixelSize: 18,
             } as const;
         }, [
             currentTheme.typography.fontSize.base,
@@ -83,7 +83,6 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
             () => getStatusIconComponent(status),
             [status]
         );
-        const iconPixelSize = Number.parseInt(sizeStyles.iconSize, 10) || 16;
         const baseColor = getStatusColor(status);
 
         const dotStyle = useMemo<StatusIndicatorStyle>(
@@ -152,7 +151,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                     >
                         {createElement(statusIconComponent, {
                             color: baseColor,
-                            size: iconPixelSize,
+                            size: sizeStyles.iconPixelSize,
                         })}
                     </div>
                 ) : (
