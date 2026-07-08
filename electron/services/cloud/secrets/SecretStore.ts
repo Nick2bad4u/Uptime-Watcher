@@ -37,17 +37,14 @@ export class EphemeralSecretStore implements SecretStore {
 
     public async deleteSecret(key: string): Promise<void> {
         this.values.delete(key);
-        await Promise.resolve();
     }
 
     public async getSecret(key: string): Promise<string | undefined> {
-        await Promise.resolve();
         return this.values.get(key);
     }
 
     public async setSecret(key: string, value: string): Promise<void> {
         this.values.set(key, value);
-        await Promise.resolve();
     }
 }
 
