@@ -263,6 +263,48 @@ describe(GoogleDriveCloudStorageProvider, () => {
         ]);
     });
 
+    it("skips listed Drive files with non-canonical names instead of trimming them", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [
+                        {
+                            id: "trimmed-file-id",
+                            modifiedTime: "2026-07-03T00:00:00.000Z",
+                            name: " bad-meta.txt",
+                            size: "12",
+                        },
+                        {
+                            id: "valid-file-id",
+                            modifiedTime: "2026-07-03T00:00:00.000Z",
+                            name: "valid-meta.txt",
+                            size: "4",
+                        },
+                    ],
+                    nextPageToken: null,
+                },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([
+            {
+                key: "valid-meta.txt",
+                lastModifiedAt: 1_783_036_800_000,
+                sizeBytes: 4,
+            },
+        ]);
+    });
+
     it.each([
         "1e3",
         "1.5",

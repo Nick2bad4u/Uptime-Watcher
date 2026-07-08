@@ -102,7 +102,7 @@ const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z
         id: z.string().trim().optional(),
         mimeType: z.string().trim().optional(),
         modifiedTime: z.string().trim().optional(),
-        name: z.string().trim().optional(),
+        name: z.string().optional(),
         size: z.union([z.string().trim(), z.number()]).optional(),
     })
     .loose();
