@@ -261,6 +261,31 @@ describe("databaseService strict coverage", () => {
         );
     });
 
+    it("executes synchronous operations inside existing transactions", async () => {
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
+
+        const service = DatabaseService.getInstance();
+        getPathMock.mockReturnValue("/tmp/nested-sync-tx");
+        service.initialize();
+
+        const [db] = databaseInstances;
+        db!.inTransaction = true;
+        db!.run.mockClear();
+
+        const operation = vi.fn(() => "nested sync result");
+        const result = await service.executeTransaction(operation);
+
+        expect(result).toBe("nested sync result");
+        expect(operation).toHaveBeenCalledWith(db);
+        expect(db!.run).toHaveBeenCalledWith(
+            expect.stringMatching(/^SAVEPOINT uptime_watcher_sp_\d+$/u)
+        );
+        expect(db!.run).toHaveBeenCalledWith(
+            expect.stringMatching(/^RELEASE uptime_watcher_sp_\d+$/u)
+        );
+    });
+
     it("commits successful transactions and returns the operation result", async () => {
         const { DatabaseService } =
             await import("../../../../../electron/services/database/DatabaseService");
@@ -293,6 +318,34 @@ describe("databaseService strict coverage", () => {
         expect(logger.debug).toHaveBeenCalledWith(
             "[DatabaseService] Successfully committed transaction"
         );
+    });
+
+    it("commits synchronous transaction callbacks", async () => {
+        const { DatabaseService } =
+            await import("../../../../../electron/services/database/DatabaseService");
+
+        const service = DatabaseService.getInstance();
+        getPathMock.mockReturnValue("/tmp/sync-success-tx");
+        service.initialize();
+
+        const [db] = databaseInstances;
+        db!.run.mockImplementation((query: string) => {
+            if (query === "BEGIN TRANSACTION") {
+                db!.inTransaction = true;
+            }
+            if (query === "COMMIT") {
+                db!.inTransaction = false;
+            }
+            return db!;
+        });
+
+        const operation = vi.fn(() => "sync ok");
+        const result = await service.executeTransaction(operation);
+
+        expect(result).toBe("sync ok");
+        expect(operation).toHaveBeenCalledWith(db);
+        expect(db!.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+        expect(db!.run).toHaveBeenCalledWith("COMMIT");
     });
 
     it("rolls back transactions when the operation fails", async () => {

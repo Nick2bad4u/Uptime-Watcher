@@ -107,8 +107,6 @@ export async function applyDefaultIntervalsOperation(args: {
                         )
                     );
                 }
-
-                return Promise.resolve();
             }),
         "monitor-manager-apply-default-interval",
         undefined,

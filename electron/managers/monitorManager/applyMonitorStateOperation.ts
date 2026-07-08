@@ -88,7 +88,6 @@ export async function applyMonitorStateOperation(args: {
                     dependencies.monitorRepository.createTransactionAdapter(db);
 
                 monitorTx.update(monitor.id, sanitizedChanges);
-                return Promise.resolve();
             }),
         "monitor-manager-apply-state-change",
         dependencies.eventEmitter,

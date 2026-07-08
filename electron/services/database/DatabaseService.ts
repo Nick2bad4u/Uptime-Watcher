@@ -53,6 +53,8 @@ const TRANSACTION_RETRY_INITIAL_DELAY_MS = 50;
 /** Maximum delay between transaction retries (milliseconds). */
 const TRANSACTION_RETRY_MAX_DELAY_MS = 750;
 
+type DatabaseTransactionOperation<T> = (db: Database) => Promise<T> | T;
+
 /**
  * @remarks
  * Provides a singleton interface for low-level database operations:
@@ -153,7 +155,7 @@ export class DatabaseService {
      * @throws `Error` when transaction fails or operation throws.
      */
     public async executeTransaction<T>(
-        operation: (db: Database) => Promise<T>
+        operation: DatabaseTransactionOperation<T>
     ): Promise<T> {
         const db = this.getDatabase();
 
@@ -173,7 +175,7 @@ export class DatabaseService {
             db.run(`SAVEPOINT ${savepointName}`);
 
             try {
-                return await operation(db).then((result) => {
+                return await Promise.resolve(operation(db)).then((result) => {
                     db.run(`RELEASE ${savepointName}`);
                     return result;
                 });
@@ -209,9 +211,7 @@ export class DatabaseService {
                 db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
                 logger.debug("[DatabaseService] Started new transaction");
 
-                // Execute operation, then commit and return in one expression.
-                // This ensures operation completes before commit.
-                return await operation(db).then((result) => {
+                return await Promise.resolve(operation(db)).then((result) => {
                     db.run(DATABASE_SERVICE_QUERIES.COMMIT);
                     logger.debug(
                         "[DatabaseService] Successfully committed transaction"
