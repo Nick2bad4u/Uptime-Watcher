@@ -53,7 +53,7 @@ export async function writeFileWithinDirectory(args: {
 
         // Path is validated by resolvePathWithinDirectory to prevent traversal.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath is sanitized and confined to baseDirectory.
-        await fs.writeFile(tmpPath, contents);
+        await fs.writeFile(tmpPath, contents, { flag: "wx" });
         await syncFileSafely(tmpPath);
 
         if (existingTarget) {

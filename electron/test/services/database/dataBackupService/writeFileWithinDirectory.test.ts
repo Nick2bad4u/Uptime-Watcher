@@ -116,4 +116,58 @@ describe(writeFileWithinDirectory, () => {
             "outside"
         );
     });
+
+    it("refuses to write temporary files through symlinks", async () => {
+        const fixedUuid = "00000000-0000-4000-8000-000000000000";
+        const outsideFilePath = path.join(tempDirectory, "outside.sqlite");
+        const tempPath = path.join(
+            tempDirectory,
+            `backup.sqlite.tmp-${fixedUuid}`
+        );
+
+        await writeFile(outsideFilePath, "outside");
+
+        try {
+            await symlink(outsideFilePath, tempPath);
+        } catch (error) {
+            const errorCode = (error as NodeJS.ErrnoException).code;
+            if (errorCode === "EPERM" || errorCode === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        vi.resetModules();
+        vi.doMock("node:crypto", async () => {
+            const actual =
+                await vi.importActual<typeof import("node:crypto")>(
+                    "node:crypto"
+                );
+            return {
+                ...actual,
+                randomUUID: () => fixedUuid,
+            };
+        });
+
+        const { writeFileWithinDirectory: writeWithMockedUuid } =
+            await import("../../../../services/database/dataBackupService/writeFileWithinDirectory");
+
+        try {
+            await expect(
+                writeWithMockedUuid({
+                    baseDirectory: tempDirectory,
+                    contents: "new",
+                    fileName: "backup.sqlite",
+                })
+            ).rejects.toThrow();
+
+            await expect(readFile(outsideFilePath, "utf8")).resolves.toBe(
+                "outside"
+            );
+            await expect(readFile(tempPath, "utf8")).rejects.toThrow();
+        } finally {
+            vi.doUnmock("node:crypto");
+        }
+    });
 });
