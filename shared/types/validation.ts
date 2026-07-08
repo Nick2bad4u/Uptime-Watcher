@@ -15,6 +15,21 @@ import { isDefined } from "ts-extras";
 
 import { isRecord } from "../utils/typeHelpers";
 
+function isValidationMetadataRecord(
+    value: unknown
+): value is ValidationMetadata {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+
+    try {
+        const prototype: unknown = Object.getPrototypeOf(value);
+        return prototype === null || prototype === Object.prototype;
+    } catch {
+        return false;
+    }
+}
+
 /**
  * Base validation result interface.
  *
@@ -234,10 +249,5 @@ export function isValidationResult(
         return false;
     }
 
-    return (
-        !isDefined(metadata) ||
-        (typeof metadata === "object" &&
-            metadata !== null &&
-            !Array.isArray(metadata))
-    );
+    return !isDefined(metadata) || isValidationMetadataRecord(metadata);
 }

@@ -320,6 +320,49 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult(validResult)).toBeTruthy();
         });
 
+        it("should return true for null-prototype metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Validation", "type");
+
+            const metadata = Object.create(null) as Record<string, unknown>;
+            Object.defineProperty(metadata, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "metadata-value",
+                writable: true,
+            });
+
+            expect(
+                isValidationResult({
+                    errors: [],
+                    metadata,
+                    success: true,
+                })
+            ).toBeTruthy();
+        });
+
+        it.each([
+            new Date(0),
+            new Map<string, unknown>(),
+            Object.create({ inherited: "value" }),
+        ])(
+            "should return false for non-record validation metadata: %p",
+            (metadata) => {
+                expect(
+                    isValidationResult({
+                        errors: [],
+                        metadata,
+                        success: true,
+                    })
+                ).toBeFalsy();
+            }
+        );
+
         it("should return false for null", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validation", "component");
