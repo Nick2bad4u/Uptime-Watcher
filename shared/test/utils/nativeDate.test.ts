@@ -20,6 +20,14 @@ describe("nativeDate helpers", () => {
         expect(toNativeDateISOString(date)).toBeUndefined();
     });
 
+    it("returns undefined for Date prototype impostors", () => {
+        const date = Object.create(Date.prototype) as Date;
+
+        expect(date).toBeInstanceOf(Date);
+        expect(getNativeDateEpochMs(date)).toBeUndefined();
+        expect(toNativeDateISOString(date)).toBeUndefined();
+    });
+
     it("does not invoke shadowed Date methods", () => {
         const date = new Date("2026-07-08T00:00:00.000Z");
         const getTime = vi.fn(() => {

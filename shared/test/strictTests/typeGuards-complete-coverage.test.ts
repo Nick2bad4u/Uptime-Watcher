@@ -584,6 +584,25 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(isDate(new Date(NaN))).toBeFalsy();
         });
 
+        it("should return false for Date prototype impostors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: typeGuards-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const impostor = Object.create(Date.prototype) as Date;
+
+            expect(impostor).toBeInstanceOf(Date);
+            expect(() => isDate(impostor)).not.toThrow();
+            expect(isDate(impostor)).toBeFalsy();
+        });
+
         it("should return false for non-Date objects", async ({
             task,
             annotate,

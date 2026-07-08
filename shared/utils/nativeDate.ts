@@ -27,7 +27,12 @@ export function getNativeDateEpochMs(value: Date): number | undefined {
         return undefined;
     }
 
-    const epochMs: unknown = Reflect.apply(DATE_GET_TIME, value, []);
+    let epochMs: unknown;
+    try {
+        epochMs = Reflect.apply(DATE_GET_TIME, value, []);
+    } catch {
+        return undefined;
+    }
 
     return typeof epochMs === "number" && isFiniteNumber(epochMs)
         ? epochMs
