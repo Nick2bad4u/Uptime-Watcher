@@ -112,8 +112,6 @@ export class DataBackupService {
         return this.downloadDatabaseBackupSingleFlight();
     }
 
-    /* eslint-disable security/detect-non-literal-fs-filename -- This workflow writes a backup to a user-selected path (via native save dialog). We still guard against symlink overwrites and use atomic replacement semantics. */
-
     /**
      * Saves a SQLite database backup directly to disk.
      *
@@ -139,6 +137,7 @@ export class DataBackupService {
 
                 const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
                 const directory = path.dirname(targetPath);
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- Directory is derived from an absolute native save-dialog target path.
                 await fs.mkdir(directory, { recursive: true });
 
                 const existing = await lstatIfExists(targetPath);
@@ -166,6 +165,7 @@ export class DataBackupService {
                         snapshotFileName: BACKUP_SNAPSHOT_FILE_NAME,
                     });
 
+                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Snapshot path is created inside an app-controlled temp directory by createConsistentSnapshot.
                     const snapshotStats = await fs.stat(snapshotPath);
                     if (snapshotStats.size > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
                         throw new Error(
@@ -191,6 +191,7 @@ export class DataBackupService {
 
                     const schemaVersion =
                         readDatabaseSchemaVersionFromFile(targetPath);
+                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Target path was checked for symlink/non-file replacement before the atomic swap.
                     const stats = await fs.stat(targetPath);
                     const sizeBytes = stats.size;
                     const checksum = await this.computeFileChecksum(targetPath);
@@ -230,6 +231,7 @@ export class DataBackupService {
     }
 
     private async computeFileChecksum(filePath: string): Promise<string> {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Caller passes a backup file path that has already gone through save/restore validation.
         const handle = await fs.open(filePath, "r");
         try {
             const hash = createHash("sha256");
@@ -280,13 +282,16 @@ export class DataBackupService {
         const isTargetExists = targetStat?.isFile() === true;
 
         if (!isTargetExists) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- Source temp path and target path were validated before replacement.
             await fs.rename(sourcePath, targetPath);
             return;
         }
 
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Existing target was lstat-checked as a regular file; backup path is a random sibling.
         await fs.rename(targetPath, backupPath);
 
         try {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- Source temp path and target path were validated before replacement.
             await fs.rename(sourcePath, targetPath);
         } catch (error) {
             const rollbackErrors: Error[] = [];
@@ -302,6 +307,7 @@ export class DataBackupService {
                         { targetPath }
                     );
                 });
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- Backup path is a random sibling created from the validated target.
             await fs
                 .rename(backupPath, targetPath)
                 .catch((rollbackError: unknown) => {
@@ -346,8 +352,6 @@ export class DataBackupService {
                 );
             });
     }
-
-    /* eslint-enable security/detect-non-literal-fs-filename -- Re-enable after user-path backup save helpers. */
 
     private async downloadDatabaseBackupImpl(): Promise<DatabaseBackupResult> {
         let snapshotDir: string | undefined;
