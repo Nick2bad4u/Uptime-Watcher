@@ -213,12 +213,10 @@ export const createSiteSyncActions = (
         cleanup: (() => void) | undefined;
         pending: Promise<void> | undefined;
         refCount: number;
-        shouldCleanupOnReady: boolean;
     } = {
         cleanup: undefined,
         pending: undefined,
         refCount: 0,
-        shouldCleanupOnReady: false,
     };
 
     /**
@@ -474,10 +472,6 @@ export const createSiteSyncActions = (
         subscribeToSyncEvents: (): (() => void) => {
             syncEventSubscription.refCount += 1;
 
-            // A previous cleanup request can set `shouldCleanupOnReady` while
-            // subscription setup is still pending. If a new subscriber attaches
-            // before setup completes, we must not auto-cleanup on completion.
-            syncEventSubscription.shouldCleanupOnReady = false;
             let isReleased = false;
 
             const shouldAttachSubscription =
@@ -506,7 +500,6 @@ export const createSiteSyncActions = (
 
                         if (syncEventSubscription.refCount === 0) {
                             serviceCleanup();
-                            syncEventSubscription.shouldCleanupOnReady = false;
                             return;
                         }
 
@@ -528,8 +521,6 @@ export const createSiteSyncActions = (
                             status: "failure",
                             success: false,
                         });
-
-                        syncEventSubscription.shouldCleanupOnReady = false;
                     } finally {
                         syncEventSubscription.pending = undefined;
 
@@ -539,7 +530,6 @@ export const createSiteSyncActions = (
                         ) {
                             syncEventSubscription.cleanup();
                             syncEventSubscription.cleanup = undefined;
-                            syncEventSubscription.shouldCleanupOnReady = false;
                         }
                     }
                 })();
@@ -568,12 +558,6 @@ export const createSiteSyncActions = (
                 if (syncEventSubscription.cleanup) {
                     syncEventSubscription.cleanup();
                     syncEventSubscription.cleanup = undefined;
-                    syncEventSubscription.shouldCleanupOnReady = false;
-                    return;
-                }
-
-                if (syncEventSubscription.pending) {
-                    syncEventSubscription.shouldCleanupOnReady = true;
                 }
             };
         },
