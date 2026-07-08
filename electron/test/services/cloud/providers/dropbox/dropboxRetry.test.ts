@@ -4,7 +4,7 @@ import { DropboxResponseError } from "dropbox";
 import { describe, expect, it, vi } from "vitest";
 
 function createAxiosError(args: {
-    headers?: Record<string, string>;
+    headers?: AxiosResponse["headers"];
     status?: number;
 }): AxiosError {
     const response: Partial<AxiosResponse> = {
@@ -21,6 +21,23 @@ function createAxiosError(args: {
         undefined,
         response as AxiosResponse
     );
+}
+
+class HeadersLike {
+    readonly #values: ReadonlyMap<string, string>;
+
+    constructor(values: Readonly<Record<string, string>>) {
+        this.#values = new Map(
+            Object.entries(values).map(([key, value]) => [
+                key.toLowerCase(),
+                value,
+            ])
+        );
+    }
+
+    get(name: string): null | string {
+        return this.#values.get(name.toLowerCase()) ?? null;
+    }
 }
 
 describe(withDropboxRetry, () => {
@@ -113,6 +130,87 @@ describe(withDropboxRetry, () => {
         expect(fn).toHaveBeenCalledTimes(2);
 
         vi.useRealTimers();
+    });
+
+    it("reads Retry-After from Headers-like prototype methods", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const error = createAxiosError({
+                headers: new HeadersLike({ "retry-after": "1" }),
+                status: 429,
+            });
+
+            const fn = vi
+                .fn<() => Promise<string>>()
+                .mockRejectedValueOnce(error)
+                .mockResolvedValueOnce("ok");
+
+            const promise = withDropboxRetry({
+                fn,
+                operationName: "test",
+                maxAttempts: 3,
+                initialDelayMs: 10,
+                maxDelayMs: 50,
+            });
+
+            await vi.advanceTimersByTimeAsync(999);
+            expect(fn).toHaveBeenCalledTimes(1);
+
+            await vi.advanceTimersByTimeAsync(1);
+            await expect(promise).resolves.toBe("ok");
+            expect(fn).toHaveBeenCalledTimes(2);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("does not invoke accessor-backed retry header fields", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const headers: Record<PropertyKey, unknown> = {};
+            const getAccessor = vi.fn<() => unknown>(() => () => "5");
+            const retryAfterAccessor = vi.fn<() => unknown>(() => "5");
+
+            Object.defineProperties(headers, {
+                get: {
+                    configurable: true,
+                    get: getAccessor,
+                },
+                "retry-after": {
+                    configurable: true,
+                    get: retryAfterAccessor,
+                },
+            });
+
+            const error = createAxiosError({
+                headers,
+                status: 429,
+            });
+
+            const fn = vi
+                .fn<() => Promise<string>>()
+                .mockRejectedValueOnce(error)
+                .mockResolvedValueOnce("ok");
+
+            const promise = withDropboxRetry({
+                fn,
+                operationName: "test",
+                maxAttempts: 3,
+                initialDelayMs: 10,
+                maxDelayMs: 50,
+            });
+
+            await vi.advanceTimersByTimeAsync(100);
+
+            await expect(promise).resolves.toBe("ok");
+            expect(fn).toHaveBeenCalledTimes(2);
+            expect(getAccessor).not.toHaveBeenCalled();
+            expect(retryAfterAccessor).not.toHaveBeenCalled();
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it("does not retry on non-retryable 4xx", async () => {

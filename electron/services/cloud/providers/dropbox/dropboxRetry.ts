@@ -1,8 +1,12 @@
 import { logger } from "@electron/utils/logger";
 import { hasAsciiLetter, isAsciiDigits } from "@shared/utils/ascii";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
+import {
+    getCallableDataProperty,
+    getOwnDataProperty,
+} from "@shared/utils/errorPropertyAccess";
 import { withRetry } from "@shared/utils/retry";
-import { isRecord, safePropertyAccess } from "@shared/utils/typeHelpers";
+import { safePropertyAccess } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
@@ -51,23 +55,27 @@ function readHeaderValue(headers: unknown, headerName: string): unknown {
     }
 
     // node-fetch Headers
-    if (isRecord(headers)) {
-        const maybeGet = headers["get"];
-        if (typeof maybeGet === "function") {
+    const maybeGet = getCallableDataProperty(headers, "get");
+    if (maybeGet) {
+        try {
             return Reflect.apply(maybeGet, headers, [headerName]);
+        } catch {
+            return undefined;
         }
     }
 
-    if (!isRecord(headers)) {
-        return undefined;
+    for (const key of [
+        headerName,
+        headerName.toLowerCase(),
+        headerName.toUpperCase(),
+    ]) {
+        const property = getOwnDataProperty(headers, key);
+        if (property.found && property.value !== undefined) {
+            return property.value;
+        }
     }
 
-    const record = headers;
-    return (
-        record[headerName] ??
-        record[headerName.toLowerCase()] ??
-        record[headerName.toUpperCase()]
-    );
+    return undefined;
 }
 
 function computeBackoffDelayMs(args: {
