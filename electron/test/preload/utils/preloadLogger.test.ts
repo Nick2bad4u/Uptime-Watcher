@@ -49,6 +49,19 @@ describe(buildPayloadPreview, () => {
         expect(preview).not.toContain("?");
     });
 
+    it("redacts direct URL string payloads", () => {
+        const preview = buildPayloadPreview(
+            "https://user:password@example.com/reset?token=super-secret#frag"
+        );
+
+        expect(preview).toBe("https://example.com/reset");
+        expect(preview).not.toContain("user");
+        expect(preview).not.toContain("password");
+        expect(preview).not.toContain("token");
+        expect(preview).not.toContain("super-secret");
+        expect(preview).not.toContain("#frag");
+    });
+
     it("serializes invalid Date values without dropping the whole preview", () => {
         const preview = buildPayloadPreview({
             checkedAt: new Date(Number.NaN),

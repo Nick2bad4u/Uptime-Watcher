@@ -265,6 +265,15 @@ const sanitizePreviewString = (value: string): string => {
     }
 };
 
+const sanitizePreviewStringOrUrl = (value: string): string => {
+    try {
+        const parsedUrl = new URL(value);
+        return serializeUrl(parsedUrl);
+    } catch {
+        return sanitizePreviewString(value);
+    }
+};
+
 function serializeErrorCause(value: Error, seen: WeakSet<object>): unknown {
     const cause = getOwnDataProperty(value, "cause");
 
@@ -464,15 +473,7 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     }
 
     if (typeof value === "string") {
-        try {
-            // Accept any parseable URL (including mailto/file) for redaction.
-            const parsedUrl = new URL(value);
-            return serializeUrl(parsedUrl);
-        } catch {
-            // not a URL
-        }
-
-        const sanitized = sanitizePreviewString(value);
+        const sanitized = sanitizePreviewStringOrUrl(value);
         if (sanitized.length <= MAX_PREVIEW_STRING) {
             return sanitized;
         }
@@ -571,7 +572,7 @@ export const buildPayloadPreview = (
     }
 
     if (typeof payload === "string") {
-        return truncate(sanitizePreviewString(payload), limit);
+        return truncate(sanitizePreviewStringOrUrl(payload), limit);
     }
 
     if (typeof payload === "number" || typeof payload === "boolean") {
