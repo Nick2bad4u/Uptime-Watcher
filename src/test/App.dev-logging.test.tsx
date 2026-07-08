@@ -335,4 +335,58 @@ describe("App Development Logging Coverage", () => {
             )
         );
     });
+
+    it("should redact URL-shaped site identifiers in development status update logs", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: App.dev-logging", "component");
+        await annotate("Category: Core", "category");
+        await annotate("Type: Privacy", "type");
+
+        const subscribeToStatusUpdatesMock = vi.fn();
+
+        vi.spyOn(vi.mocked(useSitesStore), "getState").mockReturnValue({
+            ...mockSitesStoreState,
+            initializeSites: vi.fn().mockResolvedValue(undefined),
+            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
+            unsubscribeFromStatusUpdates: vi.fn(),
+        } as unknown as ReturnType<typeof useSitesStore.getState>);
+
+        render(<App />);
+
+        await waitFor(
+            () => {
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+            },
+            { timeout: 1000 }
+        );
+
+        const statusUpdateCallback = arrayFirst(
+            subscribeToStatusUpdatesMock.mock.calls
+        )?.[0];
+
+        if (!statusUpdateCallback) {
+            throw new Error("Expected status update callback to be registered");
+        }
+
+        statusUpdateCallback({
+            site: {
+                identifier:
+                    "https://user:site-secret@example.com/status?access_token=site-token#private",
+            },
+            siteIdentifier: "fallback-site-id",
+        });
+
+        const debugPayload = JSON.stringify(vi.mocked(logger.debug).mock.calls);
+
+        expect(debugPayload).toContain(
+            "Status update received for site: https://example.com/status"
+        );
+        expect(debugPayload).not.toContain("site-secret");
+        expect(debugPayload).not.toContain("site-token");
+        expect(debugPayload).not.toContain("private");
+        expect(debugPayload).not.toContain("access_token");
+    });
 });

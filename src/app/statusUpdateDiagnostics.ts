@@ -9,6 +9,7 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { isRecord } from "@shared/utils/typeHelpers";
 
 import type { StatusUpdateSubscriptionSummary } from "../stores/sites/baseTypes";
@@ -25,9 +26,11 @@ export function logStatusUpdateDebugInfo(update: StatusUpdate): void {
 
     const timestamp = new Date().toLocaleTimeString();
     const resolvedIdentifier = resolveStatusUpdateSiteIdentifier(update);
+    const safeIdentifier =
+        getSafeIdentifierForLogging(resolvedIdentifier) ?? resolvedIdentifier;
 
     logger.debug(
-        `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
+        `[${timestamp}] Status update received for site: ${safeIdentifier}`
     );
 }
 
