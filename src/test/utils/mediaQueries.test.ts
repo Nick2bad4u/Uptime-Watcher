@@ -108,6 +108,44 @@ describe("mediaQueries utilities", () => {
                 }
             }
         });
+
+        it("returns null when the media query matches accessor throws", () => {
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    value: {
+                        matchMedia: () =>
+                            Object.defineProperty({}, "matches", {
+                                configurable: true,
+                                enumerable: true,
+                                get() {
+                                    throw new Error("matches unavailable");
+                                },
+                            }),
+                    },
+                });
+
+                expect(
+                    tryGetMediaQueryList("(prefers-reduced-motion: reduce)")
+                ).toBeNull();
+            } finally {
+                if (originalWindowDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "window",
+                        originalWindowDescriptor
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "window");
+                }
+            }
+        });
     });
 
     describe(subscribeToMediaQueryListChanges, () => {
@@ -133,6 +171,57 @@ describe("mediaQueries utilities", () => {
             expect(removeEventListener).toHaveBeenCalledWith("change", handler);
         });
 
+        it("no-ops when addEventListener throws", () => {
+            const addEventListener = vi.fn(() => {
+                throw new Error("addEventListener unavailable");
+            });
+            const removeEventListener = vi.fn();
+
+            const mediaQueryList = {
+                addEventListener,
+                removeEventListener,
+            } as unknown as MediaQueryList;
+
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                vi.fn()
+            );
+
+            expect(addEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
+            expect(removeEventListener).not.toHaveBeenCalled();
+        });
+
+        it("no-ops when removeEventListener throws during cleanup", () => {
+            const addEventListener = vi.fn();
+            const removeEventListener = vi.fn(() => {
+                throw new Error("removeEventListener unavailable");
+            });
+
+            const mediaQueryList = {
+                addEventListener,
+                removeEventListener,
+            } as unknown as MediaQueryList;
+
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                vi.fn()
+            );
+
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
+            expect(removeEventListener).toHaveBeenCalledWith(
+                "change",
+                expect.any(Function)
+            );
+        });
+
         it("falls back to addListener/removeListener when addEventListener is missing", () => {
             const addListener = vi.fn();
             const removeListener = vi.fn();
@@ -153,6 +242,51 @@ describe("mediaQueries utilities", () => {
             cleanup();
 
             expect(removeListener).toHaveBeenCalledWith(handler);
+        });
+
+        it("no-ops when legacy addListener throws", () => {
+            const addListener = vi.fn(() => {
+                throw new Error("addListener unavailable");
+            });
+            const removeListener = vi.fn();
+
+            const mediaQueryList = {
+                addListener,
+                removeListener,
+            } as unknown as MediaQueryList;
+
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                vi.fn()
+            );
+
+            expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
+            expect(removeListener).not.toHaveBeenCalled();
+        });
+
+        it("no-ops when legacy removeListener throws during cleanup", () => {
+            const addListener = vi.fn();
+            const removeListener = vi.fn(() => {
+                throw new Error("removeListener unavailable");
+            });
+
+            const mediaQueryList = {
+                addListener,
+                removeListener,
+            } as unknown as MediaQueryList;
+
+            const cleanup = subscribeToMediaQueryListChanges(
+                mediaQueryList,
+                vi.fn()
+            );
+
+            expect(() => {
+                cleanup();
+            }).not.toThrow();
+            expect(removeListener).toHaveBeenCalledWith(expect.any(Function));
         });
 
         it("supports legacy listener methods defined on the prototype", () => {

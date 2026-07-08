@@ -54,8 +54,17 @@ const isObjectLike = (value: unknown): value is object =>
 const isMatchMediaMethod = (value: unknown): value is MatchMediaMethod =>
     typeof value === "function";
 
-const isMediaQueryList = (value: unknown): value is MediaQueryList =>
-    isObjectLike(value) && typeof Reflect.get(value, "matches") === "boolean";
+const isMediaQueryList = (value: unknown): value is MediaQueryList => {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return typeof Reflect.get(value, "matches") === "boolean";
+    } catch {
+        return false;
+    }
+};
 
 const getTrustedGlobalValue = (key: PropertyKey): unknown => {
     const property = getOwnPropertyValue(globalThis, key);
@@ -101,9 +110,18 @@ export function subscribeToMediaQueryListChanges(
     handler: (event: MediaQueryListEvent) => void
 ): () => void {
     if (typeof mediaQueryList.addEventListener === "function") {
-        mediaQueryList.addEventListener("change", handler);
+        try {
+            mediaQueryList.addEventListener("change", handler);
+        } catch {
+            return noop;
+        }
+
         return () => {
-            mediaQueryList.removeEventListener("change", handler);
+            try {
+                mediaQueryList.removeEventListener("change", handler);
+            } catch {
+                // Listener cleanup is best-effort during renderer teardown.
+            }
         };
     }
 
@@ -114,14 +132,23 @@ export function subscribeToMediaQueryListChanges(
     );
 
     if (typeof addListenerCandidate === "function") {
-        addListenerCandidate.call(mediaQueryList, handler);
+        try {
+            addListenerCandidate.call(mediaQueryList, handler);
+        } catch {
+            return noop;
+        }
+
         return () => {
             const removeListenerCandidate = getMediaQueryListDataMethod(
                 mediaQueryList,
                 "removeListener"
             );
             if (typeof removeListenerCandidate === "function") {
-                removeListenerCandidate.call(mediaQueryList, handler);
+                try {
+                    removeListenerCandidate.call(mediaQueryList, handler);
+                } catch {
+                    // Listener cleanup is best-effort during renderer teardown.
+                }
             }
         };
     }
