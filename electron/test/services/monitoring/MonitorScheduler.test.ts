@@ -247,6 +247,18 @@ describe(MonitorScheduler, () => {
         expect(scheduler.isMonitoring("site-2", "monitor-2")).toBeTruthy();
     });
 
+    it("keeps jobs distinct when identifiers contain key separators", () => {
+        scheduler.startMonitor("site|prod", createMonitor({ id: "api" }));
+        scheduler.startMonitor("site", createMonitor({ id: "prod|api" }));
+
+        expect(scheduler.getActiveCount()).toBe(2);
+
+        scheduler.stopSite("site|prod");
+
+        expect(scheduler.isMonitoring("site|prod", "api")).toBeFalsy();
+        expect(scheduler.isMonitoring("site", "prod|api")).toBeTruthy();
+    });
+
     it("queues an immediate check while a job is running and executes it after the in-flight check completes", async () => {
         const jobKey = "site-1|monitor-1";
 

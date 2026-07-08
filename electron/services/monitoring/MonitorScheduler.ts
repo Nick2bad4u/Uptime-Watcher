@@ -4,7 +4,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
-import { isInteger, stringSplit } from "ts-extras";
+import { isInteger } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../../events/eventTypes";
 import type { EventPayload, TypedEventBus } from "../../events/TypedEventBus";
@@ -87,7 +87,7 @@ export class MonitorScheduler {
      */
     private readonly logger: Logger;
 
-    /** Active monitor jobs keyed by `${siteIdentifier}|${monitorId}`. */
+    /** Active monitor jobs keyed by escaped `${siteIdentifier}|${monitorId}`. */
     private readonly jobs = new Map<string, MonitorJob>();
 
     /** Event emitter used for surfacing scheduling/backoff/timeout lifecycle. */
@@ -775,24 +775,29 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = [...this.jobs.keys()].filter((key) =>
-                key.startsWith(`${siteIdentifier}|`)
+            const siteJobs = [...this.jobs.values()].filter(
+                (job) => job.siteIdentifier === siteIdentifier
             );
-            for (const intervalKey of siteIntervals) {
-                const parsed = this.parseIntervalKey(intervalKey);
-                if (parsed) {
-                    this.stopMonitor(parsed.siteIdentifier, parsed.monitorId);
-                }
+            for (const job of siteJobs) {
+                this.stopMonitor(job.siteIdentifier, job.monitorId);
             }
         }
+    }
+
+    /**
+     * Escapes interval key components so user-controlled identifiers cannot
+     * collide with the scheduler's internal separator.
+     */
+    private createIntervalKeyComponent(value: string): string {
+        return value.replaceAll("\\", "\\\\").replaceAll("|", "\\|");
     }
 
     /**
      * Creates a standardized interval key for monitor tracking.
      *
      * @remarks
-     * Format: `${siteIdentifier}|${monitorId}`. Used internally for consistent
-     * lookup and management of monitor intervals.
+     * Format: escaped `${siteIdentifier}|${monitorId}`. Used internally for
+     * consistent lookup and management of monitor intervals.
      *
      * @example
      *
@@ -811,41 +816,7 @@ export class MonitorScheduler {
         siteIdentifier: string,
         monitorId: string
     ): string {
-        return `${siteIdentifier}|${monitorId}`;
-    }
-
-    /**
-     * Parses an interval key into its site and monitor components.
-     *
-     * @remarks
-     * Returns `null` if the key is invalid or does not match the expected
-     * format.
-     *
-     * @example
-     *
-     * ```typescript
-     * const parsed = scheduler.parseIntervalKey("siteA|monitor123");
-     * // parsed = { siteIdentifier: "siteA", monitorId: "monitor123" }
-     * ```
-     *
-     * @param intervalKey - Interval key string in the format
-     *   `${siteIdentifier}|${monitorId}`.
-     *
-     * @returns An object with `siteIdentifier` and `monitorId`, or `null` if
-     *   invalid.
-     *
-     * @internal
-     */
-    private parseIntervalKey(
-        intervalKey: string
-    ): null | { monitorId: string; siteIdentifier: string } {
-        const parts = stringSplit(intervalKey, "|");
-        if (parts.length !== 2) return null;
-
-        const [siteIdentifier, monitorId] = parts;
-        if (!siteIdentifier || !monitorId) return null;
-
-        return { monitorId, siteIdentifier };
+        return `${this.createIntervalKeyComponent(siteIdentifier)}|${this.createIntervalKeyComponent(monitorId)}`;
     }
 
     /**
