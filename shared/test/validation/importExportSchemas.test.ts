@@ -32,6 +32,36 @@ describe("importExportSchemas", () => {
         });
     });
 
+    it("preserves prototype-named import settings as own data for downstream stripping", () => {
+        const settings = Object.defineProperty(
+            { "ui.theme": "dark" },
+            "__proto__",
+            {
+                configurable: true,
+                enumerable: true,
+                value: "strip-me",
+                writable: true,
+            }
+        );
+
+        const result = validateImportData({
+            settings,
+            sites: [{ identifier: "example.com" }],
+            version: "1.0",
+        });
+
+        expect(result.ok).toBeTruthy();
+        if (!result.ok) {
+            throw new Error("Expected import payload to pass validation");
+        }
+
+        expect(Object.getPrototypeOf(result.value.settings!)).toBeNull();
+        expect(Object.hasOwn(result.value.settings!, "__proto__")).toBeTruthy();
+        expect(Reflect.get(result.value.settings!, "__proto__")).toBe(
+            "strip-me"
+        );
+    });
+
     it("accepts empty-site import payloads from fresh app exports", () => {
         const result = validateImportData({
             exportedAt: "2026-07-02T00:00:00.000Z",
@@ -53,6 +83,19 @@ describe("importExportSchemas", () => {
             settings: {
                 "   ": "value",
             },
+            sites: [{ identifier: "example.com" }],
+        });
+
+        expect(result.ok).toBeFalsy();
+    });
+
+    it.each([
+        new Date(0),
+        new Map<string, string>(),
+        Object.create({ inherited: "value" }),
+    ])("rejects non-record import settings: %p", (settings) => {
+        const result = validateImportData({
+            settings,
             sites: [{ identifier: "example.com" }],
         });
 
@@ -89,6 +132,21 @@ describe("importExportSchemas", () => {
             settings: {
                 "   ": "value",
             },
+            sites: [createSiteSnapshot({ identifier: "example.com" })],
+            version: "1.0",
+        });
+
+        expect(result).toBeFalsy();
+    });
+
+    it.each([
+        new Date(0),
+        new Map<string, string>(),
+        Object.create({ inherited: "value" }),
+    ])("rejects non-record export settings: %p", (settings) => {
+        const result = validateExportData({
+            exportedAt: "2026-07-02T00:00:00.000Z",
+            settings,
             sites: [createSiteSnapshot({ identifier: "example.com" })],
             version: "1.0",
         });

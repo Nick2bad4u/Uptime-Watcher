@@ -1,6 +1,7 @@
 import type { Site } from "@shared/types";
 
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import * as z from "zod";
 
 import { monitorSchema } from "./monitorSchemas";
@@ -59,11 +60,15 @@ export interface ImportData {
 const settingKeySchema = z.string().refine((key) => key.trim().length > 0, {
     message: "Setting key is required",
 });
+const settingsSchema = createOwnDataRecordSchema(
+    z.string().trim(),
+    settingKeySchema
+);
 
 const importDataSchema: z.ZodType<ImportData> = z
     .object({
         exportedAt: z.string().trim().optional(),
-        settings: z.record(settingKeySchema, z.string().trim()).optional(),
+        settings: settingsSchema.optional(),
         sites: z.array(importSiteSchema),
         version: z.string().trim().optional(),
     })
@@ -82,7 +87,7 @@ export interface ExportData {
 const exportDataSchema: z.ZodType<ExportData> = z
     .object({
         exportedAt: z.string().trim().min(1),
-        settings: z.record(settingKeySchema, z.string().trim()).optional(),
+        settings: settingsSchema.optional(),
         sites: z.array(siteSchema),
         version: importExportVersionSchema,
     })
