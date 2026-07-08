@@ -399,10 +399,8 @@ export function createHttpMonitorService<
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
             let nextConfig: MonitorServiceConfig = { ...this.config };
-            const configRecord = config as Partial<MonitorServiceConfig> &
-                Record<string, unknown>;
             const remaining = safeObjectOmit(
-                configRecord,
+                config,
                 RESERVED_HTTP_MONITOR_CONFIG_UPDATE_KEYS
             );
 

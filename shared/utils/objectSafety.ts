@@ -243,6 +243,17 @@ export function safeObjectOmit<T extends object, K extends keyof T>(
     keys: readonly K[]
 ): Except<T, K>;
 
+/**
+ * Omits arbitrary own-property keys while preserving the known source shape.
+ */
+export function safeObjectOmit<T extends object, K extends PropertyKey>(
+    obj:
+        | null
+        | T
+        | undefined,
+    keys: readonly K[]
+): Except<T, Extract<K, keyof T>>;
+
 export function safeObjectOmit<T extends object, K extends PropertyKey>(
     obj:
         | null

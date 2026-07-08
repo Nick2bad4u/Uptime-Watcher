@@ -63,9 +63,8 @@ export async function applyMonitorStateOperation(args: {
     const { changes, dependencies, monitor, newStatus, site } = args;
 
     const previousStatus = monitor.status;
-    const changeRecord = changes as Partial<Monitor> & Record<string, unknown>;
     const sanitizedChanges = safeObjectOmit(
-        changeRecord,
+        changes,
         RESERVED_MONITOR_STATE_CHANGE_KEYS
     );
 
