@@ -9,6 +9,8 @@
  * @packageDocumentation
  */
 
+import type { Promisable } from "type-fest";
+
 interface MapWithConcurrencyResultSlot<R> {
     readonly value: R;
 }
@@ -39,7 +41,7 @@ function normalizeConcurrency(concurrency: number): number {
 export async function mapWithConcurrency<T, R>(args: {
     readonly concurrency: number;
     readonly items: readonly T[];
-    readonly task: (item: T) => Promise<R>;
+    readonly task: (item: T) => Promisable<R>;
 }): Promise<R[]> {
     const { concurrency, items, task } = args;
     if (items.length === 0) {

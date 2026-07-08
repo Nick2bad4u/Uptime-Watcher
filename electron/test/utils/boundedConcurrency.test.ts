@@ -54,6 +54,24 @@ describe("mapWithConcurrency()", () => {
         expect(maxActive).toBe(1);
     });
 
+    it("accepts synchronous task results", async () => {
+        await expect(
+            mapWithConcurrency({
+                concurrency: 3,
+                items: [
+                    1,
+                    2,
+                    3,
+                ],
+                task: (item) => item * 2,
+            })
+        ).resolves.toEqual([
+            2,
+            4,
+            6,
+        ]);
+    });
+
     it("returns an empty result for empty input", async () => {
         await expect(
             mapWithConcurrency({

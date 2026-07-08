@@ -77,5 +77,15 @@ describe("syncEngineUtils", () => {
                 3,
             ]);
         });
+
+        it("accepts synchronous task results", async () => {
+            const result = await mapWithConcurrency({
+                concurrency: 2,
+                items: ["a", "b"],
+                task: (item) => item.toUpperCase(),
+            });
+
+            expect(result).toEqual(["A", "B"]);
+        });
     });
 });
