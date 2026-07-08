@@ -124,6 +124,47 @@ describe("sanitizeDiagnosticsReport", () => {
         );
     });
 
+    it("does not invoke accessor-backed optional report fields", async () => {
+        const { emitTyped, reportHandler } = createDiagnosticsHandlerHarness();
+        const getter = vi.fn(() => {
+            throw new Error("diagnostics getter should not run");
+        });
+        const report = {
+            channel: "test-channel",
+            guard: "exampleGuard",
+            timestamp: Date.now(),
+        };
+        Object.defineProperties(report, {
+            metadata: {
+                enumerable: true,
+                get: getter,
+            },
+            payloadPreview: {
+                enumerable: true,
+                get: getter,
+            },
+            reason: {
+                enumerable: true,
+                get: getter,
+            },
+        });
+
+        const result = await reportHandler(createTrustedIpcEvent(), report);
+
+        expect(result.success).toBeTruthy();
+        expect(getter).not.toHaveBeenCalled();
+        expect(emitTyped).toHaveBeenCalledWith(
+            "diagnostics:report-created",
+            expect.objectContaining({
+                channel: "test-channel",
+                guard: "exampleGuard",
+                metadataTruncated: false,
+                payloadPreviewLength: 0,
+                payloadPreviewTruncated: false,
+            })
+        );
+    });
+
     it("sanitizes and bounds report identifiers and reasons", async () => {
         const { emitTyped, reportHandler } = createDiagnosticsHandlerHarness();
         const timestamp = Date.now();

@@ -10,6 +10,7 @@ import type { UnknownRecord } from "type-fest";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { readBooleanEnv } from "@shared/utils/environment";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import {
     normalizeLogValue,
     withLogContext,
@@ -51,12 +52,49 @@ const isPreloadGuardDiagnosticsReport = (
         return false;
     }
 
+    const channel = getOwnDataProperty(value, "channel");
+    const guard = getOwnDataProperty(value, "guard");
+    const timestamp = getOwnDataProperty(value, "timestamp");
+
     return (
-        typeof value["channel"] === "string" &&
-        typeof value["guard"] === "string" &&
-        isNonNegativeSafeInteger(value["timestamp"]) &&
-        value["timestamp"] <= MAX_VALID_DATE_EPOCH_MS
+        channel.found &&
+        guard.found &&
+        timestamp.found &&
+        typeof channel.value === "string" &&
+        typeof guard.value === "string" &&
+        isNonNegativeSafeInteger(timestamp.value) &&
+        timestamp.value <= MAX_VALID_DATE_EPOCH_MS
     );
+};
+
+const getOwnString = (
+    value: PreloadGuardDiagnosticsReport,
+    key: keyof Pick<
+        PreloadGuardDiagnosticsReport,
+        | "channel"
+        | "guard"
+        | "payloadPreview"
+        | "reason"
+    >
+): string | undefined => {
+    const property = getOwnDataProperty(value, key);
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
+};
+
+const getOwnTimestamp = (
+    value: PreloadGuardDiagnosticsReport
+): number | undefined => {
+    const property = getOwnDataProperty(value, "timestamp");
+    return property.found && typeof property.value === "number"
+        ? property.value
+        : undefined;
+};
+
+const getOwnMetadata = (value: PreloadGuardDiagnosticsReport): unknown => {
+    const property = getOwnDataProperty(value, "metadata");
+    return property.found ? property.value : undefined;
 };
 
 const normalizeDiagnosticsString = (
@@ -117,8 +155,9 @@ const normalizeDiagnosticsReportPayload = (
     let isPayloadPreviewTruncated = false;
 
     let metadata: undefined | UnknownRecord;
-    if (report.metadata) {
-        const sanitizedMetadata = normalizeLogValue(report.metadata);
+    const metadataCandidate = getOwnMetadata(report);
+    if (metadataCandidate) {
+        const sanitizedMetadata = normalizeLogValue(metadataCandidate);
         if (isRecord(sanitizedMetadata)) {
             const serialized = JSON.stringify(sanitizedMetadata);
             if (
@@ -132,8 +171,9 @@ const normalizeDiagnosticsReportPayload = (
     }
 
     let payloadPreview: string | undefined;
-    if (typeof report.payloadPreview === "string") {
-        const sanitizedPreview = normalizeLogValue(report.payloadPreview);
+    const payloadPreviewCandidate = getOwnString(report, "payloadPreview");
+    if (payloadPreviewCandidate) {
+        const sanitizedPreview = normalizeLogValue(payloadPreviewCandidate);
         if (typeof sanitizedPreview === "string") {
             const { truncated, value } = truncateUtfString(
                 sanitizedPreview,
@@ -145,22 +185,22 @@ const normalizeDiagnosticsReportPayload = (
     }
 
     const reason = normalizeOptionalDiagnosticsString(
-        report.reason,
+        getOwnString(report, "reason"),
         MAX_DIAGNOSTICS_REPORT_REASON_BYTES
     );
 
     const sanitizedReport: PreloadGuardDiagnosticsReport = {
         channel: normalizeDiagnosticsString(
-            report.channel,
+            getOwnString(report, "channel") ?? "",
             MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
             "unknown-channel"
         ),
         guard: normalizeDiagnosticsString(
-            report.guard,
+            getOwnString(report, "guard") ?? "",
             MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
             "unknown-guard"
         ),
-        timestamp: report.timestamp,
+        timestamp: getOwnTimestamp(report) ?? 0,
         ...(reason && { reason }),
         ...(metadata && { metadata }),
         ...(payloadPreview && { payloadPreview }),
