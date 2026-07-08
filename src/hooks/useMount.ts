@@ -61,7 +61,7 @@
 import type { Promisable } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { logger } from "../services/logger";
 import { fireAndForget } from "../utils/async/fireAndForget";
@@ -87,19 +87,31 @@ export function useMount(
     mountCallback: (signal: AbortSignal) => Promisable<void>,
     unmountCallback?: () => void
 ): void {
+    const mountCallbackRef = useRef(mountCallback);
+    const unmountCallbackRef = useRef(unmountCallback);
+
+    useEffect(function syncMountLifecycleCallbacks() {
+        mountCallbackRef.current = mountCallback;
+        unmountCallbackRef.current = unmountCallback;
+    });
+
+    // eslint-disable-next-line canonical/prefer-use-mount -- This is the implementation of useMount's mount-only lifecycle effect.
     useEffect(
         function handleMountLifecycle() {
             const abortController = new AbortController();
             let didCleanup = false;
 
-            fireAndForget(() => mountCallback(abortController.signal), {
-                onError: (error) => {
-                    logger.error(
-                        "Error in useMount callback:",
-                        ensureError(error)
-                    );
+            fireAndForget(
+                () => mountCallbackRef.current(abortController.signal),
+                {
+                    onError: (error) => {
+                        logger.error(
+                            "Error in useMount callback:",
+                            ensureError(error)
+                        );
+                    },
                 },
-            });
+            );
 
             return (): void => {
                 if (didCleanup) {
@@ -110,7 +122,7 @@ export function useMount(
                 abortController.abort();
 
                 try {
-                    unmountCallback?.();
+                    unmountCallbackRef.current?.();
                 } catch (error: unknown) {
                     logger.error(
                         "Error in useMount cleanup:",
@@ -119,6 +131,6 @@ export function useMount(
                 }
             };
         },
-        [mountCallback, unmountCallback]
+        []
     );
 }

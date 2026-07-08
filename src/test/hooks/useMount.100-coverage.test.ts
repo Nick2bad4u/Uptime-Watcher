@@ -29,22 +29,35 @@ describe("useMount - 100% Coverage Tests", () => {
         await annotate("Category: Hook", "category");
         await annotate("Type: Business Logic", "type");
 
-        const mountCallback = vi.fn();
-        const unmountCallback = vi.fn();
+        const initialMountCallback = vi.fn();
+        const rerenderMountCallback = vi.fn();
+        const initialUnmountCallback = vi.fn();
+        const latestUnmountCallback = vi.fn();
 
-        const { rerender, unmount } = renderHook(() => {
-            useMount(mountCallback, unmountCallback);
+        const { rerender, unmount } = renderHook(
+            ({ mountCallback, unmountCallback }) => {
+                useMount(mountCallback, unmountCallback);
+            },
+            {
+                initialProps: {
+                    mountCallback: initialMountCallback,
+                    unmountCallback: initialUnmountCallback,
+                },
+            }
+        );
+
+        expect(initialMountCallback).toHaveBeenCalledTimes(1);
+
+        rerender({
+            mountCallback: rerenderMountCallback,
+            unmountCallback: latestUnmountCallback,
         });
-
-        expect(mountCallback).toHaveBeenCalledTimes(1);
-
-        // Rerender should not re-run the mount callback because the hook uses
-        // an effect with an empty dependency array.
-        rerender();
-        expect(mountCallback).toHaveBeenCalledTimes(1);
+        expect(initialMountCallback).toHaveBeenCalledTimes(1);
+        expect(rerenderMountCallback).not.toHaveBeenCalled();
 
         unmount();
-        expect(unmountCallback).toHaveBeenCalledTimes(1);
+        expect(initialUnmountCallback).not.toHaveBeenCalled();
+        expect(latestUnmountCallback).toHaveBeenCalledTimes(1);
     });
 
     it("should handle async mount callback errors", async ({
