@@ -531,22 +531,7 @@ describe("UUID Generation", () => {
 
                 const uniqueResults = new Set(results);
 
-                // With crypto.randomUUID mock, all UUIDs should be unique
-                // For small sample sizes (10-30), allow for very rare collisions due to Math.random()
-                const uniquenessRatio = uniqueResults.size / results.length;
-                const minExpectedUnique = Math.max(
-                    1,
-                    Math.floor(numRequests * 0.8)
-                );
-
-                if (numRequests <= 15) {
-                    // For very small samples, be more lenient but still expect high uniqueness
-                    expect(uniquenessRatio).toBeGreaterThan(0.8); // At least 80% unique for small samples
-                } else {
-                    // For larger samples, maintain stricter requirements
-                    expect(uniquenessRatio).toBeGreaterThan(0.9); // At least 90% unique
-                }
-                expect(uniqueResults.size).toBeGreaterThan(minExpectedUnique);
+                expect(uniqueResults.size).toBe(results.length);
             }
         );
 

@@ -12,6 +12,7 @@
 
 import type { Site } from "@shared/types";
 
+import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
@@ -22,7 +23,7 @@ const createHttpMonitor = (
 ): Site["monitors"][0] => ({
     checkInterval: 60_000,
     history: [],
-    id: `test-${Math.random().toString(36).slice(2)}`,
+    id: `test-${randomUUID()}`,
     monitoring: true,
     responseTime: 0,
     retryAttempts: 0,
