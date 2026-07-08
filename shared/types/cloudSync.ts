@@ -204,6 +204,14 @@ const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> = z
 const cloudSyncOperationSchema: typeof cloudSyncOperationInternalSchema =
     cloudSyncOperationInternalSchema;
 
+function compareSyncStrings(a: string, b: string): number {
+    if (a === b) {
+        return 0;
+    }
+
+    return a < b ? -1 : 1;
+}
+
 /**
  * Parses a candidate into a {@link CloudSyncOperation}.
  *
@@ -233,7 +241,7 @@ export function compareCloudSyncWriteKey(
         return a.timestamp - b.timestamp;
     }
 
-    const deviceCompare = a.deviceId.localeCompare(b.deviceId);
+    const deviceCompare = compareSyncStrings(a.deviceId, b.deviceId);
     if (deviceCompare !== 0) {
         return deviceCompare;
     }

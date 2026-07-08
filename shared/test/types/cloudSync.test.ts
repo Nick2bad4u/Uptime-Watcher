@@ -1,6 +1,7 @@
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     cloudSyncWriteKeySchema,
+    compareCloudSyncWriteKey,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
 import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
@@ -104,6 +105,15 @@ describe("cloudSync", () => {
                 timestamp: 1,
             })
         ).toThrow("deviceId must not contain control characters");
+    });
+
+    it("compares write key deviceId tie-breakers without locale-sensitive ordering", () => {
+        expect(
+            compareCloudSyncWriteKey(
+                { deviceId: "Z-device", opId: 1, timestamp: 1 },
+                { deviceId: "a-device", opId: 1, timestamp: 1 }
+            )
+        ).toBeLessThan(0);
     });
 
     it("rejects monitor operation entity IDs with control characters", () => {
