@@ -1,4 +1,3 @@
-import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import {
     validateAppNotificationRequest,
@@ -7,9 +6,7 @@ import {
 
 import type { ParameterValueValidationResult } from "./parameterValidation";
 
-import { IpcValidators } from "../IpcValidators";
-import { toValidationResult } from "./parameterValidation";
-import { getForbiddenRecordKeyErrors } from "./recordValidation";
+import { requireRecordParamValue } from "./recordValidation";
 
 /**
  * Validates notification preferences payloads.
@@ -23,26 +20,14 @@ import { getForbiddenRecordKeyErrors } from "./recordValidation";
 export function validateNotificationPreferencesPayload(
     value: unknown
 ): ParameterValueValidationResult {
-    const objectError = IpcValidators.requiredObject(value, "preferences");
-    if (objectError) {
-        return toValidationResult(objectError);
+    const recordResult = requireRecordParamValue(value, "preferences");
+    if (!recordResult.ok) {
+        return recordResult.error;
     }
 
-    if (!isRecord(value)) {
-        return toValidationResult(
-            "Notification preferences payload must be an object"
-        );
-    }
-
-    const forbiddenKeyErrors = getForbiddenRecordKeyErrors(
-        value,
-        "preferences"
+    const validationResult = validateNotificationPreferenceUpdate(
+        recordResult.record
     );
-    if (forbiddenKeyErrors.length > 0) {
-        return forbiddenKeyErrors;
-    }
-
-    const validationResult = validateNotificationPreferenceUpdate(value);
     return validationResult.success
         ? null
         : formatZodIssues(validationResult.error.issues);
@@ -60,22 +45,14 @@ export function validateNotificationPreferencesPayload(
 export function validateNotifyAppEventPayload(
     value: unknown
 ): ParameterValueValidationResult {
-    const objectError = IpcValidators.requiredObject(value, "request");
-    if (objectError) {
-        return toValidationResult(objectError);
+    const recordResult = requireRecordParamValue(value, "request");
+    if (!recordResult.ok) {
+        return recordResult.error;
     }
 
-    if (isRecord(value)) {
-        const forbiddenKeyErrors = getForbiddenRecordKeyErrors(
-            value,
-            "request"
-        );
-        if (forbiddenKeyErrors.length > 0) {
-            return forbiddenKeyErrors;
-        }
-    }
-
-    const validationResult = validateAppNotificationRequest(value);
+    const validationResult = validateAppNotificationRequest(
+        recordResult.record
+    );
     return validationResult.success
         ? null
         : formatZodIssues(validationResult.error.issues);
