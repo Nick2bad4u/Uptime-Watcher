@@ -121,6 +121,43 @@ describe(DropboxTokenManager, () => {
         vi.useRealTimers();
     });
 
+    it("returns normalized refreshed tokens from SDK values", async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
+
+        const secretStore = new InMemorySecretStore();
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+            authFactory: () => ({
+                getAccessToken: () => " new-access ",
+                getAccessTokenExpiresAt: () => new Date(Date.now() + 3_600_000),
+                getRefreshToken: () => " rotated-refresh ",
+                refreshAccessToken: async () => undefined,
+                setAccessToken: () => {},
+                setAccessTokenExpiresAt: () => {},
+                setClientId: () => {},
+                setRefreshToken: () => {},
+            }),
+        });
+
+        await manager.storeTokens({
+            accessToken: "old-access",
+            expiresAtEpochMs: Date.now() - 1,
+            refreshToken: "old-refresh",
+        });
+
+        await expect(manager.getAccessToken()).resolves.toBe("new-access");
+
+        const stored = await manager.getStoredTokens();
+        expect(stored?.accessToken).toBe("new-access");
+        expect(stored?.refreshToken).toBe("rotated-refresh");
+
+        vi.useRealTimers();
+    });
+
     it("does not invoke shadowed Date methods while refreshing tokens", async () => {
         const secretStore = new InMemorySecretStore();
         const expiresAt = new Date("2025-01-01T01:00:00.000Z");

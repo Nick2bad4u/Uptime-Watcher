@@ -174,11 +174,11 @@ export class DropboxTokenManager {
                 ? refreshedRefreshToken
                 : tokens.refreshToken;
 
-        return {
+        return parseDropboxTokens({
             accessToken,
             expiresAtEpochMs,
             refreshToken,
-        };
+        });
     }
 
     /**
