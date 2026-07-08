@@ -60,6 +60,37 @@ const buildCacheInvalidationLogMetadata = (
     type: data.type,
 });
 
+const refreshMonitorTypesAfterInvalidation = async (): Promise<void> => {
+    await useMonitorTypesStore.getState().refreshMonitorTypes();
+};
+
+const syncSitesFromBackendAfterInvalidation = async (): Promise<void> => {
+    await useSitesStore.getState().fullResyncSites();
+};
+
+const startMonitorTypeRefresh = (
+    context: "all" | "monitor",
+    message: string
+): void => {
+    fireAndForget(refreshMonitorTypesAfterInvalidation, {
+        onError: (error) => {
+            logger.error(message, ensureError(error), { context });
+        },
+    });
+};
+
+const startSiteResync = (context: "all" | "site"): void => {
+    fireAndForget(syncSitesFromBackendAfterInvalidation, {
+        onError: (error) => {
+            logger.error(
+                "Failed to resynchronize sites after cache invalidation",
+                ensureError(error),
+                { context }
+            );
+        },
+    });
+};
+
 /**
  * Set up automatic cache synchronization with backend. Listens for cache
  * invalidation events, clears appropriate frontend caches, and triggers
@@ -97,55 +128,22 @@ export function setupCacheSync(): () => void {
                 buildCacheInvalidationLogMetadata(data)
             );
 
-            const syncSitesFromBackend = async (
-                context: "all" | "site"
-            ): Promise<void> => {
-                try {
-                    await useSitesStore.getState().fullResyncSites();
-                } catch (error) {
-                    logger.error(
-                        "Failed to resynchronize sites after cache invalidation",
-                        ensureError(error),
-                        { context }
-                    );
-                }
-            };
-
             switch (data.type) {
                 case "all": {
                     clearAllFrontendCaches();
-                    const refreshMonitorTypes = async (): Promise<void> => {
-                        try {
-                            await useMonitorTypesStore
-                                .getState()
-                                .refreshMonitorTypes();
-                        } catch (error) {
-                            logger.error(
-                                "Failed to refresh monitor types after cache invalidation:",
-                                ensureError(error)
-                            );
-                        }
-                    };
-                    void refreshMonitorTypes();
-                    void syncSitesFromBackend("all");
+                    startMonitorTypeRefresh(
+                        "all",
+                        "Failed to refresh monitor types after cache invalidation:"
+                    );
+                    startSiteResync("all");
                     break;
                 }
                 case "monitor": {
                     clearMonitorRelatedCaches(data.identifier);
-                    const refreshMonitorTypesMonitor =
-                        async (): Promise<void> => {
-                            try {
-                                await useMonitorTypesStore
-                                    .getState()
-                                    .refreshMonitorTypes();
-                            } catch (error) {
-                                logger.error(
-                                    "Failed to refresh monitor types after monitor cache invalidation:",
-                                    ensureError(error)
-                                );
-                            }
-                        };
-                    void refreshMonitorTypesMonitor();
+                    startMonitorTypeRefresh(
+                        "monitor",
+                        "Failed to refresh monitor types after monitor cache invalidation:"
+                    );
                     break;
                 }
                 case "site": {
@@ -172,7 +170,7 @@ export function setupCacheSync(): () => void {
 
                         lastSiteUpdateResyncAt = now;
                     }
-                    void syncSitesFromBackend("site");
+                    startSiteResync("site");
                     break;
                 }
                 default: {
