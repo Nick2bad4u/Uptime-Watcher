@@ -111,6 +111,8 @@ function getNativeMethod(
 
 const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
 const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const MAP_SIZE = getNativeGetter(Map.prototype, "size");
+const SET_SIZE = getNativeGetter(Set.prototype, "size");
 const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
 
 function isIterable(value: unknown): value is Iterable<unknown> {
@@ -200,9 +202,8 @@ const serializeUrl = (value: URL): string => {
 
 const getNativeCollectionSize = (
     value: Map<unknown, unknown> | Set<unknown>,
-    prototype: typeof Map.prototype | typeof Set.prototype
+    sizeGetter: NativeGetter | undefined
 ): number | string => {
-    const sizeGetter = getNativeGetter(prototype, "size");
     if (!sizeGetter) {
         return UNKNOWN_SIZE_PLACEHOLDER;
     }
@@ -334,7 +335,7 @@ function serializeMapPreview(
             if (!isIterable(nativeEntries)) {
                 return {
                     entries,
-                    size: getNativeCollectionSize(value, Map.prototype),
+                    size: getNativeCollectionSize(value, MAP_SIZE),
                     type: "Map",
                 };
             }
@@ -372,7 +373,7 @@ function serializeMapPreview(
 
     return {
         entries,
-        size: getNativeCollectionSize(value, Map.prototype),
+        size: getNativeCollectionSize(value, MAP_SIZE),
         type: "Map",
     };
 }
@@ -391,7 +392,7 @@ function serializeSetPreview(
             if (!isIterable(nativeValues)) {
                 return {
                     sample,
-                    size: getNativeCollectionSize(value, Set.prototype),
+                    size: getNativeCollectionSize(value, SET_SIZE),
                     type: "Set",
                 };
             }
@@ -411,7 +412,7 @@ function serializeSetPreview(
 
     return {
         sample,
-        size: getNativeCollectionSize(value, Set.prototype),
+        size: getNativeCollectionSize(value, SET_SIZE),
         type: "Set",
     };
 }

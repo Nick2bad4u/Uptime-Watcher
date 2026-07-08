@@ -280,6 +280,31 @@ describe(buildPayloadPreview, () => {
         expect(sizeGetterCalls).toBe(0);
     });
 
+    it("does not invoke patched Map prototype size accessors", () => {
+        const size = vi.spyOn(Map.prototype, "size", "get");
+        size.mockImplementation(() => {
+            throw new Error("Map prototype size should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview(
+                new Map<string, string>([
+                    ["refreshToken", "refresh-secret"],
+                    ["visible", "ordinary-value"],
+                ])
+            );
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"size": 2');
+            expect(preview).toContain("[REDACTED]");
+            expect(preview).toContain("ordinary-value");
+            expect(preview).not.toContain("refresh-secret");
+            expect(size).not.toHaveBeenCalled();
+        } finally {
+            size.mockRestore();
+        }
+    });
+
     it("does not invoke shadowed Set iterator or size accessors", () => {
         const iterator = vi.fn(() => {
             throw new Error("set iterator should not run");
@@ -306,6 +331,25 @@ describe(buildPayloadPreview, () => {
         expect(preview).toContain("second");
         expect(iterator).not.toHaveBeenCalled();
         expect(sizeGetterCalls).toBe(0);
+    });
+
+    it("does not invoke patched Set prototype size accessors", () => {
+        const size = vi.spyOn(Set.prototype, "size", "get");
+        size.mockImplementation(() => {
+            throw new Error("Set prototype size should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview(new Set(["first", "second"]));
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"size": 2');
+            expect(preview).toContain("first");
+            expect(preview).toContain("second");
+            expect(size).not.toHaveBeenCalled();
+        } finally {
+            size.mockRestore();
+        }
     });
 
     it("does not invoke object accessors while building previews", () => {
