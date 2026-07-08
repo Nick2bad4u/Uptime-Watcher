@@ -327,6 +327,33 @@ describe(MonitorOperationRegistry, () => {
 
             expect(operation).toBeUndefined();
         });
+
+        it("should return a defensive snapshot of operation metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Integrity", "type");
+
+            const result = registry.initiateCheck(mockMonitorId);
+            const operation = registry.getOperation(result.operationId);
+
+            expect(operation).toBeDefined();
+            expect(Object.isFrozen(operation)).toBeTruthy();
+
+            operation!.initiatedAt.setFullYear(2000);
+            Reflect.set(operation!, "monitorId", "corrupted-monitor");
+
+            const storedOperation = registry.getOperation(result.operationId);
+            expect(storedOperation?.monitorId).toBe(mockMonitorId);
+            expect(storedOperation?.initiatedAt.getFullYear()).not.toBe(2000);
+            expect(registry.hasOutstandingOperation(mockMonitorId)).toBeTruthy();
+            expect(
+                registry.hasOutstandingOperation("corrupted-monitor")
+            ).toBeFalsy();
+        });
     });
 
     describe("validateOperation", () => {
@@ -690,6 +717,30 @@ describe(MonitorOperationRegistry, () => {
             activeOps1.clear();
             const stillPresent = registry.getOperation(result.operationId);
             expect(stillPresent).toBeDefined();
+        });
+
+        it("should return defensive snapshots of active operation entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Integrity", "type");
+
+            const result = registry.initiateCheck(mockMonitorId);
+            const activeOps = registry.getActiveOperations();
+            const operation = activeOps.get(result.operationId);
+
+            expect(operation).toBeDefined();
+            expect(Object.isFrozen(operation)).toBeTruthy();
+
+            operation!.initiatedAt.setFullYear(2000);
+            Reflect.set(operation!, "monitorId", "corrupted-monitor");
+
+            const storedOperation = registry.getOperation(result.operationId);
+            expect(storedOperation?.monitorId).toBe(mockMonitorId);
+            expect(storedOperation?.initiatedAt.getFullYear()).not.toBe(2000);
         });
 
         it("should reflect changes when operations are completed", async ({

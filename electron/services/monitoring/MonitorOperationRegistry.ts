@@ -35,15 +35,15 @@ const getSafeIdentifier = (identifier: string): string =>
  */
 export interface MonitorCheckOperation {
     /** AbortController for this operation */
-    abortController: AbortController;
+    readonly abortController: AbortController;
     /** Unique operation ID */
-    id: string;
+    readonly id: string;
     /** When operation started */
-    initiatedAt: Date;
+    readonly initiatedAt: Date;
     /** Monitor being checked */
-    monitorId: string;
+    readonly monitorId: string;
     /** AbortSignal for easy access */
-    signal: AbortSignal;
+    readonly signal: AbortSignal;
 }
 
 /**
@@ -95,6 +95,18 @@ export class MonitorOperationRegistry {
 
     public constructor(options: MonitorOperationRegistryOptions = {}) {
         this.randomUUID = options.randomUUID ?? randomUUID;
+    }
+
+    private static cloneOperation(
+        operation: MonitorCheckOperation
+    ): MonitorCheckOperation {
+        return Object.freeze({
+            abortController: operation.abortController,
+            id: operation.id,
+            initiatedAt: new Date(operation.initiatedAt),
+            monitorId: operation.monitorId,
+            signal: operation.signal,
+        });
     }
 
     /**
@@ -194,7 +206,15 @@ export class MonitorOperationRegistry {
      * @returns Map clone containing all active operations
      */
     public getActiveOperations(): Map<string, MonitorCheckOperation> {
-        return new Map(this.activeOperations);
+        const operations = new Map<string, MonitorCheckOperation>();
+        for (const [operationId, operation] of this.activeOperations) {
+            operations.set(
+                operationId,
+                MonitorOperationRegistry.cloneOperation(operation)
+            );
+        }
+
+        return operations;
     }
 
     /**
@@ -207,7 +227,12 @@ export class MonitorOperationRegistry {
     public getOperation(
         operationId: string
     ): MonitorCheckOperation | undefined {
-        return this.activeOperations.get(operationId);
+        const operation = this.activeOperations.get(operationId);
+        if (!operation) {
+            return undefined;
+        }
+
+        return MonitorOperationRegistry.cloneOperation(operation);
     }
 
     /**
