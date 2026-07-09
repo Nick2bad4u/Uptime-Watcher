@@ -1,20 +1,4 @@
-/**
- * Comprehensive tests for theme hooks
- *
- * @module useTheme
- *
- * @file Tests for useTheme, useAvailabilityColors, useThemeClasses, and
- *   useThemeValue hooks to achieve 100% coverage
- *
- * @author GitHub Copilot
- *
- * @since 2025-01-15
- *
- * @category Theme
- *
- * @tags ["test", "theme", "hooks", "coverage"]
- */
-
+import type { SiteStatus } from "@shared/types";
 import { act, renderHook } from "@testing-library/react";
 import { arrayIncludes, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -210,7 +194,10 @@ vi.mock("../../../shared/utils/typeHelpers", () => ({
 const mockUpdateSettings = vi.fn();
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
 
-describe("Theme Hooks - Comprehensive Coverage", () => {
+const toRuntimeSiteStatus = (status: string): SiteStatus =>
+    status as unknown as SiteStatus;
+
+describe("mocked useTheme behavior", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -430,7 +417,7 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useTheme());
 
             const invalidStatus = result.current.getStatusColor(
-                "invalid" as any
+                toRuntimeSiteStatus("invalid")
             );
             expect(invalidStatus).toBe("#6b7280"); // Falls back to text.secondary
         });
