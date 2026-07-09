@@ -403,11 +403,13 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
                     // Attempt to modify should fail (frozen objects)
                     expect(() => {
-                        (config as any).ttl = 999;
+                        Object.defineProperty(config, "ttl", { value: 999 });
                     }).toThrow();
 
                     expect(() => {
-                        (config as any).name = "modified";
+                        Object.defineProperty(config, "name", {
+                            value: "modified",
+                        });
                     }).toThrow();
                 })
             );
