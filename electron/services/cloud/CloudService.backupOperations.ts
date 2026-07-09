@@ -76,11 +76,16 @@ export async function migrateBackups(
             ? await ctx.getEncryptionKeyOrThrow()
             : undefined;
 
-        const result = await migrateProviderBackups({
-            encryptionKey,
-            provider,
-            request,
-        });
+        let result: CloudBackupMigrationResult;
+        try {
+            result = await migrateProviderBackups({
+                encryptionKey,
+                provider,
+                request,
+            });
+        } finally {
+            encryptionKey?.fill(0);
+        }
 
         if (result.migrated > 0) {
             await ctx.settings.set(
@@ -129,9 +134,19 @@ export async function uploadLatestBackup(
             metadata: backup.metadata,
         });
 
-        const payloadBuffer = shouldEncrypt
-            ? encryptBuffer({ key, plaintext: backup.buffer })
-            : backup.buffer;
+        let payloadBuffer: Buffer;
+        if (shouldEncrypt) {
+            try {
+                payloadBuffer = encryptBuffer({
+                    key,
+                    plaintext: backup.buffer,
+                });
+            } finally {
+                key.fill(0);
+            }
+        } else {
+            payloadBuffer = backup.buffer;
+        }
 
         const entry = await provider.uploadBackup({
             buffer: payloadBuffer,

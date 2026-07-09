@@ -376,7 +376,11 @@ export class CloudService {
 
     private async decryptBackupOrThrow(buffer: Buffer): Promise<Buffer> {
         const key = await this.getEncryptionKeyOrThrow();
-        return decryptBuffer({ ciphertext: buffer, key });
+        try {
+            return decryptBuffer({ ciphertext: buffer, key });
+        } finally {
+            key.fill(0);
+        }
     }
 
     private async getEffectiveEncryptionMode(
