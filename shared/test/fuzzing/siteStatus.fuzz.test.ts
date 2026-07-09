@@ -338,7 +338,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                         status: "invalid-status",
                     },
                 ],
-            } as SiteForStatus;
+            } as unknown as SiteForStatus;
 
             expect(getSiteStatusDescription(site)).toBe("Unknown status");
         });
@@ -355,7 +355,7 @@ describe("SiteStatus utilities fuzzing tests", () => {
                         status: "invalid-status-2",
                     },
                 ],
-            } as SiteForStatus;
+            } as unknown as SiteForStatus;
 
             expect(getSiteStatusDescription(site)).toBe(
                 "Mixed status (2/2 monitoring active)"

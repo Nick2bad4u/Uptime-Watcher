@@ -11,7 +11,6 @@ import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
-    type StandardizedCacheKey,
 } from "../../utils/cacheKeys.js";
 
 describe("cacheKeys", () => {
