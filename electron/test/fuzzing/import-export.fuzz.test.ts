@@ -17,12 +17,130 @@
  * @packageDocumentation
  */
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site, StatusHistory } from "@shared/types";
 
 import fc from "fast-check";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DataImportExportService } from "../../services/database/DataImportExportService";
+
+type BaseGeneratedMonitor = Pick<
+    Monitor,
+    | "checkInterval"
+    | "history"
+    | "id"
+    | "monitoring"
+    | "responseTime"
+    | "retryAttempts"
+    | "status"
+    | "timeout"
+> &
+    Pick<Partial<Monitor>, "activeOperations">;
+
+function characterPool(characters: string): [string, ...string[]] {
+    const [first, ...rest] = [...characters];
+    if (!first) {
+        throw new Error("Character pool must not be empty");
+    }
+    return [first, ...rest];
+}
+
+const identifierStartCharacters = characterPool(
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+);
+const identifierRestCharacters = characterPool(
+    "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+);
+const nameRestCharacters = characterPool(
+    " -.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+);
+
+const safeIdentifierArbitrary = fc
+    .tuple(
+        fc.constantFrom(...identifierStartCharacters),
+        fc.array(fc.constantFrom(...identifierRestCharacters), {
+            maxLength: 39,
+        })
+    )
+    .map(([first, rest]) => `${first}${rest.join("")}`);
+const safeNameArbitrary = fc
+    .tuple(
+        fc.constantFrom(...identifierStartCharacters),
+        fc.array(fc.constantFrom(...nameRestCharacters), { maxLength: 79 })
+    )
+    .map(([first, rest]) => `${first}${rest.join("")}`);
+const safeHostArbitrary = fc
+    .integer({ max: 1_000_000, min: 1 })
+    .map((value) => `service-${value}.example.com`);
+const safeUrlArbitrary = safeHostArbitrary.map(
+    (host) => `https://${host}/health?token=secret#frag`
+);
+
+const statusHistoryArbitrary: fc.Arbitrary<StatusHistory> = fc.record({
+    responseTime: fc.integer({ max: 30_000, min: -1 }),
+    status: fc.constantFrom("up", "down", "degraded"),
+    timestamp: fc.integer({
+        max: Date.now(),
+        min: 1_600_000_000_000,
+    }),
+});
+
+const baseGeneratedMonitorArbitrary: fc.Arbitrary<BaseGeneratedMonitor> =
+    fc.record({
+        activeOperations: fc.array(safeIdentifierArbitrary, { maxLength: 3 }),
+        checkInterval: fc.integer({ max: 1_800_000, min: 5000 }),
+        history: fc.array(statusHistoryArbitrary, { maxLength: 100 }),
+        id: safeIdentifierArbitrary,
+        monitoring: fc.boolean(),
+        responseTime: fc.integer({ max: 30_000, min: -1 }),
+        retryAttempts: fc.integer({ max: 10, min: 0 }),
+        status: fc.constantFrom("up", "down", "pending", "paused", "degraded"),
+        timeout: fc.integer({ max: 30_000, min: 1000 }),
+    });
+
+const validExportMonitorArbitrary: fc.Arbitrary<Monitor> = fc.oneof(
+    fc
+        .tuple(baseGeneratedMonitorArbitrary, safeUrlArbitrary)
+        .map(([base, url]) => ({
+            ...base,
+            type: "http" as const,
+            url,
+        })),
+    fc
+        .tuple(baseGeneratedMonitorArbitrary, safeHostArbitrary)
+        .map(([base, host]) => ({
+            ...base,
+            host,
+            type: "ping" as const,
+        })),
+    fc
+        .tuple(
+            baseGeneratedMonitorArbitrary,
+            safeHostArbitrary,
+            fc.integer({ max: 65_535, min: 1 })
+        )
+        .map(([base, host, port]) => ({
+            ...base,
+            host,
+            port,
+            type: "port" as const,
+        })),
+    fc
+        .tuple(baseGeneratedMonitorArbitrary, safeHostArbitrary)
+        .map(([base, host]) => ({
+            ...base,
+            host,
+            recordType: "A" as const,
+            type: "dns" as const,
+        }))
+);
+
+const validExportSiteArbitrary: fc.Arbitrary<Site> = fc.record({
+    identifier: safeIdentifierArbitrary,
+    monitoring: fc.boolean(),
+    monitors: fc.array(validExportMonitorArbitrary, { maxLength: 5 }),
+    name: safeNameArbitrary,
+});
 
 describe("Data Import/Export Service Fuzzing Tests", () => {
     let service: DataImportExportService;
@@ -297,79 +415,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
         it("should handle export with various site configurations", async () => {
             await fc.assert(
                 fc.asyncProperty(
-                    fc.array(
-                        fc.record({
-                            identifier: fc.string({
-                                minLength: 1,
-                                maxLength: 100,
-                            }),
-                            name: fc.string({ minLength: 1, maxLength: 200 }),
-                            monitoring: fc.boolean(),
-                            monitors: fc.array(
-                                fc.record({
-                                    id: fc.string({
-                                        minLength: 1,
-                                        maxLength: 50,
-                                    }),
-                                    type: fc.constantFrom(
-                                        "http",
-                                        "ping",
-                                        "port",
-                                        "dns"
-                                    ),
-                                    url: fc.option(fc.webUrl()),
-                                    host: fc.option(fc.domain()),
-                                    port: fc.option(
-                                        fc.integer({ min: 1, max: 65_535 })
-                                    ),
-                                    status: fc.constantFrom(
-                                        "up",
-                                        "down",
-                                        "pending",
-                                        "paused"
-                                    ),
-                                    monitoring: fc.boolean(),
-                                    checkInterval: fc.integer({
-                                        min: 30_000,
-                                        max: 1_800_000,
-                                    }),
-                                    timeout: fc.integer({
-                                        min: 1000,
-                                        max: 30_000,
-                                    }),
-                                    retryAttempts: fc.integer({
-                                        min: 1,
-                                        max: 5,
-                                    }),
-                                    responseTime: fc.integer({
-                                        min: 0,
-                                        max: 30_000,
-                                    }),
-                                    history: fc.array(
-                                        fc.record({
-                                            timestamp: fc.integer({
-                                                min: 1_600_000_000_000,
-                                                max: Date.now(),
-                                            }),
-                                            status: fc.constantFrom(
-                                                "up",
-                                                "down"
-                                            ),
-                                            responseTime: fc.integer({
-                                                min: 0,
-                                                max: 30_000,
-                                            }),
-                                        }),
-                                        { maxLength: 100 }
-                                    ),
-                                }),
-                                { maxLength: 5 }
-                            ),
-                        }) as fc.Arbitrary<Site>,
-                        { maxLength: 10 }
-                    ),
+                    fc.array(validExportSiteArbitrary, { maxLength: 10 }),
                     fc.dictionary(
-                        fc.string({ minLength: 1, maxLength: 50 }),
+                        safeIdentifierArbitrary,
                         fc.string({ minLength: 0, maxLength: 200 })
                     ),
                     async (sites, settings) => {

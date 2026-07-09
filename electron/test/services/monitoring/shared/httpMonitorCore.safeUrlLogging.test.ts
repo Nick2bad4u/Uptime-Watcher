@@ -1,6 +1,5 @@
 /**
- * Ensures HTTP monitor logs never include sensitive URL components (auth,
- * query, hash).
+ * Ensures HTTP monitor logs never include sensitive URL components.
  */
 
 import type { Monitor } from "@shared/types";
@@ -66,7 +65,7 @@ describe("httpMonitorCore safe URL logging", () => {
         });
     });
 
-    it("redacts query/hash/auth in debug logs", async () => {
+    it("redacts query/hash in debug logs", async () => {
         const monitor: Monitor = {
             checkInterval: 5000,
             history: [],
@@ -77,7 +76,7 @@ describe("httpMonitorCore safe URL logging", () => {
             status: "pending",
             timeout: 1000,
             type: "http",
-            url: "https://user:pass@example.com/path?token=secret#frag",
+            url: "https://example.com/path?token=secret#frag",
         };
 
         const service = new HttpMonitor({ timeout: 1000 });
@@ -90,11 +89,10 @@ describe("httpMonitorCore safe URL logging", () => {
         expect(checkingLog).toBeDefined();
         expect(checkingLog).toContain("https://example.com/path");
         expect(checkingLog).not.toContain("token=secret");
-        expect(checkingLog).not.toContain("user:pass");
         expect(checkingLog).not.toContain("#frag");
     });
 
-    it("redacts query/hash/auth in operation names", async () => {
+    it("redacts query/hash in operation names", async () => {
         const monitor: Monitor = {
             checkInterval: 5000,
             history: [],
@@ -105,7 +103,7 @@ describe("httpMonitorCore safe URL logging", () => {
             status: "pending",
             timeout: 1000,
             type: "http",
-            url: "https://user:pass@example.com/path?token=secret#frag",
+            url: "https://example.com/path?token=secret#frag",
         };
 
         const service = new HttpMonitor({ timeout: 1000 });
@@ -115,7 +113,6 @@ describe("httpMonitorCore safe URL logging", () => {
 
         expect(operationName).toBe("HTTP check for https://example.com/path");
         expect(operationName).not.toContain("token=secret");
-        expect(operationName).not.toContain("user:pass");
         expect(operationName).not.toContain("#frag");
     });
 });

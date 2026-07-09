@@ -202,7 +202,11 @@ describe(MonitorManager, () => {
             timestamp: new Date().toISOString(),
         };
 
-        dependencies.getSitesCache = () => ({ get: () => mockSite });
+        const sitesCache = {
+            get: () => mockSite,
+            set: vi.fn(),
+        };
+        dependencies.getSitesCache = () => sitesCache;
         dependencies.eventEmitter.emitTyped = vi.fn();
 
         // Mock the enhanced checker to return a result
@@ -218,6 +222,10 @@ describe(MonitorManager, () => {
             true
         );
         expect(dependencies.eventEmitter.emitTyped).toHaveBeenCalled();
+        expect(sitesCache.set).toHaveBeenCalledWith("site-1", {
+            ...mockSite,
+            monitors: [monitor],
+        });
         expect(result).toEqual(mockStatusUpdate);
     });
 });
