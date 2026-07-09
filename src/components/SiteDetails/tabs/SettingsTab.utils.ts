@@ -9,7 +9,7 @@
 import type { Monitor, Site } from "@shared/types";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { arrayFirst, isFinite as isFiniteNumber } from "ts-extras";
 
 import {
@@ -72,11 +72,25 @@ export function getDisplayIdentifier(
  * Hook that resolves the identifier label for the currently selected monitor.
  */
 export function useIdentifierLabel(selectedMonitor: Monitor): string {
-    const [label, setLabel] = useState(UiDefaults.loadingLabel);
+    const fallbackLabel = useMemo(
+        () => getMonitorTypeDisplayLabel(selectedMonitor.type),
+        [selectedMonitor.type]
+    );
+    const labelRef = useRef(fallbackLabel);
+    const [label, setLabelState] = useState(fallbackLabel);
+    const setLabel = useCallback((nextLabel: string): void => {
+        if (labelRef.current === nextLabel) {
+            return;
+        }
+
+        labelRef.current = nextLabel;
+        setLabelState(nextLabel);
+    }, []);
 
     useEffect(
         function loadLabelWithCleanup() {
             let isCancelled = false;
+            setLabel(fallbackLabel);
 
             const loadLabel = async (): Promise<void> => {
                 const identifierLabel =
@@ -95,7 +109,7 @@ export function useIdentifierLabel(selectedMonitor: Monitor): string {
                 isCancelled = true;
             };
         },
-        [selectedMonitor]
+        [fallbackLabel, selectedMonitor, setLabel]
     );
 
     return label;
