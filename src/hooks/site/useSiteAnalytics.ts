@@ -20,6 +20,7 @@ import {
 } from "ts-extras";
 
 import { CHART_TIME_PERIODS } from "../../constants";
+import { isValidHistoryTimestamp } from "../../utils/monitoring/monitorHistoryTime";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
 /**
@@ -41,13 +42,6 @@ const createDowntimePeriod = (start: number, end: number): DowntimePeriod => ({
     end,
     start,
 });
-
-function isValidHistoryTimestamp(timestamp: number): boolean {
-    return (
-        isFiniteNumber(timestamp) &&
-        isFiniteNumber(new Date(timestamp).getTime())
-    );
-}
 
 function isAnalyticsHistoryRecord(record: StatusHistory): boolean {
     return (

@@ -929,6 +929,7 @@ describe(useSiteAnalytics, () => {
                 history: [
                     validRecord,
                     createStatusRecord(Number.POSITIVE_INFINITY, "up", 100),
+                    createStatusRecord(now - 4000.5, "up", 150),
                     createStatusRecord(now - 2000, "up", Number.NaN),
                     unavailableResponseRecord,
                 ],

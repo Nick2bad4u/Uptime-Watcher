@@ -3,7 +3,9 @@ import type { Monitor, StatusHistory } from "@shared/types";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, isSafeInteger } from "ts-extras";
 
-const isValidHistoryTimestamp = (timestamp: unknown): timestamp is number =>
+export const isValidHistoryTimestamp = (
+    timestamp: unknown
+): timestamp is number =>
     typeof timestamp === "number" &&
     isSafeInteger(timestamp) &&
     timestamp >= 0 &&

@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 
-import { getLatestHistoryTimestamp } from "../../../utils/monitoring/monitorHistoryTime";
+import {
+    getLatestHistoryTimestamp,
+    isValidHistoryTimestamp,
+} from "../../../utils/monitoring/monitorHistoryTime";
 
 describe(getLatestHistoryTimestamp, () => {
     it("returns undefined for empty history", () => {
@@ -47,5 +50,20 @@ describe(getLatestHistoryTimestamp, () => {
         ]);
 
         expect(latest).toBe(5000);
+    });
+});
+
+describe(isValidHistoryTimestamp, () => {
+    it("accepts non-negative safe integer timestamps inside the Date range", () => {
+        expect(isValidHistoryTimestamp(0)).toBeTruthy();
+        expect(isValidHistoryTimestamp(MAX_VALID_DATE_EPOCH_MS)).toBeTruthy();
+    });
+
+    it("rejects negative, fractional, and out-of-range timestamps", () => {
+        expect(isValidHistoryTimestamp(-1)).toBeFalsy();
+        expect(isValidHistoryTimestamp(1000.5)).toBeFalsy();
+        expect(
+            isValidHistoryTimestamp(MAX_VALID_DATE_EPOCH_MS + 1)
+        ).toBeFalsy();
     });
 });

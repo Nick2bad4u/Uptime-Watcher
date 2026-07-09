@@ -11,6 +11,8 @@ import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { useMemo } from "react";
 import { arrayIncludes, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
+import { isValidHistoryTimestamp } from "../../utils/monitoring/monitorHistoryTime";
+
 /**
  * Interface for site statistics data
  *
@@ -37,8 +39,7 @@ export interface SiteStats {
 function isStatsHistoryRecord(record: StatusHistory): boolean {
     return (
         arrayIncludes(STATUS_HISTORY_VALUES, record.status) &&
-        isFiniteNumber(record.timestamp) &&
-        isFiniteNumber(new Date(record.timestamp).getTime()) &&
+        isValidHistoryTimestamp(record.timestamp) &&
         isFiniteNumber(record.responseTime) &&
         record.responseTime >= -1
     );

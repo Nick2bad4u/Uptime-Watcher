@@ -61,6 +61,16 @@ describe("useSiteStats Edge Cases", () => {
                     status: "up",
                     timestamp: Number.POSITIVE_INFINITY,
                 },
+                {
+                    responseTime: 175,
+                    status: "up",
+                    timestamp: -1,
+                },
+                {
+                    responseTime: 225,
+                    status: "up",
+                    timestamp: 1_640_995_200_000.5,
+                },
             ] as unknown as StatusHistory[];
 
             const { result } = renderHook(() => useSiteStats(history));
