@@ -433,6 +433,142 @@ describe("Environment Detection Utilities", () => {
         });
     });
 
+    describe("readNumberEnv", () => {
+        it("should read trimmed positive integer environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            applyMockProcessSnapshot({ env: { TEST_LIMIT: " 42 " } });
+
+            expect(envModule.readNumberEnv("TEST_LIMIT", 10)).toBe(42);
+        });
+
+        it("should return the supplied default for missing or invalid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            const envModule = ensureEnvironmentModule();
+            const invalidValues = [
+                "",
+                "0",
+                "-1",
+                "1.5",
+                "1e3",
+                "10junk",
+                "Infinity",
+                String(Number.MAX_SAFE_INTEGER + 1),
+            ];
+
+            applyMockProcessSnapshot({ env: {} });
+            expect(envModule.readNumberEnv("TEST_LIMIT", 10)).toBe(10);
+
+            for (const value of invalidValues) {
+                applyMockProcessSnapshot({ env: { TEST_LIMIT: value } });
+                expect(envModule.readNumberEnv("TEST_LIMIT", 10)).toBe(10);
+            }
+        });
+    });
+
+    describe("normalizePositiveInteger", () => {
+        it("should truncate finite positive values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            expect(envModule.normalizePositiveInteger(42.9, 10)).toBe(42);
+        });
+
+        it("should return the fallback for non-positive and infinite values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            expect(envModule.normalizePositiveInteger(0, 10)).toBe(10);
+            expect(envModule.normalizePositiveInteger(-1, 10)).toBe(10);
+            expect(
+                envModule.normalizePositiveInteger(Number.POSITIVE_INFINITY, 10)
+            ).toBe(10);
+        });
+    });
+
+    describe("readBoundedPositiveIntegerEnv", () => {
+        it("should read and clamp positive integer environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            applyMockProcessSnapshot({ env: { TEST_LIMIT: "50" } });
+
+            expect(
+                envModule.readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 25,
+                })
+            ).toBe(25);
+        });
+
+        it("should use the fallback when the env value or bound is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            applyMockProcessSnapshot({ env: { TEST_LIMIT: "invalid" } });
+            expect(
+                envModule.readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 25,
+                })
+            ).toBe(10);
+
+            applyMockProcessSnapshot({ env: { TEST_LIMIT: "20" } });
+            expect(
+                envModule.readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 0,
+                })
+            ).toBe(10);
+        });
+    });
+
     describe("isBrowserEnvironment", () => {
         let originalWindow: object | undefined;
         let originalDocument: object | undefined;
