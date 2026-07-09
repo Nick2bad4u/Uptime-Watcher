@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AppSettings } from "../../../stores/types";
 
@@ -219,6 +219,10 @@ describe(useInAppAlertTonePreview, () => {
 });
 
 describe(useSettingsChangeHandlers, () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     it("applies setting changes, honors forceKeys, and warns on invalid keys", async () => {
         const settings = createBaseSettings();
 
@@ -251,6 +255,33 @@ describe(useSettingsChangeHandlers, () => {
         );
         expect(mockedLogger.warn).toHaveBeenCalledTimes(1);
         expect(mockedLogger.user.settingsChange).toHaveBeenCalled();
+    });
+
+    it("warns and does not update settings for invalid handleSettingChange keys", () => {
+        const settings = createBaseSettings();
+
+        const updateSettings = vi.fn<(changes: Partial<AppSettings>) => void>();
+
+        const { result } = renderHook(() =>
+            useSettingsChangeHandlers({
+                settings,
+                updateSettings,
+            })
+        );
+
+        act(() => {
+            result.current.handleSettingChange(
+                "invalidKey" as keyof AppSettings,
+                true
+            );
+        });
+
+        expect(mockedLogger.warn).toHaveBeenCalledWith(
+            "Attempted to update invalid settings key",
+            "invalidKey"
+        );
+        expect(updateSettings).not.toHaveBeenCalled();
+        expect(mockedLogger.user.settingsChange).not.toHaveBeenCalled();
     });
 
     it("does not call updateSettings when there are no effective changes", async () => {
