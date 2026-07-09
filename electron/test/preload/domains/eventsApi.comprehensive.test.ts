@@ -1189,6 +1189,25 @@ describe("Events Domain API", () => {
             expect(callback).toHaveBeenCalledWith(mockEventData);
         });
 
+        it("should strip unexpected update status event fields", () => {
+            const callback = vi.fn();
+            const mockEventData = {
+                error: "Connection failed",
+                refreshToken: "secret-token",
+                status: "checking",
+            };
+
+            eventsApi.onUpdateStatus(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, mockEventData);
+
+            expect(callback).toHaveBeenCalledWith({
+                error: "Connection failed",
+                status: "checking",
+            });
+        });
+
         it("should drop update errors that exceed the user-facing detail limit", () => {
             const callback = vi.fn();
             const oversizedPayload: UpdateStatusEventData = {

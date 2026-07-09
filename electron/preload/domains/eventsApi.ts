@@ -287,6 +287,23 @@ const isUpdateStatusEventDataPayload = (
     );
 };
 
+const mapUpdateStatusEventDataPayload = (
+    payload: unknown
+): UpdateStatusEventData | undefined => {
+    if (!isUpdateStatusEventDataPayload(payload)) {
+        return undefined;
+    }
+
+    return isDefined(payload.error)
+        ? {
+              error: payload.error,
+              status: payload.status,
+          }
+        : {
+              status: payload.status,
+          };
+};
+
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
     isUnknownRecord(payload);
 
@@ -764,6 +781,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isUpdateStatusEventDataPayload",
+                    mapPayload: mapUpdateStatusEventDataPayload,
                 }
             ),
         removeAllListeners: (...args: Readonly<UnknownArray>): void => {
