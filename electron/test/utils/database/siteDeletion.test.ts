@@ -45,7 +45,7 @@ function createSiteAdapter(overrides: Partial<SiteAdapterStub> = {}): {
     };
 }
 
-describe("deleteSiteWithAdapters runtime coverage", () => {
+describe("deleteSiteWithAdapters", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
