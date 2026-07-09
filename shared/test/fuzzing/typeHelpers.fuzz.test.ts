@@ -90,10 +90,9 @@ describe("TypeHelpers utilities fuzzing tests", () => {
 
             const response = { id: 1, name: "test" };
             const validator = (val: unknown): val is TestType =>
-                typeof val === "object" &&
-                val !== null &&
-                typeof (val as any).id === "number" &&
-                typeof (val as any).name === "string";
+                isRecord(val) &&
+                typeof val["id"] === "number" &&
+                typeof val["name"] === "string";
 
             const result = castIpcResponse<TestType>(response, validator);
             expect(result).toEqual(response);
