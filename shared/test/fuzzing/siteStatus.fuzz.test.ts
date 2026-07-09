@@ -6,7 +6,7 @@
  * @since 2024
  */
 
-import type { SiteForStatus } from "@shared/types";
+import type { SiteForStatus, SiteStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
@@ -127,7 +127,9 @@ describe("SiteStatus utilities fuzzing tests", () => {
         });
 
         it("should handle null/undefined monitors gracefully", () => {
-            const site = { monitors: null } as any;
+            const site: SiteForStatus = {
+                monitors: null as unknown as SiteForStatus["monitors"],
+            };
             const result = calculateSiteMonitoringStatus(site);
             expect(result).toBe("stopped");
         });
@@ -400,7 +402,9 @@ describe("SiteStatus utilities fuzzing tests", () => {
             "should handle invalid status gracefully",
             (invalidStatus) => {
                 // Type assertion to test runtime behavior
-                const result = getSiteStatusVariant(invalidStatus as any);
+                const result = getSiteStatusVariant(
+                    invalidStatus as SiteStatus
+                );
                 expect([
                     "success",
                     "error",
