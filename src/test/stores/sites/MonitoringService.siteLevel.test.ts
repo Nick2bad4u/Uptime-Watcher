@@ -41,11 +41,25 @@ const mockElectronAPI = {
     },
 };
 
+const resetMonitoringMocks = (): void => {
+    mockElectronAPI.monitoring.startMonitoringForMonitor.mockReset();
+    mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
+        true
+    );
+    mockElectronAPI.monitoring.startMonitoringForSite.mockReset();
+    mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(true);
+    mockElectronAPI.monitoring.stopMonitoringForMonitor.mockReset();
+    mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(true);
+    mockElectronAPI.monitoring.stopMonitoringForSite.mockReset();
+    mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(true);
+};
+
 let restoreElectronApi: (() => void) | undefined;
 
 describe("MonitoringService - Site-level monitoring", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        resetMonitoringMocks();
         mockWaitForElectronBridge.mockResolvedValue(undefined);
         ({ restore: restoreElectronApi } = installElectronApiMock(
             mockElectronAPI,
@@ -113,7 +127,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Failed to start site monitoring");
         });
 
-        it("should work with empty string site identifier", async ({
+        it("should reject empty string site identifier", async ({
             task,
             annotate,
         }) => {
@@ -127,15 +141,13 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             const siteIdentifier = "";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForSite(siteIdentifier);
+            await expect(
+                MonitoringService.startMonitoringForSite(siteIdentifier)
+            ).rejects.toThrow("Site identifier is required");
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith("");
+            ).not.toHaveBeenCalled();
         });
     });
 
@@ -192,7 +204,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             ).rejects.toThrow("Failed to stop site monitoring");
         });
 
-        it("should work with empty string site identifier", async ({
+        it("should reject empty string site identifier", async ({
             task,
             annotate,
         }) => {
@@ -206,15 +218,13 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             const siteIdentifier = "";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.stopMonitoringForSite(siteIdentifier);
+            await expect(
+                MonitoringService.stopMonitoringForSite(siteIdentifier)
+            ).rejects.toThrow("Site identifier is required");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith("");
+            ).not.toHaveBeenCalled();
         });
     });
 
@@ -277,7 +287,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             const siteIdentifier = "example.com";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValue(
+            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
                 new Error("Network error")
             );
 
@@ -297,7 +307,7 @@ describe("MonitoringService - Site-level monitoring", () => {
 
             const siteIdentifier = "example.com";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValue(
+            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
                 new Error("Request timeout")
             );
 

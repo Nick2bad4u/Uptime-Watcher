@@ -264,7 +264,7 @@ describe("SiteTableRow interaction coverage", () => {
 
         renderSiteTableRow();
 
-        expect(screen.getByText("—")).toBeInTheDocument();
+        expect(screen.getByText("N/A")).toBeInTheDocument();
     });
 
     it("provides runtime details to monitor selector and status badge", () => {
@@ -340,7 +340,7 @@ describe("SiteTableRow interaction coverage", () => {
         renderSiteTableRow();
 
         expect(screen.getByText("100%")).toBeInTheDocument();
-        expect(screen.getByText("75 ms")).toBeInTheDocument();
+        expect(screen.getByText("75ms")).toBeInTheDocument();
         expect(screen.getByText("2/2")).toBeInTheDocument();
         expect(arrayFirst(actionButtonGroupMock.props)).toMatchObject({
             allMonitorsRunning: true,

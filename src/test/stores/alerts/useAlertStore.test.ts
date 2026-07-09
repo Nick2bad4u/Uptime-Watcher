@@ -26,7 +26,8 @@ import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayloa
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const EXPECTED_MAX_TOAST_QUEUE_LENGTH = 20;
-const FALLBACK_ALERT_ID_REGEX = /^alert-site-[\da-z]{12}$/v;
+const FALLBACK_ALERT_ID_REGEX =
+    /^alert-[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/v;
 const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
     "Secure random ID generation is unavailable";
 

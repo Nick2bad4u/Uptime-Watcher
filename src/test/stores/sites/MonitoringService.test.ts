@@ -86,6 +86,29 @@ const mockElectronAPI = {
     },
 };
 
+const resetMonitoringMocks = (): void => {
+    mockElectronAPI.monitoring.checkSiteNow.mockReset();
+    mockElectronAPI.monitoring.checkSiteNow.mockResolvedValue(undefined);
+    mockElectronAPI.monitoring.startMonitoring.mockReset();
+    mockElectronAPI.monitoring.startMonitoring.mockResolvedValue(
+        createStartSummary()
+    );
+    mockElectronAPI.monitoring.startMonitoringForMonitor.mockReset();
+    mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
+        true
+    );
+    mockElectronAPI.monitoring.startMonitoringForSite.mockReset();
+    mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(true);
+    mockElectronAPI.monitoring.stopMonitoring.mockReset();
+    mockElectronAPI.monitoring.stopMonitoring.mockResolvedValue(
+        createStopSummary()
+    );
+    mockElectronAPI.monitoring.stopMonitoringForMonitor.mockReset();
+    mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(true);
+    mockElectronAPI.monitoring.stopMonitoringForSite.mockReset();
+    mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(true);
+};
+
 let restoreElectronApi: (() => void) | undefined;
 
 const getElectronApiGlobal = (): typeof globalThis & {
@@ -139,6 +162,7 @@ const createStatusUpdateFixture = (): StatusUpdate => {
 describe("MonitoringService", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        resetMonitoringMocks();
         mockWaitForElectronBridge.mockReset();
         mockWaitForElectronBridge.mockImplementation(async () => {
             const bridge =
@@ -305,7 +329,7 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to start monitoring");
         });
 
-        it("should handle empty siteIdentifier", async ({ task, annotate }) => {
+        it("should reject empty siteIdentifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -314,21 +338,19 @@ describe("MonitoringService", () => {
             const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
+            await expect(
+                MonitoringService.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
+            ).rejects.toThrow("Site identifier is required");
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForMonitor
-            ).toHaveBeenCalledWith("", monitorId);
+            ).not.toHaveBeenCalled();
         });
 
-        it("should handle empty monitorId", async ({ task, annotate }) => {
+        it("should reject empty monitorId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -337,18 +359,16 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "";
 
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
+            await expect(
+                MonitoringService.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
+            ).rejects.toThrow("Monitor ID is required");
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, "");
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle special characters in IDs", async ({
@@ -529,7 +549,7 @@ describe("MonitoringService", () => {
             ).rejects.toThrow("Failed to stop monitoring");
         });
 
-        it("should handle empty siteIdentifier", async ({ task, annotate }) => {
+        it("should reject empty siteIdentifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -538,21 +558,19 @@ describe("MonitoringService", () => {
             const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.stopMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
+            await expect(
+                MonitoringService.stopMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
+            ).rejects.toThrow("Site identifier is required");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForMonitor
-            ).toHaveBeenCalledWith("", monitorId);
+            ).not.toHaveBeenCalled();
         });
 
-        it("should handle empty monitorId", async ({ task, annotate }) => {
+        it("should reject empty monitorId", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -561,18 +579,16 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "";
 
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.stopMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
+            await expect(
+                MonitoringService.stopMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
+            ).rejects.toThrow("Monitor ID is required");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, "");
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle special characters in IDs", async ({
@@ -788,7 +804,7 @@ describe("MonitoringService", () => {
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
-        it("should handle long IDs", async ({ task, annotate }) => {
+        it("should reject overly long IDs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
@@ -797,18 +813,16 @@ describe("MonitoringService", () => {
             const siteIdentifier = "a".repeat(1000);
             const monitorId = "b".repeat(1000);
 
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
+            await expect(
+                MonitoringService.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
+            ).rejects.toThrow("Site identifier too long");
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle numeric-like string IDs", async ({
@@ -943,15 +957,15 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
+                true
+            );
+
             const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.startMonitoringForMonitor(
                     `site-${i}`,
                     `monitor-${i}`
                 )
-            );
-
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
-                true
             );
 
             await Promise.all(operations);
@@ -970,15 +984,15 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
+                true
+            );
+
             const operations = Array.from({ length: 5 }, (_, i) =>
                 MonitoringService.stopMonitoringForMonitor(
                     `site-${i}`,
                     `monitor-${i}`
                 )
-            );
-
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
-                true
             );
 
             await Promise.all(operations);
@@ -997,6 +1011,13 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
+                true
+            );
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
+                true
+            );
+
             const startOps = Array.from({ length: 3 }, (_, i) =>
                 MonitoringService.startMonitoringForMonitor(
                     `site-${i}`,
@@ -1008,13 +1029,6 @@ describe("MonitoringService", () => {
                     `site-${i + 3}`,
                     `monitor-${i + 3}`
                 )
-            );
-
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
-                true
-            );
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
-                true
             );
 
             await Promise.all([...startOps, ...stopOps]);
