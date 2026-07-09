@@ -521,6 +521,7 @@ describe("Theme Components - Comprehensive Coverage", () => {
     describe("ThemedCheckbox Component", () => {
         const defaultProps: ThemedCheckboxProperties = {
             checked: false,
+            onChange: vi.fn(),
         };
 
         it("should render with default props", ({ task, annotate }) => {
