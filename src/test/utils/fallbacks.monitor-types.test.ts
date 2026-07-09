@@ -1,16 +1,14 @@
 /**
- * Targeted monitor identifier coverage tests.
+ * Monitor-type display identifier behavior tests.
  *
  * @remarks
  * Supplements the broader fallback utility suites with focused assertions that
  * exercise every monitor-type-specific generator declared in
  * `src/utils/fallbacks.ts`. The existing suites already validate the most
- * common monitors (HTTP, Port, Ping, CDN, DNS, Replication), but coverage
- * analysis (see docs/Testing/README.md) revealed that less frequently used
- * monitor types such as `http-json`, `http-header`, and `websocket-keepalive`
- * were never instantiated inside tests. This file drives those code paths
- * explicitly and adds a Fast-Check property to ensure fallback behavior remains
- * stable across all URL-based monitor types.
+ * common monitors (HTTP, Port, Ping, CDN, DNS, Replication). These tests cover
+ * less frequently used monitor types such as `http-json`, `http-header`, and
+ * `websocket-keepalive`, then add a Fast-Check property to ensure fallback
+ * behavior remains stable across all URL-based monitor types.
  */
 
 import { test } from "@fast-check/vitest";
@@ -73,7 +71,7 @@ function createMonitorFixture(
     };
 }
 
-describe("getMonitorDisplayIdentifier monitor type coverage", () => {
+describe("getMonitorDisplayIdentifier monitor type behavior", () => {
     const fallbackLabel = "Site Fallback";
 
     interface MonitorTypeCase {

@@ -1,6 +1,5 @@
 /**
- * Targeted tests for ThemedBox keyboard interaction coverage Specifically
- * targeting lines 111-113 (onKeyDown handler)
+ * Keyboard interaction behavior tests for ThemedBox.
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
@@ -13,19 +12,19 @@ import { ThemeProvider } from "../../theme/components/ThemeProvider";
 const renderWithTheme = (component: ReactElement) =>
     render(createElement(ThemeProvider, { children: component }));
 
-describe("ThemedBox - Keyboard Interaction Coverage", () => {
-    describe("onKeyDown handler coverage (lines 111-113)", () => {
+describe("ThemedBox keyboard interaction behavior", () => {
+    describe("onKeyDown handler behavior", () => {
         it("should handle Enter key for interactive div", ({
             task,
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -53,12 +52,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -85,12 +84,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Event Processing", "type");
 
@@ -122,12 +121,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Event Processing", "type");
 
@@ -149,12 +148,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -182,12 +181,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -221,12 +220,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -246,15 +245,15 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
         });
     });
 
-    describe("Additional ThemedBox edge cases for complete coverage", () => {
+    describe("Additional ThemedBox keyboard edge cases", () => {
         it("should handle custom aria-label and role", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -275,12 +274,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
 
         it("should handle custom tabIndex", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
@@ -299,12 +298,12 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: ThemedBox.keyboard-coverage", "component");
+            annotate("Component: ThemedBox.keyboard", "component");
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
