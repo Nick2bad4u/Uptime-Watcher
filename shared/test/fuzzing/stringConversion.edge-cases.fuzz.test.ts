@@ -136,7 +136,11 @@ describe("stringConversion edge-case fuzzing", () => {
         );
 
         it("should handle circular references", () => {
-            const circular: any = { name: "test" };
+            type CircularRecord = Record<string, unknown> & {
+                self?: CircularRecord;
+            };
+
+            const circular: CircularRecord = { name: "test" };
             circular.self = circular;
 
             const result = safeStringify(circular);

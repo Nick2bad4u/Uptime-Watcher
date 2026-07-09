@@ -109,7 +109,11 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const circular: any = {};
+            type CircularRecord = Record<string, unknown> & {
+                self?: CircularRecord;
+            };
+
+            const circular: CircularRecord = {};
             circular.self = circular;
             const result = safeStringify(circular);
             expect(result).toBe("[Complex Object]");
@@ -124,7 +128,14 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const obj: any = { a: 1, b: { c: 2 } };
+            type ParentRecord = Record<string, unknown> & {
+                parent?: ParentRecord;
+            };
+
+            const obj: Record<string, unknown> & { b: ParentRecord } = {
+                a: 1,
+                b: { c: 2 },
+            };
             obj.b.parent = obj;
             const result = safeStringify(obj);
             expect(result).toBe("[Complex Object]");
@@ -339,9 +350,9 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const large = {};
+            const large: Record<string, number> = {};
             for (let i = 0; i < 1000; i++) {
-                (large as any)[`prop${i}`] = i;
+                large[`prop${i}`] = i;
             }
             const result = safeStringify(large);
             expect(result).toBeDefined();

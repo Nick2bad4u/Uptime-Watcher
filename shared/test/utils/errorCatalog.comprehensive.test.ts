@@ -469,14 +469,12 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // The function signature requires a string, so TypeScript would catch these
-            // But for runtime safety, we test the behavior
-            expect(isKnownErrorMessage(123 as any)).toBeFalsy();
-            expect(isKnownErrorMessage(true as any)).toBeFalsy();
-            expect(isKnownErrorMessage({} as any)).toBeFalsy();
-            expect(isKnownErrorMessage([] as any)).toBeFalsy();
-            expect(isKnownErrorMessage(null as any)).toBeFalsy();
-            expect(isKnownErrorMessage(undefined as any)).toBeFalsy();
+            expect(isKnownErrorMessage(123)).toBeFalsy();
+            expect(isKnownErrorMessage(true)).toBeFalsy();
+            expect(isKnownErrorMessage({})).toBeFalsy();
+            expect(isKnownErrorMessage([])).toBeFalsy();
+            expect(isKnownErrorMessage(null)).toBeFalsy();
+            expect(isKnownErrorMessage(undefined)).toBeFalsy();
         });
     });
 

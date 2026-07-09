@@ -151,7 +151,11 @@ describe("StringConversion - Property-Based Tests", () => {
         });
 
         test("should handle circular references gracefully", () => {
-            const circular: any = { name: "test" };
+            type CircularRecord = Record<string, unknown> & {
+                self?: CircularRecord;
+            };
+
+            const circular: CircularRecord = { name: "test" };
             circular.self = circular;
 
             const result = safeStringify(circular);
@@ -164,7 +168,7 @@ describe("StringConversion - Property-Based Tests", () => {
             depth: fc.integer({ min: 1, max: 5 }),
         })("should handle nested objects up to reasonable depth", (props) => {
             // Create nested object structure
-            let nested: any = { value: "leaf" };
+            let nested: Record<string, unknown> = { value: "leaf" };
             for (let i = 0; i < props.depth; i++) {
                 nested = { level: i, child: nested };
             }

@@ -97,7 +97,11 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
         test.prop([fc.string()])(
             "should handle circular reference objects",
             (name) => {
-                const obj: any = { name };
+                type CircularRecord = Record<string, unknown> & {
+                    self?: CircularRecord;
+                };
+
+                const obj: CircularRecord = { name };
                 obj.self = obj; // Create circular reference
 
                 const result = safeStringify(obj);
