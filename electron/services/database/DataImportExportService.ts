@@ -175,12 +175,20 @@ export class DataImportExportService {
     private static readonly HISTORY_LIMIT_SETTINGS_KEY = "historyLimit" as const;
 
     private static isProtectedSettingsKey(key: string): boolean {
+        const normalizedKey = DataImportExportService.normalizeSettingsKey(key);
+
         return (
-            key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX) ||
-            key === "__proto__" ||
-            key === "constructor" ||
-            key === "prototype"
+            normalizedKey.startsWith(
+                DataImportExportService.CLOUD_SETTINGS_PREFIX
+            ) ||
+            normalizedKey === "__proto__" ||
+            normalizedKey === "constructor" ||
+            normalizedKey === "prototype"
         );
+    }
+
+    private static normalizeSettingsKey(key: string): string {
+        return key.trim();
     }
 
     private readonly databaseService: DatabaseService;
@@ -480,22 +488,38 @@ export class DataImportExportService {
     ): Record<string, string> {
         const result = createNullPrototypeObject<Record<string, string>>();
         const invalidKeys: string[] = [];
+        const normalizedKeys = new Set<string>();
         const strippedKeys: string[] = [];
 
         for (const [key, value] of objectEntries(settings)) {
-            if (DataImportExportService.isProtectedSettingsKey(key)) {
+            const normalizedKey =
+                DataImportExportService.normalizeSettingsKey(key);
+
+            if (DataImportExportService.isProtectedSettingsKey(normalizedKey)) {
                 strippedKeys.push(key);
                 continue;
             }
 
-            if (key === DataImportExportService.HISTORY_LIMIT_SETTINGS_KEY) {
+            if (
+                normalizedKey.length === 0 ||
+                normalizedKeys.has(normalizedKey)
+            ) {
+                invalidKeys.push(key);
+                continue;
+            }
+
+            if (
+                normalizedKey ===
+                DataImportExportService.HISTORY_LIMIT_SETTINGS_KEY
+            ) {
                 const parsedHistoryLimit = parseHistoryLimitSetting(value);
                 if (!isDefined(parsedHistoryLimit)) {
                     invalidKeys.push(key);
                     continue;
                 }
 
-                Object.defineProperty(result, key, {
+                normalizedKeys.add(normalizedKey);
+                Object.defineProperty(result, normalizedKey, {
                     configurable: true,
                     enumerable: true,
                     value: String(parsedHistoryLimit),
@@ -504,7 +528,8 @@ export class DataImportExportService {
                 continue;
             }
 
-            Object.defineProperty(result, key, {
+            normalizedKeys.add(normalizedKey);
+            Object.defineProperty(result, normalizedKey, {
                 configurable: true,
                 enumerable: true,
                 value,

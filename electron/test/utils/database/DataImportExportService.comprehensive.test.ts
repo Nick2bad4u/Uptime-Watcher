@@ -599,7 +599,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockResolvedValue({
-                "   ": "value",
+                theme: 123,
             });
 
             await expect(service.exportAllData()).rejects.toThrow(
@@ -791,6 +791,88 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(Object.hasOwn(result.settings, "__proto__")).toBe(false);
             expect(Object.hasOwn(result.settings, "constructor")).toBe(false);
             expect(Object.hasOwn(result.settings, "prototype")).toBe(false);
+        });
+
+        it("should normalize imported setting keys before stripping protected settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
+            const mockJsonData = '{"sites": [], "settings": {}}';
+            const mockParsedData = {
+                sites: [],
+                settings: {
+                    " cloud.dropbox.tokens ": "ciphertext",
+                    " historyLimit ": " 00500 ",
+                    " theme ": "dark",
+                },
+            };
+
+            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+                success: true,
+                data: mockParsedData,
+                error: null,
+            });
+
+            const result = await service.importDataFromJson(mockJsonData);
+
+            expect(result).toEqual({
+                sites: [],
+                settings: {
+                    historyLimit: "500",
+                    theme: "dark",
+                },
+            });
+            expect(result.settings).not.toHaveProperty(
+                " cloud.dropbox.tokens "
+            );
+            expect(result.settings).not.toHaveProperty("cloud.dropbox.tokens");
+        });
+
+        it("should strip duplicate imported settings after key normalization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
+            const mockJsonData = '{"sites": [], "settings": {}}';
+            const mockParsedData = {
+                sites: [],
+                settings: {
+                    " theme ": "dark",
+                    theme: "light",
+                },
+            };
+
+            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+                success: true,
+                data: mockParsedData,
+                error: null,
+            });
+
+            const result = await service.importDataFromJson(mockJsonData);
+
+            expect(result).toEqual({
+                sites: [],
+                settings: {
+                    theme: "dark",
+                },
+            });
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataImportExportService] Stripped 1 invalid settings keys during import",
+                { keysPreview: ["theme"] }
+            );
         });
 
         it("accepts exported sites with empty monitor arrays", async ({
@@ -1164,6 +1246,39 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(
                 mockRepositories.settings.bulkInsertInternal
             ).toHaveBeenCalledWith(mockDatabase, { historyLimit: "500" });
+        });
+
+        it("should canonicalize imported setting keys before persistence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData([], {
+                " cloud.dropbox.tokens ": "ciphertext",
+                " historyLimit ": " 00500 ",
+                " theme ": "dark",
+            });
+
+            expect(
+                mockRepositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDatabase, {
+                historyLimit: "500",
+                theme: "dark",
+            });
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "[DataImportExportService] Stripped 1 protected settings keys during persist",
+                { keysPreview: [" cloud.dropbox.tokens "] }
+            );
         });
 
         it("should preserve protected existing settings while replacing import-managed settings", async ({
