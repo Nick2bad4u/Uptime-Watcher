@@ -327,23 +327,18 @@ describe("shared/types/database additional function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const emptyRow = {};
-            const nullRow = null as any;
-            const undefinedRow = undefined as any;
-            const primitiveRow = "not an object" as any;
-
-            expect(safeGetRowProperty(emptyRow, "any", "default")).toBe(
+            expect(safeGetRowProperty({}, "any", "default")).toBe(
                 "default"
             );
-            expect(safeGetRowProperty(nullRow, "any", "default")).toBe(
+            expect(safeGetRowProperty(null, "any", "default")).toBe(
                 "default"
             );
-            expect(safeGetRowProperty(undefinedRow, "any", "default")).toBe(
+            expect(safeGetRowProperty(undefined, "any", "default")).toBe(
                 "default"
             );
-            expect(safeGetRowProperty(primitiveRow, "any", "default")).toBe(
-                "default"
-            );
+            expect(
+                safeGetRowProperty("not an object", "any", "default")
+            ).toBe("default");
         });
 
         it("should handle special property names", async ({
@@ -444,7 +439,11 @@ describe("shared/types/database additional function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const circularRow: any = {
+            type CircularRow = Record<string, unknown> & {
+                circular: CircularRow | null;
+            };
+
+            const circularRow: CircularRow = {
                 name: "test",
                 circular: null,
             };

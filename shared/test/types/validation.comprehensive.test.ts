@@ -10,6 +10,10 @@ import {
 } from "../../types/validation";
 
 describe("Validation Types and Utilities", () => {
+    type CircularRecord = Record<string, unknown> & {
+        self?: CircularRecord;
+    };
+
     describe(createFailureResult, () => {
         it("should create a failure result with basic errors", async ({
             task,
@@ -513,7 +517,7 @@ describe("Validation Types and Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Constructor", "type");
 
-            const circularData: any = { name: "test" };
+            const circularData: CircularRecord = { name: "test" };
             circularData.self = circularData;
 
             // This should not throw an error during creation
@@ -531,7 +535,7 @@ describe("Validation Types and Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
-            const circularResult: any = {
+            const circularResult: CircularRecord = {
                 errors: [],
                 success: true,
             };

@@ -406,10 +406,7 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  * @public
  */
 export function safeGetRowProperty<T>(
-    row:
-        | null
-        | undefined
-        | UnknownRecord,
+    row: unknown,
     property: string,
     defaultValue: T
 ): T {
