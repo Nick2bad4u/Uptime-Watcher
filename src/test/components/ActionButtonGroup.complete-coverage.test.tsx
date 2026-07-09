@@ -1,42 +1,44 @@
-/**
- * Comprehensive test coverage for ActionButtonGroup component. Focuses on
- * uncovered lines and edge cases to achieve 100% coverage.
- */
-
 import type {
     ButtonHTMLAttributes,
-    ComponentProps,
     PropsWithChildren,
+    ReactElement,
+    ReactNode,
 } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import type { ActionButtonGroupProperties } from "../../components/Dashboard/SiteCard/components/ActionButtonGroup";
+import type { SiteMonitoringButtonProperties } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
 
 import { ActionButtonGroup } from "../../components/Dashboard/SiteCard/components/ActionButtonGroup";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
-// Mock ThemedButton
 type ThemedButtonMockProperties = PropsWithChildren<
-    Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
-        readonly "aria-label"?: string;
-        readonly onClick?: (event: unknown) => void;
+    ButtonHTMLAttributes<HTMLButtonElement> & {
+        readonly size?: string;
+        readonly variant?: string;
     }
 >;
 
 vi.mock("../../theme/components/ThemedButton", () => ({
     ThemedButton: ({
         children,
-        onClick,
+        className,
         disabled,
-        "aria-label": ariaLabel,
+        onClick,
+        size,
+        variant,
         ...props
     }: ThemedButtonMockProperties) => (
         <button
-            aria-label={ariaLabel}
-            data-testid={`themed-button-${ariaLabel?.toLowerCase().replaceAll(/\s+/gv, "-")}`}
+            className={className}
+            data-size={size}
+            data-variant={variant}
             disabled={disabled}
             onClick={onClick}
+            type="button"
             {...props}
         >
             {children}
@@ -44,45 +46,85 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-// Mock SiteMonitoringButton
+vi.mock("../../components/common/Tooltip/Tooltip", () => ({
+    Tooltip: ({
+        children,
+        content,
+    }: {
+        readonly children: (triggerProps: {
+            readonly "aria-describedby": string;
+        }) => ReactNode;
+        readonly content: ReactNode;
+    }) => (
+        <>
+            {children({ "aria-describedby": "mock-tooltip" })}
+            <span role="tooltip">{content}</span>
+        </>
+    ),
+}));
+
+const { siteMonitoringButtonMock } = vi.hoisted(() => ({
+    siteMonitoringButtonMock: vi.fn(
+        ({
+            allMonitorsRunning,
+            className,
+            compact,
+            disabledReason,
+            isLoading,
+            onStartSiteMonitoring,
+            onStopSiteMonitoring,
+            size,
+        }: SiteMonitoringButtonProperties) => (
+            <button
+                aria-label={
+                    allMonitorsRunning
+                        ? "Stop All Monitoring"
+                        : "Start All Monitoring"
+                }
+                className={className}
+                data-compact={String(Boolean(compact))}
+                data-disabled-reason={disabledReason ?? ""}
+                data-size={size}
+                disabled={isLoading}
+                onClick={
+                    allMonitorsRunning
+                        ? onStopSiteMonitoring
+                        : onStartSiteMonitoring
+                }
+                type="button"
+            >
+                {allMonitorsRunning ? "Stop Site" : "Start Site"}
+            </button>
+        )
+    ),
+}));
+
 vi.mock(
     "../../components/common/SiteMonitoringButton/SiteMonitoringButton",
     () => ({
-        SiteMonitoringButton: ({
-            onStartSiteMonitoring,
-            onStopSiteMonitoring,
-            allMonitorsRunning,
-            isLoading,
-            className,
-            compact,
-        }: {
-            readonly allMonitorsRunning: boolean;
-            readonly className?: string;
-            readonly compact?: boolean;
-            readonly isLoading: boolean;
-            readonly onStartSiteMonitoring: () => void;
-            readonly onStopSiteMonitoring: () => void;
-        }) => (
-            <div
-                className={className}
-                data-compact={compact}
-                data-testid="site-monitoring-button"
-            >
-                <button
-                    data-testid="site-monitoring-action"
-                    disabled={isLoading}
-                    onClick={
-                        allMonitorsRunning
-                            ? onStopSiteMonitoring
-                            : onStartSiteMonitoring
-                    }
-                >
-                    {allMonitorsRunning ? "Stop Site" : "Start Site"}
-                </button>
-            </div>
-        ),
+        SiteMonitoringButton: siteMonitoringButtonMock,
     })
 );
+
+vi.mock("../../utils/icons", () => {
+    const createIcon = (name: string) => {
+        const Icon = ({ size = 16 }: { readonly size?: number }) => (
+            <svg aria-hidden="true" data-icon={name} data-size={size} />
+        );
+        Icon.displayName = `MockIcon(${name})`;
+        return Icon;
+    };
+
+    return {
+        AppIcons: {
+            actions: {
+                pause: createIcon("pause"),
+                play: createIcon("play"),
+                refresh: createIcon("refresh"),
+            },
+        },
+    };
+});
 
 const defaultProps = {
     allMonitorsRunning: false,
@@ -94,1084 +136,199 @@ const defaultProps = {
     onStartSiteMonitoring: vi.fn(),
     onStopMonitoring: vi.fn(),
     onStopSiteMonitoring: vi.fn(),
-};
+} satisfies ActionButtonGroupProperties;
 
-type ActionButtonGroupProperties = ComponentProps<typeof ActionButtonGroup>;
+const renderWithTheme = (ui: ReactElement) =>
+    render(<ThemeProvider>{ui}</ThemeProvider>);
 
 const renderActionButtonGroup = (
     props: Partial<ActionButtonGroupProperties> = {}
-): ReturnType<typeof render> =>
-    render(
-        <ThemeProvider>
-            <ActionButtonGroup {...defaultProps} {...props} />
-        </ThemeProvider>
-    );
-const REFRESH_ICON_PATH =
-    "M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15";
-const PLAY_ICON_PATH =
-    "M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z";
-const PAUSE_ICON_PATH =
-    "M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3h-1.5ZM12.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75h-1.5Z";
+) => {
+    const mergedProps = {
+        ...defaultProps,
+        onCheckNow: vi.fn(),
+        onStartMonitoring: vi.fn(),
+        onStartSiteMonitoring: vi.fn(),
+        onStopMonitoring: vi.fn(),
+        onStopSiteMonitoring: vi.fn(),
+        ...props,
+    } satisfies ActionButtonGroupProperties;
 
-const expectButtonIconPath = (
-    button: HTMLElement,
-    expectedPath: string
-): void => {
-    const icon = button.querySelector("svg");
-    expect(icon).not.toBeNull();
-    const pathElements = icon?.querySelectorAll("path") ?? [];
-    const pathValues = Array.from(pathElements, (path) =>
-        path.getAttribute("d")
-    );
-    expect(pathValues).toContain(expectedPath);
+    const result = renderWithTheme(<ActionButtonGroup {...mergedProps} />);
+
+    return {
+        props: mergedProps,
+        ...result,
+    };
 };
 
-describe("ActionButtonGroup - Complete Coverage", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+const expectButtonIcon = (button: HTMLElement, iconName: string) => {
+    expect(button.querySelector(`svg[data-icon="${iconName}"]`)).not.toBeNull();
+};
+
+describe("ActionButtonGroup", () => {
+    it("renders check, site-wide, and monitor start controls", () => {
+        const { container } = renderActionButtonGroup();
+
+        const checkButton = screen.getByRole("button", { name: "Check Now" });
+        const startButton = screen.getByRole("button", {
+            name: "Start Monitoring",
+        });
+        const siteButton = screen.getByRole("button", {
+            name: "Start All Monitoring",
+        });
+
+        expect(container.firstElementChild).toHaveClass("gap-2");
+        expect(checkButton).toHaveAttribute("data-variant", "ghost");
+        expect(startButton).toHaveAttribute("data-variant", "success");
+        expectButtonIcon(checkButton, "refresh");
+        expectButtonIcon(startButton, "play");
+        expect(siteButton).toHaveClass("min-w-8");
+        expect(siteButton).toHaveAttribute("data-compact", "true");
     });
 
-    describe("Check Now Button", () => {
-        it("should render check now button with correct aria-label", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup();
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            expect(checkButton).toBeInTheDocument();
-            expectButtonIconPath(checkButton, REFRESH_ICON_PATH);
+    it("renders monitor stop and site stop controls when monitoring is active", () => {
+        renderActionButtonGroup({
+            allMonitorsRunning: true,
+            isMonitoring: true,
         });
 
-        it("should call onCheckNow when clicked", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const onCheckNow = vi.fn();
-            renderActionButtonGroup({ onCheckNow });
-
-            const user = userEvent.setup();
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            await user.click(checkButton);
-
-            expect(onCheckNow).toHaveBeenCalledTimes(1);
+        const stopButton = screen.getByRole("button", {
+            name: "Stop Monitoring",
+        });
+        const siteButton = screen.getByRole("button", {
+            name: "Stop All Monitoring",
         });
 
-        it("should stop event propagation when clicked", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            const onCheckNow = vi.fn();
-            const stopPropagation = vi.fn();
-
-            renderActionButtonGroup({ onCheckNow });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-
-            // Create an event with stopPropagation
-            const mockEvent = new MouseEvent("click", { bubbles: true });
-            mockEvent.stopPropagation = stopPropagation;
-
-            fireEvent(checkButton, mockEvent);
-
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onCheckNow).toHaveBeenCalled();
-        });
-
-        it("should be disabled when isLoading is true", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            renderActionButtonGroup({ isLoading: true });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            expect(checkButton).toBeDisabled();
-        });
-
-        it("should be disabled when disabled prop is true", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup({ disabled: true });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            expect(checkButton).toBeDisabled();
-        });
-
-        it("should be disabled when both isLoading and disabled are true", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            renderActionButtonGroup({ isLoading: true, disabled: true });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            expect(checkButton).toBeDisabled();
-        });
+        expect(stopButton).toHaveAttribute("data-variant", "error");
+        expectButtonIcon(stopButton, "pause");
+        expect(siteButton).toHaveTextContent("Stop Site");
+        expect(
+            screen.queryByRole("button", { name: "Start Monitoring" })
+        ).not.toBeInTheDocument();
     });
 
-    describe("Start/Stop Monitoring Buttons", () => {
-        it("should show start monitoring button when not monitoring", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+    it("uses compact spacing and smaller icons for extra-small buttons", () => {
+        const { container } = renderActionButtonGroup({ buttonSize: "xs" });
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({ isMonitoring: false });
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            expect(startButton).toBeInTheDocument();
-            expectButtonIconPath(startButton, PLAY_ICON_PATH);
-
-            const stopButton = screen.queryByRole("button", {
-                name: "Stop Monitoring",
-            });
-            expect(stopButton).not.toBeInTheDocument();
-        });
-
-        it("should show stop monitoring button when monitoring", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({ isMonitoring: true });
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-            expect(stopButton).toBeInTheDocument();
-            expectButtonIconPath(stopButton, PAUSE_ICON_PATH);
-
-            const startButton = screen.queryByRole("button", {
-                name: "Start Monitoring",
-            });
-            expect(startButton).not.toBeInTheDocument();
-        });
-
-        it("should call onStartMonitoring when start button is clicked", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStartMonitoring = vi.fn();
-            renderActionButtonGroup({ isMonitoring: false, onStartMonitoring });
-
-            const user = userEvent.setup();
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            await user.click(startButton);
-
-            expect(onStartMonitoring).toHaveBeenCalledTimes(1);
-        });
-
-        it("should call onStopMonitoring when stop button is clicked", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStopMonitoring = vi.fn();
-            renderActionButtonGroup({ isMonitoring: true, onStopMonitoring });
-
-            const user = userEvent.setup();
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-            await user.click(stopButton);
-
-            expect(onStopMonitoring).toHaveBeenCalledTimes(1);
-        });
-
-        it("should stop event propagation on start monitoring click", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStartMonitoring = vi.fn();
-            const stopPropagation = vi.fn();
-
-            renderActionButtonGroup({ isMonitoring: false, onStartMonitoring });
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-
-            // Create an event with stopPropagation
-            const mockEvent = new MouseEvent("click", { bubbles: true });
-            mockEvent.stopPropagation = stopPropagation;
-
-            fireEvent(startButton, mockEvent);
-
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onStartMonitoring).toHaveBeenCalled();
-        });
-
-        it("should stop event propagation on stop monitoring click", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStopMonitoring = vi.fn();
-            const stopPropagation = vi.fn();
-
-            renderActionButtonGroup({ isMonitoring: true, onStopMonitoring });
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-
-            // Create an event with stopPropagation
-            const mockEvent = new MouseEvent("click", { bubbles: true });
-            mockEvent.stopPropagation = stopPropagation;
-
-            fireEvent(stopButton, mockEvent);
-
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onStopMonitoring).toHaveBeenCalled();
-        });
-
-        it("should disable start button when loading", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            renderActionButtonGroup({ isMonitoring: false, isLoading: true });
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            expect(startButton).toBeDisabled();
-        });
-
-        it("should disable stop button when loading", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            renderActionButtonGroup({ isMonitoring: true, isLoading: true });
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-            expect(stopButton).toBeDisabled();
-        });
-
-        it("should disable start button when disabled prop is true", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup({ isMonitoring: false, disabled: true });
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            expect(startButton).toBeDisabled();
-        });
-
-        it("should disable stop button when disabled prop is true", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup({ isMonitoring: true, disabled: true });
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-            expect(stopButton).toBeDisabled();
-        });
+        expect(container.firstElementChild).toHaveClass("gap-1.5");
+        expect(
+            screen.getByRole("button", { name: "Check Now" })
+        ).toHaveAttribute("data-size", "xs");
+        expect(
+            screen
+                .getByRole("button", { name: "Check Now" })
+                .querySelector("svg")
+        ).toHaveAttribute("data-size", "14");
+        expect(
+            screen.getByRole("button", { name: "Start All Monitoring" })
+        ).toHaveAttribute("data-size", "xs");
     });
 
-    describe("SiteMonitoringButton Integration", () => {
-        it("should render SiteMonitoringButton with correct props", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+    it("calls the active action callbacks", async () => {
+        const user = userEvent.setup();
+        const onCheckNow = vi.fn();
+        const onStartMonitoring = vi.fn();
+        const onStartSiteMonitoring = vi.fn();
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({
-                allMonitorsRunning: true,
-                isLoading: false,
-            });
-
-            const siteMonitoringButton = screen.getByTestId(
-                "site-monitoring-button"
-            );
-            expect(siteMonitoringButton).toBeInTheDocument();
-            expect(siteMonitoringButton).toHaveAttribute(
-                "data-compact",
-                "true"
-            );
+        renderActionButtonGroup({
+            onCheckNow,
+            onStartMonitoring,
+            onStartSiteMonitoring,
         });
 
-        it("should pass onStartSiteMonitoring to SiteMonitoringButton", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        await user.click(screen.getByRole("button", { name: "Check Now" }));
+        await user.click(
+            screen.getByRole("button", { name: "Start Monitoring" })
+        );
+        await user.click(
+            screen.getByRole("button", { name: "Start All Monitoring" })
+        );
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStartSiteMonitoring = vi.fn();
-            renderActionButtonGroup({
-                allMonitorsRunning: false,
-                onStartSiteMonitoring,
-            });
-
-            const user = userEvent.setup();
-
-            const siteAction = screen.getByTestId("site-monitoring-action");
-            await user.click(siteAction);
-
-            expect(onStartSiteMonitoring).toHaveBeenCalledTimes(1);
-        });
-
-        it("should pass onStopSiteMonitoring to SiteMonitoringButton", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStopSiteMonitoring = vi.fn();
-            renderActionButtonGroup({
-                allMonitorsRunning: true,
-                onStopSiteMonitoring,
-            });
-
-            const user = userEvent.setup();
-
-            const siteAction = screen.getByTestId("site-monitoring-action");
-            await user.click(siteAction);
-
-            expect(onStopSiteMonitoring).toHaveBeenCalledTimes(1);
-        });
-
-        it("should pass loading state to SiteMonitoringButton", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            renderActionButtonGroup({
-                isLoading: true,
-            });
-
-            const siteAction = screen.getByTestId("site-monitoring-action");
-            expect(siteAction).toBeDisabled();
-        });
-
-        it("should pass disabled state to SiteMonitoringButton", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({
-                disabled: true,
-            });
-
-            const siteAction = screen.getByTestId("site-monitoring-action");
-            expect(siteAction).toBeDisabled();
-        });
+        expect(onCheckNow).toHaveBeenCalledTimes(1);
+        expect(onStartMonitoring).toHaveBeenCalledTimes(1);
+        expect(onStartSiteMonitoring).toHaveBeenCalledTimes(1);
     });
 
-    describe("Event Handling Edge Cases", () => {
-        it("should handle click events without event object", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
+    it("calls stop callbacks from the stop state", async () => {
+        const user = userEvent.setup();
+        const onStopMonitoring = vi.fn();
+        const onStopSiteMonitoring = vi.fn();
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            const onCheckNow = vi.fn();
-            renderActionButtonGroup({ onCheckNow });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-
-            // Simulate a click that might not have an event object
-            fireEvent.click(checkButton);
-
-            expect(onCheckNow).toHaveBeenCalled();
-            // Should not throw error when event is undefined
+        renderActionButtonGroup({
+            allMonitorsRunning: true,
+            isMonitoring: true,
+            onStopMonitoring,
+            onStopSiteMonitoring,
         });
 
-        it("should handle start monitoring click without event object", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        await user.click(
+            screen.getByRole("button", { name: "Stop Monitoring" })
+        );
+        await user.click(
+            screen.getByRole("button", { name: "Stop All Monitoring" })
+        );
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStartMonitoring = vi.fn();
-            renderActionButtonGroup({ isMonitoring: false, onStartMonitoring });
-
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            fireEvent.click(startButton);
-
-            expect(onStartMonitoring).toHaveBeenCalled();
-        });
-
-        it("should handle stop monitoring click without event object", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const onStopMonitoring = vi.fn();
-            renderActionButtonGroup({ isMonitoring: true, onStopMonitoring });
-
-            const stopButton = screen.getByRole("button", {
-                name: "Stop Monitoring",
-            });
-            fireEvent.click(stopButton);
-
-            expect(onStopMonitoring).toHaveBeenCalled();
-        });
+        expect(onStopMonitoring).toHaveBeenCalledTimes(1);
+        expect(onStopSiteMonitoring).toHaveBeenCalledTimes(1);
     });
 
-    describe("Component Structure", () => {
-        it("should render all required buttons", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+    it("prevents card click handlers from seeing direct action button clicks", () => {
+        const onCheckNow = vi.fn();
+        const onStartMonitoring = vi.fn();
+        const onParentClick = vi.fn();
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
+        renderWithTheme(
+            <div onClick={onParentClick}>
+                <ActionButtonGroup
+                    {...defaultProps}
+                    onCheckNow={onCheckNow}
+                    onStartMonitoring={onStartMonitoring}
+                />
+            </div>
+        );
 
-            renderActionButtonGroup({ isMonitoring: false });
+        fireEvent.click(screen.getByRole("button", { name: "Check Now" }));
+        fireEvent.click(
+            screen.getByRole("button", { name: "Start Monitoring" })
+        );
 
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            const siteButton = screen.getByTestId("site-monitoring-button");
-
-            expect(checkButton).toBeInTheDocument();
-            expect(startButton).toBeInTheDocument();
-            expect(siteButton).toBeInTheDocument();
-        });
-
-        it("should have correct button structure for all states", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup({ isMonitoring: false });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            const siteButton = screen.getByTestId("site-monitoring-button");
-
-            expect(checkButton).toBeInTheDocument();
-            expect(startButton).toBeInTheDocument();
-            expect(siteButton).toBeInTheDocument();
-        });
+        expect(onCheckNow).toHaveBeenCalledTimes(1);
+        expect(onStartMonitoring).toHaveBeenCalledTimes(1);
+        expect(onParentClick).not.toHaveBeenCalled();
     });
 
-    describe("Accessibility", () => {
-        it("should have proper aria-labels for all buttons", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderActionButtonGroup({ isMonitoring: false });
+    it.each([
+        [
+            { isLoading: true },
+            "loading",
+            /Finishing the previous request\./u,
+        ],
+        [
+            { disabled: true },
+            "unconfigured",
+            /Select a monitor to enable this action\./u,
+        ],
+    ] as const)(
+        "disables actions with %s context",
+        (props, expectedReason, expectedTooltipText) => {
+            renderActionButtonGroup(props);
 
             expect(
                 screen.getByRole("button", { name: "Check Now" })
-            ).toBeInTheDocument();
+            ).toBeDisabled();
             expect(
                 screen.getByRole("button", { name: "Start Monitoring" })
-            ).toBeInTheDocument();
-        });
-
-        it("should have proper aria-labels when monitoring", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({ isMonitoring: true });
-
+            ).toBeDisabled();
             expect(
-                screen.getByRole("button", { name: "Check Now" })
-            ).toBeInTheDocument();
+                screen.getByRole("button", { name: "Start All Monitoring" })
+            ).toBeDisabled();
             expect(
-                screen.getByRole("button", { name: "Stop Monitoring" })
-            ).toBeInTheDocument();
-        });
-    });
-
-    describe("React.memo Optimization", () => {
-        it("should be properly exported", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
+                screen.getByRole("button", { name: "Start All Monitoring" })
+            ).toHaveAttribute("data-disabled-reason", expectedReason);
+            expect(screen.getAllByRole("tooltip")[0]).toHaveTextContent(
+                expectedTooltipText
             );
-            annotate("Category: Component", "category");
-            annotate("Type: Export Operation", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Export Operation", "type");
-
-            expect(ActionButtonGroup).toBeDefined();
-            expect(typeof ActionButtonGroup).toBe("object");
-        });
-    });
-
-    describe("State Combinations", () => {
-        it("should handle all disabled and loading combinations", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Data Loading", "type");
-
-            // All buttons disabled when both loading and disabled
-            renderActionButtonGroup({
-                isLoading: true,
-                disabled: true,
-                isMonitoring: false,
-            });
-
-            const checkButton = screen.getByRole("button", {
-                name: "Check Now",
-            });
-            const startButton = screen.getByRole("button", {
-                name: "Start Monitoring",
-            });
-            const siteButton = screen.getByTestId("site-monitoring-action");
-
-            expect(checkButton).toBeDisabled();
-            expect(startButton).toBeDisabled();
-            expect(siteButton).toBeDisabled();
-        });
-
-        it("should handle monitoring state with all props", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderActionButtonGroup({
-                isMonitoring: true,
-                allMonitorsRunning: true,
-                isLoading: false,
-                disabled: false,
-            });
-
-            expect(
-                screen.getByRole("button", { name: "Stop Monitoring" })
-            ).toBeInTheDocument();
-            expect(
-                screen.queryByRole("button", { name: "Start Monitoring" })
-            ).not.toBeInTheDocument();
-        });
-    });
-
-    describe("Callback Dependencies", () => {
-        it("should maintain callback identity with same dependencies", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: ActionButtonGroup.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const onCheckNow = vi.fn();
-            const { rerender } = renderActionButtonGroup({ onCheckNow });
-
-            const checkButton1 = screen.getByRole("button", {
-                name: "Check Now",
-            });
-
-            // Rerender with same props
-            rerender(
-                <ThemeProvider>
-                    <ActionButtonGroup
-                        {...defaultProps}
-                        onCheckNow={onCheckNow}
-                    />
-                </ThemeProvider>
-            );
-
-            const checkButton2 = screen.getByRole("button", {
-                name: "Check Now",
-            });
-
-            // Should be the same element (React.memo working)
-            expect(checkButton1).toBe(checkButton2);
-        });
-    });
+        }
+    );
 });
