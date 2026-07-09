@@ -161,12 +161,18 @@ describe("logTemplates function coverage", () => {
             const logger = createTemplateLogger(mockLogger);
             const template = "User {userId} performed {action}";
 
-            logger.info(template);
+            const methods = [
+                { log: logger.debug, mock: mockLogger.debug },
+                { log: logger.error, mock: mockLogger.error },
+                { log: logger.info, mock: mockLogger.info },
+                { log: logger.warn, mock: mockLogger.warn },
+            ] as const;
 
-            expect(mockLogger.info).toHaveBeenCalledWith(
-                "User {userId} performed {action}",
-                undefined
-            );
+            for (const { log, mock } of methods) {
+                log(template);
+
+                expect(mock).toHaveBeenCalledWith(template, undefined);
+            }
         });
 
         it("should handle numeric placeholders", async ({ task, annotate }) => {

@@ -55,6 +55,18 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
         ]);
     });
 
+    it("reports unknown monitor types", () => {
+        const errors = getMonitorValidationErrors({
+            type: "definitely-not-a-monitor-type",
+        });
+
+        expect(errors).toEqual(
+            expect.arrayContaining([
+                expect.stringContaining("Unknown monitor type"),
+            ])
+        );
+    });
+
     it("surfaces required monitor ID errors", () => {
         const errors = getMonitorValidationErrors({ type: "http", id: "" });
         expect(
