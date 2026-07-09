@@ -161,6 +161,28 @@ describe(EncryptedSyncCloudStorageProvider, () => {
         expect(read.toString("utf8")).toBe("hello");
     });
 
+    it("keeps decrypting after the original key buffer is mutated", async () => {
+        const inner = new InMemoryProvider();
+        const key = await derivePassphraseKey({
+            passphrase: "secret",
+            salt: generateEncryptionSalt(),
+        });
+
+        const provider = new EncryptedSyncCloudStorageProvider({ inner, key });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("hello", "utf8"),
+            key: "sync/snapshots/1/key-copy.json",
+            overwrite: true,
+        });
+        key.fill(0);
+
+        const read = await provider.downloadObject(
+            "sync/snapshots/1/key-copy.json"
+        );
+        expect(read.toString("utf8")).toBe("hello");
+    });
+
     it("does not encrypt manifest.json", async () => {
         const inner = new InMemoryProvider();
         const key = await derivePassphraseKey({

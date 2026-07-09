@@ -35,7 +35,7 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
 
     public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
         this.inner = args.inner;
-        this.key = args.key;
+        this.key = Buffer.from(args.key);
     }
 
     public async deleteObject(key: string): Promise<void> {
