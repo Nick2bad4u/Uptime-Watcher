@@ -394,7 +394,7 @@
         "remark:toc": "npm run docs:maintain",
         "remark:watch": "remark --rc-path .remarkrc.mjs --silently-ignore --ignore-path .remarkignore --frail --watch --output -- \"*.{md,mdx}\" \"docs/**/*.{md,mdx}\" \"src/**/*.{md,mdx}\" \"electron/**/*.{md,mdx}\" \"shared/**/*.{md,mdx}\"",
         "reset": "npm run clean && npm install",
-        "postreset": "npm run reset && npm run postbuild",
+        "postreset": "npm run postbuild",
         "resolve-audit": "node scripts/run-node-cli.mjs -- npm audit --omit=dev",
         "security:check": "node scripts/run-node-cli.mjs -- npm audit --omit=dev",
         "security:fix": "node scripts/run-node-cli.mjs -- npm audit fix",
