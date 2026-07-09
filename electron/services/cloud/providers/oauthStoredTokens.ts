@@ -54,7 +54,7 @@ export async function readStoredJsonSecret<T>(
     args: ReadStoredJsonSecretArgs<T>
 ): Promise<T | undefined> {
     const raw = await args.secretStore.getSecret(args.storageKey);
-    if (!raw) {
+    if (raw === undefined) {
         return undefined;
     }
 
