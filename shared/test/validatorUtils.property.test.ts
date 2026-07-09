@@ -4,25 +4,14 @@
  * cases, boundary conditions, and invariant properties that should hold for all
  * inputs.
  *
- * @file Comprehensive property-based tests for validator utilities
- *
- * @author GitHub Copilot
+ * @file Property-based tests for validator utilities
  *
  * @since 2025-09-05
  *
- * @features -
- * Property-based testing for string validation functions
- * - URL and domain validation with comprehensive edge cases
- * - Host and port validation with boundary testing
- * - I        fc.property([
- *             fc.oneof(
- *                 fc.string().filter((s) => Number.isNaN(Number(s)) && s !== "" && !validator.isFloat(s)),
- *                 fc.anything().filter((x) => typeof x !== "string")
- *             ),
- *         ])("should return false for non-numeric strings", (nonNumString) => {
- *             const result = isValidNumeric(nonNumString);
- *             expect(result).toBeFalsy();
- *         });d numeric validation with format testing
+ * @features
+ * - Property-based testing for string validation functions
+ * - URL and domain validation with edge cases
+ * - Host, port, and numeric validation with boundary testing
  * - Array validation functions with type safety
  * - Performance testing with large inputs
  */
@@ -43,7 +32,7 @@ import {
 } from "@shared/validation/validatorUtils";
 import { describe, expect, it } from "vitest";
 
-describe("Validator Utils Property-Based Tests", () => {
+describe("validatorUtils property-based behavior", () => {
     describe(isNonEmptyString, () => {
         test.prop([
             fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),

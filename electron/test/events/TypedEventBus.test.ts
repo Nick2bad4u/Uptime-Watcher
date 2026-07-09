@@ -1,18 +1,16 @@
 /**
- * Test suite for TypedEventBus
+ * Test suite for TypedEventBus.
  *
- * @module Unknown
+ * @module TypedEventBus
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for typed event emission, listener behavior, and event-bus
+ *   introspection.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Events
  *
- * @tags ["test"]
+ * @tags ["events", "event-bus", "typed-events"]
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
