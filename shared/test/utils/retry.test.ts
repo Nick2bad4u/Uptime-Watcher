@@ -183,6 +183,31 @@ describe("shared/utils/retry", () => {
         expect(operation).not.toHaveBeenCalled();
     });
 
+    it("includes operationName in retry-generated validation errors", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: retry", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Diagnostics", "type");
+
+        const operation = vi
+            .fn<() => Promise<string>>()
+            .mockResolvedValue("ok");
+
+        await expect(
+            withRetry(operation, {
+                maxRetries: 0,
+                operationName: "database transaction",
+            })
+        ).rejects.toThrow(
+            "[withRetry:database transaction] maxRetries must be a positive number"
+        );
+
+        expect(operation).not.toHaveBeenCalled();
+    });
+
     it("wraps non-Error thrown values and exposes the original via cause", async ({
         task,
         annotate,
@@ -204,6 +229,35 @@ describe("shared/utils/retry", () => {
             const wrapped = error as Error & { readonly cause: unknown };
             expect(wrapped.message).toBe(
                 "[withRetry] Operation threw a non-Error value"
+            );
+            expect(wrapped.cause).toBe("nope");
+        }
+    });
+
+    it("includes operationName when wrapping non-Error thrown values", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: retry", "component");
+        await annotate("Category: Utility", "category");
+        await annotate("Type: Diagnostics", "type");
+
+        const operation = vi
+            .fn<() => Promise<never>>()
+            .mockRejectedValue("nope");
+
+        try {
+            await withRetry(operation, {
+                maxRetries: 1,
+                operationName: "connectivity-check",
+            });
+            throw new Error("expected withRetry to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(Error);
+            const wrapped = error as Error & { readonly cause: unknown };
+            expect(wrapped.message).toBe(
+                "[withRetry:connectivity-check] Operation threw a non-Error value"
             );
             expect(wrapped.cause).toBe("nope");
         }

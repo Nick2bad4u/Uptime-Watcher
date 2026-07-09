@@ -10,10 +10,27 @@ import { sleep, sleepUnref } from "@shared/utils/abortUtils";
 import { arrayAt, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 import type { Promisable } from "type-fest";
 
-function wrapNonErrorThrownValue(value: unknown): Error {
-    return new Error("[withRetry] Operation threw a non-Error value", {
-        cause: value,
-    });
+function getRetryErrorPrefix(operationName: unknown): string {
+    if (typeof operationName !== "string") {
+        return "[withRetry]";
+    }
+
+    const trimmedOperationName = operationName.trim();
+    return trimmedOperationName.length > 0
+        ? `[withRetry:${trimmedOperationName}]`
+        : "[withRetry]";
+}
+
+function wrapNonErrorThrownValue(
+    value: unknown,
+    operationName?: string
+): Error {
+    return new Error(
+        `${getRetryErrorPrefix(operationName)} Operation threw a non-Error value`,
+        {
+            cause: value,
+        }
+    );
 }
 
 /**
@@ -101,12 +118,15 @@ function resolveDelayMs(args: {
     return value;
 }
 
-function raiseNonRetryableRetryError(error: unknown): never {
+function raiseNonRetryableRetryError(
+    error: unknown,
+    operationName?: string
+): never {
     if (Error.isError(error)) {
         throw error;
     }
 
-    throw wrapNonErrorThrownValue(error);
+    throw wrapNonErrorThrownValue(error, operationName);
 }
 
 function shouldRetrySafely(
@@ -193,6 +213,7 @@ export async function withRetry<T>(
         delayMs: delayConfig = 300,
         onError,
         onFailedAttempt,
+        operationName,
         shouldRetry,
         unrefDelay = false,
     } = options;
@@ -201,7 +222,7 @@ export async function withRetry<T>(
     const maxRetries = options.maxRetries ?? 5;
     if (!isFiniteNumber(maxRetries) || maxRetries <= 0) {
         throw new Error(
-            `[withRetry] maxRetries must be a positive number (received ${String(maxRetries)})`
+            `${getRetryErrorPrefix(operationName)} maxRetries must be a positive number (received ${String(maxRetries)})`
         );
     }
 
@@ -218,7 +239,7 @@ export async function withRetry<T>(
 
             if (attempt < maxRetries) {
                 if (!shouldRetrySafely(shouldRetry, error, attempt)) {
-                    raiseNonRetryableRetryError(error);
+                    raiseNonRetryableRetryError(error, operationName);
                 }
 
                 const computedDelayMs = resolveDelayMs({
@@ -241,12 +262,14 @@ export async function withRetry<T>(
 
     const lastError = arrayAt(errors, -1);
     if (!isDefined(lastError)) {
-        throw new Error("[withRetry] Operation failed without an error");
+        throw new Error(
+            `${getRetryErrorPrefix(operationName)} Operation failed without an error`
+        );
     }
 
     if (Error.isError(lastError)) {
         throw lastError;
     }
 
-    throw wrapNonErrorThrownValue(lastError);
+    throw wrapNonErrorThrownValue(lastError, operationName);
 }
