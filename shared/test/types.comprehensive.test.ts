@@ -185,6 +185,13 @@ describe("shared/types type guards and validators", () => {
             history: [],
         };
 
+        const createMonitorCandidate = (
+            overrides: Record<string, unknown> = {}
+        ): Record<string, unknown> => ({
+            ...validMonitor,
+            ...overrides,
+        });
+
         it("should return true for valid monitor", async ({
             task,
             annotate,
@@ -222,8 +229,8 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitorWithUndefinedOps = { ...validMonitor };
-            delete (monitorWithUndefinedOps as any).activeOperations;
+            const monitorWithUndefinedOps = createMonitorCandidate();
+            delete monitorWithUndefinedOps["activeOperations"];
             expect(validateMonitor(monitorWithUndefinedOps)).toBeTruthy();
         });
 
@@ -236,8 +243,8 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = { ...validMonitor };
-            delete (invalidMonitor as any).id;
+            const invalidMonitor = createMonitorCandidate();
+            delete invalidMonitor["id"];
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -250,7 +257,7 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = { ...validMonitor, id: 123 } as any;
+            const invalidMonitor = createMonitorCandidate({ id: 123 });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -263,8 +270,8 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = { ...validMonitor };
-            delete (invalidMonitor as any).type;
+            const invalidMonitor = createMonitorCandidate();
+            delete invalidMonitor["type"];
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -277,10 +284,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 type: "invalid-type",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -293,10 +299,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 status: "invalid-status",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -309,10 +314,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 monitoring: "true",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -325,10 +329,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 responseTime: "150",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -341,10 +344,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 checkInterval: "60000",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -357,7 +359,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = { ...validMonitor, timeout: "5000" } as any;
+            const invalidMonitor = createMonitorCandidate({
+                timeout: "5000",
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -370,10 +374,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 retryAttempts: "3",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -386,7 +389,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = { ...validMonitor, history: "[]" } as any;
+            const invalidMonitor = createMonitorCandidate({
+                history: "[]",
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -399,14 +404,13 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 activeOperations: [
                     "valid",
                     123,
                     "invalid",
                 ], // Contains non-string
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
@@ -439,10 +443,9 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor = {
-                ...validMonitor,
+            const invalidMonitor = createMonitorCandidate({
                 activeOperations: "not-an-array",
-            } as any;
+            });
             expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 

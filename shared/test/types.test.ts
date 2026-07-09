@@ -430,6 +430,9 @@ describe(isSiteStatus, () => {
 });
 
 describe(validateMonitor, () => {
+    type MonitorCandidate = Partial<Record<keyof Monitor, unknown>> &
+        Record<string, unknown>;
+
     const createValidMonitor = (): Monitor => ({
         id: "test-monitor-1",
         type: "http",
@@ -446,6 +449,10 @@ describe(validateMonitor, () => {
         expectedValue: "success",
         recordType: "A",
         lastChecked: new Date(),
+    });
+
+    const createMonitorCandidate = (): MonitorCandidate => ({
+        ...createValidMonitor(),
     });
 
     it("should return true for valid monitor", async ({ task, annotate }) => {
@@ -498,8 +505,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            delete (monitor as any).id;
+            const monitor = createMonitorCandidate();
+            delete monitor.id;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -512,8 +519,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            (monitor as any).id = 123;
+            const monitor = createMonitorCandidate();
+            monitor.id = 123;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -542,8 +549,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            delete (monitor as any).type;
+            const monitor = createMonitorCandidate();
+            delete monitor.type;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -556,8 +563,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            (monitor as any).type = 123;
+            const monitor = createMonitorCandidate();
+            monitor.type = 123;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -570,7 +577,7 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
-            const monitor = createValidMonitor();
+            const monitor = createMonitorCandidate();
 
             // Test with first valid type if BASE_MONITOR_TYPES is available
             if (BASE_MONITOR_TYPES && BASE_MONITOR_TYPES.length > 0) {
@@ -580,7 +587,7 @@ describe(validateMonitor, () => {
             }
 
             // Test with invalid type
-            monitor.type = "invalid-type" as any;
+            monitor.type = "invalid-type";
             expect(validateMonitor(monitor)).toBeFalsy();
         });
     });
@@ -595,8 +602,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            delete (monitor as any).status;
+            const monitor = createMonitorCandidate();
+            delete monitor.status;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -609,8 +616,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidMonitor();
-            (monitor as any).status = 123;
+            const monitor = createMonitorCandidate();
+            monitor.status = 123;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -623,7 +630,7 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
-            const monitor = createValidMonitor();
+            const monitor = createMonitorCandidate();
 
             // Valid statuses
             for (const status of [
@@ -642,7 +649,7 @@ describe(validateMonitor, () => {
                 "unknown",
                 "invalid",
             ]) {
-                monitor.status = status as any;
+                monitor.status = status;
                 expect(validateMonitor(monitor)).toBeFalsy();
             }
         });
@@ -658,8 +665,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitor = createValidMonitor();
-            delete (monitor as any).monitoring;
+            const monitor = createMonitorCandidate();
+            delete monitor.monitoring;
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -672,8 +679,8 @@ describe(validateMonitor, () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitor = createValidMonitor();
-            (monitor as any).monitoring = "true";
+            const monitor = createMonitorCandidate();
+            monitor.monitoring = "true";
             expect(validateMonitor(monitor)).toBeFalsy();
         });
 
@@ -705,33 +712,33 @@ describe(validateMonitor, () => {
 
         for (const field of numericFields) {
             it(`should return false for missing ${field}`, () => {
-                const monitor = createValidMonitor();
+                const monitor = createMonitorCandidate();
                 // Use Reflect.deleteProperty to avoid dynamic delete lint error
                 Reflect.deleteProperty(monitor, field);
                 expect(validateMonitor(monitor)).toBeFalsy();
             });
 
             it(`should return false for non-number ${field}`, () => {
-                const monitor = createValidMonitor();
-                (monitor as any)[field] = "123";
+                const monitor = createMonitorCandidate();
+                monitor[field] = "123";
                 expect(validateMonitor(monitor)).toBeFalsy();
             });
 
             it(`should accept valid number for ${field}`, () => {
-                const monitor = createValidMonitor();
-                (monitor as any)[field] = 100;
+                const monitor = createMonitorCandidate();
+                monitor[field] = 100;
                 expect(validateMonitor(monitor)).toBeTruthy();
             });
 
             it(`should accept zero for ${field}`, () => {
-                const monitor = createValidMonitor();
-                (monitor as any)[field] = 0;
+                const monitor = createMonitorCandidate();
+                monitor[field] = 0;
                 expect(validateMonitor(monitor)).toBeTruthy();
             });
 
             it(`should accept negative numbers for ${field}`, () => {
-                const monitor = createValidMonitor();
-                (monitor as any)[field] = -1;
+                const monitor = createMonitorCandidate();
+                monitor[field] = -1;
                 expect(validateMonitor(monitor)).toBeTruthy();
             });
         }
@@ -764,10 +771,10 @@ describe(validateMonitor, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        const monitor = createValidMonitor();
+        const monitor = createMonitorCandidate();
 
         // Empty strings for numeric fields should fail
-        (monitor as any).responseTime = "";
+        monitor.responseTime = "";
         expect(validateMonitor(monitor)).toBeFalsy();
 
         monitor.responseTime = 150; // Reset
