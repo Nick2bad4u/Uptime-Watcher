@@ -1,11 +1,6 @@
-/**
- * Comprehensive test suite for App.tsx component. Tests all major functionality
- * including state management, modal behavior, error handling, loading states,
- * and update notifications.
- */
-
 import type { RenderResult } from "@testing-library/react";
 
+import type { Site } from "@shared/types";
 import {
     sampleOne,
     siteNameArbitrary,
@@ -29,7 +24,6 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import { themes } from "../theme/themes";
 import { useTheme } from "../theme/useTheme";
 
-// Mock all required modules
 vi.mock("../hooks/useBackendFocusSync", () => ({
     useBackendFocusSync: vi.fn(),
 }));
@@ -82,7 +76,7 @@ vi.mock("../components/Settings/Settings", () => ({
 }));
 
 vi.mock("../components/SiteDetails/SiteDetails", () => ({
-    SiteDetails: ({ onClose, site }: { onClose: () => void; site: any }) => (
+    SiteDetails: ({ onClose, site }: { onClose: () => void; site: Site }) => (
         <div data-testid="site-details-modal">
             <span data-testid="site-details-identifier">{site.identifier}</span>
             <button data-testid="close-site-details" onClick={onClose}>
@@ -112,23 +106,19 @@ const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseUpdatesStore = vi.mocked(useUpdatesStore);
 const mockUseTheme = vi.mocked(useTheme);
 
-// Mock environment functions
 vi.mock("../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => false),
     isProduction: vi.fn(() => true),
 }));
 
-// Create a mock site for testing
-const mockSite = {
+const mockSite: Site = {
     identifier: "test-site-1",
     name: sampleOne(siteNameArbitrary),
-    url: "https://example.com",
     monitors: [],
     monitoring: true,
 };
 
-describe("App Component - Comprehensive Coverage", () => {
-    // Default mock implementations
+describe("App shell behavior", () => {
     const defaultErrorStore = {
         clearError: vi.fn(),
         isLoading: false,
@@ -146,7 +136,7 @@ describe("App Component - Comprehensive Coverage", () => {
     defaultSettingsStore.getState.mockReturnValue(defaultSettingsStore);
 
     const defaultSitesStore = {
-        sites: [] as any[],
+        sites: [] as Site[],
         initializeSites: vi.fn().mockResolvedValue(undefined),
         subscribeToStatusUpdates: vi.fn(),
         unsubscribeFromStatusUpdates: vi.fn(),
@@ -458,11 +448,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
-
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
                 isLoading: true,
@@ -488,11 +473,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -526,11 +506,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
-
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
                 isLoading: true,
@@ -557,11 +532,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -614,11 +584,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
                 lastError: null,
@@ -635,11 +600,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -674,11 +634,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Loading", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
-
             mockUseUpdatesStore.mockReturnValue({
                 ...defaultUpdatesStore,
                 updateStatus: "downloading",
@@ -701,11 +656,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Loading", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -741,11 +691,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             mockUseUpdatesStore.mockReturnValue({
                 ...defaultUpdatesStore,
                 updateStatus: "error",
@@ -770,11 +715,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -808,11 +748,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
             const applyUpdate = vi.fn();
             mockUseUpdatesStore.mockReturnValue({
                 ...defaultUpdatesStore,
@@ -834,11 +769,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -871,11 +801,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -923,11 +848,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             const setShowSettings = vi.fn();
             mockUseUIStore.mockReturnValue({
                 ...defaultUIStore,
@@ -948,11 +868,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1017,11 +932,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             const setShowSiteDetails = vi.fn();
             mockUseUIStore.mockReturnValue({
                 ...defaultUIStore,
@@ -1048,11 +958,6 @@ describe("App Component - Comprehensive Coverage", () => {
 
     describe("Initialization and Cleanup", () => {
         it("should initialize stores on mount", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Initialization", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1093,11 +998,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Caching", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Caching", "type");
-
             const mockCacheSync = await import("../utils/cacheSync");
 
             await renderApp();
@@ -1111,11 +1011,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1141,11 +1036,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1185,11 +1075,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Data Update", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
@@ -1245,11 +1130,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             const mockBackendFocusSync =
                 await import("../hooks/useBackendFocusSync");
 
@@ -1273,11 +1153,6 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             const mockEnvironment =
                 await import("../../shared/utils/environment");
             vi.mocked(mockEnvironment.isProduction).mockReturnValue(true);
@@ -1295,11 +1170,6 @@ describe("App Component - Comprehensive Coverage", () => {
             task,
             annotate,
         }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: App", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: App", "component");
             await annotate("Category: Core", "category");
