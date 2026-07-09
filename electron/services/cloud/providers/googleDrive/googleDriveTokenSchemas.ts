@@ -16,13 +16,19 @@ export interface GoogleTokenResponse {
     readonly token_type?: string | undefined;
 }
 
+const optionalTrimmedNonEmptyStringSchema: z.ZodType<string | undefined> = z
+    .string()
+    .trim()
+    .min(1)
+    .optional();
+
 export const googleTokenResponseSchema: z.ZodType<GoogleTokenResponse> = z
     .object({
         access_token: z.string().trim().min(1),
         expires_in: z.int().positive().optional(),
         refresh_token: z.string().trim().min(1).optional(),
-        scope: z.string().trim().optional(),
-        token_type: z.string().trim().optional(),
+        scope: optionalTrimmedNonEmptyStringSchema,
+        token_type: optionalTrimmedNonEmptyStringSchema,
     })
     .loose();
 

@@ -25,13 +25,19 @@ export interface GoogleDriveTokens {
     tokenType?: string | undefined;
 }
 
+const optionalTrimmedNonEmptyStringSchema: z.ZodType<string | undefined> = z
+    .string()
+    .trim()
+    .min(1)
+    .optional();
+
 const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
     .object({
         accessToken: z.string().trim().min(1),
         expiresAt: epochMsSchema,
         refreshToken: z.string().trim().min(1),
-        scope: z.string().trim().optional(),
-        tokenType: z.string().trim().optional(),
+        scope: optionalTrimmedNonEmptyStringSchema,
+        tokenType: optionalTrimmedNonEmptyStringSchema,
     })
     .strict();
 

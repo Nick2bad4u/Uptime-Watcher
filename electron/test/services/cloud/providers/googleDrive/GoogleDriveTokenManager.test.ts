@@ -77,6 +77,80 @@ describe(GoogleDriveTokenManager, () => {
         );
     });
 
+    it("trims non-empty optional token metadata before storing", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "access",
+            expiresAt: Date.now() + 5 * 60_000,
+            refreshToken: "refresh",
+            scope: "  https://www.googleapis.com/auth/drive.appdata  ",
+            tokenType: "  Bearer  ",
+        });
+
+        await expect(manager.getTokens()).resolves.toMatchObject({
+            scope: "https://www.googleapis.com/auth/drive.appdata",
+            tokenType: "Bearer",
+        });
+    });
+
+    it("rejects empty optional token metadata before storing", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await expect(
+            manager.setTokens({
+                accessToken: "access",
+                expiresAt: Date.now() + 5 * 60_000,
+                refreshToken: "refresh",
+                scope: " ".repeat(3),
+            })
+        ).rejects.toThrow();
+
+        await expect(
+            secretStore.getSecret("cloud.googleDrive.tokens")
+        ).resolves.toBeUndefined();
+    });
+
+    it("rejects empty optional metadata from refresh responses without overwriting existing tokens", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        axiosPost.mockResolvedValueOnce({
+            data: {
+                access_token: "new-access",
+                expires_in: 3600,
+                token_type: " ".repeat(3),
+            },
+        });
+
+        await expect(manager.getValidAccessToken()).rejects.toThrow();
+
+        await expect(manager.getTokens()).resolves.toMatchObject({
+            accessToken: "old-access",
+            refreshToken: "refresh",
+        });
+    });
+
     it("deduplicates concurrent refreshes", async () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
