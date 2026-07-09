@@ -382,12 +382,12 @@ describe("monitoring Data Validation", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl(null as any)).toBe(false);
-            expect(isValidUrl(undefined as any)).toBe(false);
-            expect(isValidUrl(123 as any)).toBe(false);
-            expect(isValidUrl({} as any)).toBe(false);
-            expect(isValidUrl([] as any)).toBe(false);
-            expect(isValidUrl(true as any)).toBe(false);
+            expect(isValidUrl(null)).toBe(false);
+            expect(isValidUrl(undefined)).toBe(false);
+            expect(isValidUrl(123)).toBe(false);
+            expect(isValidUrl({})).toBe(false);
+            expect(isValidUrl([])).toBe(false);
+            expect(isValidUrl(true)).toBe(false);
         });
 
         it("should handle edge cases and malformed URLs", async ({
