@@ -537,6 +537,32 @@ describe("Frontend Logger Service", () => {
             );
         });
 
+        it("should keep prototype-like setting names inert", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            logger.user.settingsChange("__proto__", "enabled", "disabled");
+
+            expect(mockLog.info).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Settings change: __proto__",
+                expect.any(Object)
+            );
+
+            const [, details] = mockLog.info.mock.calls.at(-1) ?? [];
+
+            expect(Object.getPrototypeOf(details)).toBeNull();
+            expect(Object.hasOwn(details as object, "__proto__")).toBeTruthy();
+            expect(Reflect.get(details as object, "__proto__")).toEqual({
+                newValue: "disabled",
+                oldValue: "enabled",
+            });
+        });
+
         it("should redact sensitive settings changes", async ({
             task,
             annotate,
