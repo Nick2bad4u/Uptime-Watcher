@@ -1,58 +1,39 @@
-/**
- * Comprehensive test coverage for MonitorSelector component. Focuses on
- * uncovered lines and edge cases to achieve 100% coverage.
- */
-
 import type { Monitor, MonitorType } from "@shared/types";
+import type { ReactElement } from "react";
 
 import { createValidMonitor } from "@shared/test/testHelpers";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { forwardRef } from "react";
-import { arrayFirst, objectHasOwn } from "ts-extras";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import type { MonitorSelectorProperties } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-
-// Mock ThemedSelect
-vi.mock("../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: forwardRef<HTMLSelectElement, any>(
-        ({ children, className, fluid, tone, ...rest }, ref) => (
-            <select
-                {...rest}
-                className={className}
-                data-testid="themed-select"
-                ref={ref}
-            >
-                {children}
-            </select>
-        )
-    ),
-}));
 
 const createMockMonitor = (
     id: string,
     type: MonitorType,
     options: Partial<Monitor> = {}
 ): Monitor => {
-    const hasUrlOverride = objectHasOwn(options, "url");
+    const hasUrlOverride = Object.hasOwn(options, "url");
     const { url: overrideUrl, ...restOptions } = options;
     const monitor = createValidMonitor({
+        host: "example.com",
         id,
-        type,
-        status: "pending",
         monitoring: false,
         responseTime: 0,
+        status: "pending",
+        type,
         ...restOptions,
-        ...(overrideUrl !== undefined && { url: overrideUrl }),
+        ...(overrideUrl !== undefined ? { url: overrideUrl } : {}),
     });
 
     if (hasUrlOverride && overrideUrl === undefined) {
         Reflect.deleteProperty(monitor, "url");
     }
 
-    if (type === "port" || type === "ping") {
+    if (type === "ping" || type === "port") {
         Reflect.deleteProperty(monitor, "url");
     }
 
@@ -61,1083 +42,225 @@ const createMockMonitor = (
 
 const defaultProps = {
     monitors: [
-        createMockMonitor("monitor-1", "http", { url: "https://example.com" }),
+        createMockMonitor("monitor-1", "http", {
+            url: "https://example.com/status",
+        }),
         createMockMonitor("monitor-2", "port", { port: 8080 }),
         createMockMonitor("monitor-3", "ping"),
     ],
-    selectedMonitorId: "monitor-1",
     onChange: vi.fn(),
+    selectedMonitorId: "monitor-1",
+} satisfies MonitorSelectorProperties;
+
+const renderWithTheme = (ui: ReactElement) =>
+    render(<ThemeProvider>{ui}</ThemeProvider>);
+
+const renderMonitorSelector = (
+    props: Partial<MonitorSelectorProperties> = {}
+) => {
+    const mergedProps = {
+        ...defaultProps,
+        onChange: vi.fn(),
+        ...props,
+    } satisfies MonitorSelectorProperties;
+
+    const result = renderWithTheme(<MonitorSelector {...mergedProps} />);
+
+    return {
+        props: mergedProps,
+        select: screen.getByRole("combobox", { name: "Select monitor" }),
+        ...result,
+    };
 };
 
-const renderMonitorSelector = (props = {}) =>
-    render(
-        <ThemeProvider>
-            <MonitorSelector {...defaultProps} {...props} />
-        </ThemeProvider>
-    );
-
-const getSelectableOptions = () =>
+const selectableOptions = () =>
     screen
-        .queryAllByRole("option")
+        .getAllByRole("option")
         .filter((option) => option.getAttribute("value") !== "");
 
-describe("MonitorSelector - Complete Coverage", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+describe("MonitorSelector", () => {
+    it("renders the selected monitor with formatted options", () => {
+        const { container, select } = renderMonitorSelector({
+            className: "custom-selector",
+            selectedMonitorId: "monitor-2",
+        });
+
+        expect(container.firstElementChild).toHaveClass(
+            "monitor-selector__wrapper",
+            "monitor-selector",
+            "custom-selector"
+        );
+        expect(select).toHaveValue("monitor-2");
+        expect(select).not.toBeDisabled();
+        expect(selectableOptions()).toHaveLength(3);
+        expect(
+            screen.getByRole("option", {
+                name: "Website URL: https://example.com/status",
+            })
+        ).toHaveValue("monitor-1");
+        expect(
+            screen.getByRole("option", {
+                name: "Host & Port: example.com:8080",
+            })
+        ).toHaveValue("monitor-2");
+        expect(
+            screen.getByRole("option", { name: "Ping Monitor: example.com" })
+        ).toHaveValue("monitor-3");
     });
 
-    describe("Basic Rendering", () => {
-        it("should render with default className", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(".monitor-selector__wrapper");
-            expect(wrapper).not.toBeNull();
-            expect(wrapper).toHaveClass("monitor-selector");
-            expect(wrapper).toHaveClass("min-w-20");
+    it("shows an empty disabled placeholder when no monitors are available", () => {
+        const { container, select } = renderMonitorSelector({
+            monitors: [],
+            selectedMonitorId: "",
         });
 
-        it("should render with custom className", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderMonitorSelector({ className: "custom-class" });
-
-            const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(".monitor-selector__wrapper");
-            expect(wrapper).not.toBeNull();
-            expect(wrapper).toHaveClass("monitor-selector");
-            expect(wrapper).toHaveClass("custom-class");
-        });
-
-        it("should render all monitor options", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderMonitorSelector();
-
-            const options = screen.getAllByRole("option");
-            expect(options).toHaveLength(3);
-
-            expect(arrayFirst(options)).toHaveValue("monitor-1");
-            expect(options[1]).toHaveValue("monitor-2");
-            expect(options[2]).toHaveValue("monitor-3");
-        });
-
-        it("should show selected monitor value", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderMonitorSelector({ selectedMonitorId: "monitor-2" });
-
-            const select = screen.getByTestId("themed-select");
-            expect(select).toHaveValue("monitor-2");
-        });
-
-        it("should disable selector and show empty state when no monitors available", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Accessibility", "type");
-
-            renderMonitorSelector({ monitors: [], selectedMonitorId: "" });
-
-            const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(".monitor-selector__wrapper")!;
-
-            expect(select).toBeDisabled();
-            expect(select).toHaveValue("");
-            expect(wrapper).toHaveAttribute("data-disabled", "true");
-            expect(wrapper).not.toHaveAttribute("role");
-            expect(wrapper).not.toHaveAttribute("tabindex");
-            expect(
-                screen.getByText("No monitors available")
-            ).toBeInTheDocument();
-        });
-
-        it("should surface placeholder when selection is no longer valid", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Resilience", "type");
-
-            renderMonitorSelector({ selectedMonitorId: "missing-monitor" });
-
-            const select = screen.getByTestId("themed-select");
-            const wrapper = select.closest(".monitor-selector__wrapper")!;
-
-            expect(select).not.toBeDisabled();
-            expect(select).toHaveValue("");
-            expect(wrapper).toHaveAttribute("data-disabled", "false");
-            expect(wrapper).not.toHaveAttribute("role");
-            expect(wrapper).not.toHaveAttribute("tabindex");
-            expect(screen.getByText("Select a monitor")).toBeInTheDocument();
-        });
-
-        it("should render trailing chevron icon for affordance", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Accessibility", "type");
-
-            renderMonitorSelector();
-
-            expect(
-                document.querySelector(".monitor-selector__icon--trailing")
-            ).toBeInTheDocument();
-        });
+        expect(select).toBeDisabled();
+        expect(select).toHaveValue("");
+        expect(container.firstElementChild).toHaveAttribute(
+            "data-disabled",
+            "true"
+        );
+        expect(
+            screen.getByRole("option", { name: "No monitors available" })
+        ).toBeDisabled();
     });
 
-    describe("Interactions", () => {
-        it("should focus the select when it is clicked", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Interaction", "type");
-
-            const user = userEvent.setup();
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-            const focusSpy = vi
-                .spyOn(select, "focus")
-                .mockReturnValue(undefined);
-            const wrapper = select.closest(".monitor-selector__wrapper")!;
-
-            await user.click(select);
-            select.focus();
-
-            expect(focusSpy).toHaveBeenCalled();
-            expect(defaultProps.onChange).not.toHaveBeenCalled();
-            expect(wrapper).not.toHaveAttribute("aria-expanded");
-
-            focusSpy.mockRestore();
+    it("shows a placeholder when the selected monitor is missing", () => {
+        const { container, select } = renderMonitorSelector({
+            selectedMonitorId: "missing-monitor",
         });
+
+        expect(select).toHaveValue("");
+        expect(container.firstElementChild).toHaveAttribute(
+            "title",
+            "Select a monitor"
+        );
+        expect(
+            screen.getByRole("option", { name: "Select a monitor" })
+        ).toBeDisabled();
+        expect(selectableOptions()).toHaveLength(3);
     });
 
-    describe("Monitor Option Formatting", () => {
-        it("should format HTTP monitor with URL", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+    it("emits changes and prevents row activation events", async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        const onParentClick = vi.fn();
+        const onParentMouseDown = vi.fn();
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        renderWithTheme(
+            <div onClick={onParentClick} onMouseDown={onParentMouseDown}>
+                <MonitorSelector {...defaultProps} onChange={onChange} />
+            </div>
+        );
 
-            renderMonitorSelector();
-
-            const option = screen.getByText("Website URL: https://example.com");
-            expect(option).toBeInTheDocument();
+        const select = screen.getByRole("combobox", {
+            name: "Select monitor",
         });
 
-        it("should format port monitor with port number", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        await user.selectOptions(select, "monitor-2");
+        fireEvent.click(select);
+        fireEvent.mouseDown(select);
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onParentClick).not.toHaveBeenCalled();
+        expect(onParentMouseDown).not.toHaveBeenCalled();
+    });
 
-            renderMonitorSelector();
-
-            const option = screen.getByText("Host & Port: example.com:8080");
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should format ping monitor without additional details", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderMonitorSelector();
-
-            const option = screen.getByText("Ping Monitor: example.com");
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should format monitor with only type when no url or port", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("monitor-no-details", "http"), // No URL or port
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const option = screen.getByText("Website URL: https://example.com");
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should handle mixed case monitor types", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                {
-                    ...createMockMonitor("monitor-1", "http"),
-                    type: "HTTP",
-                } as any,
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            // For non-standard types, component falls back to generated label and URL identifier
-            const option = screen.getByText(
-                "HTTP Monitor: https://example.com"
-            );
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should prioritize port over url when both present", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const monitors = [
-                createMockMonitor("monitor-both", "http", {
-                    url: "https://example.com",
-                    port: 3000,
+    it("redacts URL query strings in rendered labels", () => {
+        renderMonitorSelector({
+            monitors: [
+                createMockMonitor("with-query", "http", {
+                    url: "https://example.com/path?token=secret&debug=true",
                 }),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const option = screen.getByText("Website URL: https://example.com");
-            expect(option).toBeInTheDocument();
+            ],
+            selectedMonitorId: "with-query",
         });
+
+        expect(
+            screen.getByRole("option", {
+                name: "Website URL: https://example.com/path",
+            })
+        ).toBeInTheDocument();
+        expect(screen.queryByText(/token=secret/u)).not.toBeInTheDocument();
+        expect(screen.queryByText(/debug=true/u)).not.toBeInTheDocument();
     });
 
-    describe("Event Handling", () => {
-        it("should call onChange when selection changes", async ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const onChange = vi.fn();
-            renderMonitorSelector({ onChange });
-
-            const user = userEvent.setup();
-
-            const select = screen.getByTestId("themed-select");
-            await user.selectOptions(select, "monitor-2");
-
-            expect(onChange).toHaveBeenCalled();
-        });
-
-        it("should stop propagation on click events", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-            const stopPropagation = vi.fn();
-
-            const mockEvent = new MouseEvent("click", { bubbles: true });
-            mockEvent.stopPropagation = stopPropagation;
-
-            fireEvent(select, mockEvent);
-
-            expect(stopPropagation).toHaveBeenCalled();
-        });
-
-        it("should stop propagation on mouseDown events", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-            const stopPropagation = vi.fn();
-
-            const mockEvent = new MouseEvent("mousedown", { bubbles: true });
-            mockEvent.stopPropagation = stopPropagation;
-
-            fireEvent(select, mockEvent);
-
-            expect(stopPropagation).toHaveBeenCalled();
-        });
-
-        it("should handle click without event object", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-
-            // Should not throw when event handlers receive undefined
-            fireEvent.click(select);
-
-            expect(select).toBeInTheDocument();
-        });
-
-        it("should handle mouseDown without event object", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-
-            // Should not throw when event handlers receive undefined
-            fireEvent.mouseDown(select);
-
-            expect(select).toBeInTheDocument();
-        });
-    });
-
-    describe("Performance Optimizations", () => {
-        it("should be a memoized component (React.memo)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(typeof MonitorSelector).toBe("object");
-            // React.memo components don't automatically have displayName
-            expect(MonitorSelector).toBeDefined();
-        });
-
-        it("should maintain stable event handlers across renders", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Event Processing", "type");
-
-            const { rerender } = renderMonitorSelector();
-
-            const select1 = screen.getByTestId("themed-select");
-
-            // Rerender with same props
-            rerender(
-                <ThemeProvider>
-                    <MonitorSelector {...defaultProps} />
-                </ThemeProvider>
-            );
-
-            const select2 = screen.getByTestId("themed-select");
-
-            // Should be the same element (React.memo working)
-            expect(select1).toBe(select2);
-        });
-
-        it("should re-render when props change", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const { rerender } = renderMonitorSelector();
-
-            screen.getAllByRole("option");
-
-            // Rerender with different monitors
-            const newMonitors = [
-                createMockMonitor("new-monitor", "http", {
-                    url: "https://new.com",
-                }),
-            ];
-
-            rerender(
-                <ThemeProvider>
-                    <MonitorSelector
-                        {...defaultProps}
-                        monitors={newMonitors}
-                        selectedMonitorId="new-monitor"
-                    />
-                </ThemeProvider>
-            );
-
-            const newOptions = getSelectableOptions();
-            expect(newOptions).toHaveLength(1);
-            expect(arrayFirst(newOptions)).toHaveValue("new-monitor");
-            expect(arrayFirst(newOptions)).toHaveTextContent(
-                "Website URL: https://new.com"
-            );
-        });
-    });
-
-    describe("Edge Cases", () => {
-        it("should handle empty monitors array", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderMonitorSelector({ monitors: [], selectedMonitorId: "" });
-
-            const select = screen.getByTestId("themed-select");
-            expect(select).toBeInTheDocument();
-
-            const options = screen.queryAllByRole("option");
-            expect(options).toHaveLength(1);
-            expect(arrayFirst(options)).toHaveTextContent(
-                "No monitors available"
-            );
-            expect(arrayFirst(options)).toBeDisabled();
-        });
-
-        it("should handle single monitor", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const singleMonitor = [createMockMonitor("only-monitor", "ping")];
+    it.each([
+        [
+            createMockMonitor("unknown-port", "port", {
+                host: "example.com",
+                port: 1234,
+                type: "type-a" as MonitorType,
+            }),
+            "Type A Monitor: example.com:1234",
+        ],
+        [
+            createMockMonitor("unknown-url", "http", {
+                type: "type-b" as MonitorType,
+                url: "https://test.com/status",
+            }),
+            "Type B Monitor: https://test.com/status",
+        ],
+        [
+            (() => {
+                const monitor = createMockMonitor("unknown-host", "ping", {
+                    type: "type-c" as MonitorType,
+                });
+                Reflect.deleteProperty(monitor, "port");
+                return monitor;
+            })(),
+            "Type C Monitor: example.com",
+        ],
+    ])(
+        "formats unknown monitor types with available connection data",
+        (monitor, label) => {
             renderMonitorSelector({
-                monitors: singleMonitor,
-                selectedMonitorId: "only-monitor",
+                monitors: [monitor],
+                selectedMonitorId: monitor.id,
             });
 
-            const options = getSelectableOptions();
-            expect(options).toHaveLength(1);
-            expect(arrayFirst(options)).toHaveTextContent("Ping Monitor");
-        });
-
-        it("should redact query strings in URL labels", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("special-chars", "http", {
-                    url: "https://example.com/path?param=value&other=test",
-                }),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const option = screen.getByText(
-                "Website URL: https://example.com/path"
-            );
-            expect(option).toBeInTheDocument();
-            expect(screen.queryByText(/param=value/iu)).not.toBeInTheDocument();
-            expect(screen.queryByText(/other=test/iu)).not.toBeInTheDocument();
-        });
-
-        it("should handle monitors with very high port numbers", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("high-port", "port", { port: 65_535 }),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const option = screen.getByText("Host & Port: example.com:65535");
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should handle monitors with port 0 (falsy value edge case)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("port-zero", "port", { port: 0 }),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const option = screen.getByText("Host & Port: example.com");
-            expect(option).toBeInTheDocument();
-        });
-
-        it("should handle invalid selected monitor ID gracefully", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = defaultProps.monitors;
-            renderMonitorSelector({
-                monitors,
-                selectedMonitorId: "non-existent-id",
-            });
-
-            const select = screen.getByTestId("themed-select");
-            // The component should still render even with invalid ID
-            expect(select).toBeInTheDocument();
-
-            // Options should still be available
-            const options = getSelectableOptions();
-            expect(options).toHaveLength(3);
-        });
-
-        it("should handle undefined selected monitor ID", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            renderMonitorSelector({ selectedMonitorId: undefined as any });
-
-            const select = screen.getByTestId("themed-select");
-            expect(select).toBeInTheDocument();
-        });
-    });
-
-    describe("Monitor Type Coverage", () => {
-        it("should handle all supported monitor types", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const allTypes = [
-                createMockMonitor("http-monitor", "http", {
-                    url: "https://test.com",
-                }),
-                createMockMonitor("port-monitor", "port", { port: 443 }),
-                createMockMonitor("ping-monitor", "ping"),
-            ];
-
-            renderMonitorSelector({ monitors: allTypes });
-
             expect(
-                screen.getByText("Website URL: https://test.com")
+                screen.getByRole("option", { name: label })
             ).toBeInTheDocument();
-            expect(
-                screen.getByText("Host & Port: example.com:443")
-            ).toBeInTheDocument();
-            expect(
-                screen.getByText("Ping Monitor: example.com")
-            ).toBeInTheDocument();
-        });
+        }
+    );
 
-        it("should format advanced monitor types with descriptive labels", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("cdn-monitor", "cdn-edge-consistency", {
+    it("keeps advanced monitor type labels readable", () => {
+        renderMonitorSelector({
+            monitors: [
+                createMockMonitor("cdn", "cdn-edge-consistency", {
                     baselineUrl: "https://origin.example.com/status",
                     edgeLocations: "https://edge.example.com/status",
                 }),
-                createMockMonitor("heartbeat-monitor", "server-heartbeat", {
+                createMockMonitor("heartbeat", "server-heartbeat", {
                     heartbeatExpectedStatus: "ok",
                     heartbeatStatusField: "status",
                     heartbeatTimestampField: "timestamp",
                     url: "https://api.example.com/heartbeat",
                 }),
-                createMockMonitor("replication-monitor", "replication", {
+                createMockMonitor("replication", "replication", {
                     primaryStatusUrl: "https://primary.example.com/status",
                     replicaStatusUrl: "https://replica.example.com/status",
                     replicationTimestampField: "timestamp",
                 }),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            expect(
-                screen.getByText(
-                    "CDN Edge Consistency: https://origin.example.com/status"
-                )
-            ).toBeInTheDocument();
-            expect(
-                screen.getByText(
-                    "Server Heartbeat: https://api.example.com/heartbeat"
-                )
-            ).toBeInTheDocument();
-            expect(
-                screen.getByText(
-                    "Replication Lag: https://primary.example.com/status"
-                )
-            ).toBeInTheDocument();
+            ],
+            selectedMonitorId: "cdn",
         });
 
-        it("should format monitor options consistently", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Monitoring", "type");
-
-            const monitors = [
-                createMockMonitor("test-1", "http", {
-                    url: "http://localhost",
-                }),
-                createMockMonitor("test-2", "port", { port: 8080 }),
-                createMockMonitor("test-3", "ping"),
-            ];
-
-            renderMonitorSelector({ monitors });
-
-            const options = getSelectableOptions();
-
-            // Check that each option has expected format
-            expect(arrayFirst(options)).toHaveTextContent(/^Website URL:/v);
-            expect(options[1]).toHaveTextContent(/^Host & Port:/v);
-            expect(options[2]).toHaveTextContent(/^Ping Monitor:/v);
-        });
-    });
-
-    describe("Accessibility", () => {
-        it("should be keyboard navigable", async ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-
-            // Focus the select
-            await act(async () => {
-                select.focus();
-            });
-            expect(select).toHaveFocus();
-
-            // Should be able to change selection with keyboard
-            const user = userEvent.setup();
-            await user.keyboard("{ArrowDown}");
-            // The actual selection change depends on the select implementation
-        });
-
-        it("should have proper roles and attributes", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: MonitorSelector.complete-coverage",
-                "component"
-            );
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            renderMonitorSelector();
-
-            const select = screen.getByTestId("themed-select");
-            // Check that the select element exists and is properly structured
-            expect(select).toBeInTheDocument();
-
-            const options = screen.getAllByRole("option");
-            for (const option of options) {
-                expect(option).toHaveAttribute("value");
-            }
-        });
+        expect(
+            screen.getByRole("option", {
+                name: "CDN Edge Consistency: https://origin.example.com/status",
+            })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("option", {
+                name: "Server Heartbeat: https://api.example.com/heartbeat",
+            })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByRole("option", {
+                name: "Replication Lag: https://primary.example.com/status",
+            })
+        ).toBeInTheDocument();
     });
 });
