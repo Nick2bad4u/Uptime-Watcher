@@ -2,11 +2,10 @@
  * Property-based invariants for shared history limit helpers.
  *
  * @remarks
- * These properties complement the example-based coverage in
- * `historyLimits-complete-coverage.test.ts` by asserting cross-cutting
- * behaviours of {@link normalizeHistoryLimit} such as idempotence, range
- * constraints, and monotonicity. They are intentionally focused on the default
- * rules used across renderer and Electron layers.
+ * These properties complement the example-based history limit tests by
+ * asserting cross-cutting behaviours of {@link normalizeHistoryLimit} such as
+ * idempotence, range constraints, and monotonicity. They are intentionally
+ * focused on the default rules used across renderer and Electron layers.
  */
 
 import {

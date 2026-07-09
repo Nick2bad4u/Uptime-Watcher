@@ -1,29 +1,9 @@
 /**
  * Comprehensive Fast-Check Property-Based Tests for shared/types.ts
  *
- * This test file specifically targets 100% function coverage for all functions
- * in shared/types.ts using property-based testing. The current coverage shows
- * only 50% function coverage (5/10), so this aims to exercise all functions
- * comprehensively.
- *
- * Target Functions:
- *
- * - IsValidActiveOperations (internal function)
- * - IsComputedSiteStatus
- * - IsMonitorStatus
- * - IsSiteStatus
- * - ValidateMonitor
- *
- * Plus any exported co test.prop([fc.record({ id: fc.string({ minLength: 1 }),
- * type: fc.constantFrom(...BASE_MONITOR_TYPES), status: fc.constantFrom("down",
- * "paused", "pending", "up"), monitoring: fc.boolean(), responseTime: fc.nat(),
- * checkInterval: fc.nat(), timeout: fc.nat(), retryAttempts: fc.nat(), history:
- * fc.array(fc.anything()), activeOperations: fc.array(fc.constantFrom(" ", " \t
- * ", " \n ", ""), { minLength: 1 }) })])( "should return false when
- * activeOperations contains whitespace-only strings",
- * (monitorWithWhitespaceActiveOps: any) => {
- * expect(validateMonitor(monitorWithWhitespaceActiveOps)).toBeFalsy(); }
- * );constructors.
+ * These tests assert type guard and monitor validation invariants across broad
+ * generated inputs, including active operation edge cases and status
+ * classification boundaries.
  */
 
 import { test } from "@fast-check/vitest";

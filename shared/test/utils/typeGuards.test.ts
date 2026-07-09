@@ -2,8 +2,7 @@
  * Comprehensive test suite for typeGuards utility functions
  *
  * Tests all type guard functions with edge cases, typical values, and boundary
- * conditions to ensure 100% function coverage and robust type checking
- * behavior.
+ * conditions to ensure robust type checking behavior.
  */
 
 import { fc, test } from "@fast-check/vitest";

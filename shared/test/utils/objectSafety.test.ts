@@ -1,10 +1,7 @@
 /**
- * This test file validates 100% function coverage for
- * shared/utils/objectSafety.ts using the Function Coverage Validation pattern.
- * Ensures all exported functions are called and tested for proper execution
- * without necessarily testing business logic.
+ * Property and regression tests for shared/utils/objectSafety.ts.
  *
- * @file Function Coverage Validation Tests for shared/utils/objectSafety.ts
+ * @file Behavior tests for shared/utils/objectSafety.ts
  *
  * @author AI Agent
  *
@@ -15,76 +12,21 @@ import { fc } from "@fast-check/vitest";
 import * as objectSafetyModule from "@shared/utils/objectSafety";
 import { describe, expect, it, test } from "vitest";
 
-describe("shared/utils/objectSafety Function Coverage Validation", () => {
-    describe("Function Coverage Validation", () => {
-        it("should call all exported functions to ensure 100% function coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: objectSafety", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
+describe("shared/utils/objectSafety", () => {
+    describe("null-prototype object creation", () => {
+        it("creates a null-prototype object without mutating Object.prototype", () => {
+            const result = objectSafetyModule.createNullPrototypeObject({
+                "__proto__": "safe-value",
+                stable: "value",
+            } as Record<string, unknown>);
 
-            // Test safeObjectAccess function
-            const testObj = { prop: "value", num: 42 };
-            expect(
-                objectSafetyModule.safeObjectAccess(testObj, "prop", "fallback")
-            ).toBe("value");
-            expect(
-                objectSafetyModule.safeObjectAccess(
-                    testObj,
-                    "missing",
-                    "fallback"
-                )
-            ).toBe("fallback");
-            expect(
-                objectSafetyModule.safeObjectAccess(null, "prop", "fallback")
-            ).toBe("fallback");
+            result["stable"] = "value";
+            result["__proto__"] = "safe-value";
 
-            // Test safeObjectIteration function (returns void)
-            const iterationResults: string[] = [];
-            objectSafetyModule.safeObjectIteration(testObj, (key, value) => {
-                iterationResults.push(`${key}:${value}`);
-            });
-            expect(Array.isArray(iterationResults)).toBeTruthy();
-            expect(iterationResults.length).toBeGreaterThan(0);
-
-            // Test safeObjectIteration with null input (should not throw)
-            expect(() => {
-                objectSafetyModule.safeObjectIteration(
-                    null,
-                    (k, v) => `${k}:${v}`
-                );
-            }).not.toThrow();
-
-            // Test safeObjectOmit function
-            const omitResult = objectSafetyModule.safeObjectOmit(testObj, [
-                "prop",
-            ] as (keyof typeof testObj)[]);
-            expect(omitResult).toBeDefined();
-
-            // Test safeObjectPick function
-            const pickResult = objectSafetyModule.safeObjectPick(testObj, [
-                "prop",
-            ] as (keyof typeof testObj)[]);
-            expect(pickResult).toBeDefined();
-
-            // Test typedObjectEntries function
-            const entriesResult =
-                objectSafetyModule.typedObjectEntries(testObj);
-            expect(Array.isArray(entriesResult)).toBeTruthy();
-            expect(entriesResult.length).toBeGreaterThan(0);
-
-            // Test typedObjectKeys function
-            const keysResult = objectSafetyModule.typedObjectKeys(testObj);
-            expect(Array.isArray(keysResult)).toBeTruthy();
-            expect(keysResult.length).toBeGreaterThan(0);
-
-            // Test typedObjectValues function
-            const valuesResult = objectSafetyModule.typedObjectValues(testObj);
-            expect(Array.isArray(valuesResult)).toBeTruthy();
-            expect(valuesResult.length).toBeGreaterThan(0);
+            expect(Object.getPrototypeOf(result)).toBeNull();
+            expect(result["stable"]).toBe("value");
+            expect(Reflect.get(result, "__proto__")).toBe("safe-value");
+            expect(Object.hasOwn({}, "__proto__")).toBeFalsy();
         });
     });
 
