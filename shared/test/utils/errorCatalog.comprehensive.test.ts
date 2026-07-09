@@ -183,6 +183,47 @@ describe("errorCatalog utilities", () => {
             expect(result).toBe("Error E001: E001 is not handled");
         });
 
+        it("should not replace dangerous prototype placeholder keys", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const template =
+                "Value: {__proto__} and {constructor} and {prototype}";
+            const variables = {
+                __proto__: "dangerous",
+                constructor: "risky",
+                prototype: "unsafe",
+                safe: "ok",
+            };
+
+            const result = formatErrorMessage(template, variables);
+
+            expect(result).toBe(
+                "Value: {__proto__} and {constructor} and {prototype}"
+            );
+        });
+
+        it("should treat replacement strings literally", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorCatalog", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const result = formatErrorMessage("Pattern: {pattern}", {
+                pattern: "$1 and $& and $$",
+            });
+
+            expect(result).toBe("Pattern: $1 and $& and $$");
+        });
+
         it("should handle complex error scenarios", async ({
             task,
             annotate,
