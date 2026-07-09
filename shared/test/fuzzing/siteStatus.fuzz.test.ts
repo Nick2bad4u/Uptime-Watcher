@@ -330,6 +330,38 @@ describe("SiteStatus utilities fuzzing tests", () => {
             expect(result).toBe("No monitors configured");
         });
 
+        it("should describe a single invalid monitor status as unknown", () => {
+            const site = {
+                monitors: [
+                    {
+                        monitoring: true,
+                        status: "invalid-status",
+                    },
+                ],
+            } as SiteForStatus;
+
+            expect(getSiteStatusDescription(site)).toBe("Unknown status");
+        });
+
+        it("should describe multiple different invalid monitor statuses as mixed", () => {
+            const site = {
+                monitors: [
+                    {
+                        monitoring: true,
+                        status: "invalid-status-1",
+                    },
+                    {
+                        monitoring: true,
+                        status: "invalid-status-2",
+                    },
+                ],
+            } as SiteForStatus;
+
+            expect(getSiteStatusDescription(site)).toBe(
+                "Mixed status (2/2 monitoring active)"
+            );
+        });
+
         test.prop([
             fc.array(monitorArbitrary, { minLength: 1, maxLength: 10 }),
         ])("should handle all possible display statuses", (monitors) => {
