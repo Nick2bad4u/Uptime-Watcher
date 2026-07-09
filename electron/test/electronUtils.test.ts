@@ -30,12 +30,19 @@ vi.mock("../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => false),
 }));
 
+const setAppIsPackaged = (isPackaged: boolean): void => {
+    Object.defineProperty(app, "isPackaged", {
+        configurable: true,
+        value: isPackaged,
+    });
+};
+
 describe("ElectronUtils", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset mock defaults
         vi.mocked(isDevelopment).mockReturnValue(false);
-        (app as any).isPackaged = false;
+        setAppIsPackaged(false);
     });
 
     afterEach(() => {
@@ -54,7 +61,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act
             const isResult = isDev();
@@ -75,7 +82,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = true;
+            setAppIsPackaged(true);
 
             // Act
             const isResult = isDev();
@@ -96,7 +103,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act
             const isResult = isDev();
@@ -117,7 +124,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
-            (app as any).isPackaged = true;
+            setAppIsPackaged(true);
 
             // Act
             const isResult = isDev();
@@ -138,7 +145,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(false);
-            (app as any).isPackaged = true;
+            setAppIsPackaged(true);
 
             // Act
             isDev();
@@ -159,7 +166,7 @@ describe("ElectronUtils", () => {
 
             // Arrange - test boolean coercion
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act
             const isResult = isDev();
@@ -180,7 +187,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act - call multiple times with same conditions
             const isResult1 = isDev();
@@ -232,7 +239,7 @@ describe("ElectronUtils", () => {
                 expected,
             } of testCases) {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
-                (app as any).isPackaged = isPackaged;
+                setAppIsPackaged(isPackaged);
 
                 const isResult = isDev();
 
@@ -252,7 +259,7 @@ describe("ElectronUtils", () => {
 
             // Test with different truthy values
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
             expect(isDev()).toBeTruthy();
 
             // Test with falsy values
@@ -273,11 +280,11 @@ describe("ElectronUtils", () => {
             vi.mocked(isDevelopment).mockReturnValue(true);
 
             // Test with false (not packaged)
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
             expect(isDev()).toBeTruthy();
 
             // Test with true (packaged)
-            (app as any).isPackaged = true;
+            setAppIsPackaged(true);
             expect(isDev()).toBeFalsy();
         });
     });
@@ -294,7 +301,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act
             const isResult = isDev();
@@ -316,7 +323,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act
             const isResult = isDev();
@@ -347,7 +354,7 @@ describe("ElectronUtils", () => {
                 isPackaged,
             } of testCases) {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
-                (app as any).isPackaged = isPackaged;
+                setAppIsPackaged(isPackaged);
 
                 const isResult = isDev();
                 expect(typeof isResult).toBe("boolean");
@@ -367,7 +374,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act & Assert
             const startTime = Date.now();
@@ -389,7 +396,7 @@ describe("ElectronUtils", () => {
 
             // Arrange
             vi.mocked(isDevelopment).mockReturnValue(true);
-            (app as any).isPackaged = false;
+            setAppIsPackaged(false);
 
             // Act - call function many times rapidly
             const results: boolean[] = [];
