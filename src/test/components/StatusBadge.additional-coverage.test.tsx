@@ -54,12 +54,12 @@ describe("StatusBadge", () => {
             status: "paused",
         });
 
-        expect(screen.getByText("CUSTOM => PAUSED")).toBeInTheDocument();
+        const badgeLabel = screen.getByText("CUSTOM => PAUSED");
+
+        expect(badgeLabel).toBeInTheDocument();
         expect(
-            screen
-                .getByText("CUSTOM => PAUSED")
-                .parentElement?.querySelector(".themed-status-indicator")
-        ).not.toBeInTheDocument();
+            badgeLabel.parentElement?.querySelector(".themed-status-indicator")
+        ).toBeNull();
     });
 
     it("combines caller classes with the badge layout", () => {

@@ -9,7 +9,7 @@
 import type { Monitor, Site } from "@shared/types";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { arrayFirst, isFinite as isFiniteNumber } from "ts-extras";
 
 import {
@@ -72,31 +72,34 @@ export function getDisplayIdentifier(
  * Hook that resolves the identifier label for the currently selected monitor.
  */
 export function useIdentifierLabel(selectedMonitor: Monitor): string {
+    const { type: monitorType } = selectedMonitor;
     const fallbackLabel = useMemo(
-        () => getMonitorTypeDisplayLabel(selectedMonitor.type),
-        [selectedMonitor.type]
+        () => getMonitorTypeDisplayLabel(monitorType),
+        [monitorType]
     );
-    const labelRef = useRef(fallbackLabel);
-    const [label, setLabelState] = useState(fallbackLabel);
-    const setLabel = useCallback((nextLabel: string): void => {
-        if (labelRef.current === nextLabel) {
-            return;
-        }
-
-        labelRef.current = nextLabel;
-        setLabelState(nextLabel);
-    }, []);
+    const [resolvedLabel, setResolvedLabel] =
+        useState<IdentifierLabelState>();
+    const label =
+        resolvedLabel?.monitorType === monitorType
+            ? resolvedLabel.label
+            : fallbackLabel;
 
     useEffect(
         function loadLabelWithCleanup() {
             let isCancelled = false;
-            setLabel(fallbackLabel);
 
             const loadLabel = async (): Promise<void> => {
-                const identifierLabel =
-                    await getIdentifierLabel(selectedMonitor);
-                if (!isCancelled) {
-                    setLabel(identifierLabel);
+                const identifierLabel = await getIdentifierLabel(monitorType);
+                if (!isCancelled && identifierLabel !== fallbackLabel) {
+                    setResolvedLabel((currentLabel) =>
+                        currentLabel?.monitorType === monitorType &&
+                        currentLabel.label === identifierLabel
+                            ? currentLabel
+                            : {
+                                  label: identifierLabel,
+                                  monitorType,
+                              }
+                    );
                 }
             };
 
@@ -109,10 +112,15 @@ export function useIdentifierLabel(selectedMonitor: Monitor): string {
                 isCancelled = true;
             };
         },
-        [fallbackLabel, selectedMonitor, setLabel]
+        [fallbackLabel, monitorType]
     );
 
     return label;
+}
+
+interface IdentifierLabelState {
+    readonly label: string;
+    readonly monitorType: Monitor["type"];
 }
 
 function calculateBackoffSeconds(retryAttempts: number): number {
@@ -124,10 +132,12 @@ function calculateBackoffSeconds(retryAttempts: number): number {
     return 2 ** retryAttempts - 1;
 }
 
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+async function getIdentifierLabel(
+    monitorType: Monitor["type"]
+): Promise<string> {
     return withUtilityErrorHandling(
         async () => {
-            const config = await getMonitorTypeConfig(selectedMonitor.type);
+            const config = await getMonitorTypeConfig(monitorType);
             if (config?.fields) {
                 const primaryField = config.fields.find(
                     (field) => field.required
@@ -142,7 +152,7 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
                 }
             }
 
-            return getMonitorTypeDisplayLabel(selectedMonitor.type);
+            return getMonitorTypeDisplayLabel(monitorType);
         },
         "Get identifier label for monitor type",
         UiDefaults.unknownLabel

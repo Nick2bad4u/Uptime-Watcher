@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -29,16 +29,13 @@ const renderBar = (
 
 describe(MiniChartBar, () => {
     it("uses status color and theme radius for the compact bar", () => {
-        const { container } = renderBar({
+        renderBar({
             className: "custom-bar",
             status: "down",
         });
 
-        const bar = container.querySelector<HTMLElement>(
-            ".themed-mini-chart-bar"
-        );
+        const bar = screen.getByTitle(/^down -/u);
 
-        expect(bar).not.toBeNull();
         expect(bar).toHaveClass("custom-bar");
         expect(bar).toHaveStyle({
             backgroundColor: "color-down",
@@ -50,18 +47,15 @@ describe(MiniChartBar, () => {
     });
 
     it("includes formatted response time and valid timestamp labels in the title", () => {
-        const { container } = renderBar({
+        renderBar({
             responseTime: 1500,
             timestamp: Date.UTC(2026, 0, 2, 3, 4, 5),
         });
 
-        const bar = container.querySelector<HTMLElement>(
-            ".themed-mini-chart-bar"
-        );
+        const bar = screen.getByTitle(/^up - 1\.50s at /u);
 
-        expect(bar?.title).toContain("up - 1.50s at ");
-        expect(bar?.title).not.toContain("Invalid Date");
-        expect(bar?.title).not.toContain("N/A");
+        expect(bar.title).not.toContain("Invalid Date");
+        expect(bar.title).not.toContain("N/A");
     });
 
     it.each([
@@ -70,13 +64,10 @@ describe(MiniChartBar, () => {
         ["non-finite number", Number.NaN],
         ["invalid Date object", new Date(Number.NaN)],
     ] as const)("uses fallback timestamp text for %s", (_, timestamp) => {
-        const { container } = renderBar({ timestamp });
+        renderBar({ timestamp });
 
-        const bar = container.querySelector<HTMLElement>(
-            ".themed-mini-chart-bar"
-        );
+        const bar = screen.getByTitle(/ at N\/A$/u);
 
-        expect(bar?.title).toContain("at N/A");
-        expect(bar?.title).not.toContain("Invalid Date");
+        expect(bar.title).not.toContain("Invalid Date");
     });
 });

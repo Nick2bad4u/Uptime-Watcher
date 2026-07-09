@@ -240,8 +240,9 @@ describe("Shared Type Helpers", () => {
             await annotate("Operation: PromiseLike Type Guard", "operation");
 
             let thenAccessCount = 0;
-            const thenableWithAccessor = {};
-            Object.defineProperty(thenableWithAccessor, "then", {
+            const valueWithAccessor = {};
+            // eslint-disable-next-line unicorn/no-thenable -- This guard test intentionally verifies that accessor-backed then properties are not treated as PromiseLike.
+            Object.defineProperty(valueWithAccessor, "then", {
                 configurable: true,
                 enumerable: true,
                 get() {
@@ -250,7 +251,7 @@ describe("Shared Type Helpers", () => {
                 },
             });
 
-            expect(isPromiseLike(thenableWithAccessor)).toBeFalsy();
+            expect(isPromiseLike(valueWithAccessor)).toBeFalsy();
             expect(thenAccessCount).toBe(0);
         });
     });

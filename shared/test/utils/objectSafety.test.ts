@@ -15,13 +15,18 @@ import { describe, expect, it, test } from "vitest";
 describe("shared/utils/objectSafety", () => {
     describe("null-prototype object creation", () => {
         it("creates a null-prototype object without mutating Object.prototype", () => {
-            const result = objectSafetyModule.createNullPrototypeObject({
-                "__proto__": "safe-value",
-                stable: "value",
-            } as Record<string, unknown>);
+            const source: Record<string, unknown> = { stable: "value" };
+            Object.defineProperty(source, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "safe-value",
+            });
+
+            const result =
+                objectSafetyModule.createNullPrototypeObject(source);
 
             result["stable"] = "value";
-            result["__proto__"] = "safe-value";
+            Reflect.set(result, "__proto__", "safe-value");
 
             expect(Object.getPrototypeOf(result)).toBeNull();
             expect(result["stable"]).toBe("value");

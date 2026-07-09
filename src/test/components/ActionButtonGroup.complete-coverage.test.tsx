@@ -154,16 +154,20 @@ const renderActionButtonGroup = (
         ...props,
     } satisfies ActionButtonGroupProperties;
 
-    const result = renderWithTheme(<ActionButtonGroup {...mergedProps} />);
+    const view = renderWithTheme(<ActionButtonGroup {...mergedProps} />);
 
     return {
         props: mergedProps,
-        ...result,
+        ...view,
     };
 };
 
 const expectButtonIcon = (button: HTMLElement, iconName: string) => {
-    expect(button.querySelector(`svg[data-icon="${iconName}"]`)).not.toBeNull();
+    expect(
+        [...button.querySelectorAll<SVGElement>("svg[data-icon]")].some(
+            (icon) => icon.dataset["icon"] === iconName
+        )
+    ).toBeTruthy();
 };
 
 describe("ActionButtonGroup", () => {

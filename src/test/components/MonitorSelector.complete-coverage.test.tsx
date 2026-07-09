@@ -26,8 +26,10 @@ const createMockMonitor = (
         status: "pending",
         type,
         ...restOptions,
-        ...(overrideUrl !== undefined ? { url: overrideUrl } : {}),
     });
+    if (overrideUrl !== undefined) {
+        monitor.url = overrideUrl;
+    }
 
     if (hasUrlOverride && overrideUrl === undefined) {
         Reflect.deleteProperty(monitor, "url");
@@ -64,12 +66,12 @@ const renderMonitorSelector = (
         ...props,
     } satisfies MonitorSelectorProperties;
 
-    const result = renderWithTheme(<MonitorSelector {...mergedProps} />);
+    const view = renderWithTheme(<MonitorSelector {...mergedProps} />);
 
     return {
         props: mergedProps,
         select: screen.getByRole("combobox", { name: "Select monitor" }),
-        ...result,
+        ...view,
     };
 };
 
