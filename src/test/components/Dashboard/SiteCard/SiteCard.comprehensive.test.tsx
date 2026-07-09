@@ -77,6 +77,7 @@ vi.mock("../../../../hooks/site/useSite", () => ({
             selectedMonitorId: "monitor-1",
 
             // Status and metrics
+            averageResponseTime: 175,
             status: "up",
             uptime: 99.5,
             responseTime: 200,
@@ -145,6 +146,16 @@ describe("SiteCard Component", () => {
         // Check for metrics grid
         expect(screen.getByText("Status")).toBeInTheDocument();
         expect(screen.getByText("Uptime")).toBeInTheDocument();
+
+        const metricsSummary = screen.getByTestId(
+            "site-card-metrics-summary-test-site-1"
+        );
+
+        expect(metricsSummary).toHaveTextContent("Status: Up");
+        expect(metricsSummary).toHaveTextContent("Uptime: 99.5%");
+        expect(metricsSummary).toHaveTextContent("Last Response: 200ms");
+        expect(metricsSummary).toHaveTextContent("Avg Response: 175ms");
+        expect(metricsSummary).toHaveTextContent("Checks Logged: 100");
     });
 
     it("should handle site with no monitors", ({ task, annotate }) => {
