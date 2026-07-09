@@ -730,7 +730,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 retryAttempts: 3,
                 status: "up" as const,
                 timeout: 5000,
-                type: "invalid" as any,
+                type: "invalid",
             };
 
             expect(() => monitorSchema.parse(invalidMonitor)).toThrow();

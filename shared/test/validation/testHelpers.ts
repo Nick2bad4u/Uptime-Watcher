@@ -70,6 +70,11 @@ interface StatusHistoryData {
     timestamp: number;
 }
 
+type MonitorOverrides<TMonitor extends { type: string }> =
+    Partial<Omit<TMonitor, "type">> & {
+        type?: unknown;
+    };
+
 /**
  * Creates a valid base monitor object with all required fields
  *
@@ -106,7 +111,7 @@ export function createValidBaseMonitor(
  * @returns Valid HTTP monitor object that passes httpMonitorSchema validation
  */
 export const createValidHttpMonitor = (
-    overrides: Partial<HttpMonitorData> = {}
+    overrides: MonitorOverrides<HttpMonitorData> = {}
 ): HttpMonitorData => {
     const baseMonitor = createValidBaseMonitor({
         type: "http",
@@ -128,7 +133,7 @@ export const createValidHttpMonitor = (
  * @returns Valid port monitor object that passes portMonitorSchema validation
  */
 export const createValidPortMonitor = (
-    overrides: Partial<PortMonitorData> = {}
+    overrides: MonitorOverrides<PortMonitorData> = {}
 ): PortMonitorData => {
     const baseMonitor = createValidBaseMonitor({
         type: "port",
@@ -151,7 +156,7 @@ export const createValidPortMonitor = (
  * @returns Valid ping monitor object that passes pingMonitorSchema validation
  */
 export const createValidPingMonitor = (
-    overrides: Partial<PingMonitorData> = {}
+    overrides: MonitorOverrides<PingMonitorData> = {}
 ): PingMonitorData => {
     const baseMonitor = createValidBaseMonitor({
         type: "ping",

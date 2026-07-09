@@ -242,7 +242,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidHttpMonitor({ type: "port" as any });
+            const monitor = createValidHttpMonitor({ type: "port" });
 
             expect(monitor.type).toBe("http"); // Should be overridden back to HTTP
         });
@@ -338,7 +338,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidPortMonitor({ type: "http" as any });
+            const monitor = createValidPortMonitor({ type: "http" });
 
             expect(monitor.type).toBe("port"); // Should be overridden back to port
         });
@@ -417,7 +417,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createValidPingMonitor({ type: "http" as any });
+            const monitor = createValidPingMonitor({ type: "http" });
 
             expect(monitor.type).toBe("ping"); // Should be overridden back to ping
         });
