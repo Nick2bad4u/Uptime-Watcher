@@ -53,7 +53,7 @@ vi.mock(
                 <button
                     data-testid="monitor-selector"
                     onClick={() =>
-                        onChange({ target: { value: "monitor-2" } } as any)
+                        onChange({ target: { value: "monitor-2" } })
                     }
                 >
                     monitor
