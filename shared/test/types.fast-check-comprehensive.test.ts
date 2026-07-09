@@ -276,7 +276,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when id is not a string",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -299,7 +299,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when type is not a valid MonitorType",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -320,7 +320,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when status is not a valid MonitorStatus",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -339,7 +339,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when monitoring is not a boolean",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -360,7 +360,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when responseTime is not a number",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -381,7 +381,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when checkInterval is not a number",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -400,7 +400,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when timeout is not a number",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -421,7 +421,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when retryAttempts is not a number",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -440,7 +440,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when history is not an array",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -473,7 +473,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when activeOperations is invalid",
-            (invalidMonitor: any) => {
+            (invalidMonitor: unknown) => {
                 expect(validateMonitor(invalidMonitor)).toBeFalsy();
             }
         );
@@ -489,7 +489,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             ),
         ])(
             "should return false for null, undefined, or non-object inputs",
-            (invalidInput: any) => {
+            (invalidInput: unknown) => {
                 expect(validateMonitor(invalidInput)).toBeFalsy();
             }
         );
@@ -515,7 +515,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return true when activeOperations contains valid strings",
-            (monitorWithActiveOps: any) => {
+            (monitorWithActiveOps: unknown) => {
                 expect(validateMonitor(monitorWithActiveOps)).toBeTruthy();
             }
         );
@@ -629,7 +629,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return true when activeOperations is undefined",
-            (monitorWithUndefinedActiveOps: any) => {
+            (monitorWithUndefinedActiveOps: unknown) => {
                 expect(
                     validateMonitor(monitorWithUndefinedActiveOps)
                 ).toBeTruthy();
@@ -651,7 +651,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return true when activeOperations is an empty array",
-            (monitorWithEmptyActiveOps: any) => {
+            (monitorWithEmptyActiveOps: unknown) => {
                 expect(validateMonitor(monitorWithEmptyActiveOps)).toBeTruthy();
             }
         );
@@ -672,7 +672,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when activeOperations contains empty strings",
-            (monitorWithEmptyStringActiveOps: any) => {
+            (monitorWithEmptyStringActiveOps: unknown) => {
                 expect(
                     validateMonitor(monitorWithEmptyStringActiveOps)
                 ).toBeFalsy();
@@ -697,7 +697,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }),
         ])(
             "should return false when activeOperations contains whitespace-only strings",
-            (monitorWithWhitespaceActiveOps: any) => {
+            (monitorWithWhitespaceActiveOps: unknown) => {
                 expect(
                     validateMonitor(monitorWithWhitespaceActiveOps)
                 ).toBeFalsy();
