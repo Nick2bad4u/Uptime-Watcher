@@ -207,26 +207,21 @@ npm run docusaurus:serve
 npm run docs:preview
 ```
 
-### 2. Documentation Download Scripts
+### 2. Generated Documentation Maintenance
 
-The project includes scripts to download external documentation for better offline development:
+The project maintains generated documentation from source comments, Markdown,
+Storybook, and the ESLint rule inspector:
 
 ```bash
-# Download all external documentation
-npm run docs:download:all
+# Refresh generated tables of contents and documentation metadata
+npm run docs:maintain
 
-# Individual package documentation
-npm run docs:download:react
-npm run docs:download:electron
-npm run docs:download:chartjs
-npm run docs:download:zustand
-npm run docs:download:axios
-npm run docs:download:zod
-npm run docs:download:validator
-npm run docs:download:sqlite3
-npm run docs:download:sqlite3-wasm
-npm run docs:download:nodeping
-npm run docs:download:tsdoc
+# Regenerate API documentation
+npm run docs:typedoc
+
+# Build generated inspector and Storybook assets used by the docs site
+npm run build:eslint-inspector
+npm run build:docs-storybook
 ```
 
 ### 3. Generation Steps
@@ -437,20 +432,11 @@ Available npm scripts for documentation:
 - `docs:deploy` - Deploy to GitHub Pages
 - `docs:deploy:local` - Deploy with local configuration
 
-### External Documentation Downloads
+### Generated Documentation Scripts
 
-- `docs:download:all` - Download all external package documentation
-- `docs:download:react` - Download React documentation
-- `docs:download:electron` - Download Electron documentation
-- `docs:download:chartjs` - Download Chart.js documentation
-- `docs:download:zustand` - Download Zustand documentation
-- `docs:download:axios` - Download Axios documentation
-- `docs:download:zod` - Download Zod documentation
-- `docs:download:validator` - Download Validator.js documentation
-- `docs:download:sqlite3` - Download node-sqlite3 documentation
-- `docs:download:sqlite3-wasm` - Download node-sqlite3-wasm documentation
-- `docs:download:nodeping` - Download NodePing API documentation
-- `docs:download:tsdoc` - Download TSDoc tag specifications
+- `docs:maintain` - Refresh generated documentation metadata and tables of contents
+- `docs:typedoc` - Generate API documentation for the Docusaurus site
+- `build:docs-storybook` - Build Storybook static output for the docs site
 
 ### Build Enhancement Scripts
 
@@ -479,7 +465,6 @@ npm run type-check:all
 
 ```bash
 # Full production build and deploy
-npm run docs:download:all  # Optional: update external docs
 npm run docs:deploy
 ```
 
@@ -490,7 +475,7 @@ npm run docs:deploy
 - `docs/docusaurus/docusaurus.config.ts` - Main Docusaurus configuration
 - `docs/docusaurus/sidebars.ts` - Sidebar navigation configuration
 - `docs/docusaurus/tsconfig.typedoc.json` - TypeScript config for TypeDoc
-- `scripts/download-*-docs.mjs` - External documentation download scripts
+- `scripts/maintain-docs.mjs` - Generated documentation maintenance script
 
 ---
 

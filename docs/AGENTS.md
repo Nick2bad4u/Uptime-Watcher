@@ -37,9 +37,9 @@ specific guidance, such as `docs/docusaurus/**`.
 - Do not hand-edit generated TypeDoc output. Change source comments or TypeDoc
   config, then regenerate.
 - Do not hand-edit generated ESLint inspector or Storybook static output.
-- For downloaded reference docs, update the corresponding
-  `docs:download:*` script or source URL rather than manually patching stale
-  output.
+- For generated reference docs, update the source comments, Markdown, TypeDoc
+  config, Storybook stories, or documentation generator instead of manually
+  patching stale output.
 - If generated docs create broken links, fix the source, config, sidebar, or
   generator. Do not add placeholder pages to hide the failure.
 
