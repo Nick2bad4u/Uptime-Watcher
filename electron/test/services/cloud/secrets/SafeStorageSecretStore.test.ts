@@ -299,4 +299,49 @@ describe(FallbackSecretStore, () => {
             "new-token-json"
         );
     });
+
+    it("reads fallback after primary write failure leaves stale primary data", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        await primary.setSecret("cloud.dropbox.tokens", "old-token-json");
+        primary.shouldFailSet = true;
+        primary.shouldFailDelete = true;
+
+        await store.setSecret("cloud.dropbox.tokens", "new-token-json");
+
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "old-token-json"
+        );
+        expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
+            "new-token-json"
+        );
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            "new-token-json"
+        );
+    });
+
+    it("returns to primary storage after a failed primary write recovers", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        await primary.setSecret("cloud.dropbox.tokens", "old-token-json");
+        primary.shouldFailSet = true;
+        primary.shouldFailDelete = true;
+        await store.setSecret("cloud.dropbox.tokens", "fallback-token-json");
+
+        primary.shouldFailSet = false;
+        primary.shouldFailDelete = false;
+        await store.setSecret("cloud.dropbox.tokens", "primary-token-json");
+
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "primary-token-json"
+        );
+        expect(fallback.values.has("cloud.dropbox.tokens")).toBeFalsy();
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            "primary-token-json"
+        );
+    });
 });

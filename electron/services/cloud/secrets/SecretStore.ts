@@ -55,6 +55,8 @@ export class EphemeralSecretStore implements SecretStore {
  * {@link SecretStore} that falls back to a secondary store if the primary fails.
  */
 export class FallbackSecretStore implements SecretStore {
+    private readonly fallbackPreferredKeys = new Set<string>();
+
     private readonly fallback: SecretStore;
 
     private readonly primary: SecretStore;
@@ -83,16 +85,20 @@ export class FallbackSecretStore implements SecretStore {
                 { cause: failures[0] }
             );
         }
+
+        this.fallbackPreferredKeys.delete(key);
     }
 
     public async getSecret(key: string): Promise<string | undefined> {
-        try {
-            const value = await this.primary.getSecret(key);
-            if (typeof value === "string") {
-                return value;
+        if (!this.fallbackPreferredKeys.has(key)) {
+            try {
+                const value = await this.primary.getSecret(key);
+                if (typeof value === "string") {
+                    return value;
+                }
+            } catch {
+                // Ignore
             }
-        } catch {
-            // Ignore
         }
 
         return this.fallback.getSecret(key);
@@ -101,6 +107,7 @@ export class FallbackSecretStore implements SecretStore {
     public async setSecret(key: string, value: string): Promise<void> {
         try {
             await this.primary.setSecret(key, value);
+            this.fallbackPreferredKeys.delete(key);
             try {
                 await this.fallback.deleteSecret(key);
             } catch {
@@ -108,7 +115,14 @@ export class FallbackSecretStore implements SecretStore {
             }
             return;
         } catch {
-            // Ignore
+            this.fallbackPreferredKeys.add(key);
+            try {
+                await this.primary.deleteSecret(key);
+                this.fallbackPreferredKeys.delete(key);
+            } catch {
+                // Keep preferring fallback for this key; primary may still
+                // contain a stale readable value from an earlier write.
+            }
         }
 
         await this.fallback.setSecret(key, value);
