@@ -3,9 +3,7 @@
  * possible monitor configurations and edge cases. Tests formatter registration,
  * suffix generation, and defensive handling of malformed data.
  *
- * @file Comprehensive property-based tests for monitor title formatters
- *
- * @author GitHub Copilot
+ * @file Property-based tests for monitor title formatters
  *
  * @since 2025-09-05
  */
@@ -19,7 +17,7 @@ import { describe, expect } from "vitest";
 
 import { formatTitleSuffix } from "../../utils/monitorTitleFormatters";
 
-describe("monitorTitleFormatters Property-Based Tests", () => {
+describe("monitorTitleFormatters property-based behavior", () => {
     /**
      * Helper function to create basic monitor structure
      */
@@ -35,6 +33,15 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
         type: "http",
         ...overrides,
     });
+
+    const createRuntimeMonitor = (overrides: Record<string, unknown>): Monitor =>
+        ({
+            ...createBaseMonitor(),
+            ...overrides,
+        }) as Monitor;
+
+    const runtimeMonitorType = (type: unknown): Monitor["type"] =>
+        type as Monitor["type"];
 
     /**
      * Custom arbitraries for generating test data
@@ -63,7 +70,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
         test.prop([monitorTypeArbitrary])(
             "should always return a string",
             (type) => {
-                const monitor = createBaseMonitor({ type: type as any });
+                const monitor = createBaseMonitor({
+                    type: runtimeMonitorType(type),
+                });
                 const result = formatTitleSuffix(monitor);
 
                 expect(result).toBeTypeOf("string");
@@ -74,7 +83,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
             "should return empty string for unknown monitor types",
             (type) => {
                 const unknownType = `unknown-${type}-xyz`;
-                const monitor = createBaseMonitor({ type: unknownType as any });
+                const monitor = createBaseMonitor({
+                    type: runtimeMonitorType(unknownType),
+                });
                 const result = formatTitleSuffix(monitor);
 
                 expect(result).toBe("");
@@ -127,9 +138,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
             ])(
                 "should handle HTTP monitors with falsy URL properties",
                 (invalidUrl) => {
-                    const monitor = createBaseMonitor({
+                    const monitor = createRuntimeMonitor({
                         type: "http",
-                        url: invalidUrl as any,
+                        url: invalidUrl,
                     });
 
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
@@ -148,9 +159,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
             ])(
                 "should format HTTP monitors with truthy non-string URLs as strings",
                 (truthyUrl) => {
-                    const monitor = createBaseMonitor({
+                    const monitor = createRuntimeMonitor({
                         type: "http",
-                        url: truthyUrl as any,
+                        url: truthyUrl,
                     });
 
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
@@ -231,9 +242,9 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
             ])(
                 "should handle port monitors with invalid host/port properties",
                 (invalidHost, invalidPort) => {
-                    const monitor = createBaseMonitor({
-                        host: invalidHost as any,
-                        port: invalidPort as any,
+                    const monitor = createRuntimeMonitor({
+                        host: invalidHost,
+                        port: invalidPort,
                         type: "port",
                     });
 
@@ -328,7 +339,7 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
         ])(
             "should handle monitors with invalid type properties",
             (invalidType) => {
-                const monitor = createBaseMonitor({ type: invalidType as any });
+                const monitor = createRuntimeMonitor({ type: invalidType });
 
                 expect(() => formatTitleSuffix(monitor)).not.toThrow();
 
@@ -348,7 +359,7 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
             (monitorTypes) => {
                 // Only use known monitor types to avoid interference from custom formatters
                 const monitors = monitorTypes.map((type) =>
-                    createBaseMonitor({ type: type as any })
+                    createBaseMonitor({ type: runtimeMonitorType(type) })
                 );
 
                 const start = performance.now();

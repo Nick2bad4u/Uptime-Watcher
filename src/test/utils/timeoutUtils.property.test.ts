@@ -3,9 +3,7 @@
  * across numeric inputs and edge cases. Validates mathematical properties,
  * boundary conditions, and defensive handling of extreme values.
  *
- * @file Comprehensive property-based tests for timeout utilities
- *
- * @author GitHub Copilot
+ * @file Property-based tests for timeout utilities
  *
  * @since 2025-09-05
  */
@@ -24,7 +22,11 @@ import {
     timeoutSecondsToMs,
 } from "../../utils/timeoutUtils";
 
-describe("timeoutUtils Property-Based Tests", () => {
+const getRuntimeTimeoutSeconds = getTimeoutSeconds as (
+    monitorTimeout?: unknown
+) => number;
+
+describe("timeoutUtils property-based behavior", () => {
     /**
      * Custom arbitraries for testing timeout values using doubles for better
      * precision
@@ -191,7 +193,7 @@ describe("timeoutUtils Property-Based Tests", () => {
         test.prop([
             fc.oneof(fc.constant(0), fc.constant(null), fc.constant(false)),
         ])("should return default for falsy values", (falsyValue) => {
-            const result = getTimeoutSeconds(falsyValue as any);
+            const result = getRuntimeTimeoutSeconds(falsyValue);
 
             expect(result).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
         });
