@@ -8,9 +8,12 @@ import { EphemeralSecretStore } from "../../../../services/cloud/secrets/SecretS
 
 const MAX_STORED_OAUTH_TOKEN_JSON_BYTES = 64 * 1024;
 
+const createWarnMock = (): ((message: string, ...args: unknown[]) => void) =>
+    vi.fn((_message: string, ..._args: unknown[]): void => {});
+
 function createReadArgs(args?: {
     clear?: () => Promise<void>;
-    logger?: { warn: ReturnType<typeof vi.fn> };
+    logger?: { warn: (message: string, ...args: unknown[]) => void };
     parse?: (record: UnknownRecord) => UnknownRecord;
     secretStore?: SecretStore;
     storageKey?: string;
@@ -24,7 +27,7 @@ function createReadArgs(args?: {
             (async () => {
                 await secretStore.deleteSecret(storageKey);
             }),
-        logger: args?.logger ?? { warn: vi.fn() },
+        logger: args?.logger ?? { warn: createWarnMock() },
         logPrefix: "[TestTokenManager]",
         parse: args?.parse ?? ((record): UnknownRecord => record),
         secretStore,

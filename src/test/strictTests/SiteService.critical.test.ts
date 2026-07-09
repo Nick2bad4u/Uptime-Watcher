@@ -248,26 +248,19 @@ describe("SiteService Critical Coverage Tests", () => {
             const monitorId = "";
 
             mockWaitForElectronBridge.mockResolvedValue(undefined);
-            const persistedSite = createMockSiteSnapshot(siteIdentifier);
-            vi.mocked(getRemoveMonitorMock()).mockResolvedValue(persistedSite);
 
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
             ).rejects.toThrow(
-                "Monitor removal returned an invalid site snapshot for /"
+                "[SiteService] Invalid site identifier for removeMonitor: Site identifier is required"
             );
 
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
-            expect(getRemoveMonitorMock()).toHaveBeenCalledWith("", "");
+            expect(getRemoveMonitorMock()).not.toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot",
-                expect.any(Error),
-                expect.objectContaining({
-                    monitorId,
-                    reason: "Invalid site snapshot returned after monitor removal",
-                    siteIdentifier,
-                })
+                "[SiteService] removeMonitor failed:",
+                expect.any(TypeError)
             );
         });
 
@@ -599,30 +592,19 @@ describe("SiteService Critical Coverage Tests", () => {
             const longMonitorId = "b".repeat(1000);
 
             mockWaitForElectronBridge.mockResolvedValue(undefined);
-            vi.mocked(getRemoveMonitorMock()).mockResolvedValue(
-                createMockSiteSnapshot(longSiteId)
-            );
 
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(longSiteId, longMonitorId)
             ).rejects.toThrow(
-                `Monitor removal returned an invalid site snapshot for ${longSiteId}/${longMonitorId}`
+                "[SiteService] Invalid site identifier for removeMonitor: Site identifier too long"
             );
 
             expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
-            expect(getRemoveMonitorMock()).toHaveBeenCalledWith(
-                longSiteId,
-                longMonitorId
-            );
+            expect(getRemoveMonitorMock()).not.toHaveBeenCalled();
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot",
-                expect.any(Error),
-                expect.objectContaining({
-                    monitorId: longMonitorId,
-                    reason: "Invalid site snapshot returned after monitor removal",
-                    siteIdentifier: longSiteId,
-                })
+                "[SiteService] removeMonitor failed:",
+                expect.any(TypeError)
             );
         });
     });

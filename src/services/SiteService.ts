@@ -35,6 +35,12 @@ import { parseServiceBooleanResponse } from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
+interface SiteUpdatePayload {
+    readonly monitoring?: Site["monitoring"] | undefined;
+    readonly monitors?: Site["monitors"] | undefined;
+    readonly name?: Site["name"] | undefined;
+}
+
 const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
     try {
         return getIpcServiceHelpers("SiteService", {
@@ -140,6 +146,16 @@ const parseSitePayload = (operation: string, value: Site): Site => {
     );
 };
 
+const omitUndefinedSiteUpdateFields = (
+    updates: SiteUpdatePayload
+): Partial<Site> => ({
+    ...(updates.monitoring !== undefined && {
+        monitoring: updates.monitoring,
+    }),
+    ...(updates.monitors !== undefined && { monitors: updates.monitors }),
+    ...(updates.name !== undefined && { name: updates.name }),
+});
+
 const parseSiteUpdates = (
     operation: string,
     updates: Partial<Site>
@@ -153,7 +169,15 @@ const parseSiteUpdates = (
     const parsed = validateSiteUpdate(updates);
 
     if (parsed.success) {
-        return parsed.data;
+        const normalizedUpdates = omitUndefinedSiteUpdateFields(parsed.data);
+
+        if (isEmpty(objectKeys(normalizedUpdates))) {
+            throw new TypeError(
+                `[SiteService] Invalid site updates for ${operation}: updates must not be empty`
+            );
+        }
+
+        return normalizedUpdates;
     }
 
     throw new TypeError(
