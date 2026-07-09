@@ -32,7 +32,7 @@ function isCanonicalProviderObjectKey(value: string): boolean {
     }
 }
 
-const cloudBackupFileNameSchema = z
+const cloudBackupFileNameSchema: z.ZodType<string> = z
     .string()
     .min(1)
     .superRefine((fileName, context) => {
@@ -63,7 +63,7 @@ const cloudBackupFileNameSchema = z
         }
     });
 
-const cloudBackupKeySchema = z
+const cloudBackupKeySchema: z.ZodType<string> = z
     .string()
     .min(1)
     .superRefine((key, context) => {

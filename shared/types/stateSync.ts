@@ -133,7 +133,7 @@ const stateSyncSitesSchema: z.ZodType<Site[]> = z.array(siteOutputSchema);
  * Zod schema validating state synchronization status summaries.
  */
 const stateSyncStatusSummaryInternalSchema: z.ZodType<{
-    lastSyncAt?: null | number;
+    lastSyncAt: null | number;
     siteCount: number;
     source: StateSyncSource;
     synchronized: boolean;
