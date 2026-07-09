@@ -107,6 +107,15 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("::ffff:c0a8:1")).toBeTruthy();
         });
 
+        it("detects 6to4 hostnames that embed private or special-use IPv4 addresses", () => {
+            expect(isPrivateNetworkHostname("2002:0a00:0001::")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[2002:0a00:0001::]")).toBeTruthy();
+            expect(isPrivateNetworkHostname("2002:c0a8:0101::")).toBeTruthy();
+            expect(isPrivateNetworkHostname("2002:7f00:0001::")).toBeTruthy();
+            expect(isPrivateNetworkHostname("2002:c000:020a::")).toBeTruthy();
+            expect(isPrivateNetworkHostname("2002:0808:0808::")).toBeFalsy();
+        });
+
         it("detects deprecated IPv4-compatible IPv6 private addresses", () => {
             expect(isPrivateNetworkHostname("::192.168.1.1")).toBeTruthy();
             expect(isPrivateNetworkHostname("[::192.168.1.1]")).toBeTruthy();
@@ -409,6 +418,9 @@ describe("urlSafety", () => {
             expect(tryGetSafeThirdPartyHttpUrl("https://[::c0a8:101]")).toBe(
                 null
             );
+            expect(
+                tryGetSafeThirdPartyHttpUrl("https://[2002:c0a8:0101::]")
+            ).toBe(null);
         });
 
         it("returns null for IPv4 special-use hostnames", () => {

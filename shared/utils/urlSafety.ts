@@ -699,6 +699,40 @@ function parseIpvFourFromMappedIpvSix(mappedHostname: string):
     ];
 }
 
+function parseIpvFourFromSixToFourHostname(hostname: string):
+    | [
+          number,
+          number,
+          number,
+          number,
+      ]
+    | null {
+    const parts = stringSplit(hostname, ":");
+    const [prefix, highPart, lowPart] = parts;
+
+    if (
+        prefix?.toLowerCase() !== "2002" ||
+        !isDefined(highPart) ||
+        !isDefined(lowPart)
+    ) {
+        return null;
+    }
+
+    const high = parseIpvSixHextet(highPart);
+    const low = parseIpvSixHextet(lowPart);
+
+    if (high === null || low === null) {
+        return null;
+    }
+
+    return [
+        Math.floor(high / 256),
+        high % 256,
+        Math.floor(low / 256),
+        low % 256,
+    ];
+}
+
 function isPrivateIpv6(hostname: string): boolean {
     const normalized = hostname.toLowerCase();
 
@@ -725,6 +759,14 @@ function isPrivateIpv6(hostname: string): boolean {
     // Unique local addresses fc00::/7 (fc.. or fd..)
     if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
         return true;
+    }
+
+    // 6to4 addresses embed an IPv4 address in the second and third hextets.
+    // Treat private or special-use embedded IPv4 targets as internal so they
+    // are not sent to third-party screenshot/preview services.
+    if (normalized.startsWith("2002:")) {
+        const embedded = parseIpvFourFromSixToFourHostname(normalized);
+        return embedded ? isPrivateIpvFourOctets(embedded) : false;
     }
 
     // IPv4-mapped IPv6 ::ffff:192.168.0.1
