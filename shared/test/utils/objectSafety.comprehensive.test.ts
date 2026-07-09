@@ -124,12 +124,21 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
                 safeObjectAccess(testObj, "number", 0, isPositiveNumber)
             ).toBe(42);
 
-            // Validator fails - use type assertions to test edge cases
             expect(
-                safeObjectAccess(testObj, "string", "fallback", isNumber as any)
+                safeObjectAccess<number | string>(
+                    testObj,
+                    "string",
+                    "fallback",
+                    isNumber
+                )
             ).toBe("fallback");
             expect(
-                safeObjectAccess(testObj, "number", 0, isString as any)
+                safeObjectAccess<number | string>(
+                    testObj,
+                    "number",
+                    0,
+                    isString
+                )
             ).toBe(0);
             expect(
                 safeObjectAccess(

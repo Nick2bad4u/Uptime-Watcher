@@ -155,6 +155,10 @@ describe("shared/utils/objectSafety", () => {
                     }),
                     fc.subarray(["omit1", "omit2"] as const),
                     (obj, keysToOmit) => {
+                        type ObjectKey = keyof typeof obj;
+                        const keysToOmitSet = new Set<ObjectKey>(
+                            keysToOmit
+                        );
                         const result = objectSafetyModule.safeObjectOmit(
                             obj,
                             keysToOmit
@@ -166,16 +170,15 @@ describe("shared/utils/objectSafety", () => {
                         }
 
                         // Should contain all other keys that were in original object
-                        const originalKeys = Object.keys(obj);
+                        const originalKeys =
+                            objectSafetyModule.typedObjectKeys(obj);
                         for (const key of originalKeys) {
-                            if (keysToOmit.includes(key as any)) {
+                            if (keysToOmitSet.has(key)) {
                                 continue;
                             }
 
                             expect(result).toHaveProperty(key);
-                            expect((result as any)[key]).toBe(
-                                (obj as any)[key]
-                            );
+                            expect(result[key]).toBe(obj[key]);
                         }
                     }
                 )
@@ -209,6 +212,10 @@ describe("shared/utils/objectSafety", () => {
                     }),
                     fc.subarray(["pick1", "pick2"] as const),
                     (obj, keysToPick) => {
+                        type ObjectKey = keyof typeof obj;
+                        const keysToPickSet = new Set<ObjectKey>(
+                            keysToPick
+                        );
                         const result = objectSafetyModule.safeObjectPick(
                             obj,
                             keysToPick
@@ -224,8 +231,10 @@ describe("shared/utils/objectSafety", () => {
                         }
 
                         // Should not contain any other keys
-                        for (const key of Object.keys(obj)) {
-                            if (!keysToPick.includes(key as any)) {
+                        for (const key of objectSafetyModule.typedObjectKeys(
+                            obj
+                        )) {
+                            if (!keysToPickSet.has(key)) {
                                 expect(result).not.toHaveProperty(key);
                             }
                         }
@@ -255,7 +264,7 @@ describe("shared/utils/objectSafety", () => {
                         // Each entry should be a [key, value] pair from the original object
                         for (const [key, value] of entries) {
                             expect(obj).toHaveProperty(key);
-                            expect((obj as any)[key]).toBe(value);
+                            expect(obj[key]).toBe(value);
                         }
                     }
                 )
