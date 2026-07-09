@@ -4,7 +4,7 @@ import {
     type SecretStore,
 } from "@electron/services/cloud/secrets/SecretStore";
 import { logger } from "@electron/utils/logger";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({
     safeStorage: {
@@ -19,6 +19,10 @@ vi.mock("electron", () => ({
         isEncryptionAvailable: () => true,
     },
 }));
+
+beforeEach(() => {
+    vi.restoreAllMocks();
+});
 
 describe(SafeStorageSecretStore, () => {
     it("round-trips secrets using base64 storage", async () => {
@@ -249,6 +253,9 @@ describe(FallbackSecretStore, () => {
     });
 
     it("clears stale fallback values after primary storage succeeds", async () => {
+        const warnSpy = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
         const primary = new MutableSecretStore();
         const fallback = new MutableSecretStore();
         const store = new FallbackSecretStore({ fallback, primary });
@@ -270,9 +277,20 @@ describe(FallbackSecretStore, () => {
         await expect(
             store.getSecret("cloud.dropbox.tokens")
         ).resolves.toBeUndefined();
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[FallbackSecretStore] Primary secret read failed; using fallback",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "get failed",
+            }
+        );
     });
 
     it("updates fallback value when stale fallback deletion fails after primary storage succeeds", async () => {
+        const warnSpy = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
         const primary = new MutableSecretStore();
         const fallback = new MutableSecretStore();
         const store = new FallbackSecretStore({ fallback, primary });
@@ -293,6 +311,13 @@ describe(FallbackSecretStore, () => {
         expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
             "new-token-json"
         );
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[FallbackSecretStore] Failed to clear fallback secret after primary write; refreshing fallback copy",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "delete failed",
+            }
+        );
 
         primary.shouldFailGet = true;
         await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
@@ -301,6 +326,9 @@ describe(FallbackSecretStore, () => {
     });
 
     it("reads fallback after primary write failure leaves stale primary data", async () => {
+        const warnSpy = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
         const primary = new MutableSecretStore();
         const fallback = new MutableSecretStore();
         const store = new FallbackSecretStore({ fallback, primary });
@@ -319,6 +347,21 @@ describe(FallbackSecretStore, () => {
         );
         await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
             "new-token-json"
+        );
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[FallbackSecretStore] Primary secret write failed; using fallback",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "set failed",
+            }
+        );
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[FallbackSecretStore] Failed to clear stale primary secret after write failure",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "delete failed",
+            }
         );
     });
 

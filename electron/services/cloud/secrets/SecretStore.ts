@@ -96,8 +96,14 @@ export class FallbackSecretStore implements SecretStore {
                 if (typeof value === "string") {
                     return value;
                 }
-            } catch {
-                // Ignore
+            } catch (error) {
+                logger.warn(
+                    "[FallbackSecretStore] Primary secret read failed; using fallback",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(error),
+                    }
+                );
             }
         }
 
@@ -110,16 +116,37 @@ export class FallbackSecretStore implements SecretStore {
             this.fallbackPreferredKeys.delete(key);
             try {
                 await this.fallback.deleteSecret(key);
-            } catch {
+            } catch (error) {
+                logger.warn(
+                    "[FallbackSecretStore] Failed to clear fallback secret after primary write; refreshing fallback copy",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(error),
+                    }
+                );
                 await this.fallback.setSecret(key, value);
             }
             return;
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[FallbackSecretStore] Primary secret write failed; using fallback",
+                {
+                    key,
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
             this.fallbackPreferredKeys.add(key);
             try {
                 await this.primary.deleteSecret(key);
                 this.fallbackPreferredKeys.delete(key);
-            } catch {
+            } catch (deleteError) {
+                logger.warn(
+                    "[FallbackSecretStore] Failed to clear stale primary secret after write failure",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(deleteError),
+                    }
+                );
                 // Keep preferring fallback for this key; primary may still
                 // contain a stale readable value from an earlier write.
             }
