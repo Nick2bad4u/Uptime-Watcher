@@ -1,6 +1,5 @@
 /**
- * Coverage-focused tests for DatabaseManager. Uses comprehensive mocking to
- * achieve stable test coverage.
+ * DatabaseManager operation tests using focused mocks for command, history, and cache behavior.
  */
 
 import {
@@ -69,7 +68,7 @@ vi.mock("../../services/database/historyLimitManager", () => ({
     getHistoryLimit: vi.fn(() => Promise.resolve(100)),
 }));
 
-describe("DatabaseManager - Coverage Tests", () => {
+describe("DatabaseManager operations", () => {
     let databaseManager: DatabaseManager;
     let eventEmitter: ReturnType<typeof createMockEventBus>;
     let mockDependencies: DatabaseManagerDependencies;

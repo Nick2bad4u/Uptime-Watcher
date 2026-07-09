@@ -1,6 +1,5 @@
 /**
- * @file Complete DatabaseManager test coverage Tests all public and private
- *   methods with proper mocking and error scenarios
+ * @file DatabaseManager edge-case tests for command, history, cache, and event behavior
  */
 
 import type { Site } from "@shared/types";
@@ -168,7 +167,7 @@ vi.mock("../../shared/utils/errorHandling", () => {
     };
 });
 
-describe("DatabaseManager - 100% Coverage", () => {
+describe("DatabaseManager edge cases", () => {
     let databaseManager: DatabaseManager;
     let mockDependencies: DatabaseManagerDependencies;
     let mockEventEmitter: TypedEventBus<UptimeEvents>;
@@ -303,7 +302,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -316,7 +315,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         it("should set default history limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -335,7 +334,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -367,7 +366,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -401,7 +400,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -431,7 +430,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -458,7 +457,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -490,7 +489,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -514,7 +513,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -538,7 +537,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -562,7 +561,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -592,7 +591,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -624,7 +623,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -656,7 +655,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -719,7 +718,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -762,7 +761,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -784,7 +783,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         it("should reject non-number values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -811,7 +810,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -832,7 +831,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -848,7 +847,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         it("should reject infinite values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -869,7 +868,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -899,7 +898,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -927,7 +926,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -953,7 +952,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -981,7 +980,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -1007,7 +1006,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -1046,7 +1045,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -1071,7 +1070,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -1104,7 +1103,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
-                    "Component: DatabaseManager.100-percent-coverage",
+                    "Component: DatabaseManager",
                     "component"
                 );
                 await annotate("Category: Manager", "category");
@@ -1133,7 +1132,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -1157,7 +1156,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -1180,7 +1179,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -1211,7 +1210,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
@@ -1235,7 +1234,7 @@ describe("DatabaseManager - 100% Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: DatabaseManager.100-percent-coverage",
+                "Component: DatabaseManager",
                 "component"
             );
             await annotate("Category: Manager", "category");
