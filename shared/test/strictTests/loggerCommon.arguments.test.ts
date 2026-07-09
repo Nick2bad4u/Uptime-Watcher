@@ -1,5 +1,5 @@
 /**
- * Complete coverage for shared logging helpers and contract interfaces.
+ * Shared logging helper and interface contract behavior.
  */
 
 import type {

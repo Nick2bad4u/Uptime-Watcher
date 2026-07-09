@@ -1,6 +1,5 @@
 /**
- * Additional test cases for schemas.ts to reach 98% branch coverage This file
- * targets the remaining uncovered branches and edge cases
+ * Additional validation-result tests for shared schemas.
  */
 
 import { describe, expect, it } from "vitest";
@@ -11,14 +10,14 @@ import {
 } from "../../validation/monitorSchemas";
 import { validateSiteData } from "../../validation/siteSchemas";
 
-describe("Validation Schemas - Branch Coverage Completion", () => {
+describe("Validation schemas result handling", () => {
     describe("Error handling edge cases", () => {
         it("should handle Zod errors with structured issue codes for warnings", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -47,7 +46,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -64,7 +63,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -81,7 +80,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -99,7 +98,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -117,7 +116,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -132,7 +131,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -143,13 +142,13 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
         });
     });
 
-    describe("getMonitorSchema function coverage", () => {
+    describe("getMonitorSchema branch behavior", () => {
         it("should test all monitor types to cover getMonitorSchema branches", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -217,7 +216,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -246,7 +245,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -286,7 +285,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -316,7 +315,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -333,7 +332,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -352,7 +351,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.branch-coverage", "component");
+            await annotate("Component: schemas.validation-results", "component");
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 

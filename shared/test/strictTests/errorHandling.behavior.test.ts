@@ -1,5 +1,5 @@
 /**
- * Comprehensive coverage for shared error handling utilities.
+ * Shared error handling utility behavior.
  */
 
 import {

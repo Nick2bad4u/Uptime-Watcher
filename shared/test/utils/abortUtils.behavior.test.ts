@@ -1,5 +1,5 @@
 /**
- * Targeted tests to improve function coverage for abortUtils. Tests specific
+ * Behavior tests for abortUtils edge cases. Tests specific
  * function paths that might not be covered by fuzzing tests.
  *
  * @packageDocumentation
@@ -72,7 +72,7 @@ interface PrototypeWithToString {
     toString: () => string;
 }
 
-describe("AbortUtils Function Coverage Tests", () => {
+describe("abortUtils behavior", () => {
     afterEach(() => {
         vi.restoreAllMocks();
         vi.useRealTimers();

@@ -1,20 +1,5 @@
 /**
- * Comprehensive fast-check fuzzing tests for typeHelpers utilities.
- *
- * @remarks
- * These property-based tests use fast-check to systematically explore edge
- * cases and verify type helper function invariants across all possible
- * JavaScript values.
- *
- * Focuses on achieving 100% coverage for typeHelpers module functions:
- *
- * - CastIpcResponse
- * - IsArray
- * - IsRecord
- * - SafePropertyAccess
- * - ValidateAndConvert
- *
- * @packageDocumentation
+ * @file Property-based edge-case tests for shared type helper utilities.
  */
 
 import { test } from "@fast-check/vitest";
@@ -29,7 +14,7 @@ import {
     validateAndConvert,
 } from "../../utils/typeHelpers";
 
-describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
+describe("typeHelpers edge-case fuzzing", () => {
     describe(castIpcResponse, () => {
         test.prop([fc.anything()])(
             "should return input when no validator provided",

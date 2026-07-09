@@ -1,5 +1,5 @@
 /**
- * Provides complete coverage for shared monitoring interval constants.
+ * Shared monitoring interval constant behavior.
  *
  * @file Ensures remediation heuristics remain in sync across app layers by
  *   validating the exported thresholds and helper logic.

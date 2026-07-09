@@ -1,15 +1,14 @@
 /**
- * Additional tests for validatorUtils.ts to achieve complete coverage Targeting
- * specific uncovered lines: 203, 250-253
+ * Additional host and port validation tests for validatorUtils.
  */
 
 import { describe, expect, it } from "vitest";
 
 import { isValidHost, isValidPort } from "../../validation/validatorUtils";
 
-describe("ValidatorUtils - Complete Coverage", () => {
+describe("validatorUtils host and port validation", () => {
     describe("isValidHost - Complete Edge Cases", () => {
-        it("should reject non-string values (line 203)", async ({
+        it("should reject non-string host values", async ({
             task,
             annotate,
         }) => {
@@ -18,7 +17,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Test non-string types to hit the return false on line 203
+            // Non-string values are not valid hosts.
             expect(isValidHost(123)).toBeFalsy();
             expect(isValidHost(null)).toBeFalsy();
             expect(isValidHost(undefined)).toBeFalsy();
@@ -63,7 +62,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
     });
 
     describe("isValidPort - Complete Edge Cases", () => {
-        it("should reject non-number, non-string values (lines 250-253)", async ({
+        it("should reject non-number and non-string port values", async ({
             task,
             annotate,
         }) => {
@@ -72,7 +71,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Test various non-number, non-string types to hit line 253 (return false)
+            // Ports must be provided as numbers or numeric strings.
             expect(isValidPort(null)).toBeFalsy();
             expect(isValidPort(undefined)).toBeFalsy();
             expect(isValidPort({})).toBeFalsy();
@@ -91,7 +90,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            // Valid number ports (line 249)
+            // Valid number ports.
             expect(isValidPort(80)).toBeTruthy();
             expect(isValidPort(443)).toBeTruthy();
             expect(isValidPort(3000)).toBeTruthy();
@@ -109,7 +108,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            // Valid string ports (line 251)
+            // Valid string ports.
             expect(isValidPort("80")).toBeTruthy();
             expect(isValidPort("443")).toBeTruthy();
             expect(isValidPort("3000")).toBeTruthy();

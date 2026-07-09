@@ -1,5 +1,5 @@
 /**
- * Exhaustive coverage for site snapshot sanitation and synchronization helpers.
+ * Site snapshot sanitation and synchronization behavior.
  */
 
 import {

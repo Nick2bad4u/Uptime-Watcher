@@ -1,5 +1,5 @@
 /**
- * Achieves exhaustive coverage of history retention constants and helpers.
+ * History retention constant and helper behavior.
  *
  * @file Validates that default rule metadata stays frozen and that
  *   {@link normalizeHistoryLimit} applies the documented clamping semantics for

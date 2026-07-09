@@ -1,18 +1,5 @@
 /**
- * Comprehensive fast-check fuzzing tests for stringConversion utilities.
- *
- * @remarks
- * These property-based tests use fast-check to systematically explore edge
- * cases and verify string conversion function invariants across all possible
- * JavaScript values.
- *
- * Focuse // Maps and Sets stringify to JSON as empty objects
- * expect(mapResult).toBe("{}"); expect(setResult).toBe("{}"); n achieving 100%
- * coverage for stringConversion module functions:
- *
- * - SafeStringify
- *
- * @packageDocumentation
+ * @file Property-based edge-case tests for string conversion utilities.
  */
 
 import { test } from "@fast-check/vitest";
@@ -21,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { safeStringify } from "../../utils/stringConversion";
 
-describe("StringConversion Complete Coverage Fuzzing Tests", () => {
+describe("stringConversion edge-case fuzzing", () => {
     describe(safeStringify, () => {
         test.prop([fc.constant(null)])(
             "should return empty string for null",

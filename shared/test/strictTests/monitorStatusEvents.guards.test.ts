@@ -1,5 +1,5 @@
 /**
- * Exhaustive coverage for monitor status event validation guards.
+ * Monitor status event validation guard behavior.
  */
 
 import type { MonitorStatusChangedEventData } from "@shared/types/events";

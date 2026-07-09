@@ -1,5 +1,5 @@
 /**
- * Comprehensive coverage for runtime validation guards.
+ * Runtime validation guard behavior.
  */
 
 import {

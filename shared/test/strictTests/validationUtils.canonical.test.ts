@@ -1,5 +1,5 @@
 /**
- * Canonical validation coverage.
+ * Canonical validation behavior.
  *
  * @remarks
  * This suite intentionally covers the canonical Zod validators under
@@ -17,7 +17,7 @@ import {
 import { validateSiteData } from "@shared/validation/siteSchemas";
 import { describe, expect, it } from "vitest";
 
-describe("Canonical validation coverage", () => {
+describe("Canonical validation behavior", () => {
     it("validateMonitorType behaves as a strict type guard", () => {
         expect(validateMonitorType("http")).toBeTruthy();
         expect(validateMonitorType("not-a-type")).toBeFalsy();

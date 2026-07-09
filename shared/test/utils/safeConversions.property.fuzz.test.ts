@@ -5,19 +5,19 @@
  *
  * @version 1.0.0
  *
- *   This file provides 100% fuzzing test coverage for the safeConversions module
+ *   This file provides property-based edge-case tests for the safeConversions module
  *   using fast-check property-based testing. It validates type safety, edge
  *   cases, and comprehensive input handling across all conversion functions.
  *
  *   Coverage Goals:
  *
- *   - 100% line coverage for all safeConversions functions
+ *   - Safe conversion invariants across generated values
  *   - Comprehensive edge case testing with property-based fuzzing
  *   - Type safety validation with arbitrary inputs
  *   - Error handling and fallback behavior verification
  *   - Performance characteristics under extreme inputs
  *
- * @file Comprehensive fuzzing test coverage for safeConversions utilities
+ * @file Property-based tests for safeConversions utilities
  */
 
 import { fc, test } from "@fast-check/vitest";

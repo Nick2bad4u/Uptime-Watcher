@@ -1,5 +1,5 @@
 /**
- * Additional property-based tests for abortUtils to achieve 100% coverage.
+ * Property-based tests for abort signal edge cases.
  * Targets specific edge cases that may not be covered by existing tests.
  *
  * @packageDocumentation
@@ -15,7 +15,7 @@ import {
     raceWithAbort,
 } from "../../utils/abortUtils.js";
 
-describe("AbortUtils Coverage Gap Fuzzing Tests", () => {
+describe("abortUtils signal edge-case fuzzing", () => {
     beforeAll(() => {
         // Mock AbortSignal.timeout for fake timers compatibility
         vi.spyOn(AbortSignal, "timeout").mockImplementation((delay: number) => {

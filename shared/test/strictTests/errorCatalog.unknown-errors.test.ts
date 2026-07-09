@@ -1,5 +1,5 @@
 /**
- * Exhaustive behavioural coverage for {@link getUnknownErrorMessage}.
+ * Behavior tests for {@link getUnknownErrorMessage}.
  *
  * @file Guarantees deterministic fallbacks for unknown error values so shared
  *   logging infrastructure remains resilient when receiving mixed exception

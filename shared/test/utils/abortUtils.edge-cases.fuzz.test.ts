@@ -1,55 +1,5 @@
 /**
- * Property-based testing for all test.prop([f test.prop([fc.integer({ min: 1,
- * max: 100 })])( "creates timeout signal when timeoutMs is provided", async
- * (timeoutMs) => { const signal = createCombinedAbortSignal({ timeoutMs });
- *
- * ```
- *             expect(signal).toBeInstanceOf(AbortSignal);
- *             expect(signal.aborted).toBeFalsy();
- *
- *             // Wait for timeout to trigger
- *             await new Promise((resolve) => {
- *                 setTimeout(resolve, timeoutMs + 20);
- *             });
- *             expect(signal.aborted).toBeTruthy();
- *         },
- *         5000
- *     );: 1, max: 1000
- * ```
- *
- * })])( "creates timeout signal when timeoutMs is provided", async (timeoutMs)
- * => { const signal = createCombinedAbortSignal({ timeoutMs });
- *
- * ```
- *             expect(signal).toBeInstanceOf(AbortSignal);
- *             expect(signal.aborted).toBeFalsy();
- *
- *             // Wait for timeout to trigger
- *             await new Promise((resolve) => {
- *                 setTimeout(resolve, timeoutMs + 50);
- *             });
- *             expect(signal.aborted).toBeTruthy();
- *         }
- *     );tilities with edge cases
- * ```
- *
- * @module shared/utils/abortUtils
- *
- * @version 1.0.0
- *
- *   This file provides 100% fuzzing test coverage for the abortUtils module using
- *   fast-check property-based testing. It validates abort signal management,
- *   timeout handling, and comprehensive edge case coverage.
- *
- *   Coverage Goals:
- *
- *   - 100% line coverage for all abortUtils functions
- *   - Comprehensive edge case testing with property-based fuzzing
- *   - Abort signal handling and timeout validation
- *   - Error handling and cleanup verification
- *   - Performance characteristics under extreme inputs
- *
- * @file Comprehensive fuzzing test coverage for abortUtils utilities
+ * @file Property-based edge-case tests for abort signal utilities.
  */
 
 import { fc, test } from "@fast-check/vitest";

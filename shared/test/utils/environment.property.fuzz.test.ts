@@ -1,25 +1,5 @@
 /**
- * Property-based testing for all environment detection functions with edge
- * cases
- *
- * @module shared/utils/environment
- *
- * @version 1.0.0
- *
- *   This file provides 100% fuzzing test coverage for the environment module
- *   using fast-check property-based testing. It validates environment
- *   detection, safe environment variable access, and comprehensive edge case
- *   coverage.
- *
- *   Coverage Goals:
- *
- *   - 100% line coverage for all environment functions
- *   - Comprehensive edge case testing with property-based fuzzing
- *   - Environment detection validation with mocked global objects
- *   - Safe environment variable access verification
- *   - Cross-platform compatibility testing
- *
- * @file Comprehensive fuzzing test coverage for environment utilities
+ * @file Property-based edge-case tests for environment utilities.
  */
 
 import { fc, test } from "@fast-check/vitest";

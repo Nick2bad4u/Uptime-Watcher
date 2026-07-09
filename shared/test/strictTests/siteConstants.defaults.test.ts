@@ -1,5 +1,5 @@
 /**
- * Validates complete coverage for shared site constants.
+ * Shared site constant behavior.
  *
  * @file Guards against unexpected drift in renderer and main process defaults
  *   when users omit explicit site names.
