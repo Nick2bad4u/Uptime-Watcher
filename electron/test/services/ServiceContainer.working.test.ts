@@ -61,7 +61,7 @@ const mockSiteManager = vi.hoisted(() => {
 const mockEventBus = vi.hoisted(() => {
     // Create a constructor function that returns EventEmitter
     function MockEventBus(name?: string) {
-        // eslint-disable-next-line unicorn/prefer-event-target
+        // eslint-disable-next-line unicorn/prefer-event-target -- Mock must satisfy the existing TypedEventBus EventEmitter contract.
         const emitter = new EventEmitter();
         // Add required TypedEventBus methods
         (emitter as any).onTyped = vi.fn().mockReturnThis();

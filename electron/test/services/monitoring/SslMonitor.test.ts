@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/prefer-event-target */
+/* eslint-disable unicorn/prefer-event-target -- Tests mock Node TLS/EventEmitter behavior. */
 /**
  * Comprehensive unit tests for the SSL monitor implementation.
  */

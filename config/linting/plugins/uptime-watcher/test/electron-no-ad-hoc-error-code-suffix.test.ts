@@ -12,7 +12,7 @@ ruleTester.run(
     {
         invalid: [
             {
-                // eslint-disable-next-line no-template-curly-in-string
+                // eslint-disable-next-line no-template-curly-in-string -- Rule fixture intentionally contains template syntax.
                 code: "const code = 'E_FOO'; const suffix = code ? ` (${code})` : '';",
                 errors: [{ messageId: "banned" }],
                 filename: repoPath("electron", "services", "foo.ts"),
@@ -20,12 +20,12 @@ ruleTester.run(
         ],
         valid: [
             {
-                // eslint-disable-next-line no-template-curly-in-string
+                // eslint-disable-next-line no-template-curly-in-string -- Rule fixture intentionally contains template syntax.
                 code: "const code = 'E_FOO'; const suffix = code ? `(${code})` : '';",
                 filename: repoPath("electron", "services", "foo.ts"),
             },
             {
-                // eslint-disable-next-line no-template-curly-in-string
+                // eslint-disable-next-line no-template-curly-in-string -- Rule fixture intentionally contains template syntax.
                 code: "const code = 'E_FOO'; const suffix = code ? ` (${code})` : '';",
                 filename: repoPath(
                     "electron",

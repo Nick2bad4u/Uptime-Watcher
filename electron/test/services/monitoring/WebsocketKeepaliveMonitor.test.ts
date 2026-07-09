@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/prefer-event-target */
+/* eslint-disable unicorn/prefer-event-target -- Tests mock Node EventEmitter-backed WebSocket behavior. */
 /**
  * Unit tests for the WebSocket keepalive monitor service.
  */

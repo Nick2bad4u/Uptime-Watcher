@@ -193,8 +193,7 @@ describe("Final Function Coverage Push", () => {
         expect(typeGuards.isDate(123_456_789)).toBeFalsy();
 
         // Test isError
-        // eslint-disable-next-line unicorn/error-message
-        expect(typeGuards.isError(new Error())).toBeTruthy();
+        expect(typeGuards.isError(new Error("test error"))).toBeTruthy();
         expect(typeGuards.isError("error")).toBeFalsy();
 
         // Test isFiniteNumber

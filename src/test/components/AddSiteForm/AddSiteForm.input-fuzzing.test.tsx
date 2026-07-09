@@ -609,7 +609,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     'Site "with" quotes',
                     "Site 'with' single quotes",
                     "<h1>HTML Tag</h1>",
-                    // eslint-disable-next-line no-script-url
+                    // eslint-disable-next-line no-script-url -- Security fixture intentionally includes a script protocol.
                     "javascript:alert('xss')",
                     "data:text/html,<script>",
                     "vbscript:msgbox('xss')",
@@ -650,10 +650,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
                         " "
                     );
                     // Allow for some whitespace normalization variations
-                    // eslint-disable-next-line unicorn/prefer-string-replace-all
-                    const actualTrimmed = inputValue.replace(/\s+/gv, " ");
-                    // eslint-disable-next-line unicorn/prefer-string-replace-all
-                    const expectedTrimmed = normalizedExpected.replace(
+                    const actualTrimmed = inputValue.replaceAll(/\s+/gv, " ");
+                    const expectedTrimmed = normalizedExpected.replaceAll(
                         /\s+/gv,
                         " "
                     );
@@ -729,7 +727,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     "data:image/png;base64,iVBORw0KG",
                     "file:///home/user/secrets.txt",
                     "vbscript:alert(1)",
-                    // eslint-disable-next-line no-script-url
+                    // eslint-disable-next-line no-script-url -- Security fixture intentionally includes a script protocol.
                     "javascript:alert('test')"
                 ),
             ],

@@ -22,8 +22,8 @@
  * @packageDocumentation
  */
 
-/* eslint-disable no-script-url */
-/* eslint-disable no-template-curly-in-string */
+/* eslint-disable no-script-url -- Fuzz fixtures intentionally include script protocol payloads. */
+/* eslint-disable no-template-curly-in-string -- Fuzz fixtures intentionally include template-like payloads. */
 
 import type { MonitorType } from "@shared/types";
 
