@@ -64,12 +64,12 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isComputedSiteStatus(null as any)).toBeFalsy();
-            expect(isComputedSiteStatus(undefined as any)).toBeFalsy();
-            expect(isComputedSiteStatus(123 as any)).toBeFalsy();
-            expect(isComputedSiteStatus(true as any)).toBeFalsy();
-            expect(isComputedSiteStatus({} as any)).toBeFalsy();
-            expect(isComputedSiteStatus([] as any)).toBeFalsy();
+            expect(isComputedSiteStatus(null)).toBeFalsy();
+            expect(isComputedSiteStatus(undefined)).toBeFalsy();
+            expect(isComputedSiteStatus(123)).toBeFalsy();
+            expect(isComputedSiteStatus(true)).toBeFalsy();
+            expect(isComputedSiteStatus({})).toBeFalsy();
+            expect(isComputedSiteStatus([])).toBeFalsy();
         });
     });
 
@@ -113,12 +113,12 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isMonitorStatus(null as any)).toBeFalsy();
-            expect(isMonitorStatus(undefined as any)).toBeFalsy();
-            expect(isMonitorStatus(123 as any)).toBeFalsy();
-            expect(isMonitorStatus(true as any)).toBeFalsy();
-            expect(isMonitorStatus({} as any)).toBeFalsy();
-            expect(isMonitorStatus([] as any)).toBeFalsy();
+            expect(isMonitorStatus(null)).toBeFalsy();
+            expect(isMonitorStatus(undefined)).toBeFalsy();
+            expect(isMonitorStatus(123)).toBeFalsy();
+            expect(isMonitorStatus(true)).toBeFalsy();
+            expect(isMonitorStatus({})).toBeFalsy();
+            expect(isMonitorStatus([])).toBeFalsy();
         });
     });
 
@@ -163,12 +163,12 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isSiteStatus(null as any)).toBeFalsy();
-            expect(isSiteStatus(undefined as any)).toBeFalsy();
-            expect(isSiteStatus(123 as any)).toBeFalsy();
-            expect(isSiteStatus(true as any)).toBeFalsy();
-            expect(isSiteStatus({} as any)).toBeFalsy();
-            expect(isSiteStatus([] as any)).toBeFalsy();
+            expect(isSiteStatus(null)).toBeFalsy();
+            expect(isSiteStatus(undefined)).toBeFalsy();
+            expect(isSiteStatus(123)).toBeFalsy();
+            expect(isSiteStatus(true)).toBeFalsy();
+            expect(isSiteStatus({})).toBeFalsy();
+            expect(isSiteStatus([])).toBeFalsy();
         });
     });
 
@@ -265,7 +265,7 @@ describe("shared/types type guards and validators", () => {
 
             const invalidMonitor = { ...validMonitor };
             delete (invalidMonitor as any).type;
-            expect(validateMonitor(invalidMonitor as any)).toBeFalsy();
+            expect(validateMonitor(invalidMonitor)).toBeFalsy();
         });
 
         it("should return false for monitor with invalid type", async ({
@@ -455,11 +455,11 @@ describe("shared/types type guards and validators", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(validateMonitor(null as any)).toBeFalsy();
-            expect(validateMonitor(undefined as any)).toBeFalsy();
-            expect(validateMonitor({} as any)).toBeFalsy();
-            expect(validateMonitor("not an object" as any)).toBeFalsy();
-            expect(validateMonitor(123 as any)).toBeFalsy();
+            expect(validateMonitor(null)).toBeFalsy();
+            expect(validateMonitor(undefined)).toBeFalsy();
+            expect(validateMonitor({})).toBeFalsy();
+            expect(validateMonitor("not an object")).toBeFalsy();
+            expect(validateMonitor(123)).toBeFalsy();
         });
     });
 });

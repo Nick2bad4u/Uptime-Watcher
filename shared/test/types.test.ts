@@ -101,7 +101,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus(null as any)).toBeFalsy();
+        expect(isComputedSiteStatus(null)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -110,7 +110,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus(undefined as any)).toBeFalsy();
+        expect(isComputedSiteStatus(undefined)).toBeFalsy();
     });
 
     it("should return false for number", async ({ task, annotate }) => {
@@ -119,7 +119,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus(123 as any)).toBeFalsy();
+        expect(isComputedSiteStatus(123)).toBeFalsy();
     });
 
     it("should return false for boolean", async ({ task, annotate }) => {
@@ -128,7 +128,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus(true as any)).toBeFalsy();
+        expect(isComputedSiteStatus(true)).toBeFalsy();
     });
 
     it("should return false for object", async ({ task, annotate }) => {
@@ -137,7 +137,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus({} as any)).toBeFalsy();
+        expect(isComputedSiteStatus({})).toBeFalsy();
     });
 
     it("should return false for array", async ({ task, annotate }) => {
@@ -146,7 +146,7 @@ describe(isComputedSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isComputedSiteStatus([] as any)).toBeFalsy();
+        expect(isComputedSiteStatus([])).toBeFalsy();
     });
 
     it("should return false for invalid string values", async ({
@@ -208,7 +208,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus(null as any)).toBeFalsy();
+        expect(isMonitorStatus(null)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -217,7 +217,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus(undefined as any)).toBeFalsy();
+        expect(isMonitorStatus(undefined)).toBeFalsy();
     });
 
     it("should return false for number", async ({ task, annotate }) => {
@@ -226,7 +226,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus(123 as any)).toBeFalsy();
+        expect(isMonitorStatus(123)).toBeFalsy();
     });
 
     it("should return false for boolean", async ({ task, annotate }) => {
@@ -235,7 +235,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus(false as any)).toBeFalsy();
+        expect(isMonitorStatus(false)).toBeFalsy();
     });
 
     it("should return false for object", async ({ task, annotate }) => {
@@ -244,7 +244,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus({} as any)).toBeFalsy();
+        expect(isMonitorStatus({})).toBeFalsy();
     });
 
     it("should return false for array", async ({ task, annotate }) => {
@@ -253,7 +253,7 @@ describe(isMonitorStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isMonitorStatus([] as any)).toBeFalsy();
+        expect(isMonitorStatus([])).toBeFalsy();
     });
 
     it("should return false for case variations", async ({
@@ -322,7 +322,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus(null as any)).toBeFalsy();
+        expect(isSiteStatus(null)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -331,7 +331,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus(undefined as any)).toBeFalsy();
+        expect(isSiteStatus(undefined)).toBeFalsy();
     });
 
     it("should return false for number", async ({ task, annotate }) => {
@@ -340,7 +340,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus(456 as any)).toBeFalsy();
+        expect(isSiteStatus(456)).toBeFalsy();
     });
 
     it("should return false for boolean", async ({ task, annotate }) => {
@@ -349,7 +349,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus(true as any)).toBeFalsy();
+        expect(isSiteStatus(true)).toBeFalsy();
     });
 
     it("should return false for object", async ({ task, annotate }) => {
@@ -358,7 +358,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus({ status: "up" } as any)).toBeFalsy();
+        expect(isSiteStatus({ status: "up" })).toBeFalsy();
     });
 
     it("should return false for array", async ({ task, annotate }) => {
@@ -367,7 +367,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(isSiteStatus(["up"] as any)).toBeFalsy();
+        expect(isSiteStatus(["up"])).toBeFalsy();
     });
 
     it("should return false for case variations", async ({
@@ -464,7 +464,7 @@ describe(validateMonitor, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitor(null as any)).toBeFalsy();
+        expect(validateMonitor(null)).toBeFalsy();
     });
 
     it("should return false for undefined", async ({ task, annotate }) => {
@@ -473,7 +473,7 @@ describe(validateMonitor, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitor(undefined as any)).toBeFalsy();
+        expect(validateMonitor(undefined)).toBeFalsy();
     });
 
     it("should return false for non-object values", async ({
@@ -485,10 +485,10 @@ describe(validateMonitor, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Business Logic", "type");
 
-        expect(validateMonitor("string" as any)).toBeFalsy();
-        expect(validateMonitor(123 as any)).toBeFalsy();
-        expect(validateMonitor(true as any)).toBeFalsy();
-        expect(validateMonitor([] as any)).toBeFalsy();
+        expect(validateMonitor("string")).toBeFalsy();
+        expect(validateMonitor(123)).toBeFalsy();
+        expect(validateMonitor(true)).toBeFalsy();
+        expect(validateMonitor([])).toBeFalsy();
     });
 
     describe("id validation", () => {
