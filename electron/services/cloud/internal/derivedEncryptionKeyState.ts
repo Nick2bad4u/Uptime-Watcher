@@ -31,7 +31,7 @@ export async function resolveStoredDerivedEncryptionKey(args: {
         SECRET_KEY_ENCRYPTION_DERIVED_KEY
     );
 
-    if (!rawKeyBase64) {
+    if (rawKeyBase64 === undefined) {
         return { kind: "missing" };
     }
 

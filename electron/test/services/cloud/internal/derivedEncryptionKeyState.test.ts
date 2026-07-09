@@ -15,6 +15,18 @@ describe(resolveStoredDerivedEncryptionKey, () => {
         ).resolves.toStrictEqual({ kind: "missing" });
     });
 
+    it("returns invalid and clears empty stored key values", async () => {
+        const secretStore = new InMemorySecretStore();
+        await secretStore.setSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY, "");
+
+        await expect(
+            resolveStoredDerivedEncryptionKey({ secretStore })
+        ).resolves.toStrictEqual({ kind: "invalid" });
+        await expect(
+            secretStore.getSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY)
+        ).resolves.toBeUndefined();
+    });
+
     it("returns available when a valid key is stored", async () => {
         const secretStore = new InMemorySecretStore();
         const key = Buffer.alloc(ENCRYPTION_KEY_BYTES, 7);
