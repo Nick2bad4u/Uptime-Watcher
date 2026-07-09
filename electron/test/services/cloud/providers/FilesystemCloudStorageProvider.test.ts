@@ -7,6 +7,9 @@ import { FilesystemCloudStorageProvider } from "@electron/services/cloud/provide
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe(FilesystemCloudStorageProvider, () => {
+    const RESERVED_UPLOAD_ARTIFACT_KEY =
+        "sync/state.json.tmp-12345678-1234-1234-1234-123456789abc";
+
     let baseDirectory: string;
     let provider: FilesystemCloudStorageProvider;
 
@@ -50,6 +53,23 @@ describe(FilesystemCloudStorageProvider, () => {
         await expect(
             provider.downloadObject("C:/outside.json")
         ).rejects.toThrow(/drive tokens/iu);
+    });
+
+    it("rejects reserved internal upload artifact keys", async () => {
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload", "utf8"),
+                key: RESERVED_UPLOAD_ARTIFACT_KEY,
+            })
+        ).rejects.toThrow(/reserved filesystem upload artifact suffix/iu);
+
+        await expect(
+            provider.downloadObject(RESERVED_UPLOAD_ARTIFACT_KEY)
+        ).rejects.toThrow(/reserved filesystem upload artifact suffix/iu);
+
+        await expect(
+            provider.deleteObject(RESERVED_UPLOAD_ARTIFACT_KEY)
+        ).rejects.toThrow(/reserved filesystem upload artifact suffix/iu);
     });
 
     it("preserves existing objects when overwrite is not requested", async () => {
@@ -113,6 +133,39 @@ describe(FilesystemCloudStorageProvider, () => {
         await expect(provider.listObjects("backups")).resolves.toEqual([
             expect.objectContaining({
                 key: "backups/valid.sqlite",
+                sizeBytes: 5,
+            }),
+        ]);
+    });
+
+    it("hides stray internal upload artifacts from object listings", async () => {
+        await provider.uploadObject({
+            buffer: Buffer.from("valid", "utf8"),
+            key: "sync/state.json",
+        });
+
+        const syncDirectory = path.join(getAppRoot(), "sync");
+        await mkdir(syncDirectory, { recursive: true });
+        await writeFile(
+            path.join(
+                syncDirectory,
+                "state.json.tmp-12345678-1234-1234-1234-123456789abc"
+            ),
+            "temporary",
+            "utf8"
+        );
+        await writeFile(
+            path.join(
+                syncDirectory,
+                "state.json.bak-12345678-1234-1234-1234-123456789abc"
+            ),
+            "backup",
+            "utf8"
+        );
+
+        await expect(provider.listObjects("sync")).resolves.toEqual([
+            expect.objectContaining({
+                key: "sync/state.json",
                 sizeBytes: 5,
             }),
         ]);
