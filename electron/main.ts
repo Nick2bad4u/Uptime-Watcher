@@ -115,13 +115,10 @@ if (isDev()) {
         default: (options: ElectronDebugOptions) => void;
     }
 
-    const isRecord = (value: unknown): value is UnknownRecord =>
-        typeof value === "object" && value !== null;
-
     const isElectronDebugModule = (
         value: unknown
     ): value is ElectronDebugModule => {
-        if (!isRecord(value)) {
+        if (!isPlainRecord(value)) {
             return false;
         }
 
