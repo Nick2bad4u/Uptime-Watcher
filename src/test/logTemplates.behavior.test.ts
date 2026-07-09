@@ -1,11 +1,3 @@
-/**
- * Comprehensive tests for logTemplates.ts - achieving 100% coverage
- *
- * @file Tests all functions, constants, and edge cases in logTemplates.ts
- *
- * @author GitHub Copilot
- */
-
 import type { UnknownRecord } from "type-fest";
 
 import {
@@ -24,7 +16,7 @@ import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { createMockFunction } from "./utils/mockFactories";
 
-describe("logTemplates.ts - Comprehensive Coverage", () => {
+describe("logTemplates behavior", () => {
     describe("Template Constants", () => {
         describe("SERVICE_LOGS", () => {
             it("should contain all service-related log templates", () => {
@@ -575,7 +567,10 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
 
         it("should handle null and undefined by leaving placeholders", () => {
             const template = "Value1: {val1}, Value2: {val2}";
-            const variables = { val1: null, val2: undefined } as any;
+            const variables: TemplateVariables = {
+                val1: null,
+                val2: undefined,
+            };
 
             const result = interpolateLogTemplate(template, variables);
 
