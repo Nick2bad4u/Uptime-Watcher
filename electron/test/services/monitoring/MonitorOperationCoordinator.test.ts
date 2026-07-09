@@ -8,7 +8,7 @@ import type { OperationTimeoutManager } from "../../../services/monitoring/Opera
 
 import { MonitorOperationCoordinator } from "../../../services/monitoring/coordinators/MonitorOperationCoordinator";
 
-const createMonitor = (): Monitor => ({
+const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
     activeOperations: [],
     checkInterval: 30_000,
     history: [],
@@ -21,6 +21,7 @@ const createMonitor = (): Monitor => ({
     timeout: 5000,
     type: "http",
     url: "https://example.com",
+    ...overrides,
 });
 
 const createAbortSignal = (): AbortSignal => new AbortController().signal;
@@ -88,6 +89,18 @@ describe(MonitorOperationCoordinator, () => {
             expect.objectContaining({
                 activeOperations: ["operation-123"],
             })
+        );
+    });
+
+    it("uses the monitor timeout plus cleanup buffer when scheduling operations", async () => {
+        const monitor = createMonitor({ timeout: 45_000 });
+
+        const handle = await coordinator.initiateOperation(monitor);
+
+        expect(handle?.timeoutMs).toBe(50_000);
+        expect(timeoutManagerSchedule).toHaveBeenCalledWith(
+            "operation-123",
+            50_000
         );
     });
 
