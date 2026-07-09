@@ -154,7 +154,10 @@ export class DropboxTokenManager {
                 ? getNativeDateEpochMs(expiresAt)
                 : undefined;
 
-        if (!accessToken || typeof accessToken !== "string") {
+        if (
+            typeof accessToken !== "string" ||
+            accessToken.trim().length === 0
+        ) {
             throw new Error("Dropbox refresh did not return an access token");
         }
 
@@ -164,6 +167,12 @@ export class DropboxTokenManager {
         ) {
             throw new TypeError(
                 "Dropbox refresh did not return a valid access token expiration"
+            );
+        }
+
+        if (expiresAtEpochMs <= nowEpochMs() + TOKEN_REFRESH_SAFETY_WINDOW_MS) {
+            throw new TypeError(
+                "Dropbox refresh returned an access token expiration inside the refresh safety window"
             );
         }
 
