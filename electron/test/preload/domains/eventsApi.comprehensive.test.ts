@@ -179,6 +179,29 @@ describe("Events Domain API", () => {
             expect(callback).toHaveBeenCalledWith(mockEventData);
         });
 
+        it("should strip unexpected cache invalidation event fields", () => {
+            const callback = vi.fn();
+            const mockEventData = {
+                identifier: "site-abc",
+                reason: "update",
+                secretToken: "secret-token",
+                timestamp: Date.now(),
+                type: "site",
+            };
+
+            eventsApi.onCacheInvalidated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, mockEventData);
+
+            expect(callback).toHaveBeenCalledWith({
+                identifier: "site-abc",
+                reason: "update",
+                timestamp: mockEventData.timestamp,
+                type: "site",
+            });
+        });
+
         it("should reject targeted cache invalidation payloads with invalid identifiers", () => {
             const callback = vi.fn();
 
@@ -918,6 +941,29 @@ describe("Events Domain API", () => {
             expect(typeof cleanup).toBe("function");
         });
 
+        it("should strip unexpected site removed event fields", () => {
+            const callback = vi.fn();
+            const payload = {
+                cascade: false,
+                refreshToken: "secret-token",
+                siteIdentifier: "site-abc",
+                siteName: "Example",
+                timestamp: Date.now(),
+            };
+
+            eventsApi.onSiteRemoved(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            expect(callback).toHaveBeenCalledWith({
+                cascade: false,
+                siteIdentifier: "site-abc",
+                siteName: "Example",
+                timestamp: payload.timestamp,
+            });
+        });
+
         it("should reject malformed site removed payloads", () => {
             const callback = vi.fn();
 
@@ -1357,10 +1403,12 @@ describe("Events Domain API", () => {
                         nil: undefined,
                     }),
                     fc.constantFrom(...statusValues),
-                    fc.date({
-                        max: MAX_ISO_TIMESTAMP_DATE,
-                        min: MIN_ISO_TIMESTAMP_DATE,
-                    })
+                    fc
+                        .date({
+                            max: MAX_ISO_TIMESTAMP_DATE,
+                            min: MIN_ISO_TIMESTAMP_DATE,
+                        })
+                        .filter((date) => !Number.isNaN(date.getTime()))
                 )
                 .map(
                     ([

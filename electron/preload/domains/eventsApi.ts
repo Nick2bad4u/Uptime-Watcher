@@ -171,6 +171,27 @@ const isCacheInvalidatedEventDataPayload = (
     return true;
 };
 
+const mapCacheInvalidatedEventDataPayload = (
+    payload: unknown
+): CacheInvalidatedEventData | undefined => {
+    if (!isCacheInvalidatedEventDataPayload(payload)) {
+        return undefined;
+    }
+
+    return isDefined(payload.identifier)
+        ? {
+              identifier: payload.identifier,
+              reason: payload.reason,
+              timestamp: payload.timestamp,
+              type: payload.type,
+          }
+        : {
+              reason: payload.reason,
+              timestamp: payload.timestamp,
+              type: payload.type,
+          };
+};
+
 const isMonitoringControlEventDataPayload = (
     payload: unknown
 ): payload is MonitoringControlEventData => {
@@ -344,6 +365,22 @@ const isMonitorCheckCompletedEventDataPayload = (
     );
 };
 
+const mapMonitorCheckCompletedEventDataPayload = (
+    payload: unknown
+): MonitorCheckCompletedEventDataPayload | undefined => {
+    if (!isMonitorCheckCompletedEventDataPayload(payload)) {
+        return undefined;
+    }
+
+    return {
+        checkType: payload.checkType,
+        monitorId: payload.monitorId,
+        result: payload.result,
+        siteIdentifier: payload.siteIdentifier,
+        timestamp: payload.timestamp,
+    };
+};
+
 const isHistoryLimitUpdatedEventDataPayload = (
     payload: unknown
 ): payload is HistoryLimitUpdatedEventDataPayload => {
@@ -368,6 +405,27 @@ const isHistoryLimitUpdatedEventDataPayload = (
     }
 
     return !isDefined(previousLimit) || isNonNegativeSafeInteger(previousLimit);
+};
+
+const mapHistoryLimitUpdatedEventDataPayload = (
+    payload: unknown
+): HistoryLimitUpdatedEventDataPayload | undefined => {
+    if (!isHistoryLimitUpdatedEventDataPayload(payload)) {
+        return undefined;
+    }
+
+    return isDefined(payload.previousLimit)
+        ? {
+              limit: payload.limit,
+              operation: payload.operation,
+              previousLimit: payload.previousLimit,
+              timestamp: payload.timestamp,
+          }
+        : {
+              limit: payload.limit,
+              operation: payload.operation,
+              timestamp: payload.timestamp,
+          };
 };
 
 const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);
@@ -429,6 +487,21 @@ const isSiteRemovedEventDataPayload = (
     }
 
     return hasFiniteTimestamp(timestamp);
+};
+
+const mapSiteRemovedEventDataPayload = (
+    payload: unknown
+): SiteRemovedEventDataPayload | undefined => {
+    if (!isSiteRemovedEventDataPayload(payload)) {
+        return undefined;
+    }
+
+    return {
+        cascade: payload.cascade,
+        siteIdentifier: payload.siteIdentifier,
+        siteName: payload.siteName,
+        timestamp: payload.timestamp,
+    };
 };
 
 const mapSiteUpdatedEventDataPayload = (
@@ -625,6 +698,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isCacheInvalidatedEventDataPayload",
+                    mapPayload: mapCacheInvalidatedEventDataPayload,
                 }
             ),
         onHistoryLimitUpdated: (
@@ -637,6 +711,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isHistoryLimitUpdatedEventDataPayload",
+                    mapPayload: mapHistoryLimitUpdatedEventDataPayload,
                 }
             ),
         onMonitorCheckCompleted: (
@@ -649,6 +724,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isMonitorCheckCompletedEventDataPayload",
+                    mapPayload: mapMonitorCheckCompletedEventDataPayload,
                 }
             ),
         onMonitorDown: (
@@ -734,6 +810,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteRemovedEventDataPayload",
+                    mapPayload: mapSiteRemovedEventDataPayload,
                 }
             ),
         onSiteUpdated: (
