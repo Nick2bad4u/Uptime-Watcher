@@ -270,6 +270,7 @@ export async function waitForElectronBridge(
                 delayMs: ({ attempt }) =>
                     computeDelayMs({ attempt, baseDelay }),
                 maxRetries: attempts,
+                operationName: "wait for electron bridge",
                 shouldRetry: (error) => error instanceof BridgeNotReadyYetError,
             }
         );

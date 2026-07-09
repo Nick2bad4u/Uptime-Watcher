@@ -210,6 +210,7 @@ export async function withDropboxRetry<T>(args: {
                 : computedDelay;
         },
         maxRetries: maxAttempts,
+        operationName: args.operationName,
         onFailedAttempt: ({ attempt, delayMs, error }) => {
             const retryable = extractRetryableHttpFailure(error);
 

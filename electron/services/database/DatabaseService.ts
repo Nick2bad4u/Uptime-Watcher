@@ -263,6 +263,7 @@ export class DatabaseService {
                     TRANSACTION_RETRY_MAX_DELAY_MS
                 ),
             maxRetries: TRANSACTION_MAX_ATTEMPTS,
+            operationName: "database transaction",
             onError: (error, attempt) => {
                 const normalizedError = ensureError(error);
                 const canRetry =

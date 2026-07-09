@@ -638,6 +638,7 @@ export class WindowService {
                         return exponentialDelay + jitter;
                     },
                     maxRetries: MAX_RETRIES,
+                    operationName: "wait for Vite dev server",
                     onError: (error, attempt) => {
                         const resolved = ensureError(error);
                         // Log only significant errors or last attempt.
