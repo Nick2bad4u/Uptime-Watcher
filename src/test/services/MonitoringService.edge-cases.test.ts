@@ -206,9 +206,7 @@ describe("MonitoringService edge cases", () => {
             "[MonitoringService] Invalid monitor ID for startMonitoringForMonitor: Monitor ID must not contain control characters"
         );
 
-        expect(
-            monitoringApi.startMonitoringForMonitor
-        ).not.toHaveBeenCalled();
+        expect(monitoringApi.startMonitoringForMonitor).not.toHaveBeenCalled();
     });
 
     it("throws when startMonitoringForSite reports backend failure", async () => {

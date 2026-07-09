@@ -312,9 +312,8 @@ describe("file Download Utility", () => {
             });
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            const result = await handleSQLiteBackupDownload(
-                mockDownloadFunction
-            );
+            const result =
+                await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expect(result.fileName).toBe(mockAnchor.download);
             expect(result.fileName).toMatch(
@@ -330,9 +329,8 @@ describe("file Download Utility", () => {
             });
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            const result = await handleSQLiteBackupDownload(
-                mockDownloadFunction
-            );
+            const result =
+                await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expect(result.fileName).toMatch(
                 /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/u

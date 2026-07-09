@@ -373,10 +373,7 @@ export const SiteService: SiteServiceContract = {
                 "removeMonitor",
                 siteIdentifier
             );
-            const parsedMonitorId = parseMonitorId(
-                "removeMonitor",
-                monitorId
-            );
+            const parsedMonitorId = parseMonitorId("removeMonitor", monitorId);
             const savedSite = await api.sites.removeMonitor(
                 parsedSiteIdentifier,
                 parsedMonitorId
@@ -421,7 +418,10 @@ export const SiteService: SiteServiceContract = {
         const isRemoved = parseServiceBooleanResponse(
             "removeSite",
             await api.sites.removeSite(parsedIdentifier),
-            { details: { identifier: parsedIdentifier }, serviceName: "SiteService" }
+            {
+                details: { identifier: parsedIdentifier },
+                serviceName: "SiteService",
+            }
         );
 
         if (!isRemoved) {

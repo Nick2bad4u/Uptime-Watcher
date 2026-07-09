@@ -529,10 +529,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const value = Object.create(null) as Record<string, unknown>;
                 value["key"] = "value";
 
-                const result = IpcValidators.requiredObject(
-                    value,
-                    "testParam"
-                );
+                const result = IpcValidators.requiredObject(value, "testParam");
 
                 expect(result).toBeNull();
             });

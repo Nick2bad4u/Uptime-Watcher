@@ -115,7 +115,7 @@ describe(readStoredJsonSecret, () => {
         });
         const args = createReadArgs({ clear, parse, secretStore, storageKey });
 
-        await secretStore.setSecret(storageKey, "{\"accessToken\":\"secret\"}");
+        await secretStore.setSecret(storageKey, '{"accessToken":"secret"}');
 
         await expect(readStoredJsonSecret(args)).resolves.toBeUndefined();
 

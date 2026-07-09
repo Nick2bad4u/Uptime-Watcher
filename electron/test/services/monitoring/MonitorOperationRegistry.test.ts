@@ -349,7 +349,9 @@ describe(MonitorOperationRegistry, () => {
             const storedOperation = registry.getOperation(result.operationId);
             expect(storedOperation?.monitorId).toBe(mockMonitorId);
             expect(storedOperation?.initiatedAt.getFullYear()).not.toBe(2000);
-            expect(registry.hasOutstandingOperation(mockMonitorId)).toBeTruthy();
+            expect(
+                registry.hasOutstandingOperation(mockMonitorId)
+            ).toBeTruthy();
             expect(
                 registry.hasOutstandingOperation("corrupted-monitor")
             ).toBeFalsy();

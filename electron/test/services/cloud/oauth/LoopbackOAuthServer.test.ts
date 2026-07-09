@@ -233,9 +233,7 @@ describe(startLoopbackOAuthServer, () => {
                 const response = await requestUrl(callbackUrl.toString());
 
                 expect(response.statusCode).toBe(400);
-                expect(response.body).toContain(
-                    "Invalid callback parameters."
-                );
+                expect(response.body).toContain("Invalid callback parameters.");
                 await expect(callbackPromise).rejects.toThrow(
                     `OAuth callback parameter '${parameterName}' must appear at most once`
                 );

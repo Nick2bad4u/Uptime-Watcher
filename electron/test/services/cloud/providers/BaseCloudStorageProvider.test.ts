@@ -44,17 +44,17 @@ class TestCloudStorageProvider extends BaseCloudStorageProvider {
             throw new Error(`Unexpected download key: ${key}`);
         });
 
-    public readonly listObjects = vi.fn<
-        (prefix: string) => Promise<CloudObjectEntry[]>
-    >();
+    public readonly listObjects =
+        vi.fn<(prefix: string) => Promise<CloudObjectEntry[]>>();
 
-    public readonly uploadObject = vi.fn<
-        (args: {
-            buffer: Buffer;
-            key: string;
-            overwrite?: boolean;
-        }) => Promise<CloudObjectEntry>
-    >();
+    public readonly uploadObject =
+        vi.fn<
+            (args: {
+                buffer: Buffer;
+                key: string;
+                overwrite?: boolean;
+            }) => Promise<CloudObjectEntry>
+        >();
 
     public constructor() {
         super("backups/");
@@ -88,16 +88,13 @@ describe(BaseCloudStorageProvider, () => {
         ["trailing slash", "backups/nested/"],
         ["drive token", "backups/C:backup.sqlite"],
         ["wrong prefix", "sync/backup.sqlite"],
-    ])(
-        "rejects %s backup keys before downloading",
-        async (_caseName, key) => {
-            const provider = new TestCloudStorageProvider();
+    ])("rejects %s backup keys before downloading", async (_caseName, key) => {
+        const provider = new TestCloudStorageProvider();
 
-            await expect(provider.downloadBackup(key)).rejects.toThrow(
-                /failed to download backup/iu
-            );
+        await expect(provider.downloadBackup(key)).rejects.toThrow(
+            /failed to download backup/iu
+        );
 
-            expect(provider.downloadObject).not.toHaveBeenCalled();
-        }
-    );
+        expect(provider.downloadObject).not.toHaveBeenCalled();
+    });
 });

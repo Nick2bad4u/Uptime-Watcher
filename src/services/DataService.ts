@@ -134,11 +134,9 @@ export const DataService: DataServiceContract = {
      *   errors.
      */
     exportData: wrap("exportData", async (api) =>
-        parseServiceStringResponse(
-            "exportData",
-            await api.data.exportData(),
-            { serviceName: "DataService" }
-        )
+        parseServiceStringResponse("exportData", await api.data.exportData(), {
+            serviceName: "DataService",
+        })
     ),
 
     /**

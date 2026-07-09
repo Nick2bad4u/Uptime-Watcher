@@ -254,8 +254,9 @@ export const SettingsService: SettingsServiceContract = {
                 );
             }
 
-            const updatedLimit =
-                await api.settings.updateHistoryLimit(sanitizedRequestLimit);
+            const updatedLimit = await api.settings.updateHistoryLimit(
+                sanitizedRequestLimit
+            );
 
             try {
                 return normalizeHistoryLimit(updatedLimit, historyRules);

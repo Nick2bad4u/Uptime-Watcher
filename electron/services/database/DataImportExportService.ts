@@ -172,7 +172,8 @@ export class DataImportExportService {
      */
     private static readonly CLOUD_SETTINGS_PREFIX = "cloud." as const;
 
-    private static readonly HISTORY_LIMIT_SETTINGS_KEY = "historyLimit" as const;
+    private static readonly HISTORY_LIMIT_SETTINGS_KEY =
+        "historyLimit" as const;
 
     private static isProtectedSettingsKey(key: string): boolean {
         const normalizedKey = DataImportExportService.normalizeSettingsKey(key);

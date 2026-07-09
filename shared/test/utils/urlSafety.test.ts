@@ -118,7 +118,9 @@ describe("urlSafety", () => {
 
         it("detects NAT64 hostnames that embed private or special-use IPv4 addresses", () => {
             expect(isPrivateNetworkHostname("64:ff9b::c0a8:0101")).toBeTruthy();
-            expect(isPrivateNetworkHostname("[64:ff9b::c0a8:101]")).toBeTruthy();
+            expect(
+                isPrivateNetworkHostname("[64:ff9b::c0a8:101]")
+            ).toBeTruthy();
             expect(isPrivateNetworkHostname("64:ff9b::7f00:0001")).toBeTruthy();
             expect(isPrivateNetworkHostname("64:ff9b::c000:020a")).toBeTruthy();
             expect(
@@ -442,9 +444,7 @@ describe("urlSafety", () => {
                 tryGetSafeThirdPartyHttpUrl("https://[64:ff9b::c0a8:101]")
             ).toBe(null);
             expect(
-                tryGetSafeThirdPartyHttpUrl(
-                    "https://[64:ff9b:1:c0a8:101::]"
-                )
+                tryGetSafeThirdPartyHttpUrl("https://[64:ff9b:1:c0a8:101::]")
             ).toBe(null);
         });
 

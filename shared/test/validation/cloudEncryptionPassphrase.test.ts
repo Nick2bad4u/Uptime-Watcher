@@ -26,8 +26,8 @@ describe("cloud encryption passphrase validation", () => {
     });
 
     it("rejects oversized passphrases", () => {
-        expect(collectCloudEncryptionPassphraseIssues("x".repeat(2000))).toContain(
-            CLOUD_ENCRYPTION_PASSPHRASE_MESSAGES.tooLarge
-        );
+        expect(
+            collectCloudEncryptionPassphraseIssues("x".repeat(2000))
+        ).toContain(CLOUD_ENCRYPTION_PASSPHRASE_MESSAGES.tooLarge);
     });
 });

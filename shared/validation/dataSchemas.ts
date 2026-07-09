@@ -80,9 +80,7 @@ const hasWindowsReservedFileNameCharacter = (value: string): boolean => {
 const getFileNameStem = (fileName: string): string => {
     const extensionIndex = fileName.indexOf(".");
 
-    return extensionIndex === -1
-        ? fileName
-        : fileName.slice(0, extensionIndex);
+    return extensionIndex === -1 ? fileName : fileName.slice(0, extensionIndex);
 };
 
 const createSqliteFileNameSchema = (label: string): z.ZodType<string> =>

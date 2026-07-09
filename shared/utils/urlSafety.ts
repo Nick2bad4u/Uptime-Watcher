@@ -776,7 +776,11 @@ function parseIpvFourFromSixToFourHostname(hostname: string):
       ]
     | null {
     const parts = stringSplit(hostname, ":");
-    const [prefix, highPart, lowPart] = parts;
+    const [
+        prefix,
+        highPart,
+        lowPart,
+    ] = parts;
 
     if (
         prefix?.toLowerCase() !== "2002" ||

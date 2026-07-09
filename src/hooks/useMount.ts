@@ -96,41 +96,29 @@ export function useMount(
     });
 
     // eslint-disable-next-line canonical/prefer-use-mount -- This is the implementation of useMount's mount-only lifecycle effect.
-    useEffect(
-        function handleMountLifecycle() {
-            const abortController = new AbortController();
-            let didCleanup = false;
+    useEffect(function handleMountLifecycle() {
+        const abortController = new AbortController();
+        let didCleanup = false;
 
-            fireAndForget(
-                () => mountCallbackRef.current(abortController.signal),
-                {
-                    onError: (error) => {
-                        logger.error(
-                            "Error in useMount callback:",
-                            ensureError(error)
-                        );
-                    },
-                },
-            );
+        fireAndForget(() => mountCallbackRef.current(abortController.signal), {
+            onError: (error) => {
+                logger.error("Error in useMount callback:", ensureError(error));
+            },
+        });
 
-            return (): void => {
-                if (didCleanup) {
-                    return;
-                }
+        return (): void => {
+            if (didCleanup) {
+                return;
+            }
 
-                didCleanup = true;
-                abortController.abort();
+            didCleanup = true;
+            abortController.abort();
 
-                try {
-                    unmountCallbackRef.current?.();
-                } catch (error: unknown) {
-                    logger.error(
-                        "Error in useMount cleanup:",
-                        ensureError(error)
-                    );
-                }
-            };
-        },
-        []
-    );
+            try {
+                unmountCallbackRef.current?.();
+            } catch (error: unknown) {
+                logger.error("Error in useMount cleanup:", ensureError(error));
+            }
+        };
+    }, []);
 }

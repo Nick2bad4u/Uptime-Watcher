@@ -529,9 +529,8 @@ export class DatabaseManager {
 
         // Then get snapshots from cache without exposing live cache objects.
         try {
-            const sites = Array.from(
-                this.siteCache.entries(),
-                ([, site]) => structuredClone(site)
+            const sites = Array.from(this.siteCache.entries(), ([, site]) =>
+                structuredClone(site)
             );
 
             // Emit typed sites refreshed event

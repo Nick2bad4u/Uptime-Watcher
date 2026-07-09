@@ -113,7 +113,10 @@ const normalizeMutedSiteIdentifiers = (
     value === undefined || value === fallback
         ? fallback
         : isMutedSiteIdentifierArray(value)
-          ? [...new Set(value)].slice(0, MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS)
+          ? [...new Set(value)].slice(
+                0,
+                MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS
+            )
           : fallback;
 
 const normalizeThemeSetting = (

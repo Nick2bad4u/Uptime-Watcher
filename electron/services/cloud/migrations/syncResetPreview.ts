@@ -79,9 +79,7 @@ export function buildCloudSyncResetPreview(args: {
     }
 
     const perDevice = [...perDeviceMap.values()];
-    perDevice.sort((a, b) =>
-        compareStringsCodeUnit(a.deviceId, b.deviceId)
-    );
+    perDevice.sort((a, b) => compareStringsCodeUnit(a.deviceId, b.deviceId));
 
     const deviceIds = objectKeys(args.manifest.devices);
     deviceIds.sort(compareStringsCodeUnit);

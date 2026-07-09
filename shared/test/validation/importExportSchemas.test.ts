@@ -191,8 +191,7 @@ describe("importExportSchemas", () => {
                     identifier: "example.com",
                     monitors: [
                         createMonitorSnapshot({
-                            lastChecked:
-                                lastChecked as unknown as Date,
+                            lastChecked: lastChecked as unknown as Date,
                         }),
                     ],
                 },

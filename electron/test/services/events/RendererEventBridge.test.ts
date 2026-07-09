@@ -154,8 +154,7 @@ describe(RendererEventBridge, () => {
         if (originalStateSyncBudgetEnv === undefined) {
             Reflect.deleteProperty(process.env, STATE_SYNC_BUDGET_ENV_KEY);
         } else {
-            process.env[STATE_SYNC_BUDGET_ENV_KEY] =
-                originalStateSyncBudgetEnv;
+            process.env[STATE_SYNC_BUDGET_ENV_KEY] = originalStateSyncBudgetEnv;
         }
 
         if (originalStateSyncDiagnosticsEnv === undefined) {

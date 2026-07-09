@@ -53,8 +53,7 @@ function normalizeSerializedMonitorDates(value: unknown): unknown {
         Object.defineProperty(normalized, key, {
             configurable: true,
             enumerable: true,
-            value:
-                key === "lastChecked" ? parsedLastChecked.data : entry.value,
+            value: key === "lastChecked" ? parsedLastChecked.data : entry.value,
             writable: true,
         });
     }

@@ -97,14 +97,7 @@ describe("jsonSafety behavior", () => {
 
         it("rejects collection objects instead of serializing them as empty objects", () => {
             const topLevelMapResult = safeJsonStringify(
-                unsafeJsonifiable(
-                    new Map([
-                        [
-                            "token",
-                            "secret",
-                        ],
-                    ])
-                )
+                unsafeJsonifiable(new Map([["token", "secret"]]))
             );
             const nestedSetResult = safeJsonStringify(
                 unsafeJsonifiable({
@@ -117,7 +110,9 @@ describe("jsonSafety behavior", () => {
                 "JSON serialization failed"
             );
             expect(nestedSetResult.success).toBeFalsy();
-            expect(nestedSetResult.error).toContain("JSON serialization failed");
+            expect(nestedSetResult.error).toContain(
+                "JSON serialization failed"
+            );
         });
     });
 

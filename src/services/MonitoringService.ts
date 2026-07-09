@@ -107,7 +107,11 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
 
 const formatZodIssueMessages = (
     issues: readonly { readonly message: string }[]
-): string => arrayJoin(issues.map(({ message }) => message), ", ");
+): string =>
+    arrayJoin(
+        issues.map(({ message }) => message),
+        ", "
+    );
 
 const parseMonitoringIdentifier = (
     operation: string,

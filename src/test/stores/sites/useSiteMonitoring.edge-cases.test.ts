@@ -427,8 +427,7 @@ describe("useSiteMonitoring edge cases", () => {
 
             expect(
                 currentSites.some(
-                    ({ identifier }) =>
-                        identifier === unrelatedSite.identifier
+                    ({ identifier }) => identifier === unrelatedSite.identifier
                 )
             ).toBeTruthy();
             expect(revertedMonitor?.monitoring).toBeTruthy();
