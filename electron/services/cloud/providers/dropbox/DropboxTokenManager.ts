@@ -2,6 +2,7 @@ import type { Except } from "type-fest";
 
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { isPromiseLike } from "@shared/utils/typeHelpers";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { Dropbox, DropboxAuth } from "dropbox";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
@@ -214,8 +215,13 @@ export class DropboxTokenManager {
                 },
                 operationName: "auth/token/revoke",
             });
-        } catch {
-            // Best-effort: ignore token revoke failures.
+        } catch (error) {
+            logger.warn(
+                "[DropboxTokenManager] Failed to revoke stored tokens",
+                {
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
         }
 
         await this.clearTokens();

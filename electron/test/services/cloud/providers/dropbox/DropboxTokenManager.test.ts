@@ -1,13 +1,18 @@
 import { DropboxTokenManager } from "@electron/services/cloud/providers/dropbox/DropboxTokenManager";
+import { logger } from "@electron/utils/logger";
 import { InMemorySecretStore } from "@electron/test/utils/InMemorySecretStore";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import type { DropboxResponse } from "dropbox";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 const createVoidDropboxResponse = (): DropboxResponse<void> => ({
     headers: {},
     result: undefined,
     status: 200,
+});
+
+afterEach(() => {
+    vi.restoreAllMocks();
 });
 
 describe(DropboxTokenManager, () => {
@@ -426,9 +431,14 @@ describe(DropboxTokenManager, () => {
     });
 
     it("clears stored tokens when revoke fails", async () => {
+        const loggerWarn = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
         const secretStore = new InMemorySecretStore();
         const authTokenRevoke = vi.fn(async () => {
-            throw new Error("network down");
+            throw new Error(
+                "network down refresh_token=VERY_SECRET_TOKEN Authorization: Bearer VERY_SECRET_TOKEN"
+            );
         });
 
         const manager = new DropboxTokenManager({
@@ -447,6 +457,15 @@ describe(DropboxTokenManager, () => {
         await expect(manager.revokeStoredTokens()).resolves.toBeUndefined();
 
         expect(authTokenRevoke).toHaveBeenCalledTimes(1);
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[DropboxTokenManager] Failed to revoke stored tokens",
+            {
+                message: "network down refresh_token=[redacted] [redacted]",
+            }
+        );
+        expect(JSON.stringify(loggerWarn.mock.calls)).not.toContain(
+            "VERY_SECRET_TOKEN"
+        );
         await expect(manager.getStoredTokens()).resolves.toBeUndefined();
         await expect(
             secretStore.getSecret("cloud.dropbox.tokens")

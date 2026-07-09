@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { createSingleFlight } from "@shared/utils/singleFlight";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import axios from "axios";
 import { isDefined } from "ts-extras";
@@ -141,8 +142,13 @@ export class GoogleDriveTokenManager {
                     timeout: GOOGLE_OAUTH_REQUEST_TIMEOUT_MS,
                 }
             )
-            .catch(() => {
-                // Best-effort.
+            .catch((error: unknown) => {
+                logger.warn(
+                    "[GoogleDriveTokenManager] Failed to revoke stored tokens",
+                    {
+                        message: getUserFacingErrorDetail(error),
+                    }
+                );
             });
 
         await this.clear();

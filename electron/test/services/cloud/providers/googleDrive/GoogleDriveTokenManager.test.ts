@@ -1,6 +1,7 @@
 import { GoogleDriveTokenManager } from "@electron/services/cloud/providers/googleDrive/GoogleDriveTokenManager";
+import { logger } from "@electron/utils/logger";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InMemorySecretStore } from "../../../../utils/InMemorySecretStore";
 
@@ -19,6 +20,10 @@ vi.mock("axios", () => ({
 describe(GoogleDriveTokenManager, () => {
     beforeEach(() => {
         vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it("returns existing access token when not near expiry", async () => {
@@ -188,6 +193,9 @@ describe(GoogleDriveTokenManager, () => {
     });
 
     it("revoke is best-effort and always clears stored tokens", async () => {
+        const loggerWarn = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
         const secretStore = new InMemorySecretStore();
         const manager = new GoogleDriveTokenManager({
             clientId: "client-id",
@@ -201,9 +209,22 @@ describe(GoogleDriveTokenManager, () => {
             refreshToken: "refresh",
         });
 
-        axiosPost.mockRejectedValueOnce(new Error("network down"));
+        axiosPost.mockRejectedValueOnce(
+            new Error(
+                "network down refresh_token=VERY_SECRET_TOKEN Authorization: Bearer VERY_SECRET_TOKEN"
+            )
+        );
 
         await expect(manager.revoke()).resolves.toBeUndefined();
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[GoogleDriveTokenManager] Failed to revoke stored tokens",
+            {
+                message: "network down refresh_token=[redacted] [redacted]",
+            }
+        );
+        expect(JSON.stringify(loggerWarn.mock.calls)).not.toContain(
+            "VERY_SECRET_TOKEN"
+        );
         await expect(manager.getTokens()).resolves.toBeUndefined();
     });
 
