@@ -330,7 +330,7 @@ export const AppSidebar: NamedExoticComponent = memo(
                         </div>
                     </div>
 
-                    <search className="app-sidebar__search">
+                    <div className="app-sidebar__search" role="search">
                         <label
                             className="app-sidebar__search-label"
                             htmlFor="sidebar-search"
@@ -355,7 +355,7 @@ export const AppSidebar: NamedExoticComponent = memo(
                                 value={query}
                             />
                         </label>
-                    </search>
+                    </div>
 
                     <nav
                         aria-label="Monitored sites"
