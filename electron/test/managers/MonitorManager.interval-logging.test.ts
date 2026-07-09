@@ -1,13 +1,5 @@
 /**
- * Arithmetic mutation tests for MonitorManager.ts
- *
- * Targets interval division operations to kill arithmetic operator mutations.
- * These tests ensure proper millisecond to sec // The division should still use
- * DEFAULT_CHECK_INTERVAL (300000) not customInterval
- * expect(mockInterpolateLogTemplate).toHaveBeenCalledWith( expect.anything(),
- * expect.objectContaining({ interval: 300, // DEFAULT_CHECK_INTERVAL (300000) /
- * 1000 = 300s monitorId: "custom-monitor", })versions in logging and
- * calculations.
+ * @file Verifies MonitorManager default interval logging uses seconds.
  */
 
 import type { Site } from "@shared/types";
@@ -19,7 +11,7 @@ import { MonitorManager } from "../../managers/MonitorManager";
 // Hoist the mock function to avoid initialization issues
 const mockInterpolateLogTemplate = vi.hoisted(() =>
     vi.fn((template: string, params: any) => {
-        // Simulate template interpolation for arithmetic testing
+        // Simulate the interval interpolation used by production log templates.
         if (
             template &&
             typeof template === "string" &&
@@ -64,7 +56,7 @@ vi.mock("../../../shared/utils/logger", () => ({
     default: mockLogger,
 }));
 
-describe("MonitorManager arithmetic mutations", () => {
+describe("MonitorManager interval logging", () => {
     let manager: MonitorManager;
     let mockDependencies: any;
     let mockEnhancedServices: any;
@@ -72,7 +64,7 @@ describe("MonitorManager arithmetic mutations", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Reset template interpolation mock to return seconds value for testing
+        // Reset template interpolation mock to return the seconds value.
         mockInterpolateLogTemplate.mockImplementation(
             (template: string, params: any) => {
                 if (
@@ -158,8 +150,8 @@ describe("MonitorManager arithmetic mutations", () => {
         manager = new MonitorManager(mockDependencies, mockEnhancedServices);
     });
 
-    describe("DEFAULT_CHECK_INTERVAL / 1000 division for seconds conversion", () => {
-        it("should correctly convert 300000ms to 300s (kills / -> * mutation)", async () => {
+    describe("DEFAULT_CHECK_INTERVAL seconds conversion", () => {
+        it("should log 300000ms defaults as 300s", async () => {
             // Arrange: Create a site with monitors that will trigger interval app
             const testSite: Site = {
                 identifier: "test-site",
@@ -201,17 +193,15 @@ describe("MonitorManager arithmetic mutations", () => {
                 })
             );
 
-            // Mutation (/ 1000 -> * 1000) would yield 300_000_000 (300000ms * 1000 = 300_000_000s = massive value)
             expect(mockInterpolateLogTemplate).not.toHaveBeenCalledWith(
                 expect.anything(),
                 expect.objectContaining({
-                    interval: 300_000_000, // Ensure mutation doesn't produce this value
+                    interval: 300_000_000,
                 })
             );
         });
 
-        it("should handle custom intervals correctly (300000ms -> 300s)", async () => {
-            // Test with a different interval to ensure the arithmetic is working correctly
+        it("should log defaulted intervals consistently for different monitors", async () => {
             const testSite: Site = {
                 identifier: "custom-site",
                 name: "Custom Site",
@@ -241,17 +231,16 @@ describe("MonitorManager arithmetic mutations", () => {
 
             await manager.setupSiteForMonitoring(testSite);
 
-            // The division should still use DEFAULT_CHECK_INTERVAL (300000) not customInterval
             expect(mockInterpolateLogTemplate).toHaveBeenCalledWith(
                 expect.anything(),
                 expect.objectContaining({
-                    interval: 300, // Still DEFAULT_CHECK_INTERVAL / 1000
+                    interval: 300,
                     monitorId: "custom-monitor",
                 })
             );
         });
 
-        it("should log seconds value in reasonable range (kills extreme mutation values)", async () => {
+        it("should log the default interval in a reasonable seconds range", async () => {
             const testSite: Site = {
                 identifier: "range-test",
                 name: "Range Test",
@@ -300,9 +289,8 @@ describe("MonitorManager arithmetic mutations", () => {
             // Specifically, DEFAULT_CHECK_INTERVAL / 1000 = 300000 / 1000 = 300
             expect(loggedInterval).toBe(300);
 
-            // Ensure mutations don't produce unreasonable values
-            expect(loggedInterval).not.toBe(60_000_000); // / -> * mutation
-            expect(loggedInterval).not.toBe(0.06); // / -> * 1000000 hypothetical mutation
+            expect(loggedInterval).not.toBe(60_000_000);
+            expect(loggedInterval).not.toBe(0.06);
         });
     });
 });
