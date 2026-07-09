@@ -46,7 +46,7 @@ vi.mock("../../utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn((fn) => fn()),
 }));
 
-describe("SettingsRepository Coverage Tests", () => {
+describe("SettingsRepository operations", () => {
     let mockDb: any;
     let mockDatabaseService: any;
     let mockStatement: any;

@@ -49,7 +49,7 @@ interface MockDb {
 let mockDatabaseService: MockDatabaseService;
 let mockDb: MockDb;
 
-describe("MonitorRepository simple orchestration", () => {
+describe("MonitorRepository orchestration", () => {
     beforeEach(() => {
         mockDb = {
             prepare: vi.fn(() => ({

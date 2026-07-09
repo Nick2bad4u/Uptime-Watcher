@@ -88,7 +88,7 @@ vi.mock("node:path", () => {
     };
 });
 
-describe("DatabaseService Coverage Tests", () => {
+describe("DatabaseService lifecycle and transaction behavior", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });

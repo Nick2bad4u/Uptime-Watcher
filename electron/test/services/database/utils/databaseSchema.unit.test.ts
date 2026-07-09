@@ -37,7 +37,7 @@ const createMockSchemaVersionDatabase = (
     run: vi.fn<Database["run"]>(() => RUN_RESULT),
 });
 
-describe("Database Schema", () => {
+describe("Database schema unit behavior", () => {
     const maliciousInputs = [
         "'; DROP TABLE monitors; --",
         "' OR '1'='1",
