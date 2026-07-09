@@ -25,6 +25,15 @@ function createHistory(partial: Partial<StatusHistory> = {}): StatusHistory {
     };
 }
 
+function createHistoryCandidate(
+    partial: Partial<Record<keyof StatusHistory, unknown>> = {}
+): Record<string, unknown> {
+    return {
+        ...createHistory(),
+        ...partial,
+    };
+}
+
 function createMonitor(partial: Partial<Monitor> = {}): Monitor {
     return {
         activeOperations: [],
@@ -41,12 +50,30 @@ function createMonitor(partial: Partial<Monitor> = {}): Monitor {
     };
 }
 
+function createMonitorCandidate(
+    partial: Partial<Record<keyof Monitor, unknown>> = {}
+): Record<string, unknown> {
+    return {
+        ...createMonitor(),
+        ...partial,
+    };
+}
+
 function createSite(partial: Partial<Site> = {}): Site {
     return {
         identifier: "site-1",
         monitoring: true,
         monitors: [createMonitor()],
         name: "Example",
+        ...partial,
+    };
+}
+
+function createSiteCandidate(
+    partial: Partial<Record<keyof Site, unknown>> = {}
+): Record<string, unknown> {
+    return {
+        ...createSite(),
         ...partial,
     };
 }
@@ -102,20 +129,21 @@ describe("siteSnapshots", () => {
         expect(
             isMonitorSnapshot(createMonitor({ history: [createHistory()] }))
         ).toBeTruthy();
-        expect(
-            isMonitorSnapshot(createMonitor({ history: [{} as any] }))
-        ).toBeFalsy();
+        expect(isMonitorSnapshot(createMonitorCandidate({ history: [{}] })))
+            .toBeFalsy();
 
         for (const invalidHistory of [
             createHistory({ responseTime: -2 }),
             createHistory({ responseTime: 10.5 }),
-            createHistory({ status: "pending" as any }),
+            createHistoryCandidate({ status: "pending" }),
             createHistory({ timestamp: -1 }),
             createHistory({ timestamp: 1.5 }),
             createHistory({ timestamp: MAX_VALID_DATE_EPOCH_MS + 1 }),
         ]) {
             expect(
-                isMonitorSnapshot(createMonitor({ history: [invalidHistory] }))
+                isMonitorSnapshot(
+                    createMonitorCandidate({ history: [invalidHistory] })
+                )
             ).toBeFalsy();
         }
     });
@@ -126,11 +154,7 @@ describe("siteSnapshots", () => {
 
         // Exercise the invalid-status branch while other fields are present.
         expect(
-            isMonitorSnapshot(
-                createMonitor({
-                    status: "not-a-status" as any,
-                })
-            )
+            isMonitorSnapshot(createMonitorCandidate({ status: "not-a-status" }))
         ).toBeFalsy();
 
         for (const responseTime of [-2, 10.5]) {
@@ -151,7 +175,7 @@ describe("siteSnapshots", () => {
         }
 
         expect(
-            isMonitorSnapshot(createMonitor({ type: "unknown-type" as any }))
+            isMonitorSnapshot(createMonitorCandidate({ type: "unknown-type" }))
         ).toBeFalsy();
 
         expect(isSiteSnapshot(createSite())).toBeTruthy();
@@ -160,9 +184,7 @@ describe("siteSnapshots", () => {
         // Exercise the monitors.every(...) false branch.
         expect(
             isSiteSnapshot(
-                createSite({
-                    monitors: [createMonitor(), { id: "bad" } as any],
-                })
+                createSiteCandidate({ monitors: [createMonitor(), { id: "bad" }] })
             )
         ).toBeFalsy();
     });
@@ -260,7 +282,7 @@ describe("siteSnapshots", () => {
         // Cover invalid status branch (should produce no overlay).
         expect(
             mergeMonitorSnapshots(canonical, {
-                status: "not-a-status" as any,
+                status: "not-a-status",
             })
         ).toBe(canonical);
     });
@@ -283,8 +305,8 @@ describe("siteSnapshots", () => {
 
         const mergedWithInvalidHistory = mergeMonitorSnapshots(canonical, {
             history: [
-                createHistory({
-                    status: "not-a-history-status" as any,
+                createHistoryCandidate({
+                    status: "not-a-history-status",
                 }),
             ],
         });
