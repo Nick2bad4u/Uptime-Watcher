@@ -17,6 +17,7 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 import { RowValidationUtils } from "@shared/types/database";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { safeStringify } from "@shared/utils/stringConversion";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
@@ -135,7 +136,7 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
                 details:
                     typeof row.details === "string"
                         ? row.details
-                        : JSON.stringify(row.details),
+                        : safeStringify(row.details),
             }),
             responseTime: safeNumber(row.responseTime, 0),
             status: validateStatus(row.status),

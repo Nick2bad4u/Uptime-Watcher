@@ -127,7 +127,7 @@ describe(rowToHistoryEntry, () => {
         });
     });
 
-    it("logs and rethrows serialization failures", async ({
+    it("falls back for unserializable non-string details", async ({
         annotate,
         task,
     }) => {
@@ -144,13 +144,12 @@ describe(rowToHistoryEntry, () => {
             timestamp: TEST_TIMESTAMP,
         } as unknown as DatabaseHistoryRow;
 
-        expect(() => rowToHistoryEntry(row)).toThrow(TypeError);
-        expect(logger.error).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.any(TypeError),
-            expect.objectContaining({
-                row,
-            })
-        );
+        expect(rowToHistoryEntry(row)).toEqual({
+            details: "[Complex Object]",
+            responseTime: 100,
+            status: "up",
+            timestamp: TEST_TIMESTAMP,
+        });
+        expect(logger.error).not.toHaveBeenCalled();
     });
 });
