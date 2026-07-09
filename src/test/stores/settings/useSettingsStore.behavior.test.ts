@@ -1,8 +1,7 @@
 // Import mocked modules
 import { withErrorHandling } from "@shared/utils/errorHandling";
 /**
- * Targeted tests for useSettingsStore uncovered lines (75, 207-228). Focuses
- * specifically on error scenarios and edge cases.
+ * Tests useSettingsStore error scenarios and edge cases.
  *
  * Verifies:
  *
@@ -101,7 +100,7 @@ const mockElectronAPI = {
 
 let restoreElectronApi: (() => void) | undefined;
 
-describe("useSettingsStore - Targeted Coverage", () => {
+describe("useSettingsStore behavior", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -303,7 +302,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
         });
     });
 
-    describe("Edge Cases for Complete Coverage", () => {
+    describe("Edge Cases for Behavior", () => {
         it("should handle syncFromBackend edge cases", async ({
             task,
             annotate,

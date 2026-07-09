@@ -1,5 +1,5 @@
 /**
- * @file Coverage tests for the `StatusSubscriptionIndicator` component.
+ * @file Behavior tests for the `StatusSubscriptionIndicator` component.
  */
 
 import type { ReactNode } from "react";
@@ -167,7 +167,7 @@ vi.mock("../../stores/sites/useSitesStore", () => {
     return { useSitesStore: useSitesStoreMock };
 });
 
-describe("StatusSubscriptionIndicator coverage", () => {
+describe("StatusSubscriptionIndicator behavior", () => {
     beforeEach(() => {
         themedButtonInvocations.length = 0;
         siteStoreState.summary = undefined;

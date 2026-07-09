@@ -1,5 +1,5 @@
 /**
- * @file Coverage-oriented tests for header-oriented UI components.
+ * @file Behavior tests for header-oriented UI components.
  */
 
 import type { HTMLAttributes, ReactNode } from "react";

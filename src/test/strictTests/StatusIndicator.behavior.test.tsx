@@ -1,5 +1,5 @@
 /**
- * @file Coverage tests for the themed StatusIndicator component.
+ * @file Behavior tests for the themed StatusIndicator component.
  */
 
 import { render, screen } from "@testing-library/react";
@@ -57,7 +57,7 @@ const statusUtilsMock = vi.hoisted(() => ({
 
 vi.mock("../../utils/status", () => statusUtilsMock);
 
-describe("StatusIndicator coverage", () => {
+describe("StatusIndicator behavior", () => {
     beforeEach(() => {
         themeMock.getStatusColor.mockClear();
         statusUtilsMock.formatStatusLabel.mockClear();

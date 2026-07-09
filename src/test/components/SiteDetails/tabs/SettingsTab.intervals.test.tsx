@@ -1,7 +1,7 @@
 /**
- * Arithmetic mutation tests for SettingsTab.tsx
+ * Interval and retry arithmetic tests for SettingsTab.tsx
  *
- * Targets arithmetic operations to kill arithmetic operator mutations. These
+ * Verifies arithmetic operations for displayed intervals and retry attempts. These
  * tests ensure proper calculations in interval display, retry calculations, and
  * duration formatting.
  */
@@ -221,7 +221,7 @@ const initializeSampledSiteData = () => {
 
 initializeSampledSiteData();
 
-describe("SettingsTab arithmetic mutations", () => {
+describe("SettingsTab interval and retry arithmetic", () => {
     const mockSite: Site = {
         identifier: sampledSiteIdentifier,
         name: sampledSiteName,
@@ -265,8 +265,8 @@ describe("SettingsTab arithmetic mutations", () => {
         localTimeoutSeconds: 30,
     };
 
-    describe("Line 466: Math.round(localCheckIntervalMs / 1000) mutation", () => {
-        it("should correctly convert 60000ms to 60s (kills / -> * mutation)", () => {
+    describe("check interval seconds conversion", () => {
+        it("should correctly convert 60000ms to 60s", () => {
             const props = {
                 ...defaultProps,
                 localCheckIntervalMs: 60_000, // 60000ms should show as 60s
@@ -277,7 +277,7 @@ describe("SettingsTab arithmetic mutations", () => {
             // Remains readable with the new help callout formatting.
             expect(screen.getByText(/Current:\s*60s/v)).toBeInTheDocument();
 
-            // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
+            // Incorrect arithmetic (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
             expect(
                 screen.queryByText(/Currently:\s*60{7}s/v)
             ).not.toBeInTheDocument();
@@ -297,15 +297,15 @@ describe("SettingsTab arithmetic mutations", () => {
                 )
             ).toBeInTheDocument();
 
-            // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
+            // Incorrect arithmetic (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
             expect(
                 screen.queryByText(/Currently:\s*50{5}s/v)
             ).not.toBeInTheDocument();
         });
     });
 
-    describe("Line 561: localRetryAttempts + 1 mutation", () => {
-        it("should calculate total attempts correctly (kills + -> - mutation)", () => {
+    describe("retry attempt total calculation", () => {
+        it("should calculate total attempts correctly", () => {
             const props = {
                 ...defaultProps,
                 localRetryAttempts: 3,
@@ -319,7 +319,7 @@ describe("SettingsTab arithmetic mutations", () => {
                 screen.getByText(/\b4 attempts \+ backoff\./v)
             ).toBeInTheDocument();
 
-            // Mutation (+ 1 -> - 1) would yield 2 attempts which would be incorrect
+            // Incorrect arithmetic (+ 1 -> - 1) would yield 2 attempts which would be incorrect
             expect(
                 screen.queryByText(/2 attempts \+ backoff/v)
             ).not.toBeInTheDocument();
@@ -339,7 +339,7 @@ describe("SettingsTab arithmetic mutations", () => {
                 screen.getByText(/1 attempts \+ backoff/v)
             ).toBeInTheDocument();
 
-            // Mutation (+ 1 -> - 1) would yield -1 attempts which would be incorrect
+            // Incorrect arithmetic (+ 1 -> - 1) would yield -1 attempts which would be incorrect
             expect(
                 screen.queryByText(/-1 attempts \+ backoff/v)
             ).not.toBeInTheDocument();

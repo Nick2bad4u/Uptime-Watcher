@@ -1,10 +1,10 @@
 /**
- * Coverage tests for IPC helper initialization error paths.
+ * Tests IPC helper initialization error paths.
  *
  * @remarks
  * Renderer services initialize IPC helpers at module load time. Those error
  * paths are intentionally hard to hit in normal runtime, but they still need
- * coverage because they are part of our defensive error handling.
+ * behavior because they are part of our defensive error handling.
  */
 
 import { describe, expect, it, vi } from "vitest";

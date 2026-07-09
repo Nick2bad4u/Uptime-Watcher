@@ -1,5 +1,5 @@
 /**
- * @file Coverage tests for the StatusSummary component in the header.
+ * @file Behavior tests for the StatusSummary component in the header.
  */
 
 import type { ReactNode } from "react";
@@ -71,7 +71,7 @@ vi.mock("../../components/Header/HealthIndicator", () => ({
     },
 }));
 
-describe("StatusSummary coverage", () => {
+describe("StatusSummary behavior", () => {
     beforeEach(() => {
         themedTextCalls.length = 0;
         statusIndicatorCalls.length = 0;

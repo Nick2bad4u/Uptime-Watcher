@@ -1,5 +1,5 @@
 /**
- * @file Behavioral coverage tests for the `AddSiteModal` component.
+ * @file Behavioral behavior tests for the `AddSiteModal` component.
  */
 
 import type { ReactNode } from "react";
@@ -63,7 +63,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: themedTextMock.component,
 }));
 
-describe("AddSiteModal coverage", () => {
+describe("AddSiteModal behavior", () => {
     beforeEach(() => {
         themeState.isDark = false;
         addSiteFormMock.lastOnSuccess = undefined;

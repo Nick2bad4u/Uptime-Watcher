@@ -1,10 +1,8 @@
 /**
- * Mutation-specific test for Header component assignment operations
+ * Status count accumulation tests for the Header component
  *
  * @remarks
- * Tests specifically target the AssignmentOperator mutations on lines 125 and
- * 126 of Header.tsx where totalCounts.paused and totalCounts.pending are
- * accumulated
+ * Verifies paused and pending monitor counts are accumulated across sites.
  */
 
 import type { Site } from "@shared/types";
@@ -191,7 +189,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
     };
 };
 
-describe("Header Assignment Operator Mutations", () => {
+describe("Header status count accumulation", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -250,12 +248,7 @@ describe("Header Assignment Operator Mutations", () => {
     });
 
     /**
-     * Test to detect mutation on line 125: `totalCounts.paused +=
-     * siteCounts.paused;` -> `totalCounts.paused -= siteCounts.paused`
-     *
-     * This test verifies that paused monitor counts are properly accumulated
-     * across sites. If the mutation is present (subtracting instead of adding),
-     * the total count will be incorrect.
+     * Verifies paused monitor counts are accumulated across sites.
      */
     it("should properly accumulate paused monitor counts across sites", () => {
         const sitesWithPausedMonitors: Site[] = [
@@ -336,9 +329,9 @@ describe("Header Assignment Operator Mutations", () => {
 
         const { container } = render(<Header />);
 
-        // If mutation is present (subtracting instead of adding), total paused count would be wrong
+        // Total paused count would be wrong.
         // With correct logic: site1 has 2 paused + site2 has 1 paused = 3 total paused
-        // With mutation: site1 has 2 paused - site2 has 1 paused = 1 total paused (wrong)
+        // With subtraction instead of accumulation: site1 has 2 paused - site2 has 1 paused = 1 total paused (wrong)
 
         // The component should render successfully
         expect(container).toBeInTheDocument();
@@ -348,12 +341,7 @@ describe("Header Assignment Operator Mutations", () => {
     });
 
     /**
-     * Test to detect mutation on line 126: `totalCounts.pending +=
-     * siteCounts.pending;` -> `totalCounts.pending -= siteCounts.pending`
-     *
-     * This test verifies that pending monitor counts are properly accumulated
-     * across sites. If the mutation is present (subtracting instead of adding),
-     * the total count will be incorrect.
+     * Verifies pending monitor counts are accumulated across sites.
      */
     it("should properly accumulate pending monitor counts across sites", () => {
         const sitesWithPendingMonitors: Site[] = [
@@ -446,16 +434,16 @@ describe("Header Assignment Operator Mutations", () => {
 
         const { container } = render(<Header />);
 
-        // If mutation is present (subtracting instead of adding), total pending count would be wrong
+        // Total pending count would be wrong.
         // With correct logic: site1 has 3 pending + site2 has 1 pending = 4 total pending
-        // With mutation: site1 has 3 pending - site2 has 1 pending = 2 total pending (wrong)
+        // With subtraction instead of accumulation: site1 has 3 pending - site2 has 1 pending = 2 total pending (wrong)
 
         expect(container).toBeInTheDocument();
         expect(mockUseSitesStore).toHaveBeenCalled();
     });
 
     /**
-     * Test to detect both mutations by testing with multiple sites having both
+     * Test to detect both incorrect accumulations by testing with multiple sites having both
      * paused and pending monitors
      *
      * This test creates a comprehensive scenario that would reveal incorrect
@@ -564,9 +552,9 @@ describe("Header Assignment Operator Mutations", () => {
         // Total paused: site1(1) + site2(1) + site3(0) = 2
         // Total pending: site1(1) + site2(1) + site3(0) = 2
 
-        // With mutations:
-        // If paused mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
-        // If pending mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
+        // With subtraction instead of accumulation:
+        // If paused incorrect accumulation: site1(1) - site2(1) - site3(0) = 0 (wrong)
+        // If pending incorrect accumulation: site1(1) - site2(1) - site3(0) = 0 (wrong)
 
         expect(mockUseSitesStore).toHaveBeenCalled();
     });

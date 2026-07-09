@@ -1,5 +1,5 @@
 /**
- * @file Coverage tests exercising interactive flows in the OverviewTab.
+ * @file Behavior tests exercising interactive flows in the OverviewTab.
  */
 
 import type { Monitor } from "@shared/types";
@@ -141,7 +141,7 @@ vi.mock("../../services/logger", () => ({
     },
 }));
 
-describe("OverviewTab coverage", () => {
+describe("OverviewTab behavior", () => {
     beforeEach(() => {
         availabilityMock.getAvailabilityColor.mockClear();
         availabilityMock.getAvailabilityVariant.mockClear();

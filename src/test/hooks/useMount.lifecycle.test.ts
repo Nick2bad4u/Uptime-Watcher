@@ -19,13 +19,13 @@ vi.mock("../../services/logger", () => ({
 
 const mockLogger = vi.mocked(logger);
 
-describe("useMount - 100% Coverage Tests", () => {
+describe("useMount - lifecycle behavior", () => {
     it("does not re-run mount callback on rerender", async ({
         task,
         annotate,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Component: useMount.lifecycle", "component");
         await annotate("Category: Hook", "category");
         await annotate("Type: Business Logic", "type");
 
@@ -65,7 +65,7 @@ describe("useMount - 100% Coverage Tests", () => {
         annotate,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Component: useMount.lifecycle", "component");
         await annotate("Category: Hook", "category");
         await annotate("Type: Error Handling", "type");
 
@@ -96,7 +96,7 @@ describe("useMount - 100% Coverage Tests", () => {
         annotate,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Component: useMount.lifecycle", "component");
         await annotate("Category: Hook", "category");
         await annotate("Type: Error Handling", "type");
 
@@ -126,7 +126,7 @@ describe("useMount - 100% Coverage Tests", () => {
         annotate,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Component: useMount.lifecycle", "component");
         await annotate("Category: Hook", "category");
         await annotate("Type: Lifecycle", "type");
 

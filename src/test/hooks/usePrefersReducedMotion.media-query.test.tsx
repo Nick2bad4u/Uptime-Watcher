@@ -1,5 +1,5 @@
 /**
- * Focused coverage tests for {@link usePrefersReducedMotion}.
+ * Focused behavior tests for {@link usePrefersReducedMotion}.
  *
  * @remarks
  * Exercises both branches of the media-query guards and verifies that the hook

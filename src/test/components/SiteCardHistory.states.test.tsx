@@ -1,6 +1,6 @@
 /**
- * Branch coverage tests for SiteCardHistory component. These tests specifically
- * target untested conditional branches to improve coverage metrics.
+ * Branch behavior tests for SiteCardHistory component. These tests specifically
+ * target untested conditional branches to improve behavior metrics.
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
@@ -40,7 +40,7 @@ vi.mock("../../components/common/HistoryChart", () => ({
     )),
 }));
 
-describe("SiteCardHistory - Branch Coverage Tests", () => {
+describe("SiteCardHistory - Behavior Tests", () => {
     const mockHistory: StatusHistory[] = [
         {
             status: "up",
@@ -73,12 +73,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -115,12 +115,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -155,12 +155,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -194,12 +194,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     describe("Monitor Type Specific Branches", () => {
         it("should handle HTTP monitor with URL", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -234,12 +234,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -275,12 +275,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -314,12 +314,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
     describe("Props Comparison Function Branches", () => {
         it("should handle different history lengths", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -351,12 +351,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
 
         it("should handle empty history arrays", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -384,12 +384,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -408,12 +408,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -445,12 +445,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
 
         it("should handle different monitor types", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -483,12 +483,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
 
         it("should handle monitor ID differences", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -525,12 +525,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -564,12 +564,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -605,12 +605,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -642,12 +642,12 @@ describe("SiteCardHistory - Branch Coverage Tests", () => {
 
         it("should handle very long monitor URLs", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: SiteCardHistory.branch-coverage", "component");
+            annotate("Component: SiteCardHistory.states", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 

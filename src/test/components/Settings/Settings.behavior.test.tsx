@@ -1,6 +1,6 @@
 /**
- * Tests all conditional branches to improve overall branch coverage. Targets
- * Settings.tsx which currently has 36.36% branch coverage.
+ * Tests all conditional branches to improve overall branch behavior. Targets
+ * Settings.tsx which currently has 36.36% branch behavior.
  *
  * This test file focuses on:
  *
@@ -11,7 +11,7 @@
  * - Button state conditions
  * - User confirmation flows
  *
- * @file Comprehensive branch coverage tests for Settings component
+ * @file Comprehensive branch behavior tests for Settings component
  */
 
 import type { UnknownRecord } from "type-fest";
@@ -116,7 +116,7 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
-describe("Settings - Branch Coverage Tests", () => {
+describe("Settings - Behavior Tests", () => {
     const setSitesStoreState = (
         overrides: Partial<typeof sitesStoreState>
     ): void => {
@@ -241,12 +241,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -262,12 +262,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -285,12 +285,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -322,12 +322,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -343,12 +343,12 @@ describe("Settings - Branch Coverage Tests", () => {
     describe("Settings Validation Branches", () => {
         it("should update allowed settings keys", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Update", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Update", "type");
 
@@ -372,12 +372,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -399,12 +399,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -430,12 +430,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Data Loading", "type");
 
@@ -463,12 +463,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -493,12 +493,12 @@ describe("Settings - Branch Coverage Tests", () => {
 
         it("should handle backup save errors", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -526,12 +526,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -562,12 +562,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -602,12 +602,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -638,12 +638,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -662,12 +662,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -689,12 +689,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -722,12 +722,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -757,12 +757,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
@@ -789,12 +789,12 @@ describe("Settings - Branch Coverage Tests", () => {
     describe("Event Handler Branches", () => {
         it("should handle all checkbox change events", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Event Processing", "type");
 
@@ -839,12 +839,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Configuration", "type");
 
@@ -862,12 +862,12 @@ describe("Settings - Branch Coverage Tests", () => {
 
         it("should handle close button clicks", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -890,12 +890,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -923,12 +923,12 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Backup Operation", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: Settings.branch-coverage", "component");
+            annotate("Component: Settings.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Backup Operation", "type");
 

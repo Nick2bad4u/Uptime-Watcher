@@ -1,5 +1,5 @@
 /**
- * Test to cover remaining uncovered lines in ScreenshotThumbnail component
+ * State and cleanup behavior tests for ScreenshotThumbnail.
  */
 
 import {
@@ -135,7 +135,7 @@ const createMockBoundingClientRect = (overrides = {}) => ({
 
 let restoreElectronApi: (() => void) | undefined;
 
-describe("ScreenshotThumbnail - Complete Coverage", () => {
+describe("ScreenshotThumbnail - Behavior", () => {
     const createProps = (
         overrides: Partial<ScreenshotThumbnailProperties> = {}
     ): ScreenshotThumbnailProperties => ({
@@ -176,7 +176,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         vi.useRealTimers();
     });
 
-    it("should handle cleanup with current timeout and portal removal (lines 60-61, 67-68)", ({
+    it("should handle cleanup with current timeout and portal removal", ({
         task,
         annotate,
     }) => {
@@ -273,7 +273,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
             vi.advanceTimersByTime(500); // Advance past hover delay
         });
 
-        // Unmount should trigger cleanup including portal removal (lines 67-68)
+        // Unmount should trigger cleanup including portal removal.
         act(() => {
             unmount();
         });

@@ -1,7 +1,7 @@
 /**
- * Additional coverage tests for SiteDetailsHeader component
+ * Additional behavior tests for SiteDetailsHeader component
  *
- * Targets uncovered line 72 in the openExternal call
+ * Tests external URL actions from SiteDetailsHeader.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -103,7 +103,7 @@ vi.mock("../../../components/SiteDetails/MonitoringStatusDisplay", () => ({
     ),
 }));
 
-describe("SiteDetailsHeader - Additional Coverage", () => {
+describe("SiteDetailsHeader - Additional Behavior", () => {
     const mockSite: Site = {
         identifier: sampledSiteIdentifier,
         name: sampledSiteName,
@@ -134,14 +134,14 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         mockStoreState.siteDetailsHeaderCollapsedState = {};
     });
 
-    describe("URL Click Handler Coverage (Line 72)", () => {
+    describe("URL click handler behavior", () => {
         it("should call openExternal with proper parameters when URL link is clicked", async ({
             task,
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -149,7 +149,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -171,7 +171,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             const link = screen.getByRole("link");
             await user.click(link);
 
-            // Verify openExternal was called with correct URL (targeting line 72)
+            // Verify openExternal was called with the correct URL.
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
             expect(mockOpenExternal).toHaveBeenCalledWith(sampledMonitorUrl, {
                 siteName: mockSite.name,
@@ -184,7 +184,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -192,15 +192,15 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            // Create a monitor with empty URL (edge case coverage)
+            // Create a monitor with empty URL (edge case behavior)
             const httpMonitorNoUrl: Monitor = {
-                id: "coverage-monitor-no-url",
+                id: "behavior-monitor-no-url",
                 type: "http",
                 url: "", // Empty URL for edge case
                 status: "up",
@@ -232,9 +232,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             const links = screen.queryAllByRole("link");
             expect(links).toHaveLength(0);
 
-            // This test verifies the logic path where empty URL prevents link creation
-            // The actual line 72 (openExternal call) won't be reached without a link to click
-            // This is the correct behavior - no link means no accidental external opens
+            // This test verifies the logic path where empty URL prevents link creation, and openExternal is only reached when a link is rendered and clicked.
         });
 
         it("should call openExternal when clicking link with different site names", async ({
@@ -243,7 +241,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -251,7 +249,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -261,7 +259,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             // Test with a site that has special characters in name
             const httpMonitorSpecial: Monitor = {
-                id: "coverage-monitor-special",
+                id: "behavior-monitor-special",
                 type: "http",
                 url: "https://special-chars.com",
                 status: "up",
@@ -274,7 +272,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             };
 
             const siteSpecial: Site = {
-                identifier: "coverage-site-special",
+                identifier: "behavior-site-special",
                 name: "Test Site & Co. #1",
                 monitors: [],
                 monitoring: true,
@@ -294,7 +292,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             const link = screen.getByRole("link");
             await user.click(link);
 
-            // Verify openExternal was called with correct URL (targeting line 72)
+            // Verify openExternal was called with the correct URL.
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
             expect(mockOpenExternal).toHaveBeenCalledWith(
                 "https://special-chars.com",
@@ -310,7 +308,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -351,7 +349,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -402,7 +400,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -436,7 +434,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -470,7 +468,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -507,7 +505,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");
@@ -535,7 +533,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate(
-                "Component: SiteDetailsHeader.additional-coverage",
+                "Component: SiteDetailsHeader.actions",
                 "component"
             );
             annotate("Category: Component", "category");

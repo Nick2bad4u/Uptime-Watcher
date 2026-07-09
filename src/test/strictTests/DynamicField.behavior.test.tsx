@@ -1,5 +1,5 @@
 /**
- * @file Coverage-focused tests for the `DynamicField` component.
+ * @file Behavior tests for the `DynamicField` component.
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
@@ -96,7 +96,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
     ThemedText: themedTextMock.component,
 }));
 
-describe("DynamicField coverage", () => {
+describe("DynamicField behavior", () => {
     beforeEach(() => {
         textFieldProps.length = 0;
         selectFieldProps.length = 0;

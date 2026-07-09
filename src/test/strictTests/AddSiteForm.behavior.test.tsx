@@ -1,6 +1,6 @@
 /**
- * @file Comprehensive behavioral coverage tests for `AddSiteForm` focusing on
- *   branch-heavy handlers and derived callbacks to improve overall coverage.
+ * @file Comprehensive behavioral behavior tests for `AddSiteForm` focusing on
+ *   branch-heavy handlers and derived callbacks to improve overall behavior.
  */
 
 import type { Site } from "@shared/types";
@@ -381,7 +381,7 @@ const createFormState = (
     return combined;
 };
 
-describe("AddSiteForm behavioral coverage", () => {
+describe("AddSiteForm behavioral behavior", () => {
     beforeEach(() => {
         handleSubmitMock.mockReset();
         handleSubmitMock.mockImplementation(async (_event, payload) => {

@@ -1,5 +1,5 @@
 /**
- * Ensures complete behavioural coverage for {@link toSentenceCase} utility.
+ * Ensures complete behavioural behavior for {@link toSentenceCase} utility.
  *
  * @file Validates edge cases around whitespace, Unicode handling, and empty
  *   input behaviour so that UI bindings relying on sentence cased output remain

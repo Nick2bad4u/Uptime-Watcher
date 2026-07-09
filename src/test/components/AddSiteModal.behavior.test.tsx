@@ -1,10 +1,10 @@
 /**
  * @file Comprehensive tests for AddSiteModal component to improve branch
- *   coverage
+ *   behavior
  *
  * @see Related Component: {@link src/components/AddSiteForm/AddSiteModal.tsx}
  *
- * Test Coverage Focus:
+ * Behavior focus:
  * - Modal visibility toggle branches
  * - Event handler branches
  * - Keyboard escape handling branches
@@ -87,7 +87,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
     ),
 }));
 
-describe("AddSiteModal - Branch Coverage Tests", () => {
+describe("AddSiteModal - Behavior Tests", () => {
     const mockSetShowAddSiteModal = vi.fn();
     const mockUseUIStore = vi.mocked(useUIStore);
     const mockUseTheme = vi.mocked(useTheme);
@@ -238,7 +238,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -274,12 +274,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -314,12 +314,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -362,12 +362,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -429,12 +429,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -456,12 +456,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -483,12 +483,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -506,12 +506,12 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteModal.branch-coverage", "component");
+            annotate("Component: AddSiteModal.behavior", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 

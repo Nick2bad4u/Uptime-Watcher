@@ -1,6 +1,5 @@
 /**
- * Targeted test coverage for useSiteOperations uncovered lines Focuses on
- * specific error handling paths and edge cases
+ * Tests useSiteOperations error handling paths and edge cases.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -122,7 +121,7 @@ const createMockElectronAPI = (mockSiteWithMultipleMonitors: Site) => ({
     },
 });
 
-describe("useSiteOperations - Targeted Coverage", () => {
+describe("useSiteOperations behavior", () => {
     let mockElectronAPI: ReturnType<typeof createMockElectronAPI>;
     let mockSiteDeps: SiteOperationsDependencies;
     let actions: ReturnType<typeof createSiteOperationsActions>;
@@ -301,7 +300,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 "Backup download failed"
             );
 
-            // Verify logger.error was called (lines 147-148)
+            // Verify logger.error was called.
             expect(logger.error).toHaveBeenCalledWith(
                 "Failed to download SQLite backup:",
                 downloadError
@@ -495,7 +494,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
         });
     });
 
-    describe("Branch Coverage Edge Cases", () => {
+    describe("Branch behavior edge cases", () => {
         it("should handle successful monitor removal with successful stop monitoring", async ({
             task,
             annotate,

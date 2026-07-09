@@ -1,9 +1,9 @@
 /**
- * Complete 100% test coverage for useMonitorTypesStore
+ * Complete 100% test behavior for useMonitorTypesStore
  *
- * This test suite provides exhaustive coverage for the MonitorTypesStore,
+ * This test suite provides exhaustive behavior for the MonitorTypesStore,
  * testing all code paths, edge cases, and error scenarios to achieve 100% line,
- * branch, and function coverage.
+ * branch, and function behavior.
  *
  * @remarks
  * This suite specifically targets areas not covered by the existing
@@ -12,7 +12,7 @@
  * - IPC response edge cases and error scenarios
  * - Config filtering with various malformed data types
  * - Error handling wrapper scenarios
- * - State mutation patterns
+ * - Direct setState update patterns
  * - Boundary conditions and race conditions
  * - Logging and action tracking
  * - Complete validation result transformation paths
@@ -116,7 +116,7 @@ const createMonitorTypeConfig = (
     ...(overrides.uiConfig !== undefined && { uiConfig: overrides.uiConfig }),
 });
 
-describe("useMonitorTypesStore - 100% Coverage", () => {
+describe("useMonitorTypesStore - Behavior", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
@@ -572,8 +572,8 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
         });
     });
 
-    describe("State Access and Mutation Edge Cases", () => {
-        it("should handle direct state mutations through setState", async ({
+    describe("State access and setState edge cases", () => {
+        it("should handle direct state updates through setState", async ({
             task,
             annotate,
         }) => {
@@ -584,7 +584,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            // Test direct state mutations
+            // Test direct setState updates.
             act(() => {
                 useMonitorTypesStore.setState({
                     isLoaded: true,
@@ -592,7 +592,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         createMonitorTypeConfig({
                             type: "http",
                             displayName: "Direct",
-                            description: "Direct mutation",
+                            description: "Direct setState update",
                         }),
                     ],
                     fieldConfigs: {

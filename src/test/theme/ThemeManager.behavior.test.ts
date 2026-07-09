@@ -1,6 +1,6 @@
 /**
- * Additional branch coverage tests for ThemeManager.ts Focuses on achieving 98%
- * branch coverage by testing edge cases
+ * Additional branch behavior tests for ThemeManager.ts Focuses on achieving 98%
+ * branch behavior by testing edge cases
  */
 
 import { arrayFirst } from "ts-extras";
@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import ThemeManager - make sure it's the actual class
 import { ThemeManager } from "../../theme/ThemeManager";
 
-describe("ThemeManager - Branch Coverage Completion", () => {
+describe("ThemeManager - Behavior", () => {
     let themeManager: ThemeManager;
 
     beforeEach(() => {
@@ -24,7 +24,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -71,7 +71,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -108,7 +108,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -183,7 +183,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -247,7 +247,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -325,14 +325,14 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         });
     });
 
-    describe("Complete Branch Coverage Scenarios", () => {
+    describe("Branch behavior scenarios", () => {
         it("should exercise all conditional branches in theme application", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");
@@ -391,7 +391,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: ThemeManager.branch-coverage",
+                "Component: ThemeManager.branch-behavior",
                 "component"
             );
             await annotate("Category: Core", "category");

@@ -1,5 +1,5 @@
 /**
- * Focused coverage tests for {@link useOverflowMarquee} to ensure marquee
+ * Focused behavior tests for {@link useOverflowMarquee} to ensure marquee
  * detection logic handles overflow, dependency updates, and lifecycle hooks.
  */
 

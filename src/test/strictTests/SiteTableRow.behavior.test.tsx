@@ -1,5 +1,5 @@
 /**
- * @file Behavioral coverage tests for `SiteTableRow` interaction handlers.
+ * @file Behavioral behavior tests for `SiteTableRow` interaction handlers.
  */
 
 import type { Site } from "@shared/types";
@@ -205,7 +205,7 @@ const renderSiteTableRow = (site: Site = sampleSite): void => {
     );
 };
 
-describe("SiteTableRow interaction coverage", () => {
+describe("SiteTableRow interaction behavior", () => {
     beforeEach(() => {
         statusBadgeMock.props.length = 0;
         monitorSelectorMock.props.length = 0;

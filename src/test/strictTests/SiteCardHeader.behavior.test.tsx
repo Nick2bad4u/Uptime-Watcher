@@ -1,5 +1,5 @@
 /**
- * @file Behavioral coverage tests for the `SiteCardHeader` component.
+ * @file Behavioral behavior tests for the `SiteCardHeader` component.
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -89,7 +89,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
     ),
 }));
 
-describe("SiteCardHeader coverage", () => {
+describe("SiteCardHeader behavior", () => {
     const baseMonitor: Monitor = {
         checkInterval: 60_000,
         history: [],

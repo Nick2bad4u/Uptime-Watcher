@@ -1,16 +1,16 @@
 /**
- * @module src/test/stores/error/ErrorBoundary.arithmetic-mutations
+ * @module src/test/stores/error/ErrorBoundary.retry-count
  *
  * These tests target specific arithmetic operations in the ErrorBoundary component
- * to ensure that arithmetic operator mutations (e.g., + to -, * to /) are properly
+ * to ensure that retry count regressions (e.g., + to -, * to /) are properly
  * detected and killed by the test suite.
  *
- * Target mutations:
+ * Target behavior:
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount - 1`
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount * 1`
  * - Line 121: `retryCount: prevState.retryCount + 1` -> `retryCount: prevState.retryCount / 1`
  *
- * @file Arithmetic mutation tests for ErrorBoundary component
+ * @file Retry count behavior tests for ErrorBoundary component
  */
 
 import type { JSX } from "react";
@@ -66,12 +66,12 @@ const MockFallback = ({
     </div>
 );
 
-describe("ErrorBoundary Arithmetic Mutations", () => {
+describe("ErrorBoundary retry count behavior", () => {
     /**
-     * Test the retryCount increment arithmetic to ensure mutations are
+     * Test the retryCount increment arithmetic to ensure regressions are
      * detected.
      *
-     * Target: retryCount: prevState.retryCount + 1 Mutations to kill:
+     * Target: retryCount: prevState.retryCount + 1 Regression examples:
      *
      * - RetryCount: prevState.retryCount - 1 (would cause retryCount to stay the
      *   same or decrease)
