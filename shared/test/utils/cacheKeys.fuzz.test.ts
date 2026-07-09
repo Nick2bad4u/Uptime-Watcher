@@ -22,6 +22,9 @@ const VALID_CACHE_PREFIXES = [
     "site",
     "validation",
 ] as const;
+const VALID_CACHE_PREFIX_SET: ReadonlySet<string> = new Set(
+    VALID_CACHE_PREFIXES
+);
 
 // Create arbitraries for valid cache key parts (no colons, no empty/whitespace-only strings)
 const validCacheKeyPart = fc
@@ -326,9 +329,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                 fc.property(
                     fc
                         .string({ minLength: 1, maxLength: 20 })
-                        .filter(
-                            (s) => !VALID_CACHE_PREFIXES.includes(s as any)
-                        ),
+                        .filter((s) => !VALID_CACHE_PREFIX_SET.has(s)),
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (invalidPrefix, identifier) => {
                         const key = `${invalidPrefix}:${identifier}`;
