@@ -214,7 +214,10 @@ describe("dataSchemas", () => {
             { buffer: new ArrayBuffer(8), fileName: "restore\n.sqlite" },
             { buffer: new ArrayBuffer(8), fileName: "../restore.sqlite" },
             { buffer: new ArrayBuffer(8), fileName: "C:restore.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "restore:ads.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "CON.sqlite" },
             { buffer: new ArrayBuffer(8), fileName: "." },
+            { buffer: new ArrayBuffer(8), fileName: "restore." },
             {
                 buffer: new ArrayBuffer(8),
                 fileName: `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
@@ -305,7 +308,10 @@ describe("dataSchemas", () => {
             "backup\n.sqlite",
             "../backup.sqlite",
             "C:backup.sqlite",
+            "backup:ads.sqlite",
+            "CON.sqlite",
             ".",
+            "backup.",
             `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
         ]) {
             expect(
@@ -334,7 +340,10 @@ describe("dataSchemas", () => {
             "pre-restore\n.sqlite",
             "../pre-restore.sqlite",
             "C:pre-restore.sqlite",
+            "pre-restore:ads.sqlite",
+            "CON.sqlite",
             ".",
+            "pre-restore.",
             `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
         ]) {
             expect(

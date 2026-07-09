@@ -16,6 +16,7 @@ import {
     getNativeArrayBufferByteLength,
     isNativeArrayBuffer,
 } from "@shared/utils/nativeArrayBuffer";
+import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
@@ -31,6 +32,16 @@ const FORBIDDEN_RECORD_KEYS = [
     "constructor",
     "prototype",
 ] as const;
+
+const WINDOWS_RESERVED_FILE_NAME_CHARACTERS = new Set([
+    '"',
+    "*",
+    ":",
+    "<",
+    ">",
+    "?",
+    "|",
+]);
 
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => isNativeArrayBuffer(value),
@@ -54,6 +65,24 @@ const hasAsciiControlCharacter = (value: string): boolean => {
     }
 
     return false;
+};
+
+const hasWindowsReservedFileNameCharacter = (value: string): boolean => {
+    for (const character of value) {
+        if (WINDOWS_RESERVED_FILE_NAME_CHARACTERS.has(character)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+const getFileNameStem = (fileName: string): string => {
+    const extensionIndex = fileName.indexOf(".");
+
+    return extensionIndex === -1
+        ? fileName
+        : fileName.slice(0, extensionIndex);
 };
 
 const createSqliteFileNameSchema = (label: string): z.ZodType<string> =>
@@ -88,6 +117,27 @@ const createSqliteFileNameSchema = (label: string): z.ZodType<string> =>
                 context.addIssue({
                     code: "custom",
                     message: `${label} must be a valid file name`,
+                });
+            }
+
+            if (fileName.endsWith(".")) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not end with a dot`,
+                });
+            }
+
+            if (hasWindowsReservedFileNameCharacter(fileName)) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not contain Windows reserved filename characters`,
+                });
+            }
+
+            if (isWindowsReservedFileBasename(getFileNameStem(fileName))) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not use a Windows reserved device name`,
                 });
             }
 
