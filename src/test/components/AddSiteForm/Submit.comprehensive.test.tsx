@@ -394,6 +394,36 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect.objectContaining({ url: properties.url })
             );
         });
+
+        it("should reject existing-site submissions without a selected site", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: Submit", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Validation", "type");
+
+            const mockEvent = { preventDefault: vi.fn() } as any;
+            const properties = createMockProperties({
+                addMode: "existing",
+                selectedExistingSite: "",
+            });
+
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
+
+            await handleSubmit(mockEvent, properties);
+
+            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(properties.setFormError).toHaveBeenCalledWith(
+                "Please select a site to add the monitor to"
+            );
+            expect(properties.addMonitorToSite).not.toHaveBeenCalled();
+            expect(properties.createSite).not.toHaveBeenCalled();
+            expect(properties.onSuccess).not.toHaveBeenCalled();
+            expect(validationModule.createMonitorObject).not.toHaveBeenCalled();
+        });
     });
 
     describe("Property-Based Form Submission Testing", () => {
