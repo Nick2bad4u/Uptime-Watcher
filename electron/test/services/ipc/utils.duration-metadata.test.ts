@@ -1,6 +1,5 @@
 /**
- * Tests for ArithmeticOperator mutations in electron/services/ipc/utils.ts
- * These tests target specific mutations that survived Stryker testing
+ * Tests for IPC handler duration metadata.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,7 +28,7 @@ vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => true),
 }));
 
-describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => {
+describe("IPC handler duration metadata", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();
@@ -52,7 +51,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
             const result = await withIpcHandler("test-channel", handler);
 
-            // Verify the result includes the correct duration (750ms)
             expect(result).toEqual({
                 success: true,
                 data: "test-result",
@@ -62,7 +60,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 },
             });
 
-            // If mutation (Date.now() + startTime) was applied, we'd get 2750ms instead of 750ms
             expect(result.metadata?.["duration"]).not.toBe(2750);
         });
         it("should calculate duration correctly for failed operations", async () => {
@@ -77,7 +74,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
             const result = await withIpcHandler("test-channel", handler);
 
-            // Verify the error result includes the correct duration (500ms)
             expect(result).toEqual({
                 success: false,
                 error: "Test error",
@@ -87,7 +83,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 },
             });
 
-            // If mutation (Date.now() + startTime) was applied, we'd get 4500ms instead of 500ms
             expect(result.metadata?.["duration"]).not.toBe(4500);
         });
 
@@ -125,7 +120,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 ["param1", "param2"]
             );
 
-            // Verify the result includes the correct duration (300ms)
             expect(result).toEqual({
                 success: true,
                 data: "param-result",
@@ -136,10 +130,8 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 },
             });
 
-            // Verify handler was called with correct parameters
             expect(handler).toHaveBeenCalledWith("param1", "param2");
 
-            // If mutation (Date.now() + startTime) was applied, we'd get 6300ms instead of 300ms
             expect(result.metadata?.["duration"]).not.toBe(6300);
         });
 
@@ -161,7 +153,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 ["param1"]
             );
 
-            // Verify the error result includes the correct duration (600ms)
             expect(result).toEqual({
                 success: false,
                 error: "Param error",
@@ -172,7 +163,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 },
             });
 
-            // If mutation (Date.now() + startTime) was applied, we'd get 8600ms instead of 600ms
             expect(result.metadata?.["duration"]).not.toBe(8600);
         });
 
@@ -189,8 +179,6 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 ["invalid-param"]
             );
 
-            // Verify validation error response doesn't include duration
-            // (since it short-circuits before the main handler execution)
             expect(result).toEqual({
                 success: false,
                 error: "Parameter validation failed: Invalid parameter",
@@ -201,10 +189,8 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
                 },
             });
 
-            // Handler should not have been called due to validation failure
             expect(handler).not.toHaveBeenCalled();
 
-            // No duration should be present in validation failures
             expect(result.metadata).not.toHaveProperty("duration");
         });
     });
