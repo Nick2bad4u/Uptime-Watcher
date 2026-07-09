@@ -307,9 +307,9 @@ describe("Shared Validation Utils", () => {
                     "invalid",
                 ])
             ).toBeFalsy();
-            expect(isValidIdentifierArray(["test", null as any])).toBeFalsy();
-            expect(isValidIdentifierArray([123 as any])).toBeFalsy();
-            expect(isValidIdentifierArray("not-array" as any)).toBeFalsy();
+            expect(isValidIdentifierArray(["test", null])).toBeFalsy();
+            expect(isValidIdentifierArray([123])).toBeFalsy();
+            expect(isValidIdentifierArray("not-array")).toBeFalsy();
             expect(isValidIdentifierArray(null)).toBeFalsy();
         });
     });
