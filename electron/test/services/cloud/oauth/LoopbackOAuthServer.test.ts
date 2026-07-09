@@ -199,6 +199,52 @@ describe(startLoopbackOAuthServer, () => {
         }
     });
 
+    it.each([
+        [
+            "state",
+            "code=authorization-code&state=expected-state&state=wrong-state",
+        ],
+        [
+            "code",
+            "code=authorization-code&code=second-code&state=expected-state",
+        ],
+        [
+            "error_description",
+            "state=expected-state&error=access_denied&error_description=denied&error_description=second",
+        ],
+    ])(
+        "rejects callbacks with duplicate %s parameters",
+        async (parameterName, queryString) => {
+            const server = await startLoopbackOAuthServer({
+                port: 0,
+                redirectHost: "127.0.0.1",
+                redirectPath: "/oauth2/callback",
+            });
+
+            try {
+                const callbackPromise = server.waitForCallback({
+                    expectedState: "expected-state",
+                    timeoutMs: 1000,
+                });
+
+                const callbackUrl = new URL(server.redirectUri);
+                callbackUrl.search = queryString;
+
+                const response = await requestUrl(callbackUrl.toString());
+
+                expect(response.statusCode).toBe(400);
+                expect(response.body).toContain(
+                    "Invalid callback parameters."
+                );
+                await expect(callbackPromise).rejects.toThrow(
+                    `OAuth callback parameter '${parameterName}' must appear at most once`
+                );
+            } finally {
+                await closeServer(server);
+            }
+        }
+    );
+
     it("rejects buffered provider error callbacks with mismatched state as state mismatches", async () => {
         const server = await startLoopbackOAuthServer({
             port: 0,

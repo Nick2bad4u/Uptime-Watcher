@@ -31,6 +31,12 @@ export const DEFAULT_OAUTH_LOOPBACK_PATH = "/oauth2/callback";
 
 const LOOPBACK_HOSTS = ["127.0.0.1", "::1"] as const;
 const MAX_CALLBACK_ERROR_DETAIL_CHARS = 300;
+const OAUTH_CALLBACK_SINGLE_VALUE_PARAMETERS = [
+    "code",
+    "error",
+    "error_description",
+    "state",
+] as const;
 
 const ignoreServerCloseError = (): void => undefined;
 
@@ -227,11 +233,25 @@ function parseCallbackWithExpectedPath(
     readonly code: null | string;
     readonly error: null | string;
     readonly errorDescription: null | string;
+    readonly parameterError: null | string;
     readonly pathOk: boolean;
     readonly state: null | string;
 } {
     const url = new URL(request.url ?? "/", "http://localhost");
     const isPathOk = url.pathname === expectedPath;
+
+    for (const parameterName of OAUTH_CALLBACK_SINGLE_VALUE_PARAMETERS) {
+        if (url.searchParams.getAll(parameterName).length > 1) {
+            return {
+                code: null,
+                error: null,
+                errorDescription: null,
+                parameterError: `OAuth callback parameter '${parameterName}' must appear at most once`,
+                pathOk: isPathOk,
+                state: null,
+            };
+        }
+    }
 
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
@@ -242,6 +262,7 @@ function parseCallbackWithExpectedPath(
         code,
         error,
         errorDescription,
+        parameterError: null,
         pathOk: isPathOk,
         state,
     };
@@ -354,6 +375,20 @@ export async function startLoopbackOAuthServer(args?: {
                     statusCode: 404,
                     title: "Uptime Watcher OAuth",
                 });
+                return;
+            }
+
+            if (parsed.parameterError) {
+                writeHtml(response, {
+                    body: "Invalid callback parameters.",
+                    statusCode: 400,
+                    title: "Authorization failed",
+                });
+
+                rejectOrBufferCallbackError(
+                    new Error(parsed.parameterError),
+                    parsed.state
+                );
                 return;
             }
 
