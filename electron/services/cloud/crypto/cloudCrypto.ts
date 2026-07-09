@@ -47,7 +47,7 @@ export function decryptBuffer(args: {
     }
 
     const minimumLength =
-        MAGIC.length + 1 + IV_LENGTH_BYTES + TAG_LENGTH_BYTES + 1;
+        MAGIC.length + 1 + IV_LENGTH_BYTES + TAG_LENGTH_BYTES;
     if (payload.length < minimumLength) {
         throw new Error("Encrypted payload is truncated");
     }

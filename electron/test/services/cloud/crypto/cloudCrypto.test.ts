@@ -39,6 +39,19 @@ describe("cloudCrypto", () => {
         expect(decrypted.toString("utf8")).toBe("hello world");
     });
 
+    it("round-trips empty plaintext buffers", async () => {
+        const salt = generateEncryptionSalt();
+        const key = await derivePassphraseKey({
+            passphrase: "p@ssw0rd",
+            salt,
+        });
+
+        const encrypted = encryptBuffer({ key, plaintext: Buffer.alloc(0) });
+
+        expect(isEncryptedPayload(encrypted)).toBeTruthy();
+        expect(decryptBuffer({ key, ciphertext: encrypted })).toHaveLength(0);
+    });
+
     it("key-check validates correct key and rejects wrong key", async () => {
         const salt = generateEncryptionSalt();
         const key = await derivePassphraseKey({ passphrase: "secret", salt });
