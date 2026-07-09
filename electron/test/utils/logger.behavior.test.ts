@@ -19,18 +19,18 @@ vi.mock("electron-log/main", () => ({
     default: logMocks,
 }));
 
-describe("Logger Targeted Coverage", () => {
+describe("Logger transports", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    describe("logger transports", () => {
+    describe("log forwarding", () => {
         it("forwards backend logger methods with the backend prefix", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-targeted", "component");
+            await annotate("Component: logger", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -56,7 +56,7 @@ describe("Logger Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-targeted", "component");
+            await annotate("Component: logger", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -79,7 +79,7 @@ describe("Logger Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-targeted", "component");
+            await annotate("Component: logger", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -96,7 +96,7 @@ describe("Logger Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-targeted", "component");
+            await annotate("Component: logger", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -129,7 +129,7 @@ describe("Logger Targeted Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: logger-targeted", "component");
+            await annotate("Component: logger", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 

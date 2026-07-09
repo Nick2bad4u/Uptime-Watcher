@@ -435,6 +435,42 @@ describe("Operational Hooks", () => {
                 })
             );
         });
+        it("continues the wrapped operation when lifecycle event emission fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockRejectedValue(new Error("emit failed")),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            const result = await withOperationalHooks(async () => "success", {
+                emitEvents: true,
+                eventEmitter,
+                maxRetries: 1,
+                operationName: "event-emitter-failure",
+            });
+
+            expect(result).toBe("success");
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "start",
+                    operation: "event-emitter-failure:started",
+                })
+            );
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "success",
+                    operation: "event-emitter-failure:completed",
+                })
+            );
+        });
         it("should skip accessor-backed context metadata without invoking getters", async ({
             task,
             annotate,
