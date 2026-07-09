@@ -5,7 +5,7 @@
 
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import { ErrorBoundary } from "../../../stores/error/ErrorBoundary";
@@ -42,6 +42,18 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 describe(ErrorBoundary, () => {
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+        consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockReturnValue(undefined);
+    });
+
+    afterEach(() => {
+        consoleErrorSpy.mockRestore();
+    });
+
     describe("Normal Operation", () => {
         it("should render children when there are no errors", ({
             task,
