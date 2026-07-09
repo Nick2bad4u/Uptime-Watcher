@@ -135,7 +135,6 @@ const getWasmSourcePath = (): string => {
     // Check primary location (assets directory)
     const resolvedPrimaryPath = resolveAssetPath(primaryPath);
     if (assetPathExists(resolvedPrimaryPath)) {
-        console.log(pc.green(`[WASM] ✅ Found SQLite WASM at ${primaryPath}`));
         return primaryPath;
     }
 
