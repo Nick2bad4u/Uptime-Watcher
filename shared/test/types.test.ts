@@ -21,8 +21,6 @@ import {
     SITE_STATUS_VALUES,
     validateMonitor,
 } from "../types";
-// Import namespace for function coverage validation
-import * as types from "../types";
 
 describe(isComputedSiteStatus, () => {
     it("should return true for 'mixed' status", async ({ task, annotate }) => {
@@ -782,45 +780,5 @@ describe(validateMonitor, () => {
 
         monitor.checkInterval = Infinity;
         expect(validateMonitor(monitor)).toBeFalsy();
-    });
-});
-
-// Function Coverage Validation: Ensure all exported functions are called for coverage
-describe("Function Coverage Validation", () => {
-    it("should call all exported functions to ensure 100% function coverage", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Export Operation", "type");
-
-        // Explicitly call each exported function to register coverage
-        expect(typeof types.isComputedSiteStatus).toBe("function");
-        expect(typeof types.isMonitorStatus).toBe("function");
-        expect(typeof types.isSiteStatus).toBe("function");
-        expect(typeof types.validateMonitor).toBe("function");
-
-        // Call functions with valid inputs to ensure they execute
-        types.isComputedSiteStatus("mixed");
-        types.isMonitorStatus("up");
-        types.isSiteStatus("up");
-
-        // Create a valid monitor for testing validateMonitor
-        const validMonitor: Partial<Monitor> = {
-            id: "test",
-            type: "http",
-            status: "up",
-            monitoring: true,
-            responseTime: 100,
-            checkInterval: 60_000,
-            timeout: 5000,
-            retryAttempts: 3,
-            lastChecked: new Date(),
-            history: [],
-            url: "https://example.com",
-        };
-        types.validateMonitor(validMonitor);
     });
 });

@@ -2,12 +2,9 @@
  * Comprehensive test suite for cacheKeys utility functions
  *
  * Tests all cache key generation functions, validation utilities, and parsing
- * functions to ensure 100% function coverage and consistent cache key
- * patterns.
+ * functions to ensure consistent cache key patterns.
  */
 
-// Import all exports for function coverage validation
-import * as cacheKeysModule from "@shared/utils/cacheKeys";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -18,98 +15,6 @@ import {
 } from "../../utils/cacheKeys.js";
 
 describe("cacheKeys", () => {
-    describe("Function Coverage Validation", () => {
-        it("should call all exported functions to ensure 100% function coverage", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: cacheKeys", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Export Operation", "type");
-
-            // Verify all functions are accessible through namespace import
-            expect(typeof cacheKeysModule.isStandardizedCacheKey).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.parseCacheKey).toBe("function");
-            expect(cacheKeysModule.CacheKeys).toBeDefined();
-
-            // Test all CacheKeys nested functions for coverage
-            expect(typeof cacheKeysModule.CacheKeys.config.byName).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.config.validation).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.monitor.byId).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.monitor.bySite).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.monitor.operation).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.site.byIdentifier).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.site.bulkOperation).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.site.loading).toBe(
-                "function"
-            );
-            expect(typeof cacheKeysModule.CacheKeys.validation.byType).toBe(
-                "function"
-            );
-            expect(
-                typeof cacheKeysModule.CacheKeys.validation.monitorType
-            ).toBe("function");
-
-            // Call core functions to register coverage
-            const testKey = "config:test-key" as StandardizedCacheKey;
-            expect(
-                cacheKeysModule.isStandardizedCacheKey(testKey)
-            ).toBeTruthy();
-
-            const parsed = cacheKeysModule.parseCacheKey(testKey);
-            expect(parsed.prefix).toBe("config");
-            expect(parsed.identifier).toBe("test-key");
-
-            // Call all CacheKeys functions to register coverage
-            expect(cacheKeysModule.CacheKeys.config.byName("test")).toBe(
-                "config:test"
-            );
-            expect(cacheKeysModule.CacheKeys.config.validation("test")).toBe(
-                "config:validation:test"
-            );
-            expect(cacheKeysModule.CacheKeys.monitor.byId("test")).toBe(
-                "monitor:test"
-            );
-            expect(cacheKeysModule.CacheKeys.monitor.bySite("test")).toBe(
-                "monitor:site:test"
-            );
-            expect(cacheKeysModule.CacheKeys.monitor.operation("test")).toBe(
-                "monitor:operation:test"
-            );
-            expect(cacheKeysModule.CacheKeys.site.byIdentifier("test")).toBe(
-                "site:test"
-            );
-            expect(cacheKeysModule.CacheKeys.site.bulkOperation()).toBe(
-                "site:bulk"
-            );
-            expect(cacheKeysModule.CacheKeys.site.loading("test")).toBe(
-                "site:loading:test"
-            );
-            expect(
-                cacheKeysModule.CacheKeys.validation.byType("monitor", "test")
-            ).toBe("validation:monitor:test");
-            expect(
-                cacheKeysModule.CacheKeys.validation.monitorType("http")
-            ).toBe("validation:monitor-type:http");
-        });
-    });
     describe("CacheKeys.config", () => {
         describe("byName", () => {
             it("should generate cache key for configuration by name", async ({
