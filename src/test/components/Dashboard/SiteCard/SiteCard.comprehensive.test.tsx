@@ -27,28 +27,9 @@ vi.mock("../../../../theme/components", async (importOriginal) => {
     };
 });
 
-// Mock the SiteCard components
-vi.mock("../SiteCardHeader", () => ({
-    SiteCardHeader: () => (
-        <div data-testid="site-card-header">
-            Site Header <div data-testid="site-card-footer">Site Footer</div>
-        </div>
-    ),
-}));
-
-vi.mock("../SiteCardStatus", () => ({
-    SiteCardStatus: () => <div data-testid="site-card-status">Site Status</div>,
-}));
-
-vi.mock("../SiteCardHistory", () => ({
+vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: () => (
         <div data-testid="site-card-history">Site History</div>
-    ),
-}));
-
-vi.mock("../SiteCardMetrics", () => ({
-    SiteCardMetrics: () => (
-        <div data-testid="site-card-metrics-content">Site Metrics</div>
     ),
 }));
 
@@ -107,6 +88,9 @@ vi.mock("../../../../hooks/site/useSite", () => ({
             isMonitoring: true,
 
             // Event handlers (mocked)
+            handleCardClick: vi.fn(),
+            handleCheckNow: vi.fn(),
+            handleMonitorIdChange: vi.fn(),
             handleStartMonitoring: vi.fn(),
             handleStartSiteMonitoring: vi.fn(),
             handleStopMonitoring: vi.fn(),
