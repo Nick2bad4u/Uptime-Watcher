@@ -22,6 +22,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
 
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+
 // Import after mocks are set up
 import { DataBackupService } from "../../../services/database/DataBackupService";
 import { createConsistentSnapshot } from "../../../services/database/dataBackupService/snapshot";
@@ -145,6 +147,14 @@ const createMockDatabaseService = () => ({
     close: vi.fn(),
     initialize: vi.fn(),
 });
+
+const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
+
+function createOversizedSqliteBuffer(): Buffer {
+    const buffer = Buffer.alloc(DEFAULT_MAX_BACKUP_SIZE_BYTES + 1);
+    SQLITE_HEADER.copy(buffer);
+    return buffer;
+}
 
 describe(DataBackupService, () => {
     describe("Snapshot hardening", () => {
@@ -981,9 +991,25 @@ describe(DataBackupService, () => {
     describe("restoreDatabaseBackup", () => {
         beforeEach(() => {
             mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-restore");
-            mockFsPromises.lstat.mockResolvedValue({
+            const directoryStat = {
+                isDirectory: () => true,
+                isFile: () => false,
+                isSymbolicLink: () => false,
+            };
+            const fileStat = {
+                isDirectory: () => false,
                 isFile: () => true,
                 isSymbolicLink: () => false,
+            };
+            mockFsPromises.lstat.mockImplementation(async (filePath) => {
+                if (
+                    filePath === "/tmp/mock-restore" ||
+                    filePath === "/test/userdata"
+                ) {
+                    return directoryStat;
+                }
+
+                return fileStat;
             });
             mockFsPromises.writeFile.mockResolvedValue(undefined);
             mockFsPromises.copyFile.mockResolvedValue(undefined);
@@ -1099,14 +1125,43 @@ describe(DataBackupService, () => {
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
             expect(mockDatabaseConstructor).not.toHaveBeenCalled();
         });
+
+        it("rejects oversized SQLite payloads before writing temp files", async () => {
+            const buffer = createOversizedSqliteBuffer();
+
+            await expect(
+                dataBackupService.restoreDatabaseBackup({
+                    buffer,
+                    fileName: "large-restore.sqlite",
+                })
+            ).rejects.toThrow(/exceeds max size/v);
+
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
+        });
     });
 
     describe("applyDatabaseBackupResult", () => {
         beforeEach(() => {
             mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-apply");
-            mockFsPromises.lstat.mockResolvedValue({
+            const directoryStat = {
+                isDirectory: () => true,
+                isFile: () => false,
+                isSymbolicLink: () => false,
+            };
+            const fileStat = {
+                isDirectory: () => false,
                 isFile: () => true,
                 isSymbolicLink: () => false,
+            };
+            mockFsPromises.lstat.mockImplementation(async (filePath) => {
+                if (filePath === "/tmp/mock-apply") {
+                    return directoryStat;
+                }
+
+                return fileStat;
             });
             mockFsPromises.writeFile.mockResolvedValue(undefined);
             mockFsPromises.copyFile.mockResolvedValue(undefined);
@@ -1182,6 +1237,32 @@ describe(DataBackupService, () => {
             await expect(
                 dataBackupService.applyDatabaseBackupResult(backup)
             ).rejects.toThrow(/not a valid SQLite database file/v);
+
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+            expect(mockDatabaseService.initialize).not.toHaveBeenCalled();
+        });
+
+        it("should reject oversized SQLite buffers before writing temp files", async () => {
+            const buffer = createOversizedSqliteBuffer();
+            const backup: DatabaseBackupResult = {
+                buffer,
+                fileName: "large-pre-restore.sqlite",
+                metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "checksum",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/large-pre-restore.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: buffer.length,
+                },
+            };
+
+            await expect(
+                dataBackupService.applyDatabaseBackupResult(backup)
+            ).rejects.toThrow(/exceeds max size/v);
 
             expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();

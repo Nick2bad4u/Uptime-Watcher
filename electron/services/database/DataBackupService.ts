@@ -53,6 +53,24 @@ const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
 // NOTE: File name sanitization is implemented in
 // `dataBackupService/sanitizeBackupFileName`.
 
+function assertRestoreBufferIsValidSqliteBackup(
+    buffer: Buffer,
+    label: "Backup payload" | "Restore payload"
+): void {
+    if (
+        buffer.length < SQLITE_HEADER.length ||
+        !buffer.subarray(0, SQLITE_HEADER.length).equals(SQLITE_HEADER)
+    ) {
+        throw new Error(`${label} is not a valid SQLite database file`);
+    }
+
+    if (buffer.byteLength > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
+        throw new Error(
+            `${label} exceeds max size (${buffer.byteLength} > ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes)`
+        );
+    }
+}
+
 /**
  * Dependencies required to orchestrate database backup workflows.
  */
@@ -438,16 +456,10 @@ export class DataBackupService {
                 let preRestoreSnapshotDir: null | string = null;
 
                 try {
-                    if (
-                        buffer.length < SQLITE_HEADER.length ||
-                        !buffer
-                            .subarray(0, SQLITE_HEADER.length)
-                            .equals(SQLITE_HEADER)
-                    ) {
-                        throw new Error(
-                            "Restore payload is not a valid SQLite database file"
-                        );
-                    }
+                    assertRestoreBufferIsValidSqliteBackup(
+                        buffer,
+                        "Restore payload"
+                    );
 
                     tempDir = await createTempDirectory(RESTORE_TEMP_PREFIX);
                     const incomingFileName = payload.fileName?.trim();
@@ -597,16 +609,10 @@ export class DataBackupService {
             async () => {
                 const normalizedBackup = normalizeBackupResultMetadata(backup);
                 const buffer = Buffer.from(normalizedBackup.buffer);
-                if (
-                    buffer.length < SQLITE_HEADER.length ||
-                    !buffer
-                        .subarray(0, SQLITE_HEADER.length)
-                        .equals(SQLITE_HEADER)
-                ) {
-                    throw new Error(
-                        "Backup payload is not a valid SQLite database file"
-                    );
-                }
+                assertRestoreBufferIsValidSqliteBackup(
+                    buffer,
+                    "Backup payload"
+                );
 
                 const tempDir = await createTempDirectory(ROLLBACK_TEMP_PREFIX);
                 const safeFileName = createSanitizedFileName(
