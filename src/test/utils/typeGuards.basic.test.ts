@@ -1,5 +1,5 @@
 /**
- * Simple utility coverage test with typeGuards imports.
+ * Basic behavior and property tests for type guard utilities.
  */
 
 import { test } from "@fast-check/vitest";
@@ -27,13 +27,13 @@ const nonEmptyArrayArbitrary = fc.array(fc.anything(), {
     maxLength: 20,
 });
 
-describe("TypeGuard Utility Coverage Test", () => {
-    it("should test typeguard functions with specific values", ({
+describe("type guard utility basics", () => {
+    it("should identify properties and arrays for specific values", ({
         task,
         annotate,
     }) => {
         annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: typeguard-utility-test", "component");
+        annotate("Component: typeGuards.basic", "component");
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 

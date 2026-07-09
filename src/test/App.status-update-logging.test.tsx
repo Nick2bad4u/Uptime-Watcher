@@ -1,6 +1,5 @@
 /**
- * Test for App.tsx development logging coverage Targets specific uncovered
- * lines 201-218 in App.tsx
+ * Tests App status update logging behavior in development mode.
  */
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -97,7 +96,7 @@ vi.mock("../theme/useTheme");
 
 const originalMatchMedia = matchMedia;
 
-describe("App Development Logging Coverage", () => {
+describe("App status update logging", () => {
     let mockSettingsStoreState: {
         initializeSettings: ReturnType<typeof vi.fn>;
         resetSettings: ReturnType<typeof vi.fn>;
@@ -218,7 +217,7 @@ describe("App Development Logging Coverage", () => {
         globalThis.matchMedia = originalMatchMedia;
     });
 
-    it("should execute development logging in status updates callback", async ({
+    it("should log status updates in development mode", async ({
         task,
         annotate,
     }) => {
