@@ -210,18 +210,21 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             "handles string float parsing",
             (stringInput, defaultValue) => {
                 const result = safeParseFloat(stringInput, defaultValue);
+                const normalizedDefault = Number.isFinite(defaultValue)
+                    ? defaultValue
+                    : 0;
 
                 if (
                     stringInput === "" ||
                     Number.isNaN(Number.parseFloat(stringInput))
                 ) {
-                    expect(result).toBe(defaultValue);
+                    expect(result).toBe(normalizedDefault);
                 } else {
                     const expected = Number.parseFloat(stringInput);
                     if (Number.isFinite(expected)) {
                         expect(result).toBe(expected);
                     } else {
-                        expect(result).toBe(defaultValue);
+                        expect(result).toBe(normalizedDefault);
                     }
                 }
             }
