@@ -418,8 +418,9 @@ const cleanup = await StateSyncService.onStateSyncEvent((event) => {
 
 #### `openExternal(url: string): Promise<boolean>`
 
-Opens HTTP(S) URLs in the user's default external browser. The call resolves to
-`true` when Electron successfully delegates the navigation request.
+Opens HTTP(S) URLs in the user's default external browser and strict `mailto:`
+URLs in the user's default mail handler. The call resolves to `true` when
+Electron successfully delegates the navigation request.
 
 Under the hood this delegates to the typed `system` preload domain
 (`window.electronAPI.system.openExternal`) via `SystemService`, so renderer
@@ -430,9 +431,14 @@ validation, logging, and consistent error reporting.
 import { SystemService } from "@app/services/SystemService";
 
 await SystemService.openExternal("https://example.com/docs");
+await SystemService.openExternal("mailto:ops@example.com");
 ```
 
-Only `http://` and `https://` URLs are permitted. Supplying another scheme (`ftp://`, `file://`, `javascript:`, etc.) results in a synchronous `TypeError` and the navigation request is blocked before reaching the main process.
+Only `http://`, `https://`, and plain `mailto:` URLs with a valid email address
+are permitted. `mailto:` URLs with query or hash parameters are rejected.
+Supplying another scheme (`ftp://`, `file://`, `javascript:`, etc.) results in a
+synchronous `TypeError` and the navigation request is blocked before reaching
+the main process.
 
 ## 🎭 Event System & Real-time Updates
 
