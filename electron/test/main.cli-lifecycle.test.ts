@@ -1,11 +1,10 @@
 /**
- * Additional tests for main.ts to achieve 98% branch coverage Targets specific
- * uncovered branches and edge cases
+ * Tests for main process command-line logging and startup lifecycle behavior.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Enhanced mocking for missing branches
+// Shared mocks for main process startup branches.
 const mockLog = {
     initialize: vi.fn(),
     transports: {
@@ -92,7 +91,7 @@ vi.mock("../services/application/ApplicationService", () => ({
     }),
 }));
 
-describe("main.ts - Missing Branch Coverage", () => {
+describe("main process CLI and lifecycle behavior", () => {
     let originalArgv: string[];
 
     beforeEach(() => {
@@ -126,7 +125,7 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Command Line Argument Processing", () => {
         it("should handle --debug flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -151,7 +150,7 @@ describe("main.ts - Missing Branch Coverage", () => {
         }, 60_000);
         it("should handle --log-debug flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -179,7 +178,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -204,7 +203,7 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
         it("should handle --log-info flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -232,7 +231,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -263,7 +262,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Data Loading", "type");
 
@@ -286,7 +285,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -314,7 +313,7 @@ describe("main.ts - Missing Branch Coverage", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -336,7 +335,7 @@ describe("main.ts - Missing Branch Coverage", () => {
     describe("Application Lifecycle", () => {
         it("should initialize logger", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
@@ -356,7 +355,7 @@ describe("main.ts - Missing Branch Coverage", () => {
         });
         it("should handle app ready event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.missing-branches", "component");
+            await annotate("Component: main.cli-lifecycle", "component");
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 

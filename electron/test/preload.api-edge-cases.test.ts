@@ -1,6 +1,5 @@
 /**
- * Additional tests for preload.ts to achieve 98% branch coverage Targets IPC
- * error handling and edge cases
+ * Tests for preload bridge API error handling and edge cases.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -23,7 +22,7 @@ vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
 }));
 
-describe("preload.ts - Missing Branch Coverage", () => {
+describe("preload bridge API edge cases", () => {
     let exposedAPI: any;
 
     // Mock site object for testing
@@ -453,7 +452,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: preload.ts - Missing Branch Coverage",
+                "Component: preload.api-edge-cases",
                 "component"
             );
 
@@ -469,7 +468,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
         it("should expose all site API methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: preload.ts - Missing Branch Coverage",
+                "Component: preload.api-edge-cases",
                 "component"
             );
 
@@ -485,7 +484,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: preload.ts - Missing Branch Coverage",
+                "Component: preload.api-edge-cases",
                 "component"
             );
 
