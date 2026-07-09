@@ -367,6 +367,7 @@ describe("Cache Naming Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
+            expect(CACHE_NAMES.temporary("")).toBe("temporary-");
             expect(CACHE_NAMES.temporary("test")).toBe("temporary-test");
             expect(CACHE_NAMES.temporary("backup")).toBe("temporary-backup");
             expect(CACHE_NAMES.temporary("migration")).toBe(
@@ -398,6 +399,7 @@ describe("Cache Naming Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Caching", "type");
 
+            expect(CACHE_NAMES.sites("")).toBe("sites-");
             expect(CACHE_NAMES.sites("temp")).toBe("sites-temp");
             expect(CACHE_NAMES.sites("backup")).toBe("sites-backup");
             expect(CACHE_NAMES.sites("test")).toBe("sites-test");
@@ -427,6 +429,7 @@ describe("Cache Naming Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Caching", "type");
 
+            expect(CACHE_NAMES.monitors("")).toBe("monitors-");
             expect(CACHE_NAMES.monitors("temp")).toBe("monitors-temp");
             expect(CACHE_NAMES.monitors("backup")).toBe("monitors-backup");
             expect(CACHE_NAMES.monitors("test")).toBe("monitors-test");
@@ -456,6 +459,7 @@ describe("Cache Naming Functions", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Caching", "type");
 
+            expect(CACHE_NAMES.settings("")).toBe("settings-");
             expect(CACHE_NAMES.settings("temp")).toBe("settings-temp");
             expect(CACHE_NAMES.settings("backup")).toBe("settings-backup");
             expect(CACHE_NAMES.settings("test")).toBe("settings-test");
