@@ -97,7 +97,7 @@ function buildMonitor<TType extends FixtureKey>(type: TType): Monitor {
     };
 }
 
-describe("MonitorTypeRegistry runtime coverage", () => {
+describe("MonitorTypeRegistry registration behavior", () => {
     it("exposes registered monitor metadata", () => {
         const registers = getRegisteredMonitorTypes();
         expect(registers.length).toBeGreaterThan(0);

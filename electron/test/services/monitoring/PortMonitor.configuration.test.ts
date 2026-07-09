@@ -1,6 +1,5 @@
 /**
- * @file Comprehensive coverage tests for PortMonitor.ts This file addresses
- *   42.37% coverage by testing all public methods and error paths
+ * @file Configuration, validation, and check behavior tests for PortMonitor.
  */
 
 import type { Site } from "@shared/types";
@@ -28,7 +27,7 @@ vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorErrorResult: vi.fn(),
 }));
 
-describe("PortMonitor Coverage Tests", () => {
+describe("PortMonitor configuration and checks", () => {
     let portMonitor: PortMonitor;
 
     const validPortMonitor: Site["monitors"][0] = {
@@ -82,7 +81,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -100,7 +99,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -118,7 +117,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -138,7 +137,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -156,7 +155,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -173,7 +172,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -190,7 +189,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -209,7 +208,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -228,7 +227,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -244,7 +243,7 @@ describe("PortMonitor Coverage Tests", () => {
         it("should merge partial configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -261,7 +260,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -278,7 +277,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -295,7 +294,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -312,7 +311,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -328,7 +327,7 @@ describe("PortMonitor Coverage Tests", () => {
         it("should handle empty config update", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -347,7 +346,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -368,7 +367,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -399,7 +398,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -421,7 +420,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -448,7 +447,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -472,7 +471,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -496,7 +495,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -521,7 +520,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -546,7 +545,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -585,7 +584,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -605,7 +604,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -638,7 +637,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -673,7 +672,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -697,7 +696,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -730,7 +729,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -756,7 +755,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -775,7 +774,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -797,7 +796,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -830,7 +829,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -851,7 +850,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");
@@ -878,7 +877,7 @@ describe("PortMonitor Coverage Tests", () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
-                "Component: PortMonitor-coverage-fixed",
+                "Component: PortMonitor-configuration",
                 "component"
             );
             await annotate("Category: Service", "category");

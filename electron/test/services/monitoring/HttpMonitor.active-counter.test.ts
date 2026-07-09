@@ -1,9 +1,5 @@
 /**
- * Mutation-specific test for HttpMonitor active counter assignment operations
- *
- * @remarks
- * Tests specifically target the AssignmentOperator mutations on lines 101 and
- * 106 of HttpMonitor.ts where active counter is incremented and decremented
+ * @file Active request counter tests for HttpMonitor rate limiting.
  */
 
 import type { Site } from "@shared/types";
@@ -60,7 +56,7 @@ vi.mock("@shared/utils/httpStatusUtils", () => ({
     determineMonitorStatus: vi.fn(),
 }));
 
-describe("HttpMonitor Active Counter Assignment Operations", () => {
+describe("HttpMonitor active request counter", () => {
     let httpMonitor: HttpMonitor;
     let mockAxiosInstance: any;
 
@@ -99,13 +95,8 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
     });
 
     /**
-     * Test to detect mutation on line 101: `this.active += 1;` -> `this.active
-     * -= 1`
-     *
-     * This test verifies that the active counter is properly incremented when
-     * starting a request. If the mutation is present (decrementing instead of
-     * incrementing), the rate limiter will incorrectly manage concurrent
-     * requests.
+     * Verifies that starting a request increments active request accounting so
+     * the rate limiter can manage concurrent checks consistently.
      */
     it("should properly increment active counter when starting request", async () => {
         const { withOperationalHooks } = vi.mocked(
@@ -161,18 +152,14 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         expect(firstResult.status).toBe("up");
         expect(secondResult.status).toBe("up");
 
-        // If the mutation is present (active -= 1 instead of +=), the counter would become negative
-        // and the rate limiting behavior would be broken
+        // The second request should run through the same operational wrapper,
+        // which proves active request accounting did not go negative.
         expect(withOperationalHooks).toHaveBeenCalledTimes(2);
     });
 
     /**
-     * Test to detect mutation on line 106: `this.active -= 1;` -> `this.active
-     * += 1`
-     *
-     * This test verifies that the active counter is properly decremented when
-     * finishing a request. If the mutation is present (incrementing instead of
-     * decrementing), the active counter will grow indefinitely.
+     * Verifies that completed requests decrement active request accounting so
+     * sequential checks do not inherit stale concurrency state.
      */
     it("should properly decrement active counter when request completes", async () => {
         const { withOperationalHooks } = vi.mocked(
@@ -220,18 +207,14 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         expect(secondResult.status).toBe("up");
         expect(thirdResult.status).toBe("up");
 
-        // If the mutation is present (active += 1 instead of -=),
-        // the active counter would keep growing and eventually cause issues
+        // Successful sequential checks prove the active counter is released
+        // after each request.
         expect(withOperationalHooks).toHaveBeenCalledTimes(3);
         expect(resolveCount).toBe(3);
     });
 
     /**
-     * Test to detect both mutations by verifying consistent rate limiting
-     * behavior
-     *
-     * This test creates a scenario where proper counter management is critical
-     * for correct rate limiting behavior.
+     * Verifies consistent active request accounting across concurrent checks.
      */
     it("should maintain correct active counter through multiple concurrent requests", async () => {
         const { withOperationalHooks } = vi.mocked(
@@ -291,7 +274,7 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         expect(maxConcurrentSeen).toBeLessThanOrEqual(5);
         expect(activeRequests).toBe(0); // All should be completed
 
-        // If mutations are present, the counter behavior would be broken
+        // Every concurrent check should still pass through operational hooks.
         expect(withOperationalHooks).toHaveBeenCalledTimes(5);
     });
 });
