@@ -1,8 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-
 import { UI_DELAYS } from "../../constants";
-
-const noop = (): void => undefined;
+import { useDelayedBoolean } from "../../hooks/useDelayedBoolean";
 
 /**
  * Manages the app's delayed loading overlay state.
@@ -15,52 +12,10 @@ export function useDelayedLoadingOverlay(args: {
     readonly isInitialized: boolean;
     readonly isLoading: boolean;
 }): boolean {
-    const [showLoadingOverlay, setShowLoadingOverlay] = useState(false);
-
-    // Create stable callbacks to avoid direct setState in useEffect
-    const clearLoadingOverlay = useCallback(() => {
-        setShowLoadingOverlay(false);
-    }, []);
-    const showLoadingOverlayCallback = useCallback(() => {
-        setShowLoadingOverlay(true);
-    }, []);
-
-    useEffect(
-        function handleDelayedLoadingOverlayEffect(): () => void {
-            // Only proceed if app is initialized
-            if (!args.isInitialized) {
-                return noop;
-            }
-
-            if (!args.isLoading) {
-                // Defer the state update to comply with the project lint rule that
-                // forbids setState calls directly within an effect.
-                const clearTimeoutId = setTimeout(
-                    clearLoadingOverlay,
-                    UI_DELAYS.STATE_UPDATE_DEFER
-                );
-
-                return (): void => {
-                    clearTimeout(clearTimeoutId);
-                };
-            }
-
-            const timeoutId = setTimeout(
-                showLoadingOverlayCallback,
-                UI_DELAYS.LOADING_OVERLAY
-            );
-
-            return (): void => {
-                clearTimeout(timeoutId);
-            };
-        },
-        [
-            args.isInitialized,
-            args.isLoading,
-            clearLoadingOverlay,
-            showLoadingOverlayCallback,
-        ]
-    );
-
-    return showLoadingOverlay;
+    return useDelayedBoolean({
+        clearDelayMs: UI_DELAYS.STATE_UPDATE_DEFER,
+        enabled: args.isInitialized,
+        showDelayMs: UI_DELAYS.LOADING_OVERLAY,
+        value: args.isLoading,
+    });
 }

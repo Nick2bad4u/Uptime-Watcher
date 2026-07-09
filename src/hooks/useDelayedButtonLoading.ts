@@ -25,9 +25,8 @@
  * @public
  */
 
-import { useCallback, useEffect, useState } from "react";
-
 import { UI_DELAYS } from "../constants";
+import { useDelayedBoolean } from "./useDelayedBoolean";
 
 /**
  * Hook that manages delayed button loading states to prevent UI flickering.
@@ -39,45 +38,9 @@ import { UI_DELAYS } from "../constants";
  * @public
  */
 export function useDelayedButtonLoading(isLoading: boolean): boolean {
-    const [showButtonLoading, setShowButtonLoading] = useState(false);
-
-    // Create stable callbacks to avoid direct setState in useEffect
-    const clearButtonLoading = useCallback(() => {
-        setShowButtonLoading(false);
-    }, []);
-    const showButtonLoadingCallback = useCallback(() => {
-        setShowButtonLoading(true);
-    }, []);
-
-    useEffect(
-        function handleDelayedButtonLoading() {
-            if (!isLoading) {
-                // Use timeout to defer state update to avoid direct call in
-                // useEffect
-                const clearTimeoutId = setTimeout(
-                    clearButtonLoading,
-                    UI_DELAYS.STATE_UPDATE_DEFER
-                );
-                return (): void => {
-                    clearTimeout(clearTimeoutId);
-                };
-            }
-
-            const timeoutId = setTimeout(
-                showButtonLoadingCallback,
-                UI_DELAYS.LOADING_BUTTON
-            );
-
-            return (): void => {
-                clearTimeout(timeoutId);
-            };
-        },
-        [
-            clearButtonLoading,
-            isLoading,
-            showButtonLoadingCallback,
-        ]
-    );
-
-    return showButtonLoading;
+    return useDelayedBoolean({
+        clearDelayMs: UI_DELAYS.STATE_UPDATE_DEFER,
+        showDelayMs: UI_DELAYS.LOADING_BUTTON,
+        value: isLoading,
+    });
 }
