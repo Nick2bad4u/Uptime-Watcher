@@ -33,7 +33,6 @@
  * @see {@link EventTriggerType}
  */
 /* eslint-disable @typescript-eslint/no-empty-object-type -- Interface is intentionally augmented in eventTypes.catalogue.*.ts */
-// biome-ignore lint/suspicious/noEmptyInterface: Interface is intentionally augmented in eventTypes.catalogue.*.ts.
 export interface UptimeEvents {}
 /* eslint-enable @typescript-eslint/no-empty-object-type -- Re-enable after augmented event map declaration. */
 

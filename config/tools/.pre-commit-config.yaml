@@ -64,24 +64,6 @@ repos:
       repo: "https://github.com/gitleaks/gitleaks"
       rev: "v8.28.0"
     # ===================================================================
-    #                       🧹 CODE FORMATTING & QUALITY
-    # ===================================================================
-
-    # Biome for JavaScript/TypeScript formatting and linting
-    - hooks:
-          - additional_dependencies: ["@biomejs/biome@2.4.14"]
-            args:
-                - "--config-path"
-                - "config/linting/biome.json"
-                - "--write"
-                - "--unsafe"
-            id: "biome-lint"
-            name: "🟨 typescript/react · Lint & safe fixes"
-            types_or: ["ts", "tsx", "js", "jsx", "json", "jsonc"]
-
-      repo: "https://github.com/biomejs/pre-commit"
-      rev: "v0.9.1"
-    # ===================================================================
     #                      📋 CONFIGURATION VALIDATION
     # ===================================================================
 

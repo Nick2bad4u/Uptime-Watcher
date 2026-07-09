@@ -49,7 +49,6 @@ const knipConfig: KnipConfig = {
         "@commitlint/config-conventional",
         // Invoked as package-script binaries; Knip's dependency graph doesn't
         // connect binary usage back to the owning package dependency.
-        "@biomejs/biome",
         "jscpd",
         "secretlint",
         "yamllint-js",
