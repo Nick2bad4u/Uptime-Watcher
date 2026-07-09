@@ -255,7 +255,7 @@ export function formatRelativeTimestamp(timestamp: number): string {
  *
  * @public
  */
-export function formatResponseTime(time?: number): string {
+export function formatResponseTime(time?: null | number): string {
     if (typeof time !== "number" || !Number.isFinite(time) || time < 0) {
         return UiDefaults.notAvailableLabel;
     }

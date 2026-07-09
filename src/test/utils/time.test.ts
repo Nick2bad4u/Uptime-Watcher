@@ -455,7 +455,7 @@ describe("time Utilities", () => {
 
             expect(formatResponseTime(undefined)).toBe("N/A");
             expect(formatResponseTime()).toBe("N/A");
-            expect(formatResponseTime(null as any)).toBe("N/A");
+            expect(formatResponseTime(null)).toBe("N/A");
             expect(formatResponseTime(Number.NaN)).toBe("N/A");
             expect(formatResponseTime(Infinity)).toBe("N/A");
             expect(formatResponseTime(-Infinity)).toBe("N/A");

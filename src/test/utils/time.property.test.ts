@@ -318,7 +318,7 @@ describe("time Utils Property-Based Tests", () => {
         fcTest.prop([fc.oneof(fc.constant(null), fc.constant(undefined))])(
             "should return fallback for null/undefined values",
             (value) => {
-                const result = formatResponseTime(value as any);
+                const result = formatResponseTime(value);
 
                 expect(result).toBe("N/A");
             }
