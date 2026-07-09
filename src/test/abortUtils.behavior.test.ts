@@ -1,11 +1,3 @@
-/**
- * Comprehensive tests for abortUtils.ts - achieving 100% coverage
- *
- * @file Tests all functions, branches, and edge cases in abortUtils.ts
- *
- * @author GitHub Copilot
- */
-
 import {
     createAbortableOperation,
     createCombinedAbortSignal,
@@ -16,7 +8,11 @@ import {
 } from "@shared/utils/abortUtils";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("abortUtils.ts - Comprehensive Coverage", () => {
+const toRuntimeSignals = (
+    signals: readonly (AbortSignal | null | undefined)[]
+): AbortSignal[] => signals as unknown as AbortSignal[];
+
+describe("abortUtils behavior", () => {
     beforeAll(() => {
         // Mock AbortSignal.timeout and AbortSignal.any for older Node versions
         if (!AbortSignal.timeout) {
@@ -130,11 +126,11 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             const controller = new AbortController();
 
             const signal = createCombinedAbortSignal({
-                additionalSignals: [
+                additionalSignals: toRuntimeSignals([
                     controller.signal,
                     null,
                     undefined,
-                ] as any,
+                ]),
             });
 
             expect(signal).toBeInstanceOf(AbortSignal);
@@ -152,7 +148,7 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
         it("should handle single signal with undefined/null values", () => {
             const signal = createCombinedAbortSignal({
-                additionalSignals: [null, undefined] as any,
+                additionalSignals: toRuntimeSignals([null, undefined]),
             });
 
             expect(signal).toBeInstanceOf(AbortSignal);
