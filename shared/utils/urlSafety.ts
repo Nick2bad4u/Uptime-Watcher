@@ -699,6 +699,74 @@ function parseIpvFourFromMappedIpvSix(mappedHostname: string):
     ];
 }
 
+function ipvFourOctetsFromHextets(
+    high: number,
+    low: number
+): [
+    number,
+    number,
+    number,
+    number,
+] {
+    return [
+        Math.floor(high / 256),
+        high % 256,
+        Math.floor(low / 256),
+        low % 256,
+    ];
+}
+
+function parseIpvSixHextetSequence(hostname: string): null | number[] {
+    if (hostname.includes(".")) {
+        return null;
+    }
+
+    const doubleColonParts = stringSplit(hostname, "::");
+    if (doubleColonParts.length > 2) {
+        return null;
+    }
+
+    const parsePart = (part: string): null | number[] => {
+        if (part.length === 0) {
+            return [];
+        }
+
+        const hextets: number[] = [];
+        for (const rawHextet of stringSplit(part, ":")) {
+            const parsedHextet = parseIpvSixHextet(rawHextet);
+            if (parsedHextet === null) {
+                return null;
+            }
+
+            hextets.push(parsedHextet);
+        }
+
+        return hextets;
+    };
+
+    const [headPart, tailPart] = doubleColonParts;
+    const head = parsePart(headPart ?? "");
+    const tail = parsePart(tailPart ?? "");
+    if (head === null || tail === null) {
+        return null;
+    }
+
+    if (doubleColonParts.length === 1) {
+        return head.length === 8 ? head : null;
+    }
+
+    const missingHextets = 8 - head.length - tail.length;
+    if (missingHextets < 1) {
+        return null;
+    }
+
+    return [
+        ...head,
+        ...Array.from({ length: missingHextets }, () => 0),
+        ...tail,
+    ];
+}
+
 function parseIpvFourFromSixToFourHostname(hostname: string):
     | [
           number,
@@ -725,12 +793,57 @@ function parseIpvFourFromSixToFourHostname(hostname: string):
         return null;
     }
 
-    return [
-        Math.floor(high / 256),
-        high % 256,
-        Math.floor(low / 256),
-        low % 256,
-    ];
+    return ipvFourOctetsFromHextets(high, low);
+}
+
+function parseIpvFourFromNat64Hostname(hostname: string):
+    | [
+          number,
+          number,
+          number,
+          number,
+      ]
+    | null {
+    const hextets = parseIpvSixHextetSequence(hostname);
+    if (!hextets) {
+        return null;
+    }
+
+    const [
+        prefixA,
+        prefixB,
+        prefixC,
+        prefixD,
+        prefixE,
+        prefixF,
+        prefixG,
+        prefixH,
+    ] = hextets;
+
+    if (
+        prefixA === 0x64 &&
+        prefixB === 0xff_9b &&
+        prefixC === 0 &&
+        prefixD === 0 &&
+        prefixE === 0 &&
+        prefixF === 0 &&
+        isDefined(prefixG) &&
+        isDefined(prefixH)
+    ) {
+        return ipvFourOctetsFromHextets(prefixG, prefixH);
+    }
+
+    if (
+        prefixA === 0x64 &&
+        prefixB === 0xff_9b &&
+        prefixC === 1 &&
+        isDefined(prefixD) &&
+        isDefined(prefixE)
+    ) {
+        return ipvFourOctetsFromHextets(prefixD, prefixE);
+    }
+
+    return null;
 }
 
 function isPrivateIpv6(hostname: string): boolean {
@@ -759,6 +872,11 @@ function isPrivateIpv6(hostname: string): boolean {
     // Unique local addresses fc00::/7 (fc.. or fd..)
     if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
         return true;
+    }
+
+    if (normalized.startsWith("64:ff9b:")) {
+        const embedded = parseIpvFourFromNat64Hostname(normalized);
+        return embedded ? isPrivateIpvFourOctets(embedded) : false;
     }
 
     // 6to4 addresses embed an IPv4 address in the second and third hextets.

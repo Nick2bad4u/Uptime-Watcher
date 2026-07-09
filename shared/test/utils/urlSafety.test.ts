@@ -116,6 +116,23 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("2002:0808:0808::")).toBeFalsy();
         });
 
+        it("detects NAT64 hostnames that embed private or special-use IPv4 addresses", () => {
+            expect(isPrivateNetworkHostname("64:ff9b::c0a8:0101")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[64:ff9b::c0a8:101]")).toBeTruthy();
+            expect(isPrivateNetworkHostname("64:ff9b::7f00:0001")).toBeTruthy();
+            expect(isPrivateNetworkHostname("64:ff9b::c000:020a")).toBeTruthy();
+            expect(
+                isPrivateNetworkHostname("64:ff9b:1:c0a8:0101::")
+            ).toBeTruthy();
+            expect(
+                isPrivateNetworkHostname("[64:ff9b:1:c0a8:101::]")
+            ).toBeTruthy();
+            expect(isPrivateNetworkHostname("64:ff9b::0808:0808")).toBeFalsy();
+            expect(
+                isPrivateNetworkHostname("64:ff9b:1:0808:0808::")
+            ).toBeFalsy();
+        });
+
         it("detects deprecated IPv4-compatible IPv6 private addresses", () => {
             expect(isPrivateNetworkHostname("::192.168.1.1")).toBeTruthy();
             expect(isPrivateNetworkHostname("[::192.168.1.1]")).toBeTruthy();
@@ -420,6 +437,14 @@ describe("urlSafety", () => {
             );
             expect(
                 tryGetSafeThirdPartyHttpUrl("https://[2002:c0a8:0101::]")
+            ).toBe(null);
+            expect(
+                tryGetSafeThirdPartyHttpUrl("https://[64:ff9b::c0a8:101]")
+            ).toBe(null);
+            expect(
+                tryGetSafeThirdPartyHttpUrl(
+                    "https://[64:ff9b:1:c0a8:101::]"
+                )
             ).toBe(null);
         });
 
