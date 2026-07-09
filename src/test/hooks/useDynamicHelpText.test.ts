@@ -8,7 +8,6 @@
 import type { MonitorType } from "@shared/types";
 
 import { renderHook, waitFor } from "@testing-library/react";
-import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
@@ -114,9 +113,7 @@ describe("useDynamicHelpText Hook", () => {
                 primary: "Only primary help text",
             });
 
-            const { result } = renderHook(() =>
-                useDynamicHelpText("http" as any)
-            );
+            const { result } = renderHook(() => useDynamicHelpText("http"));
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBeFalsy();
@@ -193,9 +190,7 @@ describe("useDynamicHelpText Hook", () => {
 
             vi.mocked(getMonitorHelpTexts).mockRejectedValue("String error");
 
-            const { result } = renderHook(() =>
-                useDynamicHelpText("port" as any)
-            );
+            const { result } = renderHook(() => useDynamicHelpText("port"));
 
             await waitFor(() => {
                 expect(result.current.isLoading).toBeFalsy();
@@ -256,7 +251,7 @@ describe("useDynamicHelpText Hook", () => {
                     useDynamicHelpText(monitorType),
                 {
                     initialProps: {
-                        monitorType: safeCastTo<MonitorType>("http"),
+                        monitorType: "http",
                     },
                 }
             );
@@ -268,7 +263,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.primary).toBe("HTTP help");
 
             // Change monitor type
-            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
+            rerender({ monitorType: "ping" });
 
             // Should start loading again
             expect(result.current.isLoading).toBeTruthy();
@@ -311,7 +306,7 @@ describe("useDynamicHelpText Hook", () => {
                     useDynamicHelpText(monitorType),
                 {
                     initialProps: {
-                        monitorType: safeCastTo<MonitorType>("http"),
+                        monitorType: "http",
                     },
                 }
             );
@@ -323,7 +318,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBe("First error");
 
             // Change monitor type
-            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
+            rerender({ monitorType: "ping" });
 
             // Should clear error during loading
             expect(result.current.isLoading).toBeTruthy();
@@ -410,7 +405,7 @@ describe("useDynamicHelpText Hook", () => {
                     useDynamicHelpText(monitorType),
                 {
                     initialProps: {
-                        monitorType: safeCastTo<MonitorType>("http"),
+                        monitorType: "http",
                     },
                 }
             );
@@ -419,7 +414,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.isLoading).toBeTruthy();
 
             // Change monitor type before first request resolves
-            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
+            rerender({ monitorType: "ping" });
 
             // Should start loading second request
             expect(result.current.isLoading).toBeTruthy();
@@ -526,21 +521,21 @@ describe("useDynamicHelpText Hook", () => {
             vi.mocked(getMonitorHelpTexts)
                 .mockResolvedValueOnce({ primary: "HTTP help" })
                 .mockResolvedValueOnce({ primary: "Ping help" })
-                .mockResolvedValueOnce({ primary: "TCP help" });
+                .mockResolvedValueOnce({ primary: "Port help" });
 
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
                 {
                     initialProps: {
-                        monitorType: safeCastTo<MonitorType>("http"),
+                        monitorType: "http",
                     },
                 }
             );
 
             // Quickly change types
-            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
-            rerender({ monitorType: "tcp" as MonitorType });
+            rerender({ monitorType: "ping" });
+            rerender({ monitorType: "port" });
 
             // Wait for final result
             await waitFor(() => {
@@ -548,7 +543,7 @@ describe("useDynamicHelpText Hook", () => {
             });
 
             // Should show result from final request
-            expect(result.current.primary).toBe("TCP help");
+            expect(result.current.primary).toBe("Port help");
             expect(vi.mocked(getMonitorHelpTexts)).toHaveBeenCalledTimes(3);
         });
     });
