@@ -28,6 +28,8 @@ import { CloudProviderOperationError } from "./cloudProviderErrors";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 const BACKUPS_PREFIX = "backups/" as const;
+const INTERNAL_UPLOAD_ARTIFACT_SUFFIX_PATTERN =
+    /\.(?:bak|tmp)-[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
 
 type FileSystemEntryStats = Awaited<ReturnType<typeof fs.lstat>>;
 
@@ -121,6 +123,10 @@ async function readDirectoryEntriesIfExists(
     }
 }
 
+function isInternalUploadArtifactKey(key: string): boolean {
+    return INTERNAL_UPLOAD_ARTIFACT_SUFFIX_PATTERN.test(key);
+}
+
 /**
  * Local filesystem-backed cloud provider.
  *
@@ -167,6 +173,11 @@ export class FilesystemCloudStorageProvider
         const normalized = normalizeProviderObjectKey(rawKey);
         assertCloudObjectKey(normalized);
         FilesystemCloudStorageProvider.assertNoWindowsDriveTokens(normalized);
+        if (isInternalUploadArtifactKey(normalized)) {
+            throw new Error(
+                "Invalid key path (reserved filesystem upload artifact suffix)"
+            );
+        }
         return normalized;
     }
 

@@ -186,9 +186,34 @@ describe("FilesystemCloudStorageProvider", () => {
             await expect(
                 provider.downloadObject("sync/state.json")
             ).resolves.toEqual(Buffer.from("second"));
+
+            const entries = await provider.listObjects("sync");
+            expect(entries.map((entry) => entry.key)).toEqual([
+                "sync/state.json",
+            ]);
         } finally {
             vi.doUnmock("node:fs/promises");
         }
+    });
+
+    it("rejects caller keys using reserved upload artifact suffixes", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload"),
+                key: "sync/state.json.tmp-00000000-0000-4000-8000-000000000000",
+                overwrite: true,
+            })
+        ).rejects.toThrow(/reserved filesystem upload artifact suffix/i);
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload"),
+                key: "sync/state.json.bak-00000000-0000-4000-8000-000000000000",
+                overwrite: true,
+            })
+        ).rejects.toThrow(/reserved filesystem upload artifact suffix/i);
     });
 
     it("normalizes object keys by trimming and stripping leading slashes", async () => {
