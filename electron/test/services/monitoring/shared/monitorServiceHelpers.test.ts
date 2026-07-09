@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
     extractNestedFieldValue,
-    isValidHttpMonitorUrl,
     normalizeResponseTime,
     normalizeTimestampValue,
+    resolveHttpMonitorUrl,
     validateMonitorUrl,
 } from "../../../../services/monitoring/shared/monitorServiceHelpers";
 
@@ -22,6 +22,22 @@ function createMonitorWithUrl(url: string): Monitor {
         type: "http",
         url,
     };
+}
+
+const INVALID_URL_MESSAGE = "invalid url";
+
+function expectResolvedHttpMonitorUrl(value: string, expected: string): void {
+    expect(resolveHttpMonitorUrl(value, INVALID_URL_MESSAGE)).toStrictEqual({
+        ok: true,
+        value: expected,
+    });
+}
+
+function expectRejectedHttpMonitorUrl(value: string): void {
+    expect(resolveHttpMonitorUrl(value, INVALID_URL_MESSAGE)).toStrictEqual({
+        message: INVALID_URL_MESSAGE,
+        ok: false,
+    });
 }
 
 describe(validateMonitorUrl, () => {
@@ -51,29 +67,27 @@ describe(validateMonitorUrl, () => {
     });
 });
 
-describe(isValidHttpMonitorUrl, () => {
+describe(resolveHttpMonitorUrl, () => {
     it("accepts trimmed HTTP monitor URLs", () => {
-        expect(
-            isValidHttpMonitorUrl("  https://example.com/health  ")
-        ).toBeTruthy();
-        expect(
-            isValidHttpMonitorUrl("http://localhost:3000/status")
-        ).toBeTruthy();
+        expectResolvedHttpMonitorUrl(
+            "  https://example.com/health  ",
+            "https://example.com/health"
+        );
+        expectResolvedHttpMonitorUrl(
+            "http://localhost:3000/status",
+            "http://localhost:3000/status"
+        );
     });
 
     it("rejects unsupported or malformed monitor URLs", () => {
-        expect(isValidHttpMonitorUrl("file:///etc/passwd")).toBeFalsy();
-        expect(isValidHttpMonitorUrl("https://")).toBeFalsy();
-        expect(isValidHttpMonitorUrl("not-a-url")).toBeFalsy();
+        expectRejectedHttpMonitorUrl("file:///etc/passwd");
+        expectRejectedHttpMonitorUrl("https://");
+        expectRejectedHttpMonitorUrl("not-a-url");
     });
 
     it("rejects URLs containing username or password credentials", () => {
-        expect(
-            isValidHttpMonitorUrl("https://user@example.com/status")
-        ).toBeFalsy();
-        expect(
-            isValidHttpMonitorUrl("https://user:pass@example.com/status")
-        ).toBeFalsy();
+        expectRejectedHttpMonitorUrl("https://user@example.com/status");
+        expectRejectedHttpMonitorUrl("https://user:pass@example.com/status");
     });
 });
 

@@ -184,7 +184,7 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
  *
  * @returns `true` when the value is a valid HTTP/S monitor URL.
  */
-export function isValidHttpMonitorUrl(value: unknown): value is string {
+function isValidHttpMonitorUrl(value: unknown): value is string {
     if (typeof value !== "string") {
         return false;
     }
