@@ -9,6 +9,7 @@ import { isNumber, isString } from "../../utils/typeGuards";
 import {
     castIpcResponse,
     isArray,
+    isPlainRecord,
     isPromiseLike,
     isRecord,
     safePropertyAccess,
@@ -169,6 +170,33 @@ describe("Shared Type Helpers", () => {
         });
     });
 
+    describe(isPlainRecord, () => {
+        it("should return true for plain records", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: Plain Record Type Guard", "operation");
+
+            expect(isPlainRecord({ key: "value" })).toBeTruthy();
+            expect(isPlainRecord(Object.create(null))).toBeTruthy();
+        });
+
+        it("should return false for built-in objects and non-record values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: Plain Record Type Guard", "operation");
+
+            expect(isPlainRecord(new Date())).toBeFalsy();
+            expect(isPlainRecord([])).toBeFalsy();
+            expect(isPlainRecord(null)).toBeFalsy();
+        });
+    });
+
     describe(isPromiseLike, () => {
         it("should return true for promises and thenables", async ({
             task,
@@ -201,6 +229,29 @@ describe("Shared Type Helpers", () => {
             expect(isPromiseLike({})).toBeFalsy();
             expect(isPromiseLike(null)).toBeFalsy();
             expect(isPromiseLike("string")).toBeFalsy();
+        });
+
+        it("should not invoke accessor-backed then properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: PromiseLike Type Guard", "operation");
+
+            let thenAccessCount = 0;
+            const thenableWithAccessor = {};
+            Object.defineProperty(thenableWithAccessor, "then", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    thenAccessCount += 1;
+                    return () => undefined;
+                },
+            });
+
+            expect(isPromiseLike(thenableWithAccessor)).toBeFalsy();
+            expect(thenAccessCount).toBe(0);
         });
     });
 
