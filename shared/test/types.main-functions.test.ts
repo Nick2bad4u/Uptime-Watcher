@@ -409,7 +409,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: 123, // Should be string
                 type: "http",
                 status: "up",
@@ -458,7 +458,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "invalid-type",
                 status: "up",
@@ -483,7 +483,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "invalid-status",
@@ -508,7 +508,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -533,7 +533,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -558,7 +558,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -583,7 +583,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -608,7 +608,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -633,7 +633,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -658,7 +658,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -684,7 +684,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
@@ -714,7 +714,7 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            const invalidMonitor: any = {
+            const invalidMonitor: Record<string, unknown> = {
                 id: "monitor1",
                 type: "http",
                 status: "up",
