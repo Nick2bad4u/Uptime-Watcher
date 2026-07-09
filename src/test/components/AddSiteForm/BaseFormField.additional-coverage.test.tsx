@@ -1,14 +1,4 @@
 /* @vitest-environment jsdom */
-/**
- * Additional test coverage for BaseFormField component.
- *
- * @remarks
- * This test file targets specific uncovered lines to improve coverage:
- *
- * - Lines 92-98: Conditional spread operators for error and helpText props
- * - Testing all combinations of error and helpText prop scenarios
- * - Verifying proper ARIA attribute generation and FormField prop spreading
- */
 
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
@@ -18,349 +8,135 @@ import type { AriaProperties } from "../../../components/AddSiteForm/BaseFormFie
 
 import { BaseFormField } from "../../../components/AddSiteForm/BaseFormField";
 
-describe("BaseFormField - Additional Coverage", () => {
-    it("should handle undefined error and undefined helpText (lines 97-98 false branches)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
+type BaseFormFieldTestProperties = Partial<Parameters<typeof BaseFormField>[0]>;
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
+const renderBaseFormField = (
+    props: BaseFormFieldTestProperties = {}
+) =>
+    render(
+        <BaseFormField id="test-field" label="Test Label" {...props}>
+            {(ariaProps: AriaProperties) => (
+                <input
+                    aria-describedby={ariaProps["aria-describedby"]}
+                    aria-label={ariaProps["aria-label"]}
+                    data-testid="test-input"
+                    type="text"
+                />
+            )}
+        </BaseFormField>
+    );
 
-        // Testing the scenario where both error and helpText are undefined
-        // This tests the false branches of both conditional spread operators
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                id="test-field"
-                label="Test Label"
-                required={false}
-                // Error is undefined (not passed)
-                // helpText is undefined (not passed)
-            >
-                {childrenSpy}
+describe("BaseFormField", () => {
+    it("labels optional and required fields for assistive technology", () => {
+        const { rerender } = render(
+            <BaseFormField id="name" label="Name">
+                {(ariaProps) => (
+                    <input
+                        aria-label={ariaProps["aria-label"]}
+                        data-testid="name-input"
+                        type="text"
+                    />
+                )}
             </BaseFormField>
         );
 
-        const input = screen.getByTestId("test-input");
+        expect(screen.getByTestId("name-input")).toHaveAttribute(
+            "aria-label",
+            "Name"
+        );
 
-        // Verify ARIA properties
-        expect(input).toHaveAttribute("aria-label", "Test Label");
-        expect(input).not.toHaveAttribute("aria-describedby");
+        rerender(
+            <BaseFormField id="name" label="Name" required={true}>
+                {(ariaProps) => (
+                    <input
+                        aria-label={ariaProps["aria-label"]}
+                        data-testid="name-input"
+                        type="text"
+                    />
+                )}
+            </BaseFormField>
+        );
+
+        expect(screen.getByTestId("name-input")).toHaveAttribute(
+            "aria-label",
+            "Name (required)"
+        );
     });
 
-    it("should handle defined error with undefined helpText (line 97 true, line 98 false)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
+    it.each([
+        {
+            describedBy: undefined,
+            error: undefined,
+            helpText: undefined,
+            name: "plain field",
+            visibleText: undefined,
+        },
+        {
+            describedBy: "test-field-help",
+            error: undefined,
+            helpText: "Helpful context",
+            name: "help text",
+            visibleText: "Helpful context",
+        },
+        {
+            describedBy: "test-field-error",
+            error: "Required value",
+            helpText: undefined,
+            name: "error text",
+            visibleText: "Required value",
+        },
+        {
+            describedBy: "test-field-error",
+            error: "Required value",
+            helpText: "Helpful context",
+            name: "error text before help text",
+            visibleText: "Required value",
+        },
+        {
+            describedBy: "test-field-help",
+            error: "",
+            helpText: "Helpful context",
+            name: "empty error with help text",
+            visibleText: "Helpful context",
+        },
+        {
+            describedBy: undefined,
+            error: undefined,
+            helpText: "",
+            name: "empty help text",
+            visibleText: undefined,
+        },
+    ])(
+        "sets aria-describedby from $name",
+        ({ describedBy, error, helpText, visibleText }) => {
+            const fieldProps = {
+                ...(error !== undefined && { error }),
+                ...(helpText !== undefined && { helpText }),
+            } satisfies BaseFormFieldTestProperties;
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
+            renderBaseFormField(fieldProps);
 
-        // Testing error !== undefined (true) && helpText === undefined (false)
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
+            const input = screen.getByTestId("test-input");
 
-        render(
-            <BaseFormField
-                error="This is an error"
-                id="test-field"
-                label="Test Label"
-                required={true}
-                // HelpText is undefined (not passed)
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
+            if (describedBy) {
+                expect(input).toHaveAttribute("aria-describedby", describedBy);
+            } else {
+                expect(input).not.toHaveAttribute("aria-describedby");
+            }
 
-        const input = screen.getByTestId("test-input");
+            if (visibleText) {
+                expect(screen.getByText(visibleText)).toBeInTheDocument();
+            }
+        }
+    );
 
-        // Verify ARIA properties
-        expect(input).toHaveAttribute("aria-label", "Test Label (required)");
-        expect(input).toHaveAttribute("aria-describedby", "test-field-error");
-    });
+    it("preserves caller labels with symbols while adding required context", () => {
+        renderBaseFormField({
+            label: "Complex Label: With Symbols & Numbers (123)",
+            required: true,
+        });
 
-    it("should handle undefined error with defined helpText (line 97 false, line 98 true)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        // Testing error === undefined (false) && helpText !== undefined (true)
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                // Error is undefined (not passed)
-                helpText="This is help text"
-                id="test-field"
-                label="Test Label"
-                required={false}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        const input = screen.getByTestId("test-input");
-
-        // Verify ARIA properties
-        expect(input).toHaveAttribute("aria-label", "Test Label");
-        expect(input).toHaveAttribute("aria-describedby", "test-field-help");
-    });
-
-    it("should handle defined error with defined helpText (both lines 97-98 true)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        // Testing error !== undefined (true) && helpText !== undefined (true)
-        // Error should take precedence for aria-describedby
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                error="This is an error"
-                helpText="This is help text"
-                id="test-field"
-                label="Test Label"
-                required={true}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        const input = screen.getByTestId("test-input");
-
-        // Verify ARIA properties - error takes precedence
-        expect(input).toHaveAttribute("aria-label", "Test Label (required)");
-        expect(input).toHaveAttribute("aria-describedby", "test-field-error");
-    });
-
-    it("should handle empty string error (line 97 true branch with falsy error)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Error Handling", "type");
-
-        // Testing when error is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                error=""
-                helpText="This is help text"
-                id="test-field"
-                label="Test Label"
-                required={false}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        const input = screen.getByTestId("test-input");
-
-        // Empty string error means helpText should be used for aria-describedby
-        expect(input).toHaveAttribute("aria-label", "Test Label");
-        expect(input).toHaveAttribute("aria-describedby", "test-field-help");
-    });
-
-    it("should handle empty string helpText (line 98 true branch with falsy helpText)", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        // Testing when helpText is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-describedby={ariaProps["aria-describedby"]}
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                // Error is undefined
-                helpText=""
-                id="test-field"
-                label="Test Label"
-                required={false}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        const input = screen.getByTestId("test-input");
-
-        // Empty string helpText means no aria-describedby should be set
-        expect(input).toHaveAttribute("aria-label", "Test Label");
-        expect(input).not.toHaveAttribute("aria-describedby");
-    });
-
-    it("should properly spread conditional props to FormField", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        // Testing that the conditional spread operators work correctly for FormField props
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <div
-                data-aria-props={JSON.stringify(ariaProps)}
-                data-testid="test-child"
-            />
-        );
-
-        render(
-            <BaseFormField
-                error="Test error message"
-                helpText="Test help text"
-                id="test-field"
-                label="Test Label"
-                required={true}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        // Check that FormField receives the correct props by looking at the DOM structure
-        const formField = screen.getByTestId("test-child").parentElement;
-        expect(formField).toBeInTheDocument();
-
-        // Verify the child receives correct ARIA props
-        const childElement = screen.getByTestId("test-child");
-        const ariaPropsData = childElement.dataset["ariaProps"];
-        const ariaProps = JSON.parse(ariaPropsData || "{}");
-
-        expect(ariaProps["aria-label"]).toBe("Test Label (required)");
-        expect(ariaProps["aria-describedby"]).toBe("test-field-error");
-    });
-
-    it("should handle complex label text with special characters", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: BaseFormField.additional-coverage", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
-        // Testing edge case with complex label text
-        const childrenSpy = (ariaProps: AriaProperties) => (
-            <input
-                aria-label={ariaProps["aria-label"]}
-                data-testid="test-input"
-                type="text"
-            />
-        );
-
-        render(
-            <BaseFormField
-                id="test-field"
-                label="Complex Label: With Symbols & Numbers (123)"
-                required={true}
-            >
-                {childrenSpy}
-            </BaseFormField>
-        );
-
-        const input = screen.getByTestId("test-input");
-        expect(input).toHaveAttribute(
+        expect(screen.getByTestId("test-input")).toHaveAttribute(
             "aria-label",
             "Complex Label: With Symbols & Numbers (123) (required)"
         );
