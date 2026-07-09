@@ -3,10 +3,7 @@
  *
  * @module IpcTypes
  *
- * @file Comprehensive tests for the IPC types and interfaces in the Uptime
- *   Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for IPC types and interfaces in the Uptime Watcher app.
  *
  * @since 2025-08-11
  *

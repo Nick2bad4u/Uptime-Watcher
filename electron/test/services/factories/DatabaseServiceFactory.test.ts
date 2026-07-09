@@ -3,10 +3,7 @@
  *
  * @module DatabaseServiceFactory
  *
- * @file Comprehensive tests for the DatabaseServiceFactory class in the Uptime
- *   Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for DatabaseServiceFactory behavior in the Uptime Watcher app.
  *
  * @since 2025-08-11
  *

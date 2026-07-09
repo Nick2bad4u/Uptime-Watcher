@@ -4,9 +4,6 @@
  * This test investigates why certain URLs are being marked as "down" when they
  * should be "up", particularly focusing on content negotiation and HTTP status
  * code handling.
- *
- * @author GitHub Copilot
- *
  * @since 2025-09-16
  */
 

@@ -1,18 +1,15 @@
 /**
  * Test suite for correlation
  *
- * @module Unknown
+ * @module Correlation
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for correlation identifier generation.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Utilities
  *
- * @tags ["test"]
+ * @tags ["correlation", "utilities"]
  */
 
 import { generateCorrelationId } from "@shared/utils/correlation";

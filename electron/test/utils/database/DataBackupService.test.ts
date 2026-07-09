@@ -3,10 +3,7 @@
  *
  * @module DataBackupService
  *
- * @file Comprehensive tests for the DataBackupService class in the Uptime
- *   Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for DataBackupService behavior in the Uptime Watcher app.
  *
  * @since 2025-08-11
  *

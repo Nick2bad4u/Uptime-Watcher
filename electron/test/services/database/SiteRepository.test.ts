@@ -1,18 +1,15 @@
 /**
  * Test suite for SiteRepository
  *
- * @module Unknown
+ * @module SiteRepository
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for site repository database behavior.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Database
  *
- * @tags ["test"]
+ * @tags ["database", "repository", "site"]
  */
 
 import { fc } from "@fast-check/vitest";

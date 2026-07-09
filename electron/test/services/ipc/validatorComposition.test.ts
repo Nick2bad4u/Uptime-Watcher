@@ -1,18 +1,15 @@
 /**
  * Test suite for validatorComposition
  *
- * @module Unknown
+ * @module ValidatorComposition
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for IPC validator composition helpers.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category IPC
  *
- * @tags ["test"]
+ * @tags ["ipc", "validation", "validators"]
  */
 
 import { describe, expect, it } from "vitest";

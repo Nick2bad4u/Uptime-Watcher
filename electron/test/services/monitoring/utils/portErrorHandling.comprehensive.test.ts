@@ -3,11 +3,9 @@
  *
  * @module PortErrorHandling
  *
- * @file Comprehensive tests for port error handling utilities in the Uptime
+ * @file Tests for port error handling utilities in the Uptime
  *   Watcher app, including error constants, result interfaces, custom error
  *   classes, and error handling functions.
- *
- * @author GitHub Copilot
  *
  * @since 2025-08-11
  *

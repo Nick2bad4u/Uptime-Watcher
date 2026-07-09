@@ -1,18 +1,15 @@
 /**
  * Test suite for SettingsRepository
  *
- * @module Unknown
+ * @module SettingsRepository
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for settings repository database behavior.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Database
  *
- * @tags ["test"]
+ * @tags ["database", "repository", "settings"]
  */
 
 import type { Database } from "node-sqlite3-wasm";

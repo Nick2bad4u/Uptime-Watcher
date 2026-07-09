@@ -3,10 +3,8 @@
  *
  * @module portChecker
  *
- * @file Comprehensive tests for the performSinglePortCheck function in the
- *   Uptime Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for the performSinglePortCheck function in the Uptime Watcher
+ *   app.
  *
  * @since 2025-08-11
  *

@@ -1,18 +1,15 @@
 /**
  * Test suite for SiteManager
  *
- * @module Unknown
+ * @module SiteManager
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for site manager lifecycle and event behavior.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Managers
  *
- * @tags ["test"]
+ * @tags ["site", "manager", "events"]
  */
 
 import type { Site } from "@shared/types";

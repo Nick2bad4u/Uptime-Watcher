@@ -3,10 +3,7 @@
  *
  * @module ElectronUtils
  *
- * @file Comprehensive tests for Electron utility functions in the Uptime
- *   Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for Electron utility functions in the Uptime Watcher app.
  *
  * @since 2025-08-11
  *

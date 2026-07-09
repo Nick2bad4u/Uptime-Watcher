@@ -1,18 +1,15 @@
 /**
  * Test suite for HistoryRepository
  *
- * @module Unknown
+ * @module HistoryRepository
  *
- * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   app.
- *
- * @author GitHub Copilot
+ * @file Tests for monitor history repository database behavior.
  *
  * @since 2025-08-11
  *
- * @category General
+ * @category Database
  *
- * @tags ["test"]
+ * @tags ["database", "repository", "history"]
  */
 
 import type { StatusHistory } from "@shared/types";

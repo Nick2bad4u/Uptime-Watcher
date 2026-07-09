@@ -3,10 +3,7 @@
  *
  * @module MonitorManager
  *
- * @file Comprehensive tests for monitoring service management in the Uptime
- *   Watcher app.
- *
- * @author GitHub Copilot
+ * @file Tests for monitoring service management in the Uptime Watcher app.
  *
  * @since 2025-08-11
  *
