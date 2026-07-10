@@ -83,6 +83,20 @@ class InMemoryOrchestrator {
     }
 }
 
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise) => {
+        resolve = resolvePromise;
+    });
+
+    return { promise, resolve };
+}
+
 interface SyncEnginePrivateAccess {
     applyMergedState: (
         state: CloudSyncState,
@@ -374,6 +388,105 @@ describe("SyncEngine (ADR-016)", () => {
             );
         } finally {
             vi.useRealTimers();
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("retains operation logs so a losing manifest race can recover", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-manifest-race-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+            const aListedOperations = createDeferred<undefined>();
+            const resumeA = createDeferred<undefined>();
+            const providerA = {
+                deleteObject: async (key) => provider.deleteObject(key),
+                downloadBackup: async (key) => provider.downloadBackup(key),
+                downloadObject: async (key) => provider.downloadObject(key),
+                isConnected: async () => provider.isConnected(),
+                kind: provider.kind,
+                listBackups: async () => provider.listBackups(),
+                listObjects: async (prefix) => {
+                    const entries = await provider.listObjects(prefix);
+                    if (prefix.startsWith("sync/devices/")) {
+                        aListedOperations.resolve(undefined);
+                        await resumeA.promise;
+                    }
+                    return entries;
+                },
+                uploadBackup: async (args) => provider.uploadBackup(args),
+                uploadObject: async (args) => provider.uploadObject(args),
+            } satisfies Parameters<SyncEngine["syncNow"]>[0];
+
+            const siteA: Site = {
+                identifier: "a.example.com",
+                monitoring: true,
+                monitors: [
+                    createMonitor({
+                        id: "monitor-a",
+                        monitoring: true,
+                        type: "http",
+                        url: "https://a.example.com",
+                    }),
+                ],
+                name: "Site A",
+            };
+            const siteB: Site = {
+                identifier: "b.example.com",
+                monitoring: true,
+                monitors: [
+                    createMonitor({
+                        id: "monitor-b",
+                        monitoring: true,
+                        type: "http",
+                        url: "https://b.example.com",
+                    }),
+                ],
+                name: "Site B",
+            };
+            const settingsA = new InMemorySettingsAdapter();
+            const settingsB = new InMemorySettingsAdapter();
+            await settingsA.set("cloud.sync.deviceId", "device-a");
+            await settingsB.set("cloud.sync.deviceId", "device-b");
+            const engineA = new SyncEngine({
+                orchestrator: new InMemoryOrchestrator([siteA]),
+                settings: settingsA,
+            });
+            const engineB = new SyncEngine({
+                orchestrator: new InMemoryOrchestrator([siteB]),
+                settings: settingsB,
+            });
+
+            const syncA = engineA.syncNow(providerA);
+            await aListedOperations.promise;
+            await engineB.syncNow(provider);
+            resumeA.resolve(undefined);
+            await syncA;
+
+            const operationObjects =
+                await provider.listObjects("sync/devices/");
+            expect(operationObjects).toHaveLength(2);
+
+            const recoveryOrchestrator = new InMemoryOrchestrator([]);
+            const recoverySettings = new InMemorySettingsAdapter();
+            await recoverySettings.set("cloud.sync.deviceId", "device-c");
+            const recoveryEngine = new SyncEngine({
+                orchestrator: recoveryOrchestrator,
+                settings: recoverySettings,
+            });
+
+            await recoveryEngine.syncNow(provider);
+
+            expect(
+                (await recoveryOrchestrator.getSites())
+                    .map((site) => site.identifier)
+                    .toSorted()
+            ).toEqual(["a.example.com", "b.example.com"]);
+        } finally {
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
     });

@@ -336,28 +336,15 @@ export class SyncEngine {
 
         await transport.writeManifest(nextManifest);
 
-        // Best-effort cleanup: delete the previous snapshot and any fully compacted operation objects to keep remote storage bounded.
+        // Best-effort cleanup: delete only the previously referenced snapshot.
         //
         // @remarks
-        // This is especially important when enabling encryption after older
-        // plaintext sync artifacts exist; the first encrypted compaction should
-        // remove the previous plaintext snapshot/ops.
+        // Manifest writes are not compare-and-swap across every provider. Keep
+        // operation objects as durable recovery records so a concurrent writer
+        // cannot make an update unreconstructable by overwriting the manifest
+        // after another writer compacted and deleted that update.
 
         const keysToDelete: string[] = [];
-        for (const entry of opObjects) {
-            const metadata = parseOpsObjectKeyMetadata(entry.key);
-            if (metadata) {
-                const compactedUpTo =
-                    nextManifest.devices[metadata.deviceId]?.compactedUpToOpId;
-
-                if (
-                    isDefined(compactedUpTo) &&
-                    metadata.lastOpId <= compactedUpTo
-                ) {
-                    keysToDelete.push(entry.key);
-                }
-            }
-        }
 
         if (previousSnapshotKey && previousSnapshotKey !== snapshotEntry.key) {
             keysToDelete.push(previousSnapshotKey);
