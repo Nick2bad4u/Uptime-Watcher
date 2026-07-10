@@ -1,3 +1,5 @@
+import type { MockInstance } from "vitest";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes.js";
@@ -27,9 +29,9 @@ const flushMicrotasks = async (): Promise<void> => {
  * - Error scenarios and edge cases
  */
 describe("StandardizedCache - Comprehensive Tests", () => {
-    let cache: StandardizedCache<any>;
+    let cache: StandardizedCache;
     let eventBus: TypedEventBus<UptimeEvents>;
-    let consoleSpy: any;
+    let consoleSpy: MockInstance;
 
     beforeEach(() => {
         eventBus = new TypedEventBus<UptimeEvents>();

@@ -16,12 +16,45 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MonitorManager } from "../../managers/MonitorManager";
+import type { EnhancedMonitoringServices } from "../../services/monitoring/EnhancedMonitoringServiceFactory";
+
+import {
+    MonitorManager,
+    type MonitorManagerDependencies,
+} from "../../managers/MonitorManager";
+
+interface SitesCacheFixture {
+    get: (key: string) => Site | undefined;
+    set: ReturnType<typeof vi.fn>;
+}
+
+interface MonitorManagerDependenciesFixture {
+    databaseService: Record<string, never>;
+    eventEmitter: { emitTyped: ReturnType<typeof vi.fn> };
+    getHistoryLimit: () => number;
+    getSitesCache: () => SitesCacheFixture;
+    repositories: {
+        history: Record<string, never>;
+        monitor: Record<string, never>;
+        site: Record<string, never>;
+    };
+}
+
+interface EnhancedMonitoringServicesFixture {
+    checker: {
+        checkMonitor: ReturnType<typeof vi.fn>;
+        startMonitoring: ReturnType<typeof vi.fn>;
+        stopMonitoring: ReturnType<typeof vi.fn>;
+    };
+    operationRegistry: Record<string, never>;
+    statusUpdateService: Record<string, never>;
+    timeoutManager: Record<string, never>;
+}
 
 describe(MonitorManager, () => {
     let manager: MonitorManager;
-    let dependencies: any;
-    let enhancedServices: any;
+    let dependencies: MonitorManagerDependenciesFixture;
+    let enhancedServices: EnhancedMonitoringServicesFixture;
 
     beforeEach(() => {
         dependencies = {
@@ -47,7 +80,10 @@ describe(MonitorManager, () => {
             timeoutManager: {},
         };
 
-        manager = new MonitorManager(dependencies, enhancedServices);
+        manager = new MonitorManager(
+            dependencies as unknown as MonitorManagerDependencies,
+            enhancedServices as unknown as EnhancedMonitoringServices
+        );
     });
 
     it("should construct without error", async ({ annotate, task }) => {
@@ -207,7 +243,7 @@ describe(MonitorManager, () => {
         dependencies.eventEmitter.emitTyped = vi.fn();
 
         // Mock the enhanced checker to return a result
-        vi.mocked(enhancedServices.checker.checkMonitor).mockResolvedValue(
+        enhancedServices.checker.checkMonitor.mockResolvedValue(
             mockStatusUpdate
         );
 

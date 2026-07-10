@@ -342,7 +342,7 @@ describe(PingMonitor, () => {
             await annotate("Type: Business Logic", "type");
 
             const monitor = createMockPingMonitor({
-                timeout: undefined as any,
+                timeout: undefined as unknown as number,
             });
 
             await pingMonitor.check(monitor);
@@ -366,7 +366,7 @@ describe(PingMonitor, () => {
             await annotate("Type: Business Logic", "type");
 
             const monitor = createMockPingMonitor({
-                retryAttempts: undefined as any,
+                retryAttempts: undefined as unknown as number,
             });
 
             await pingMonitor.check(monitor);

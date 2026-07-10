@@ -653,10 +653,9 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 { identifier: "site1", name: "Site 1", monitoring: true },
             ];
 
-            const monitors = [
+            const monitors: Site["monitors"] = [
                 {
                     type: "http",
-                    enabled: true,
                     url: "https://site1.com",
                     checkInterval: 60_000,
                     history: [],
@@ -665,7 +664,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                     retryAttempts: 3,
                     status: "pending" as const,
                     timeout: 5000,
-                } as any, // Cast to bypass id requirement for testing
+                } as unknown as Site["monitors"][number], // Deliberately omit the ID at the repository boundary.
             ];
 
             vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
@@ -1127,11 +1126,10 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 },
             ];
 
-            const monitors = [
+            const monitors: Site["monitors"] = [
                 {
                     id: "mon1",
                     type: "http",
-                    enabled: true,
                     url: "https://example.com",
                     checkInterval: 60_000,
                     history: [],
@@ -1144,7 +1142,6 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 {
                     id: "mon2",
                     type: "ping",
-                    enabled: false,
                     host: "example.com",
                     checkInterval: 60_000,
                     history: [],
@@ -1156,7 +1153,6 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 },
                 {
                     type: "dns",
-                    enabled: true,
                     expectedValue: "example.com",
                     checkInterval: 60_000,
                     history: [],
@@ -1165,7 +1161,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                     retryAttempts: 3,
                     status: "pending" as const,
                     timeout: 5000,
-                } as any, // Cast to bypass id requirement for testing
+                } as unknown as Site["monitors"][number], // Deliberately omit the ID at the repository boundary.
             ];
 
             const history1 = [

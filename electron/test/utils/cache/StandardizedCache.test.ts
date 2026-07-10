@@ -236,8 +236,8 @@ describe(StandardizedCache, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            cache.set("nullKey", null as any);
-            cache.set("undefinedKey", undefined as any);
+            cache.set("nullKey", null as unknown as string);
+            cache.set("undefinedKey", undefined as unknown as string);
 
             expect(cache.get("nullKey")).toBe(null);
             expect(cache.get("undefinedKey")).toBe(undefined);
