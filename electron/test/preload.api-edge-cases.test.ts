@@ -2,7 +2,15 @@
  * Tests for preload bridge API error handling and edge cases.
  */
 
+import type { ElectronBridgeApi } from "@shared/types/preload";
+import type { Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { EventsApi } from "../preload/domains/eventsApi";
+import type { SystemApi } from "../preload/domains/systemApi";
+
+type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
 
 // Mock electron dependencies
 const mockContextBridge = {
@@ -17,13 +25,24 @@ const mockIpcRenderer = {
     send: vi.fn(),
 };
 
+const removeAllListenersWithUntrustedChannel = (
+    api: ElectronAPI,
+    channel: unknown
+): void => {
+    const removeAllListeners = api.events.removeAllListeners as unknown as (
+        untrustedChannel?: unknown
+    ) => void;
+
+    removeAllListeners(channel);
+};
+
 vi.mock("electron", () => ({
     contextBridge: mockContextBridge,
     ipcRenderer: mockIpcRenderer,
 }));
 
 describe("preload bridge API edge cases", () => {
-    let exposedAPI: any;
+    let exposedAPI: ElectronAPI;
 
     // Mock site object for testing
     const mockSite = {
@@ -107,8 +126,10 @@ describe("preload bridge API edge cases", () => {
         const exposeCall = mockContextBridge.exposeInMainWorld.mock.calls.find(
             (call) => call[0] === "electronAPI"
         );
-        exposedAPI = exposeCall?.[1];
-
+        if (!exposeCall) {
+            throw new Error("Preload did not expose electronAPI");
+        }
+        exposedAPI = exposeCall[1] as ElectronAPI;
         expect(exposedAPI).toBeDefined();
     });
     describe("IPC Error Handling", () => {
@@ -119,7 +140,7 @@ describe("preload bridge API edge cases", () => {
             await expect(exposedAPI.sites.getSites()).rejects.toThrow(
                 "IPC failed"
             );
-            await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
+            await expect(exposedAPI.sites.addSite({} as Site)).rejects.toThrow(
                 "IPC failed"
             );
             await expect(exposedAPI.sites.updateSite("id", {})).rejects.toThrow(
@@ -205,18 +226,24 @@ describe("preload bridge API edge cases", () => {
         it("should handle removeAllListeners errors", async () => {
             // RemoveAllListeners should not throw
             expect(() =>
-                exposedAPI.events.removeAllListeners("test-channel")
+                removeAllListenersWithUntrustedChannel(
+                    exposedAPI,
+                    "test-channel"
+                )
             ).not.toThrow();
         });
     });
     describe("Parameter Validation", () => {
         it("should handle null/undefined parameters", async () => {
             // Test with null/undefined parameters - these should still call invoke
-            await expect(exposedAPI.sites.addSite(null)).resolves.toEqual(
-                mockSite
-            );
             await expect(
-                exposedAPI.sites.updateSite("id", undefined)
+                exposedAPI.sites.addSite(null as unknown as Site)
+            ).resolves.toEqual(mockSite);
+            await expect(
+                exposedAPI.sites.updateSite(
+                    "id",
+                    undefined as unknown as Partial<Site>
+                )
             ).resolves.toEqual(mockSite); // UpdateSite returns Site object
             // Note: validateMonitorData function doesn't exist in current API
             // await expect(
@@ -324,7 +351,7 @@ describe("preload bridge API edge cases", () => {
             await expect(exposedAPI.sites.getSites()).resolves.toEqual([
                 mockSite,
             ]);
-            await expect(exposedAPI.sites.addSite({})).rejects.toThrow(
+            await expect(exposedAPI.sites.addSite({} as Site)).rejects.toThrow(
                 "Error 2"
             );
             await expect(
@@ -348,21 +375,22 @@ describe("preload bridge API edge cases", () => {
         it("should handle invalid event names", async () => {
             // Test with various invalid event names - test removeAllListeners with invalid channels
             expect(() =>
-                exposedAPI.events.removeAllListeners("")
+                removeAllListenersWithUntrustedChannel(exposedAPI, "")
             ).not.toThrow();
             expect(() =>
-                exposedAPI.events.removeAllListeners(null)
+                removeAllListenersWithUntrustedChannel(exposedAPI, null)
             ).not.toThrow();
-            expect(() =>
-                exposedAPI.events.removeAllListeners(undefined)
-            ).not.toThrow();
+            expect(() => exposedAPI.events.removeAllListeners()).not.toThrow();
         });
         it("should handle rapid event registration/removal", async () => {
             // Rapid event operations
             for (let i = 0; i < 100; i++) {
                 exposedAPI.events.onTestEvent(vi.fn());
                 if (i % 2 === 0) {
-                    exposedAPI.events.removeAllListeners(`event-${i}`);
+                    removeAllListenersWithUntrustedChannel(
+                        exposedAPI,
+                        `event-${i}`
+                    );
                 }
             }
 
@@ -404,7 +432,8 @@ describe("preload bridge API edge cases", () => {
             for (const [index, callback] of callbacks.entries()) {
                 exposedAPI.events.onTestEvent(callback);
                 if (index % 100 === 0) {
-                    exposedAPI.events.removeAllListeners(
+                    removeAllListenersWithUntrustedChannel(
+                        exposedAPI,
                         `memory-test-${index}`
                     );
                 }
@@ -451,10 +480,7 @@ describe("preload bridge API edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: preload.api-edge-cases",
-                "component"
-            );
+            await annotate("Component: preload.api-edge-cases", "component");
 
             expect(exposedAPI.sites).toBeDefined();
             expect(exposedAPI.monitoring).toBeDefined();
@@ -467,10 +493,7 @@ describe("preload bridge API edge cases", () => {
         });
         it("should expose all site API methods", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: preload.api-edge-cases",
-                "component"
-            );
+            await annotate("Component: preload.api-edge-cases", "component");
 
             expect(typeof exposedAPI.sites.getSites).toBe("function");
             expect(typeof exposedAPI.sites.addSite).toBe("function");
@@ -483,10 +506,7 @@ describe("preload bridge API edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: preload.api-edge-cases",
-                "component"
-            );
+            await annotate("Component: preload.api-edge-cases", "component");
 
             expect(typeof exposedAPI.monitoring.startMonitoring).toBe(
                 "function"

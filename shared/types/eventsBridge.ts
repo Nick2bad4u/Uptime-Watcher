@@ -7,7 +7,10 @@
  * Ensures the Electron preload layer and renderer agree on the shape of the
  * event subscription API exposed through `window.electronAPI.events`.
  */
-import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
+import type {
+    RendererEventChannel,
+    RendererEventPayloadMap,
+} from "@shared/ipc/rendererEvents";
 
 type CacheInvalidatedPayload = RendererEventPayloadMap["cache:invalidated"];
 type HistoryLimitUpdatedPayload =
@@ -203,7 +206,10 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Remove all registered renderer event listeners.
+     * Remove registered renderer event listeners.
+     *
+     * @param channel - Optional channel to clear. Omitting it clears every
+     *   renderer event listener.
      */
-    readonly removeAllListeners: () => void;
+    readonly removeAllListeners: (channel?: RendererEventChannel) => void;
 }
