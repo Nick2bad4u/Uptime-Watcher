@@ -80,13 +80,29 @@ Asset naming and upload rules are governed by:
 
 - The repo config enables macOS hardened runtime (`hardenedRuntime: true`) and
   Gatekeeper assessment (`gatekeeperAssess: true`).
-- `forceCodeSigning` is currently `false`.
-- The GitHub Actions build workflow does **not** currently configure signing or
-  notarization secrets.
+- Developer and ordinary CI builds may remain unsigned.
+- The release workflow sets `UPTIME_WATCHER_OFFICIAL_RELEASE=true`, which makes
+  `electron-builder` require code signing and enables macOS notarization.
+- Release dispatch validates every required credential before creating or
+  pushing the version tag.
+- Windows artifacts are checked with `Get-AuthenticodeSignature` against the
+  configured publisher identity. macOS app bundles and distributables are
+  checked with `codesign`, Gatekeeper, and `stapler` before upload.
 
-Cold hard truth: the current CI pipeline can produce unsigned/non-notarized
-artifacts. That is acceptable for developer/CI validation builds, but it is not
-acceptable for official releases consumed by end users.
+The release environment must define these repository secrets:
+
+- `WINDOWS_CSC_LINK`
+- `WINDOWS_CSC_KEY_PASSWORD`
+- `WINDOWS_PUBLISHER_NAME`
+- `MACOS_CSC_LINK`
+- `MACOS_CSC_KEY_PASSWORD`
+- `APPLE_API_KEY`
+- `APPLE_API_KEY_ID`
+- `APPLE_API_ISSUER`
+
+Missing credentials fail the workflow before a release tag is created. Invalid
+or mismatched signatures fail the platform build before artifacts reach the
+release job.
 
 #### 3.2) Mandated posture for official releases
 
@@ -156,7 +172,8 @@ Flatpak is treated as an additional distribution format with its own build pipel
 
 - **Pro**: broad platform coverage from a single configuration source.
 - **Pro**: clear security boundary for signing keys.
-- **Con**: without signing/notarization secrets, users may see OS warnings.
+- **Con**: official releases cannot run until all signing and notarization
+  secrets are configured.
 
 ## Related ADRs
 
