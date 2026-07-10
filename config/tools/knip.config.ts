@@ -36,6 +36,7 @@ const knipConfig: KnipConfig = {
         "actionlint",
         "gitleaks",
         "grype",
+        "lychee",
         "powershell",
         "shellcheck",
         "taskkill",
@@ -47,9 +48,12 @@ const knipConfig: KnipConfig = {
         // Loaded by config/linting/commitlint.config.mjs through commitlint's
         // extends resolution rather than a normal import.
         "@commitlint/config-conventional",
-        // Invoked as package-script binaries; Knip's dependency graph doesn't
-        // connect binary usage back to the owning package dependency.
-        "jscpd",
+        // Loaded by package-script config paths rather than JavaScript imports.
+        "gitcliff-config-nick2bad4u",
+        "jscpd-config-nick2bad4u",
+        "lychee-config-nick2bad4u",
+        // Invoked as package-script binaries that Knip cannot map to their
+        // owning package dependency.
         "secretlint",
         "yamllint-js",
         // Loaded by Storybook/Docusaurus config strings, CSS plugin directives,
