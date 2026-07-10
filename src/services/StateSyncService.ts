@@ -301,6 +301,20 @@ export const StateSyncService: StateSyncServiceContract = {
                             return;
                         }
 
+                        if (
+                            lastSeenRevision !== null &&
+                            fullSync.revision <= lastSeenRevision
+                        ) {
+                            logger.debug(
+                                "[StateSyncService] Ignoring stale full sync recovery snapshot",
+                                {
+                                    lastSeenRevision,
+                                    snapshotRevision: fullSync.revision,
+                                }
+                            );
+                            return;
+                        }
+
                         const synthesizedEvent: StateSyncEventData = {
                             action: STATE_SYNC_ACTION.BULK_SYNC,
                             revision: fullSync.revision,

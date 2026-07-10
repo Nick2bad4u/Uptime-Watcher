@@ -407,6 +407,72 @@ describe("StateSyncService", () => {
         });
     });
 
+    it("does not overwrite a newer event with a stale recovery snapshot", async () => {
+        const callback = vi.fn();
+        let resolveFullSync: (() => void) | undefined;
+        const completedAt = Date.now();
+        const fullSyncPayload = {
+            completedAt,
+            revision: 10,
+            siteCount: 0,
+            sites: [],
+            source: "database" as const,
+            synchronized: true,
+        };
+
+        mockElectronAPI.stateSync.requestFullSync.mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveFullSync = () => {
+                    resolve(fullSyncPayload);
+                };
+            })
+        );
+
+        await StateSyncService.onStateSyncEvent(callback);
+
+        capturedHandler?.({
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            revision: 10,
+            siteCount: 0,
+            siteIdentifier: "all",
+            sites: [],
+            source: "database",
+            timestamp: completedAt - 2,
+        });
+        capturedHandler?.({ invalid: true });
+
+        await vi.waitFor(() => {
+            expect(
+                mockElectronAPI.stateSync.requestFullSync
+            ).toHaveBeenCalledTimes(1);
+        });
+
+        capturedHandler?.({
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            revision: 11,
+            siteCount: 0,
+            siteIdentifier: "all",
+            sites: [],
+            source: "database",
+            timestamp: completedAt - 1,
+        });
+        expect(callback).toHaveBeenCalledTimes(2);
+
+        resolveFullSync?.();
+
+        await vi.waitFor(() => {
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[StateSyncService] Ignoring stale full sync recovery snapshot",
+                {
+                    lastSeenRevision: 11,
+                    snapshotRevision: 10,
+                }
+            );
+        });
+
+        expect(callback).toHaveBeenCalledTimes(2);
+    });
+
     it("clears recovery timer and expectation when cleanup is invoked", async () => {
         vi.useFakeTimers();
 
