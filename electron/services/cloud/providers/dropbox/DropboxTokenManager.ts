@@ -40,6 +40,9 @@ export class DropboxTokenManager {
         accessToken: string
     ) => Pick<Dropbox, "authTokenRevoke">;
 
+    /** Invalidates asynchronous work started with older credentials. */
+    private credentialGeneration = 0;
+
     /**
      * Single-flight wrapper to prevent concurrent refresh storms when multiple
      * call sites request an access token at the same time.
@@ -49,6 +52,9 @@ export class DropboxTokenManager {
     private readonly secretStore: SecretStore;
 
     private readonly tokenStorageKey: string;
+
+    /** Serializes writes so a later login or logout determines final state. */
+    private tokenMutationQueue: Promise<void> = Promise.resolve();
 
     public constructor(args: {
         appKey: string;
@@ -91,19 +97,23 @@ export class DropboxTokenManager {
                 }));
 
         this.refreshSingleFlight = createSingleFlight(async () => {
+            const credentialGeneration = this.credentialGeneration;
             const tokens = await this.getStoredTokens();
             if (!tokens) {
                 throw new Error("Dropbox is not connected");
             }
 
             const refreshed = await this.refreshTokens(tokens);
-            await this.storeTokens(refreshed);
+            await this.storeRefreshedTokens(refreshed, credentialGeneration);
             return refreshed;
         });
     }
 
     public async clearTokens(): Promise<void> {
-        await this.secretStore.deleteSecret(this.tokenStorageKey);
+        this.credentialGeneration += 1;
+        await this.enqueueTokenMutation(async () => {
+            await this.secretStore.deleteSecret(this.tokenStorageKey);
+        });
     }
 
     public async getAccessToken(): Promise<string> {
@@ -191,16 +201,66 @@ export class DropboxTokenManager {
         });
     }
 
+    private async enqueueTokenMutation(
+        operation: () => Promise<void>
+    ): Promise<void> {
+        const previous = this.tokenMutationQueue;
+        let release: () => void = () => undefined;
+        this.tokenMutationQueue = new Promise<void>((resolve) => {
+            release = resolve;
+        });
+
+        await previous;
+        try {
+            await operation();
+        } finally {
+            release();
+        }
+    }
+
+    private async storeRefreshedTokens(
+        tokens: DropboxTokens,
+        expectedGeneration: number
+    ): Promise<void> {
+        const parsed = parseDropboxTokens(tokens);
+        await this.enqueueTokenMutation(async () => {
+            if (this.credentialGeneration !== expectedGeneration) {
+                throw new Error(
+                    "Dropbox credentials changed while the access token refresh was in progress."
+                );
+            }
+
+            await this.secretStore.setSecret(
+                this.tokenStorageKey,
+                JSON.stringify(parsed)
+            );
+        });
+    }
+
+    private async clearIfGenerationMatches(
+        expectedGeneration: number
+    ): Promise<void> {
+        await this.enqueueTokenMutation(async () => {
+            if (this.credentialGeneration !== expectedGeneration) {
+                return;
+            }
+
+            this.credentialGeneration += 1;
+            await this.secretStore.deleteSecret(this.tokenStorageKey);
+        });
+    }
+
     /**
      * Revokes the currently stored access token (and corresponding refresh
      * token) via Dropbox's `/2/auth/token/revoke` endpoint.
      *
      * @remarks
      * Network revocation is best-effort. Local stored tokens are cleared after
-     * the revoke attempt so disconnect does not leave stale credentials
-     * behind.
+     * the revoke attempt unless a newer login replaced them while revocation
+     * was in progress.
      */
     public async revokeStoredTokens(): Promise<void> {
+        const credentialGeneration = this.credentialGeneration;
         const tokens = await this.getStoredTokens();
         if (!tokens) {
             return;
@@ -224,15 +284,18 @@ export class DropboxTokenManager {
             );
         }
 
-        await this.clearTokens();
+        await this.clearIfGenerationMatches(credentialGeneration);
     }
 
     public async storeTokens(tokens: DropboxTokens): Promise<void> {
         const parsed = parseDropboxTokens(tokens);
-        await this.secretStore.setSecret(
-            this.tokenStorageKey,
-            JSON.stringify(parsed)
-        );
+        this.credentialGeneration += 1;
+        await this.enqueueTokenMutation(async () => {
+            await this.secretStore.setSecret(
+                this.tokenStorageKey,
+                JSON.stringify(parsed)
+            );
+        });
     }
 }
 

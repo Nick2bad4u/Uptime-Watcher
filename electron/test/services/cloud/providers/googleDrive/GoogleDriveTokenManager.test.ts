@@ -17,6 +17,20 @@ vi.mock("axios", () => ({
     },
 }));
 
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise) => {
+        resolve = resolvePromise;
+    });
+
+    return { promise, resolve };
+}
+
 describe(GoogleDriveTokenManager, () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -80,6 +94,38 @@ describe(GoogleDriveTokenManager, () => {
             expect.stringContaining("grant_type=refresh_token"),
             expect.any(Object)
         );
+    });
+
+    it("does not restore credentials when a refresh completes after clear", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        const refreshResponse = createDeferred<{
+            data: { access_token: string; expires_in: number };
+        }>();
+        axiosPost.mockImplementationOnce(async () => refreshResponse.promise);
+
+        const refresh = manager.getValidAccessToken();
+        await vi.waitFor(() => {
+            expect(axiosPost).toHaveBeenCalledTimes(1);
+        });
+        await manager.clear();
+        refreshResponse.resolve({
+            data: { access_token: "new-access", expires_in: 3600 },
+        });
+
+        await expect(refresh).rejects.toThrow(/credentials changed/iv);
+        await expect(manager.getTokens()).resolves.toBeUndefined();
     });
 
     it("trims non-empty optional token metadata before storing", async () => {
@@ -226,6 +272,40 @@ describe(GoogleDriveTokenManager, () => {
             "VERY_SECRET_TOKEN"
         );
         await expect(manager.getTokens()).resolves.toBeUndefined();
+    });
+
+    it("does not clear a newer login when an older revoke completes", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() + 5 * 60_000,
+            refreshToken: "old-refresh",
+        });
+
+        const revokeResponse = createDeferred<{ data: unknown }>();
+        axiosPost.mockImplementationOnce(async () => revokeResponse.promise);
+
+        const revoke = manager.revoke();
+        await vi.waitFor(() => {
+            expect(axiosPost).toHaveBeenCalledTimes(1);
+        });
+        await manager.setTokens({
+            accessToken: "new-access",
+            expiresAt: Date.now() + 5 * 60_000,
+            refreshToken: "new-refresh",
+        });
+        revokeResponse.resolve({ data: undefined });
+        await revoke;
+
+        await expect(manager.getTokens()).resolves.toMatchObject({
+            accessToken: "new-access",
+            refreshToken: "new-refresh",
+        });
     });
 
     it("treats invalid stored JSON as disconnected", async () => {

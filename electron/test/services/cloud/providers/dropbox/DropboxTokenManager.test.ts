@@ -11,6 +11,20 @@ const createVoidDropboxResponse = (): DropboxResponse<void> => ({
     status: 200,
 });
 
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise) => {
+        resolve = resolvePromise;
+    });
+
+    return { promise, resolve };
+}
+
 afterEach(() => {
     vi.restoreAllMocks();
 });
@@ -82,6 +96,43 @@ describe(DropboxTokenManager, () => {
         expect(stored?.expiresAtEpochMs).toBeGreaterThan(Date.now());
 
         vi.useRealTimers();
+    });
+
+    it("does not restore credentials when a refresh completes after clear", async () => {
+        const secretStore = new InMemorySecretStore();
+        const refreshCompleted = createDeferred<undefined>();
+        const refreshAccessToken = vi.fn(async () => refreshCompleted.promise);
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+            authFactory: () => ({
+                getAccessToken: () => "new-access",
+                getAccessTokenExpiresAt: () => new Date(Date.now() + 3_600_000),
+                getRefreshToken: () => "refresh",
+                refreshAccessToken,
+                setAccessToken: () => {},
+                setAccessTokenExpiresAt: () => {},
+                setClientId: () => {},
+                setRefreshToken: () => {},
+            }),
+        });
+
+        await manager.storeTokens({
+            accessToken: "old-access",
+            expiresAtEpochMs: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        const refresh = manager.getAccessToken();
+        await vi.waitFor(() => {
+            expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+        });
+        await manager.clearTokens();
+        refreshCompleted.resolve(undefined);
+
+        await expect(refresh).rejects.toThrow(/credentials changed/iv);
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
     });
 
     it("persists a rotated refresh token when Dropbox returns one", async () => {
@@ -428,6 +479,40 @@ describe(DropboxTokenManager, () => {
         await expect(
             secretStore.getSecret("cloud.dropbox.tokens")
         ).resolves.toBeUndefined();
+    });
+
+    it("does not clear a newer login when an older revoke completes", async () => {
+        const secretStore = new InMemorySecretStore();
+        const revokeCompleted = createDeferred<DropboxResponse<void>>();
+        const authTokenRevoke = vi.fn(async () => revokeCompleted.promise);
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            clientFactory: () => ({ authTokenRevoke }),
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+        await manager.storeTokens({
+            accessToken: "old-access",
+            expiresAtEpochMs: Date.now() + 5 * 60_000,
+            refreshToken: "old-refresh",
+        });
+
+        const revoke = manager.revokeStoredTokens();
+        await vi.waitFor(() => {
+            expect(authTokenRevoke).toHaveBeenCalledTimes(1);
+        });
+        await manager.storeTokens({
+            accessToken: "new-access",
+            expiresAtEpochMs: Date.now() + 5 * 60_000,
+            refreshToken: "new-refresh",
+        });
+        revokeCompleted.resolve(createVoidDropboxResponse());
+        await revoke;
+
+        await expect(manager.getStoredTokens()).resolves.toMatchObject({
+            accessToken: "new-access",
+            refreshToken: "new-refresh",
+        });
     });
 
     it("clears stored tokens when revoke fails", async () => {
