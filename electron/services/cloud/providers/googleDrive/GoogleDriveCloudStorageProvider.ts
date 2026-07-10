@@ -15,7 +15,6 @@ import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import {
     arrayAt,
     arrayJoin,
-    isEmpty,
     isFinite as isFiniteNumber,
     stringSplit,
 } from "ts-extras";
@@ -620,24 +619,29 @@ export class GoogleDriveCloudStorageProvider
             );
         }
 
-        const response = await drive.files.list({
-            fields: "files(id)",
-            pageSize: 1,
-            q: arrayJoin(conditions, " and "),
-            spaces: "appDataFolder",
-        });
+        let pageToken: null | string = null;
 
-        const parsedList = parseGoogleDriveListResponse(response.data);
-        if (isEmpty(parsedList.files)) {
-            return null;
-        }
+        do {
+            const params: DriveListParams = {
+                fields: "nextPageToken, files(id)",
+                pageSize: 1,
+                q: arrayJoin(conditions, " and "),
+                spaces: "appDataFolder",
+                ...(pageToken && { pageToken }),
+            };
 
-        const [first] = parsedList.files;
-        if (!first?.id) {
-            return null;
-        }
+            // eslint-disable-next-line no-await-in-loop -- Drive pagination requests must be sequential.
+            const response = await drive.files.list(params);
+            const parsedList = parseGoogleDriveListResponse(response.data);
+            pageToken = parsedList.nextPageToken;
 
-        return { id: first.id };
+            const child = parsedList.files.find((file) => file.id);
+            if (child?.id) {
+                return { id: child.id };
+            }
+        } while (pageToken);
+
+        return null;
     }
 
     private async listFolderRecursive(

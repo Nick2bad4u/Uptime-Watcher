@@ -79,6 +79,42 @@ describe(GoogleDriveCloudStorageProvider, () => {
         ).toHaveBeenCalledWith(tokenManager);
     });
 
+    it("continues child lookup when Drive returns an empty page token", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: "next-page" },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [{ id: "root-id" }],
+                    nextPageToken: null,
+                },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: null },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([]);
+
+        expect(
+            googleDriveClientMocks.driveStub.files.list
+        ).toHaveBeenCalledTimes(3);
+        expect(
+            googleDriveClientMocks.driveStub.files.list.mock.calls[1]?.[0]
+        ).toEqual(expect.objectContaining({ pageToken: "next-page" }));
+        expect(
+            googleDriveClientMocks.driveStub.files.create
+        ).not.toHaveBeenCalled();
+    });
+
     it("throws ENOENT when downloading a missing object", async () => {
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),
