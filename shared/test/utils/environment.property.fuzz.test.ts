@@ -143,11 +143,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("handles null/undefined process.env gracefully", () => {
-            globalThis.process = {
-                ...originalProcess,
-
-                env: null as unknown as ProcessSnapshot["env"],
-            };
+            setProcessSnapshotOverrideForTesting({ env: null });
 
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
         });
@@ -448,37 +444,25 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when process.versions is undefined", () => {
-            globalThis.process = {
-                ...originalProcess,
-
-                versions: undefined,
-            };
+            setProcessSnapshotOverrideForTesting({ versions: undefined });
 
             const isResult = isNodeEnvironment();
             expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions is not an object", () => {
-            globalThis.process = {
-                ...originalProcess,
-
-                versions:
-                    "not-an-object" as unknown as ProcessSnapshot["versions"],
-            };
+            setProcessSnapshotOverrideForTesting({
+                versions: "not-an-object",
+            });
 
             const isResult = isNodeEnvironment();
             expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions.node is undefined", () => {
-            globalThis.process = {
-                ...originalProcess,
-                versions: {
-                    ...originalProcess.versions,
-
-                    node: undefined,
-                },
-            };
+            setProcessSnapshotOverrideForTesting({
+                versions: { node: undefined },
+            });
 
             const isResult = isNodeEnvironment();
             expect(isResult).toBeFalsy();
@@ -493,14 +477,9 @@ describe("environment comprehensive fuzzing tests", () => {
             ];
 
             for (const falsyValue of falsyValues) {
-                globalThis.process = {
-                    ...originalProcess,
-                    versions: {
-                        ...originalProcess.versions,
-
-                        node: falsyValue,
-                    },
-                };
+                setProcessSnapshotOverrideForTesting({
+                    versions: { node: falsyValue },
+                });
 
                 const isResult = isNodeEnvironment();
                 expect(isResult).toBeFalsy();

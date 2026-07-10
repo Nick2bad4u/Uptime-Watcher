@@ -151,11 +151,14 @@ const hasProcessSnapshot = (): boolean => isDefined(getProcessSnapshot());
  * @remarks
  * Use {@link resetProcessSnapshotOverrideForTesting} after each test to avoid
  * leaking overrides across suites.
+ *
+ * @param snapshot - Arbitrary process-like value to expose to environment
+ *   guards. Non-object values represent an unavailable process.
  */
-export function setProcessSnapshotOverrideForTesting(
-    snapshot: null | ProcessSnapshot
-): void {
-    processSnapshotState.override = snapshot;
+export function setProcessSnapshotOverrideForTesting(snapshot: unknown): void {
+    processSnapshotState.override = isProcessSnapshot(snapshot)
+        ? snapshot
+        : null;
 }
 
 /**

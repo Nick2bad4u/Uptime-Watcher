@@ -366,6 +366,17 @@ const edgeCaseSiteArbitrary = fc.record({
     }),
 });
 
+const largeSiteArbitrary = fc
+    .tuple(
+        validSiteArbitrary,
+        fc.uniqueArray(validMonitorArbitrary, {
+            selector: (monitor) => monitor.id,
+            minLength: 3,
+            maxLength: 10,
+        })
+    )
+    .map(([site, monitors]) => ({ ...site, monitors }));
+
 /**
  * Helper function to render SiteCard component with mocks in a unique container
  */
@@ -587,27 +598,10 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Performance with Large Datasets", () => {
-        fcTest.prop(
-            [
-                validSiteArbitrary.map((site) => ({
-                    ...site,
-                    monitors: arrayFirst(
-                        fc.sample(
-                            fc.uniqueArray(validMonitorArbitrary, {
-                                selector: (monitor) => monitor.id,
-                                minLength: 3,
-                                maxLength: 10,
-                            }),
-                            1
-                        )
-                    ),
-                })),
-            ],
-            {
-                numRuns: 10,
-                timeout: 10_000,
-            }
-        )("should handle sites with many monitors efficiently", (site) => {
+        fcTest.prop([largeSiteArbitrary], {
+            numRuns: 10,
+            timeout: 10_000,
+        })("should handle sites with many monitors efficiently", (site) => {
             const startTime = performance.now();
             const { unmount } = renderSiteCard(site);
             const endTime = performance.now();

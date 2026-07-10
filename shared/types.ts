@@ -542,16 +542,16 @@ const isFiniteMonitorNumber = (value: unknown): value is number =>
     typeof value === "number" && isFiniteNumber(value);
 
 /**
- * Determines whether a string represents a computed site-only status value.
+ * Determines whether a value represents a computed site-only status value.
  *
- * @param status - Status string to evaluate.
+ * @param status - Value to evaluate.
  *
  * @returns `true` when the value is either `mixed` or `unknown`.
  *
  * @public
  */
 export function isComputedSiteStatus(
-    status: string
+    status: unknown
 ): status is typeof STATUS_KIND.MIXED | typeof STATUS_KIND.UNKNOWN {
     return status === STATUS_KIND.MIXED || status === STATUS_KIND.UNKNOWN;
 }

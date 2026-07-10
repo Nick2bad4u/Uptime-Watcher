@@ -22,8 +22,7 @@ describe("shared/utils/objectSafety", () => {
                 value: "safe-value",
             });
 
-            const result =
-                objectSafetyModule.createNullPrototypeObject(source);
+            const result = objectSafetyModule.createNullPrototypeObject(source);
 
             result["stable"] = "value";
             Reflect.set(result, "__proto__", "safe-value");
@@ -156,9 +155,7 @@ describe("shared/utils/objectSafety", () => {
                     fc.subarray(["omit1", "omit2"] as const),
                     (obj, keysToOmit) => {
                         type ObjectKey = keyof typeof obj;
-                        const keysToOmitSet = new Set<ObjectKey>(
-                            keysToOmit
-                        );
+                        const keysToOmitSet = new Set<ObjectKey>(keysToOmit);
                         const result = objectSafetyModule.safeObjectOmit(
                             obj,
                             keysToOmit
@@ -178,7 +175,9 @@ describe("shared/utils/objectSafety", () => {
                             }
 
                             expect(result).toHaveProperty(key);
-                            expect(result[key]).toBe(obj[key]);
+                            expect(Reflect.get(result, key)).toBe(
+                                Reflect.get(obj, key)
+                            );
                         }
                     }
                 )
@@ -213,9 +212,7 @@ describe("shared/utils/objectSafety", () => {
                     fc.subarray(["pick1", "pick2"] as const),
                     (obj, keysToPick) => {
                         type ObjectKey = keyof typeof obj;
-                        const keysToPickSet = new Set<ObjectKey>(
-                            keysToPick
-                        );
+                        const keysToPickSet = new Set<ObjectKey>(keysToPick);
                         const result = objectSafetyModule.safeObjectPick(
                             obj,
                             keysToPick
