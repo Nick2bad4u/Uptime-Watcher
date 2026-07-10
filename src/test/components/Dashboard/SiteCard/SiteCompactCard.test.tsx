@@ -8,6 +8,10 @@ import { arrayAt, arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteCompactCard";
+import type { ActionButtonGroupProperties } from "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup";
+import type { MonitorSelectorProperties } from "../../../../components/Dashboard/SiteCard/components/MonitorSelector";
+import type { UseSiteResult } from "../../../../hooks/site/useSite";
+import type { ThemedBoxProperties } from "../../../../theme/components/ThemedBox";
 import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
 
 const mockUseSite = vi.hoisted(() => vi.fn());
@@ -19,7 +23,7 @@ vi.mock("../../../../hooks/site/useSite", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedBox", () => ({
-    ThemedBox: ({ children, onClick }: any) => (
+    ThemedBox: ({ children, onClick }: ThemedBoxProperties) => (
         <div data-testid="themed-box" onClick={onClick}>
             {children}
         </div>
@@ -47,17 +51,20 @@ vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
 vi.mock(
     "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
-        MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
+        MonitorSelector: ({
+            onChange,
+            selectedMonitorId,
+        }: MonitorSelectorProperties) => {
             monitorSelectorCalls.push({ selectedMonitorId });
             return (
-                <button
+                <select
                     data-testid="monitor-selector"
-                    onClick={() =>
-                        onChange({ target: { value: "monitor-2" } })
-                    }
+                    onChange={onChange}
+                    value={selectedMonitorId}
                 >
-                    monitor
-                </button>
+                    <option value="monitor-1">Monitor 1</option>
+                    <option value="monitor-2">Monitor 2</option>
+                </select>
             );
         },
     })
@@ -66,7 +73,11 @@ vi.mock(
 vi.mock(
     "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
-        ActionButtonGroup: ({ disabled, isMonitoring, onCheckNow }: any) => {
+        ActionButtonGroup: ({
+            disabled,
+            isMonitoring,
+            onCheckNow,
+        }: ActionButtonGroupProperties) => {
             actionButtonCalls.push({ disabled, isMonitoring });
             return (
                 <button
@@ -103,13 +114,15 @@ const baseSite: Site = {
 
 describe(SiteCompactCard, () => {
     const user = userEvent.setup();
-    let siteState: any;
+    let siteState: UseSiteResult;
 
     beforeEach(() => {
         monitorSelectorCalls.length = 0;
         actionButtonCalls.length = 0;
         siteState = {
+            averageResponseTime: 180,
             checkCount: 42,
+            filteredHistory: baseMonitorHistory,
             handleCardClick: vi.fn(),
             handleCheckNow: vi.fn(),
             handleMonitorIdChange: vi.fn(),
@@ -121,9 +134,10 @@ describe(SiteCompactCard, () => {
             isMonitoring: true,
             latestSite: baseSite,
             monitor: arrayFirst(baseSite.monitors),
+            monitorIds: ["monitor-1"],
             responseTime: 180,
             selectedMonitorId: "monitor-1",
-            status: "degraded",
+            status: STATUS_KIND.DOWN,
             uptime: 99.1,
         };
         mockUseSite.mockReturnValue(siteState);
@@ -206,6 +220,6 @@ describe(SiteCompactCard, () => {
 
         expect(
             screen.getByText(/tap for detailed analytics/i)
-        ).toHaveTextContent("Tap for detailed analytics • Degraded");
+        ).toHaveTextContent("Tap for detailed analytics • Down");
     });
 });

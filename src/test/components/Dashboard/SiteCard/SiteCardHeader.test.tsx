@@ -7,8 +7,11 @@ import { arrayAt, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
+import type { ActionButtonGroupProperties } from "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup";
+import type { MonitorSelectorProperties } from "../../../../components/Dashboard/SiteCard/components/MonitorSelector";
 
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
+const monitorSelectionValues: string[] = [];
 const actionButtonCalls: {
     allMonitorsRunning: boolean;
     disabled: boolean;
@@ -24,17 +27,23 @@ vi.mock("../../../../theme/components/ThemedText", () => ({
 vi.mock(
     "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
     () => ({
-        MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
+        MonitorSelector: ({
+            onChange,
+            selectedMonitorId,
+        }: MonitorSelectorProperties) => {
             monitorSelectorCalls.push({ selectedMonitorId });
             return (
-                <button
+                <select
                     data-testid="monitor-selector"
-                    onClick={() =>
-                        onChange({ target: { value: "monitor-2" } })
-                    }
+                    onChange={(event) => {
+                        monitorSelectionValues.push(event.target.value);
+                        onChange(event);
+                    }}
+                    value={selectedMonitorId}
                 >
-                    select
-                </button>
+                    <option value="monitor-1">Monitor 1</option>
+                    <option value="monitor-2">Monitor 2</option>
+                </select>
             );
         },
     })
@@ -52,7 +61,7 @@ vi.mock(
             onStartSiteMonitoring,
             onStopMonitoring,
             onStopSiteMonitoring,
-        }: any) => {
+        }: ActionButtonGroupProperties) => {
             actionButtonCalls.push({
                 allMonitorsRunning,
                 disabled,
@@ -158,6 +167,7 @@ describe(SiteCardHeader, () => {
 
     beforeEach(() => {
         monitorSelectorCalls.length = 0;
+        monitorSelectionValues.length = 0;
         actionButtonCalls.length = 0;
         for (const fn of objectValues(baseProps.interactions)) fn.mockClear();
     });
@@ -172,11 +182,12 @@ describe(SiteCardHeader, () => {
         render(<SiteCardHeader {...baseProps} />);
 
         const selector = screen.getByTestId("monitor-selector");
-        await user.click(selector);
+        await user.selectOptions(selector, "monitor-2");
 
-        expect(baseProps.interactions.onMonitorIdChange).toHaveBeenCalledWith(
-            expect.objectContaining({ target: { value: "monitor-2" } })
+        expect(baseProps.interactions.onMonitorIdChange).toHaveBeenCalledTimes(
+            1
         );
+        expect(arrayAt(monitorSelectionValues, -1)).toBe("monitor-2");
         expect(arrayAt(monitorSelectorCalls, -1)).toEqual({
             selectedMonitorId: "monitor-1",
         });
