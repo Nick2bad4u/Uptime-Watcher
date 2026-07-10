@@ -235,20 +235,25 @@ describe("databaseService strict coverage", () => {
         service.initialize();
 
         const [db] = databaseInstances;
-        db!.inTransaction = true;
         db!.run.mockClear();
 
         const operation = vi.fn(async () => "nested result");
-        const result = await service.executeTransaction(operation);
+        const outerOperation = vi.fn(() =>
+            service.executeTransaction(operation)
+        );
+        const result = await service.executeTransaction(outerOperation);
 
         expect(result).toBe("nested result");
+        expect(outerOperation).toHaveBeenCalledWith(db);
         expect(operation).toHaveBeenCalledWith(db);
+        expect(db!.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
         expect(db!.run).toHaveBeenCalledWith(
             expect.stringMatching(/^SAVEPOINT uptime_watcher_sp_\d+$/u)
         );
         expect(db!.run).toHaveBeenCalledWith(
             expect.stringMatching(/^RELEASE uptime_watcher_sp_\d+$/u)
         );
+        expect(db!.run).toHaveBeenCalledWith("COMMIT");
         const logger = getLoggerMock();
 
         expect(logger.warn).toHaveBeenCalledWith(
@@ -270,20 +275,23 @@ describe("databaseService strict coverage", () => {
         service.initialize();
 
         const [db] = databaseInstances;
-        db!.inTransaction = true;
         db!.run.mockClear();
 
         const operation = vi.fn(() => "nested sync result");
-        const result = await service.executeTransaction(operation);
+        const result = await service.executeTransaction(() =>
+            service.executeTransaction(operation)
+        );
 
         expect(result).toBe("nested sync result");
         expect(operation).toHaveBeenCalledWith(db);
+        expect(db!.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
         expect(db!.run).toHaveBeenCalledWith(
             expect.stringMatching(/^SAVEPOINT uptime_watcher_sp_\d+$/u)
         );
         expect(db!.run).toHaveBeenCalledWith(
             expect.stringMatching(/^RELEASE uptime_watcher_sp_\d+$/u)
         );
+        expect(db!.run).toHaveBeenCalledWith("COMMIT");
     });
 
     it("commits successful transactions and returns the operation result", async () => {
