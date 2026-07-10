@@ -274,9 +274,11 @@ export async function replaceDatabaseFile(args: {
         );
         if (rollbackErrors.length > 0) {
             throw new AggregateError(
-                [copyError, initError, ...rollbackErrors].filter(
-                    (failure): failure is Error => Boolean(failure)
-                ),
+                [
+                    copyError,
+                    initError,
+                    ...rollbackErrors,
+                ].filter((failure): failure is Error => Boolean(failure)),
                 "Failed to restore database file and preserve the previous database state",
                 { cause: error }
             );

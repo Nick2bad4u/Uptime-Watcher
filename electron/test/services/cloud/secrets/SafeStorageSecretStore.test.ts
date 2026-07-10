@@ -333,10 +333,7 @@ describe(FallbackSecretStore, () => {
         const fallback = new MutableSecretStore();
         const store = new FallbackSecretStore({ fallback, primary });
 
-        await fallback.setSecret(
-            "cloud.dropbox.tokens",
-            "stale-token-json"
-        );
+        await fallback.setSecret("cloud.dropbox.tokens", "stale-token-json");
         fallback.shouldFailDelete = true;
         fallback.shouldFailSet = true;
 
