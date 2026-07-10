@@ -5,6 +5,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [23.9.0] - 2026-07-10
+
 ## [23.8.0] - 2026-05-06
 
 [[b48e2cb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b48e2cbfcd42b66be9ce1c9fc3c9f4bca9ef225a)...

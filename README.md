@@ -1,7 +1,7 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-23.8.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-23.9.0-blue.svg" alt="Version">
 </a>
 <a href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
@@ -391,4 +391,4 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: June 2026 • Version 23.8.0</em></div>
+<em>Last updated: July 2026 • Version 23.9.0</em></div>
