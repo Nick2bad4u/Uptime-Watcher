@@ -2,110 +2,181 @@
  * @file Lifecycle and error-path tests for EnhancedMonitorChecker.
  */
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EnhancedMonitorChecker } from "../../../services/monitoring/EnhancedMonitorChecker";
+import type { IMonitorService } from "../../../services/monitoring/types";
+
+type CheckerConfig = ConstructorParameters<typeof EnhancedMonitorChecker>[0];
+
+const defaultMonitor = {
+    checkInterval: 30_000,
+    history: [],
+    id: "monitor-1",
+    lastChecked: new Date(),
+    monitoring: true,
+    responseTime: 200,
+    retryAttempts: 3,
+    status: "up",
+    timeout: 10_000,
+    type: "http",
+    url: "https://example.com/",
+} satisfies Monitor;
+
+const createEventBusMock = () =>
+    ({
+        emitTyped: vi
+            .fn<CheckerConfig["eventEmitter"]["emitTyped"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<CheckerConfig["eventEmitter"]>;
+
+const createSitesCacheMock = () =>
+    ({
+        get: vi.fn<CheckerConfig["sites"]["get"]>(),
+    }) satisfies Partial<CheckerConfig["sites"]>;
+
+const createSiteRepositoryMock = () =>
+    ({
+        findByIdentifier:
+            vi.fn<CheckerConfig["siteRepository"]["findByIdentifier"]>(),
+    }) satisfies Partial<CheckerConfig["siteRepository"]>;
+
+const createMonitorRepositoryMock = () =>
+    ({
+        clearActiveOperations: vi
+            .fn<CheckerConfig["monitorRepository"]["clearActiveOperations"]>()
+            .mockResolvedValue(undefined),
+        findByIdentifier: vi
+            .fn<CheckerConfig["monitorRepository"]["findByIdentifier"]>()
+            .mockResolvedValue(defaultMonitor),
+        update: vi
+            .fn<CheckerConfig["monitorRepository"]["update"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<CheckerConfig["monitorRepository"]>;
+
+const createHistoryRepositoryMock = () =>
+    ({
+        addEntry: vi
+            .fn<CheckerConfig["historyRepository"]["addEntry"]>()
+            .mockResolvedValue(undefined),
+        findByMonitorId: vi
+            .fn<CheckerConfig["historyRepository"]["findByMonitorId"]>()
+            .mockResolvedValue([]),
+    }) satisfies Partial<CheckerConfig["historyRepository"]>;
+
+const createOperationRegistryMock = () =>
+    ({
+        cancelOperations: vi
+            .fn<CheckerConfig["operationRegistry"]["cancelOperations"]>()
+            .mockReturnValue(undefined),
+        completeOperation:
+            vi.fn<CheckerConfig["operationRegistry"]["completeOperation"]>(),
+        getOutstandingOperationIds: vi
+            .fn<
+                CheckerConfig["operationRegistry"]["getOutstandingOperationIds"]
+            >()
+            .mockReturnValue([]),
+        hasOutstandingOperation: vi
+            .fn<CheckerConfig["operationRegistry"]["hasOutstandingOperation"]>()
+            .mockReturnValue(false),
+        initiateCheck:
+            vi.fn<CheckerConfig["operationRegistry"]["initiateCheck"]>(),
+        validateOperation:
+            vi.fn<CheckerConfig["operationRegistry"]["validateOperation"]>(),
+    }) satisfies Partial<CheckerConfig["operationRegistry"]>;
+
+const createTimeoutManagerMock = () =>
+    ({
+        clearTimeout: vi.fn<CheckerConfig["timeoutManager"]["clearTimeout"]>(),
+        scheduleTimeout:
+            vi.fn<CheckerConfig["timeoutManager"]["scheduleTimeout"]>(),
+    }) satisfies Partial<CheckerConfig["timeoutManager"]>;
+
+const createStatusUpdateServiceMock = () =>
+    ({
+        updateMonitorStatus:
+            vi.fn<
+                CheckerConfig["statusUpdateService"]["updateMonitorStatus"]
+            >(),
+    }) satisfies Partial<CheckerConfig["statusUpdateService"]>;
+
+const createMonitorServiceMock = (type: Monitor["type"]) =>
+    ({
+        check: vi.fn<IMonitorService["check"]>(),
+        getType: vi.fn<IMonitorService["getType"]>().mockReturnValue(type),
+        updateConfig: vi.fn<IMonitorService["updateConfig"]>(),
+    }) satisfies IMonitorService;
 
 describe("EnhancedMonitorChecker lifecycle behavior", () => {
     let enhancedChecker: EnhancedMonitorChecker;
-    let mockEventBus: any;
-    let mockSitesCache: any;
-    let mockSiteRepository: any;
-    let mockMonitorRepository: any;
-    let mockHistoryRepository: any;
-    let mockOperationRegistry: any;
-    let mockTimeoutManager: any;
-    let mockStatusUpdateService: any;
+    let mockEventBus: ReturnType<typeof createEventBusMock>;
+    let mockSitesCache: ReturnType<typeof createSitesCacheMock>;
+    let mockSiteRepository: ReturnType<typeof createSiteRepositoryMock>;
+    let mockMonitorRepository: ReturnType<typeof createMonitorRepositoryMock>;
+    let mockHistoryRepository: ReturnType<typeof createHistoryRepositoryMock>;
+    let mockOperationRegistry: ReturnType<typeof createOperationRegistryMock>;
+    let mockTimeoutManager: ReturnType<typeof createTimeoutManagerMock>;
+    let mockStatusUpdateService: ReturnType<
+        typeof createStatusUpdateServiceMock
+    >;
+    let mockHttpMonitorService: ReturnType<typeof createMonitorServiceMock>;
+
+    const createChecker = (): EnhancedMonitorChecker =>
+        new EnhancedMonitorChecker({
+            eventEmitter:
+                mockEventBus as unknown as CheckerConfig["eventEmitter"],
+            getHistoryLimit: () => 100,
+            historyRepository:
+                mockHistoryRepository as unknown as CheckerConfig["historyRepository"],
+            monitorRepository:
+                mockMonitorRepository as unknown as CheckerConfig["monitorRepository"],
+            operationRegistry:
+                mockOperationRegistry as unknown as CheckerConfig["operationRegistry"],
+            siteRepository:
+                mockSiteRepository as unknown as CheckerConfig["siteRepository"],
+            sites: mockSitesCache as unknown as CheckerConfig["sites"],
+            statusUpdateService:
+                mockStatusUpdateService as unknown as CheckerConfig["statusUpdateService"],
+            timeoutManager:
+                mockTimeoutManager as unknown as CheckerConfig["timeoutManager"],
+        });
 
     beforeEach(() => {
         // Create mock dependencies
-        mockEventBus = {
-            emit: vi.fn().mockResolvedValue(undefined),
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-        };
-
-        mockSitesCache = {
-            get: vi.fn(),
-        };
-
-        mockSiteRepository = {
-            findByIdentifier: vi.fn(),
-        };
-
-        mockMonitorRepository = {
-            update: vi.fn().mockResolvedValue(true),
-            clearActiveOperations: vi.fn().mockResolvedValue(undefined),
-            findByIdentifier: vi.fn().mockResolvedValue({
-                id: "monitor-1",
-                type: "http",
-                url: "https://example.com/",
-                status: "up",
-                lastChecked: new Date(),
-                checkInterval: 30_000,
-                history: [],
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                timeout: 10_000,
-            }),
-            create: vi.fn(),
-        };
-
-        mockHistoryRepository = {
-            create: vi.fn(),
-            addEntry: vi.fn().mockResolvedValue(undefined),
-            findByMonitorId: vi.fn().mockResolvedValue([]),
-        };
-
-        mockOperationRegistry = {
-            initiateCheck: vi.fn(),
-            validateOperation: vi.fn(),
-            completeOperation: vi.fn(),
-            cancelOperations: vi.fn().mockReturnValue(undefined),
-            hasOutstandingOperation: vi.fn().mockReturnValue(false),
-            getOutstandingOperationIds: vi.fn().mockReturnValue([]),
-        };
+        mockEventBus = createEventBusMock();
+        mockSitesCache = createSitesCacheMock();
+        mockSiteRepository = createSiteRepositoryMock();
+        mockMonitorRepository = createMonitorRepositoryMock();
+        mockHistoryRepository = createHistoryRepositoryMock();
+        mockOperationRegistry = createOperationRegistryMock();
+        mockTimeoutManager = createTimeoutManagerMock();
+        mockStatusUpdateService = createStatusUpdateServiceMock();
 
         mockOperationRegistry.initiateCheck.mockReturnValue({
             operationId: "op-default",
             signal: new AbortController().signal,
         });
 
-        mockTimeoutManager = {
-            createTimeout: vi.fn(),
-            scheduleTimeout: vi.fn(),
-            clearTimeout: vi.fn(),
-        };
-
-        mockStatusUpdateService = {
-            updateMonitorStatus: vi.fn(),
-        };
-
         // Create the EnhancedMonitorChecker instance
-        enhancedChecker = new EnhancedMonitorChecker({
-            eventEmitter: mockEventBus,
-            getHistoryLimit: () => 100,
-            historyRepository: mockHistoryRepository,
-            monitorRepository: mockMonitorRepository,
-            operationRegistry: mockOperationRegistry,
-            siteRepository: mockSiteRepository,
-            sites: mockSitesCache,
-            statusUpdateService: mockStatusUpdateService,
-            timeoutManager: mockTimeoutManager,
-        });
+        enhancedChecker = createChecker();
 
         // Replace monitor service implementations with deterministic mocks.
-        const servicesByType = (enhancedChecker as any).servicesByType as Map<
-            string,
-            any
-        >;
-
-        servicesByType.set("http", { check: vi.fn() });
-        servicesByType.set("ping", { check: vi.fn() });
-        servicesByType.set("port", { check: vi.fn() });
-        servicesByType.set("dns", { check: vi.fn() });
+        mockHttpMonitorService = createMonitorServiceMock("http");
+        enhancedChecker.servicesByType.set("http", mockHttpMonitorService);
+        enhancedChecker.servicesByType.set(
+            "ping",
+            createMonitorServiceMock("ping")
+        );
+        enhancedChecker.servicesByType.set(
+            "port",
+            createMonitorServiceMock("port")
+        );
+        enhancedChecker.servicesByType.set(
+            "dns",
+            createMonitorServiceMock("dns")
+        );
     });
 
     describe("Constructor and Initialization", () => {
@@ -121,17 +192,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
-            const checker = new EnhancedMonitorChecker({
-                eventEmitter: mockEventBus,
-                getHistoryLimit: () => 100,
-                historyRepository: mockHistoryRepository,
-                monitorRepository: mockMonitorRepository,
-                operationRegistry: mockOperationRegistry,
-                siteRepository: mockSiteRepository,
-                sites: mockSitesCache,
-                statusUpdateService: mockStatusUpdateService,
-                timeoutManager: mockTimeoutManager,
-            });
+            const checker = createChecker();
 
             expect(checker).toBeDefined();
         });
@@ -159,6 +220,16 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             ],
         };
 
+        const getMockSiteMonitor = (): Monitor => {
+            const monitor = mockSite.monitors[0];
+            if (!monitor) {
+                throw new TypeError(
+                    "Expected the mock site to contain a monitor"
+                );
+            }
+            return monitor;
+        };
+
         it("should handle manual check with valid site and monitor", async ({
             task,
             annotate,
@@ -172,15 +243,13 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Type: Monitoring", "type");
 
             // Mock the repository methods that are called
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.update.mockResolvedValue(undefined);
             mockMonitorRepository.findByIdentifier.mockResolvedValue({
-                ...mockSite.monitors[0],
+                ...getMockSiteMonitor(),
                 status: "up",
                 lastChecked: new Date(),
                 responseTime: 200,
             });
-            mockHistoryRepository.create.mockResolvedValue(undefined);
-
             // Mock the HTTP monitor check method to return success
             const mockCheckResult = {
                 details: "Check successful",
@@ -189,9 +258,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             };
 
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).servicesByType
-                .get("http")
-                .check.mockResolvedValue(mockCheckResult);
+            mockHttpMonitorService.check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -223,68 +290,61 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Cancellation", "type");
 
-            const baseMonitor = mockSite.monitors[0];
-            expect(baseMonitor).toBeDefined();
+            const baseMonitor = getMockSiteMonitor();
 
             const fastTimeoutSite: Site = {
                 ...mockSite,
                 monitors: [
                     {
-                        ...baseMonitor!,
+                        ...baseMonitor,
                         timeout: 50,
                     },
                 ],
             };
 
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.update.mockResolvedValue(undefined);
             mockMonitorRepository.findByIdentifier.mockResolvedValue({
                 ...fastTimeoutSite.monitors[0]!,
                 status: "down",
                 lastChecked: new Date(),
                 responseTime: 0,
             });
-            mockHistoryRepository.create.mockResolvedValue(undefined);
-
             const checkMock = vi
-                .fn()
-                .mockImplementation(
-                    async (_monitor: unknown, signal?: AbortSignal) => {
-                        if (!signal) {
-                            throw new Error("Missing AbortSignal");
-                        }
-
-                        await Promise.race([
-                            new Promise<void>((resolve) => {
-                                signal.addEventListener(
-                                    "abort",
-                                    () => {
-                                        resolve();
-                                    },
-                                    { once: true }
-                                );
-                            }),
-                            new Promise<void>((_resolve, reject) => {
-                                setTimeout(() => {
-                                    reject(
-                                        new Error(
-                                            "Manual check did not abort within test window"
-                                        )
-                                    );
-                                }, 500);
-                            }),
-                        ]);
-
-                        return {
-                            details: "aborted",
-                            responseTime: 0,
-                            status: "down" as const,
-                        };
+                .fn<IMonitorService["check"]>()
+                .mockImplementation(async (_monitor, signal) => {
+                    if (!signal) {
+                        throw new Error("Missing AbortSignal");
                     }
-                );
 
-            (enhancedChecker as any).servicesByType
-                .get("http")
-                .check.mockImplementation(checkMock);
+                    await Promise.race([
+                        new Promise<void>((resolve) => {
+                            signal.addEventListener(
+                                "abort",
+                                () => {
+                                    resolve();
+                                },
+                                { once: true }
+                            );
+                        }),
+                        new Promise<void>((_resolve, reject) => {
+                            setTimeout(() => {
+                                reject(
+                                    new Error(
+                                        "Manual check did not abort within test window"
+                                    )
+                                );
+                            }, 500);
+                        }),
+                    ]);
+
+                    return {
+                        details: "aborted",
+                        responseTime: 0,
+                        status: "down" as const,
+                    };
+                });
+
+            mockHttpMonitorService.check.mockImplementation(checkMock);
 
             const result = await enhancedChecker.checkMonitor(
                 fastTimeoutSite,
@@ -293,8 +353,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             );
 
             expect(checkMock).toHaveBeenCalledTimes(1);
-            const signal = checkMock.mock.calls[0]?.[1] as
-                AbortSignal | undefined;
+            const signal = checkMock.mock.calls[0]?.[1];
             expect(signal).toBeDefined();
             expect(signal?.aborted).toBeTruthy();
             expect(result?.status).toBe("down");
@@ -334,15 +393,13 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Type: Error Handling", "type");
 
             // Mock the repository methods that are called
-            mockMonitorRepository.update.mockResolvedValue(true);
+            mockMonitorRepository.update.mockResolvedValue(undefined);
             mockMonitorRepository.findByIdentifier.mockResolvedValue({
-                ...mockSite.monitors[0],
+                ...getMockSiteMonitor(),
                 status: "down",
                 lastChecked: new Date(),
                 responseTime: -1,
             });
-            mockHistoryRepository.create.mockResolvedValue(undefined);
-
             // Mock the internal monitor check to return failure
             const mockCheckResult = {
                 details: "Connection timeout",
@@ -351,9 +408,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             };
 
             // Mock the HTTP monitor's check method directly
-            (enhancedChecker as any).servicesByType
-                .get("http")
-                .check.mockResolvedValue(mockCheckResult);
+            mockHttpMonitorService.check.mockResolvedValue(mockCheckResult);
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -377,9 +432,13 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            (enhancedChecker as any).servicesByType.set("http", {
+            const invalidService = {
                 check: vi.fn().mockResolvedValue(null),
-            });
+            };
+            enhancedChecker.servicesByType.set(
+                "http",
+                invalidService as unknown as IMonitorService
+            );
 
             const result = await enhancedChecker.checkMonitor(
                 mockSite,
@@ -409,11 +468,9 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
                 signal: new AbortController().signal,
             });
 
-            (enhancedChecker as any).servicesByType.set("http", {
-                check: vi.fn().mockResolvedValue({
-                    status: "up",
-                    responseTime: 200,
-                }),
+            mockHttpMonitorService.check.mockResolvedValue({
+                responseTime: 200,
+                status: "up",
             });
             mockStatusUpdateService.updateMonitorStatus.mockRejectedValue(
                 new Error("Update failed")
@@ -448,9 +505,10 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
                 signal: new AbortController().signal,
             });
 
-            (enhancedChecker as any).servicesByType
-                .get("http")
-                .check.mockResolvedValue({ status: "up", responseTime: 1 });
+            mockHttpMonitorService.check.mockResolvedValue({
+                responseTime: 1,
+                status: "up",
+            });
             mockStatusUpdateService.updateMonitorStatus.mockResolvedValue(
                 false
             );
@@ -779,7 +837,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             await annotate("Type: Monitoring", "type");
 
             // Simulate missing service wiring.
-            (enhancedChecker as any).servicesByType.delete("http");
+            enhancedChecker.servicesByType.delete("http");
 
             const mockSite: Site = {
                 identifier: "test-site",
@@ -846,7 +904,7 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
             });
 
             // Simulate missing service wiring for this monitor type.
-            (enhancedChecker as any).servicesByType.delete("dns");
+            enhancedChecker.servicesByType.delete("dns");
 
             const mockSite: Site = {
                 identifier: "test-site",

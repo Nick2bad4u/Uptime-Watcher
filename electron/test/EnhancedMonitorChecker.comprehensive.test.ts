@@ -2,7 +2,109 @@ import type { Monitor, Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { UptimeEvents } from "../events/eventTypes";
+import type { HistoryRepository } from "../services/database/HistoryRepository";
+import type { MonitorRepository } from "../services/database/MonitorRepository";
+import type { SiteRepository } from "../services/database/SiteRepository";
+import type { EnhancedMonitorCheckConfig } from "../services/monitoring/EnhancedMonitorChecker";
+
+import { TypedEventBus } from "../events/TypedEventBus";
 import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
+import { MonitorOperationRegistry } from "../services/monitoring/MonitorOperationRegistry";
+import { MonitorStatusUpdateService } from "../services/monitoring/MonitorStatusUpdateService";
+import { OperationTimeoutManager } from "../services/monitoring/OperationTimeoutManager";
+import { StandardizedCache } from "../utils/cache/StandardizedCache";
+
+const EVENT_BUS_ID = "enhanced-monitor-checker-test";
+
+const createHistoryRepositoryMock = () =>
+    ({
+        addEntry: vi
+            .fn<HistoryRepository["addEntry"]>()
+            .mockResolvedValue(undefined),
+        findByMonitorId: vi
+            .fn<HistoryRepository["findByMonitorId"]>()
+            .mockResolvedValue([]),
+    }) satisfies Partial<HistoryRepository>;
+
+const createMonitorRepositoryMock = () =>
+    ({
+        clearActiveOperations: vi
+            .fn<MonitorRepository["clearActiveOperations"]>()
+            .mockResolvedValue(undefined),
+        findByIdentifier: vi
+            .fn<MonitorRepository["findByIdentifier"]>()
+            .mockResolvedValue(undefined),
+        update: vi
+            .fn<MonitorRepository["update"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<MonitorRepository>;
+
+const createSiteRepositoryMock = () =>
+    ({
+        findByIdentifier: vi
+            .fn<SiteRepository["findByIdentifier"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<SiteRepository>;
+
+/**
+ * Promotes contract-checked partial test doubles at the fixture boundary.
+ */
+const asMockContract = <Contract extends object>(
+    mock: Partial<Contract>
+): Contract => mock as Contract;
+
+const createCheckerFixture = () => {
+    const eventEmitter = new TypedEventBus<UptimeEvents>(EVENT_BUS_ID);
+    const historyRepositoryMock = createHistoryRepositoryMock();
+    const monitorRepositoryMock = createMonitorRepositoryMock();
+    const siteRepositoryMock = createSiteRepositoryMock();
+    const historyRepository = asMockContract<HistoryRepository>(
+        historyRepositoryMock
+    );
+    const monitorRepository = asMockContract<MonitorRepository>(
+        monitorRepositoryMock
+    );
+    const siteRepository = asMockContract<SiteRepository>(siteRepositoryMock);
+    const operationRegistry = new MonitorOperationRegistry({
+        randomUUID: () => "operation-123",
+    });
+    const sites = new StandardizedCache<Site>({
+        eventEmitter,
+        name: "enhanced-monitor-checker-sites",
+        ttl: 0,
+    });
+    const timeoutManager = new OperationTimeoutManager(
+        operationRegistry,
+        monitorRepository
+    );
+    const statusUpdateService = new MonitorStatusUpdateService(
+        operationRegistry,
+        monitorRepository,
+        sites,
+        timeoutManager
+    );
+    const config = {
+        eventEmitter,
+        getHistoryLimit: () => 100,
+        historyRepository,
+        monitorRepository,
+        operationRegistry,
+        siteRepository,
+        sites,
+        statusUpdateService,
+        timeoutManager,
+    } satisfies EnhancedMonitorCheckConfig;
+
+    return {
+        checker: new EnhancedMonitorChecker(config),
+        eventEmitter,
+        monitorRepositoryMock,
+    };
+};
+
+const getDynamicEventMetadata = (event: object): unknown =>
+    Reflect.get(event, "_meta") as unknown;
 
 function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
@@ -32,136 +134,11 @@ function createTestSite(overrides: Partial<Site> = {}): Site {
 
 describe(EnhancedMonitorChecker, () => {
     let checker: EnhancedMonitorChecker;
-    let mockConfig: any;
+    let fixture: ReturnType<typeof createCheckerFixture>;
 
     beforeEach(() => {
-        // Create a basic mock configuration that satisfies TypeScript requirements
-        mockConfig = {
-            eventEmitter: {
-                emitTyped: vi.fn().mockResolvedValue(undefined),
-                // Add other required properties as needed
-                busId: "test-bus",
-                maxMiddleware: 10,
-                middlewares: [],
-                processMiddleware: vi.fn(),
-                emit: vi.fn(),
-                on: vi.fn(),
-                off: vi.fn(),
-                once: vi.fn(),
-                removeAllListeners: vi.fn(),
-                listeners: vi.fn(),
-                listenerCount: vi.fn(),
-                eventNames: vi.fn(),
-                setMaxListeners: vi.fn(),
-                getMaxListeners: vi.fn(),
-                prependListener: vi.fn(),
-                prependOnceListener: vi.fn(),
-                rawListeners: vi.fn(),
-                addListener: vi.fn(),
-                removeListener: vi.fn(),
-                destroy: vi.fn(),
-                destroyed: false,
-                [Symbol.asyncIterator]: vi.fn(),
-                [Symbol.dispose]: vi.fn(),
-            } as any,
-            getHistoryLimit: vi.fn().mockReturnValue(100),
-            historyRepository: {
-                create: vi.fn(),
-                findById: vi.fn(),
-                findBySiteId: vi.fn(),
-                findAll: vi.fn(),
-                findByTimeRange: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
-                deleteAll: vi.fn(),
-                deleteBySiteId: vi.fn(),
-                deleteBySiteIdAndOlderThan: vi.fn(),
-                executeTransaction: vi.fn(),
-                repository: {} as any,
-            } as any,
-            monitorRepository: {
-                create: vi.fn(),
-                findById: vi.fn(),
-                findBySiteId: vi.fn(),
-                findAll: vi.fn(),
-                clearActiveOperations: vi.fn().mockResolvedValue(undefined),
-                update: vi.fn().mockResolvedValue(undefined),
-                delete: vi.fn(),
-                deleteAll: vi.fn(),
-                deleteBySiteId: vi.fn(),
-                executeTransaction: vi.fn(),
-                repository: {} as any,
-            } as any,
-            operationRegistry: {
-                initiateCheck: vi.fn().mockReturnValue("operation-123"),
-                completeOperation: vi.fn(),
-                cancelOperations: vi.fn(),
-                getOperation: vi.fn().mockReturnValue(null),
-                getAllOperations: vi.fn(),
-            } as any,
-            siteRepository: {
-                create: vi.fn(),
-                findById: vi.fn(),
-                findAll: vi.fn(),
-                update: vi.fn(),
-                delete: vi.fn(),
-                deleteAll: vi.fn(),
-                executeTransaction: vi.fn(),
-                repository: {} as any,
-            } as any,
-            sites: {
-                get: vi.fn(),
-                set: vi.fn(),
-                delete: vi.fn(),
-                has: vi.fn(),
-                clear: vi.fn(),
-                keys: vi.fn(),
-                values: vi.fn(),
-                entries: vi.fn(),
-                forEach: vi.fn(),
-                size: 0,
-                [Symbol.iterator]: vi.fn(),
-                cache: new Map(),
-                config: {} as any,
-                invalidationCallbacks: new Map(),
-                stats: {} as any,
-                getAll: vi.fn(),
-                setMany: vi.fn(),
-                deleteMany: vi.fn(),
-                getStats: vi.fn(),
-                invalidate: vi.fn(),
-                invalidatePattern: vi.fn(),
-                invalidateAll: vi.fn(),
-                onInvalidate: vi.fn(),
-                offInvalidate: vi.fn(),
-                getCacheSize: vi.fn(),
-                getMemoryUsage: vi.fn(),
-                evict: vi.fn(),
-                evictLRU: vi.fn(),
-                evictExpired: vi.fn(),
-                compress: vi.fn(),
-                decompress: vi.fn(),
-                getCompressionRatio: vi.fn(),
-                validateKey: vi.fn(),
-                validateValue: vi.fn(),
-            } as any,
-            statusUpdateService: {
-                updateMonitorStatus: vi.fn().mockResolvedValue({
-                    status: "up",
-                    timestamp: Date.now(),
-                    responseTime: 150,
-                }),
-            } as any,
-            timeoutManager: {
-                scheduleTimeout: vi.fn(),
-                clearTimeout: vi.fn(),
-                operationRegistry: {} as any,
-                timeouts: new Map(),
-            } as any,
-        };
-
-        // Initialize checker
-        checker = new EnhancedMonitorChecker(mockConfig);
+        fixture = createCheckerFixture();
+        checker = fixture.checker;
     });
 
     it("should initialize successfully", async ({ task, annotate }) => {
@@ -202,13 +179,25 @@ describe(EnhancedMonitorChecker, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
+        const startedEvents: UptimeEvents["internal:monitor:started"][] = [];
+        fixture.eventEmitter.onTyped("internal:monitor:started", (event) => {
+            startedEvents.push(event);
+        });
+
         const isResult = await checker.startMonitoring(
             "test-site-1",
             "monitor-1"
         );
 
         expect(typeof isResult).toBe("boolean");
-        expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
+        expect(fixture.monitorRepositoryMock.update).toHaveBeenCalled();
+        expect(startedEvents).toHaveLength(1);
+        expect(getDynamicEventMetadata(startedEvents[0] ?? {})).toEqual(
+            expect.objectContaining({
+                busId: EVENT_BUS_ID,
+                eventName: "internal:monitor:started",
+            })
+        );
     });
 
     it("should handle stopMonitoring", async ({ task, annotate }) => {
@@ -217,13 +206,25 @@ describe(EnhancedMonitorChecker, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
+        const stoppedEvents: UptimeEvents["internal:monitor:stopped"][] = [];
+        fixture.eventEmitter.onTyped("internal:monitor:stopped", (event) => {
+            stoppedEvents.push(event);
+        });
+
         const isResult = await checker.stopMonitoring(
             "test-site-1",
             "monitor-1"
         );
 
         expect(typeof isResult).toBe("boolean");
-        expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
+        expect(fixture.monitorRepositoryMock.update).toHaveBeenCalled();
+        expect(stoppedEvents).toHaveLength(1);
+        expect(getDynamicEventMetadata(stoppedEvents[0] ?? {})).toEqual(
+            expect.objectContaining({
+                busId: EVENT_BUS_ID,
+                eventName: "internal:monitor:stopped",
+            })
+        );
     });
 
     it("should handle checkMonitor with non-existent monitor", async ({

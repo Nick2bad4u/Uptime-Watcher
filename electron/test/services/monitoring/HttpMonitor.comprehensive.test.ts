@@ -7,7 +7,7 @@
  */
 
 import type { Site } from "@shared/types";
-import type { AxiosResponse } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -79,7 +79,7 @@ vi.mock("@shared/utils/logTemplates", () => ({
 
 describe("HttpMonitor - Comprehensive Coverage", () => {
     let httpMonitor: HttpMonitor;
-    let mockAxiosInstance: any;
+    let mockAxiosInstance: { get: ReturnType<typeof vi.fn> };
 
     type HttpMonitorConfig = Site["monitors"][0] & { type: "http" };
 
@@ -119,6 +119,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         } as const;
     };
 
+    interface HttpMonitorTestView {
+        performSingleHealthCheck: (
+            params: ReturnType<typeof createSingleCheckParams>
+        ) => Promise<MonitorCheckResult>;
+    }
+
+    const getHttpMonitorTestView = (): HttpMonitorTestView =>
+        httpMonitor as unknown as HttpMonitorTestView;
+
     beforeEach(async () => {
         vi.clearAllMocks();
 
@@ -130,7 +139,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
         const { createHttpClient } = vi.mocked(
             await import("../../../services/monitoring/utils/httpClient")
         );
-        createHttpClient.mockReturnValue(mockAxiosInstance);
+        createHttpClient.mockReturnValue(
+            mockAxiosInstance as unknown as AxiosInstance
+        );
 
         httpMonitor = new HttpMonitor();
     });
@@ -461,7 +472,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             }).toThrow("Invalid timeout: must be a positive number");
             expect(() => {
                 httpMonitor.updateConfig({
-                    timeout: "invalid" as any,
+                    timeout: "invalid" as unknown as number,
                 });
             }).toThrow("Invalid timeout: must be a positive number");
         });
@@ -477,7 +488,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             expect(() => {
                 httpMonitor.updateConfig({
-                    userAgent: 123 as any,
+                    userAgent: 123 as unknown as string,
                 });
             }).toThrow("Invalid userAgent: must be a string");
         });
@@ -581,7 +592,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 monitoring: true,
                 responseTime: 0,
                 status: "pending" as const,
-            } as any;
+            } as unknown as Site["monitors"][number];
 
             await expect(httpMonitor.check(monitor)).rejects.toThrow(
                 "HttpMonitor cannot handle monitor type: ping"
@@ -817,7 +828,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "OK",
                 statusText: "OK",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
@@ -825,9 +836,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             // Access private method through public interface
             const singleCheckParams = createSingleCheckParams();
-            const result = await (httpMonitor as any).performSingleHealthCheck(
-                singleCheckParams
-            );
+            const result =
+                await getHttpMonitorTestView().performSingleHealthCheck(
+                    singleCheckParams
+                );
 
             expect(mockAxiosInstance.get).toHaveBeenCalledWith(
                 singleCheckParams.url,
@@ -861,16 +873,17 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "OK",
                 statusText: "OK",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
 
             const singleCheckParams = createSingleCheckParams();
-            const result = await (httpMonitor as any).performSingleHealthCheck(
-                singleCheckParams
-            );
+            const result =
+                await getHttpMonitorTestView().performSingleHealthCheck(
+                    singleCheckParams
+                );
 
             expect(result.responseTime).toBe(0);
         });
@@ -894,16 +907,17 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "Internal Server Error",
                 statusText: "Internal Server Error",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("down");
 
             const singleCheckParams = createSingleCheckParams();
-            const result = await (httpMonitor as any).performSingleHealthCheck(
-                singleCheckParams
-            );
+            const result =
+                await getHttpMonitorTestView().performSingleHealthCheck(
+                    singleCheckParams
+                );
 
             expect(result).toEqual({
                 status: "down",
@@ -941,7 +955,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "OK",
                 statusText: "OK",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
@@ -950,7 +964,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 "URL https://example.com responded in 150ms with status 200"
             );
 
-            await (httpMonitor as any).performSingleHealthCheck(
+            await getHttpMonitorTestView().performSingleHealthCheck(
                 createSingleCheckParams()
             );
 
@@ -990,13 +1004,13 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "OK",
                 statusText: "OK",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
 
-            await (httpMonitor as any).performSingleHealthCheck(
+            await getHttpMonitorTestView().performSingleHealthCheck(
                 createSingleCheckParams()
             );
 
@@ -1037,7 +1051,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 data: "Success",
                 statusText: "OK",
                 headers: {},
-                config: {} as any,
+                config: {} as AxiosResponse["config"],
             };
 
             mockAxiosInstance.get.mockResolvedValue(mockResponse);

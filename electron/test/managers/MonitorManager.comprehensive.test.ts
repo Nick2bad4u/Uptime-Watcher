@@ -13,8 +13,17 @@ import type {
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EnhancedMonitoringServices } from "../../services/monitoring/EnhancedMonitoringServiceFactory";
+
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { MonitorManager } from "../../managers/MonitorManager";
+import {
+    MonitorManager,
+    type MonitorManagerDependencies,
+} from "../../managers/MonitorManager";
+import type {
+    EnhancedLifecycleConfig,
+    MonitorActionDelegate,
+} from "../../managers/MonitorManagerEnhancedLifecycle";
 
 /**
  * Helper function to create a complete Monitor object with all required
@@ -33,6 +42,115 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
         history: [],
         ...overrides,
     };
+}
+
+function createMockSitesCache(site: Site) {
+    return {
+        get: vi.fn<(identifier: string) => Site | undefined>(() => site),
+        getAll: vi.fn<() => Site[]>(() => [site]),
+        set: vi.fn<(identifier: string, value: Site) => void>(),
+    };
+}
+
+type MockSitesCache = ReturnType<typeof createMockSitesCache>;
+
+function createMockDependencies(sitesCache: MockSitesCache) {
+    const updateInternal = vi.fn();
+
+    return {
+        databaseService: {
+            executeTransaction: vi.fn(
+                async (operation: (database: unknown) => Promise<void>) => {
+                    await operation({});
+                }
+            ),
+            getDatabase: vi.fn(() => ({})),
+        },
+        eventEmitter: {
+            emitTyped: vi.fn(),
+        },
+        getHistoryLimit: vi.fn(() => 10),
+        getSitesCache: vi.fn(() => sitesCache),
+        repositories: {
+            history: {},
+            monitor: {
+                updateInternal,
+                createTransactionAdapter: vi.fn((database: unknown) => ({
+                    update: vi.fn((id: string, changes: unknown) =>
+                        updateInternal(database, id, changes)
+                    ),
+                })),
+            },
+            site: {},
+        },
+    };
+}
+
+type MockDependencies = ReturnType<typeof createMockDependencies>;
+
+function createMockEnhancedServices() {
+    return {
+        checker: {
+            checkMonitor:
+                vi.fn<EnhancedMonitoringServices["checker"]["checkMonitor"]>(),
+            startMonitoring:
+                vi.fn<
+                    EnhancedMonitoringServices["checker"]["startMonitoring"]
+                >(),
+            stopMonitoring:
+                vi.fn<
+                    EnhancedMonitoringServices["checker"]["stopMonitoring"]
+                >(),
+        },
+        operationRegistry: {},
+        statusUpdateService: {},
+        timeoutManager: {},
+    };
+}
+
+type MockEnhancedServices = ReturnType<typeof createMockEnhancedServices>;
+
+interface MonitorManagerPrivateLifecycle {
+    startAllMonitoringEnhanced: (
+        config: EnhancedLifecycleConfig,
+        isMonitoring: boolean
+    ) => Promise<MonitoringStartSummary>;
+    startMonitoringForSiteEnhanced: (
+        config: EnhancedLifecycleConfig,
+        identifier: string,
+        monitorId?: string,
+        monitorAction?: MonitorActionDelegate
+    ) => Promise<boolean>;
+    stopAllMonitoringEnhanced: (
+        config: EnhancedLifecycleConfig
+    ) => Promise<MonitoringStopSummary>;
+    stopMonitoringForSiteEnhanced: (
+        config: EnhancedLifecycleConfig,
+        identifier: string,
+        monitorId?: string,
+        monitorAction?: MonitorActionDelegate
+    ) => Promise<boolean>;
+}
+
+function getPrivateLifecycle(
+    manager: MonitorManager
+): MonitorManagerPrivateLifecycle {
+    return manager as unknown as MonitorManagerPrivateLifecycle;
+}
+
+function createSiteWithInvalidCheckInterval(
+    site: Site,
+    checkInterval: null | undefined
+): Site {
+    const persistedSite = {
+        ...site,
+        monitors: site.monitors.map((monitor) => ({
+            ...monitor,
+            checkInterval,
+        })),
+    };
+
+    return persistedSite as unknown as Site;
 }
 
 // Mock all the dependencies
@@ -58,7 +176,16 @@ vi.mock("../../electronUtils", () => ({
 // Enhanced monitoring is now fully integrated into MonitorManager
 
 // Mock all the dependencies at the top level
-const mockSetCheckCallback = vi.fn();
+const mockSetCheckCallback =
+    vi.fn<
+        (
+            callback: (
+                siteIdentifier: string,
+                monitorId: string,
+                signal: AbortSignal
+            ) => Promise<void>
+        ) => void
+    >();
 const mockGetActiveCount = vi.fn(() => 0);
 const mockIsMonitoring = vi.fn(() => false);
 const mockRestartMonitor = vi.fn(() => true);
@@ -81,15 +208,12 @@ vi.mock("../../utils/operationalHooks", () => ({
 
 describe("MonitorManager - Comprehensive Coverage", () => {
     let manager: MonitorManager;
-    let mockDependencies: any;
-    let mockEnhancedServices: any;
+    let privateLifecycle: MonitorManagerPrivateLifecycle;
+    let mockDependencies: MockDependencies;
+    let mockEnhancedServices: MockEnhancedServices;
     let mockSite: Site;
     let mockMonitor: Site["monitors"][0];
-    let mockSitesCache: {
-        get: ReturnType<typeof vi.fn>;
-        getAll: ReturnType<typeof vi.fn>;
-        set: ReturnType<typeof vi.fn>;
-    };
+    let mockSitesCache: MockSitesCache;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -114,58 +238,15 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             monitors: [mockMonitor],
         };
 
-        mockSitesCache = {
-            get: vi.fn(() => mockSite),
-            getAll: vi.fn(() => [mockSite]),
-            set: vi.fn(),
-        };
+        mockSitesCache = createMockSitesCache(mockSite);
+        mockDependencies = createMockDependencies(mockSitesCache);
+        mockEnhancedServices = createMockEnhancedServices();
 
-        mockDependencies = {
-            databaseService: {
-                executeTransaction: vi.fn(
-                    async (fn: (db: unknown) => Promise<void>) => {
-                        await fn({});
-                    }
-                ),
-                getDatabase: vi.fn(() => ({})),
-            },
-            eventEmitter: {
-                emitTyped: vi.fn(),
-            },
-            getHistoryLimit: vi.fn(() => 10),
-            getSitesCache: vi.fn(() => mockSitesCache),
-            repositories: {
-                history: {},
-                monitor: {
-                    updateInternal: vi.fn(),
-                    createTransactionAdapter: vi
-                        .fn()
-                        .mockImplementation((db: unknown) => ({
-                            update: vi.fn((id: string, changes: unknown) =>
-                                mockDependencies.repositories.monitor.updateInternal(
-                                    db,
-                                    id,
-                                    changes
-                                )
-                            ),
-                        })),
-                },
-                site: {},
-            },
-        };
-
-        mockEnhancedServices = {
-            checker: {
-                checkMonitor: vi.fn(),
-                startMonitoring: vi.fn(),
-                stopMonitoring: vi.fn(),
-            },
-            operationRegistry: {},
-            statusUpdateService: {},
-            timeoutManager: {},
-        } as any; // Type assertion to bypass strict typing for tests
-
-        manager = new MonitorManager(mockDependencies, mockEnhancedServices);
+        manager = new MonitorManager(
+            mockDependencies as unknown as MonitorManagerDependencies,
+            mockEnhancedServices as unknown as EnhancedMonitoringServices
+        );
+        privateLifecycle = getPrivateLifecycle(manager);
     });
 
     describe("Constructor and Basic Methods", () => {
@@ -654,7 +735,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             // Spy on the enhanced method directly
             const startAllSpy = vi
-                .spyOn(manager, "startAllMonitoringEnhanced" as any)
+                .spyOn(privateLifecycle, "startAllMonitoringEnhanced")
                 .mockResolvedValue(summary);
 
             const resultSummary = await manager.startMonitoring();
@@ -676,7 +757,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should start monitoring for specific site with monitor ID using enhanced system", async () => {
             // Spy on the enhanced method directly
             const startForSiteSpy = vi
-                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "startMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             const isResult = await manager.startMonitoringForSite(
@@ -701,7 +782,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should start monitoring for specific site without monitor ID using enhanced system", async () => {
             // Spy on the enhanced method directly
             const startForSiteSpy = vi
-                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "startMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             const isResult = await manager.startMonitoringForSite("site-1");
@@ -722,7 +803,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should handle failed start monitoring for site in enhanced system", async () => {
             // Spy on the enhanced method to return false
             const startForSiteSpy = vi
-                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "startMonitoringForSiteEnhanced")
                 .mockResolvedValue(false);
 
             const isResult = await manager.startMonitoringForSite("site-1");
@@ -751,7 +832,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
             // Spy on the enhanced method directly
             const stopAllSpy = vi
-                .spyOn(manager, "stopAllMonitoringEnhanced" as any)
+                .spyOn(privateLifecycle, "stopAllMonitoringEnhanced")
                 .mockResolvedValue(summary);
 
             const resultSummary = await manager.stopMonitoring();
@@ -774,7 +855,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should stop monitoring for specific site with monitor ID using enhanced system", async () => {
             // Spy on the enhanced method directly
             const stopForSiteSpy = vi
-                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "stopMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             const isResult = await manager.stopMonitoringForSite(
@@ -800,7 +881,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should handle failed stop monitoring for site", async () => {
             // Spy on the enhanced method to return false
             const stopForSiteSpy = vi
-                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "stopMonitoringForSiteEnhanced")
                 .mockResolvedValue(false);
 
             const isResult = await manager.stopMonitoringForSite("site-1");
@@ -820,7 +901,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should handle recursive call prevention in startMonitoringForSite", async () => {
             // Mock the enhanced method to return true
             const startForSiteSpy = vi
-                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "startMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             // Test that the method can be called without causing infinite recursion
@@ -835,7 +916,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should handle recursive call prevention in stopMonitoringForSite", async () => {
             // Mock the enhanced method to return true
             const stopForSiteSpy = vi
-                .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "stopMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             // Test that the method can be called without causing infinite recursion
@@ -884,14 +965,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle shouldApplyDefaultInterval with null checkInterval", async () => {
-            const monitorWithNullInterval = {
-                ...mockMonitor,
-                checkInterval: null as any,
-            };
-            const siteWithNullInterval = {
-                ...mockSite,
-                monitors: [monitorWithNullInterval],
-            };
+            const siteWithNullInterval = createSiteWithInvalidCheckInterval(
+                mockSite,
+                null
+            );
 
             await manager.setupSiteForMonitoring(siteWithNullInterval);
 
@@ -918,14 +995,8 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle shouldApplyDefaultInterval with undefined checkInterval", async () => {
-            const monitorWithUndefinedInterval = {
-                ...mockMonitor,
-                checkInterval: undefined as any,
-            };
-            const siteWithUndefinedInterval = {
-                ...mockSite,
-                monitors: [monitorWithUndefinedInterval],
-            };
+            const siteWithUndefinedInterval =
+                createSiteWithInvalidCheckInterval(mockSite, undefined);
 
             await manager.setupSiteForMonitoring(siteWithUndefinedInterval);
 
@@ -1004,34 +1075,19 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should handle site not found in cache during scheduled check", async () => {
-            mockDependencies.getSitesCache = vi.fn(() => ({
-                get: vi.fn(() => null), // Site not found
-                getAll: vi.fn(() => []),
-            }));
+            mockSitesCache.get.mockReturnValue(undefined);
+            mockSitesCache.getAll.mockReturnValue([]);
 
-            const testEnhancedServices = {
-                checker: {
-                    checkMonitor: vi.fn(),
-                    startMonitoring: vi.fn(),
-                    stopMonitoring: vi.fn(),
-                },
-                operationRegistry: {},
-                statusUpdateService: {},
-                timeoutManager: {},
-            } as any;
+            const testEnhancedServices = createMockEnhancedServices();
 
             // Create a new manager instance with the updated cache
-            new MonitorManager(mockDependencies, testEnhancedServices); // Don't need to store reference
-
-            // Simulate a scheduled check by getting the callback and calling it
-            const MonitorSchedulerMock =
-                await import("../../services/monitoring/MonitorScheduler");
-            const scheduleInstance =
-                new MonitorSchedulerMock.MonitorScheduler();
+            new MonitorManager(
+                mockDependencies as unknown as MonitorManagerDependencies,
+                testEnhancedServices as unknown as EnhancedMonitoringServices
+            );
 
             // Get the callback that was set
-            const callbackArgs = vi.mocked(scheduleInstance.setCheckCallback)
-                .mock.calls[0];
+            const callbackArgs = mockSetCheckCallback.mock.calls.at(-1);
             expect(callbackArgs).toBeDefined();
 
             if (callbackArgs) {
@@ -1072,7 +1128,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         it("should handle auto-start with monitor missing id in autoStartNewMonitors", async () => {
             // Mock the enhanced method
             const startForSiteSpy = vi
-                .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
+                .spyOn(privateLifecycle, "startMonitoringForSiteEnhanced")
                 .mockResolvedValue(true);
 
             const monitorWithoutId = createMockMonitor({
