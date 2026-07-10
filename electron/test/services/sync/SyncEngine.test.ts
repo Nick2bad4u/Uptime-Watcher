@@ -378,7 +378,7 @@ describe("SyncEngine (ADR-016)", () => {
         }
     });
 
-    it("rebuilds from ops when snapshot is unreadable (ignores compaction)", async () => {
+    it("aborts when the referenced snapshot is corrupt", async () => {
         vi.useFakeTimers();
 
         const baseDirectory = await fs.mkdtemp(
@@ -395,9 +395,8 @@ describe("SyncEngine (ADR-016)", () => {
             const remoteDeviceId = "remote-device";
             const snapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
 
-            // Write an unreadable snapshot (invalid JSON), but mark operations
-            // as compacted in the manifest. Without the snapshot-trust guard,
-            // SyncEngine would drop opId 0 and lose state.
+            // The operation log is intentionally complete. Sync still must not
+            // guess that it can replace an unreadable authoritative snapshot.
             await provider.uploadObject({
                 buffer: Buffer.from("{", "utf8"),
                 key: snapshotKey,
@@ -547,6 +546,9 @@ describe("SyncEngine (ADR-016)", () => {
                 overwrite: true,
             });
 
+            const deleteSpy = vi.spyOn(provider, "deleteObject");
+            const uploadSpy = vi.spyOn(provider, "uploadObject");
+
             const orchestrator = new InMemoryOrchestrator([]);
             const settings = new InMemorySettingsAdapter();
             const engine = new SyncEngine({
@@ -554,7 +556,9 @@ describe("SyncEngine (ADR-016)", () => {
                 settings,
             });
 
-            await engine.syncNow(provider);
+            await expect(engine.syncNow(provider)).rejects.toThrow(
+                "invalid JSON"
+            );
 
             expect(warnSpy).toHaveBeenCalledWith(
                 expect.stringContaining("Failed to load remote snapshot"),
@@ -564,11 +568,107 @@ describe("SyncEngine (ADR-016)", () => {
             );
 
             const sites = await orchestrator.getSites();
-            expect(sites).toHaveLength(1);
-            expect(sites[0]?.identifier).toBe("example.com");
-            expect(sites[0]?.name).toBe("Remote Name");
+            expect(sites).toEqual([]);
+            expect(deleteSpy).not.toHaveBeenCalled();
+            expect(uploadSpy).not.toHaveBeenCalled();
+            warnSpy.mockRestore();
         } finally {
             vi.useRealTimers();
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("does not mutate remote or local state when snapshot download fails", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-snapshot-failure-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+            const snapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        createdAt: 1,
+                        snapshotVersion: 1,
+                        state: {
+                            monitor: {},
+                            settings: {},
+                            site: {},
+                        },
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: snapshotKey,
+                overwrite: true,
+            });
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        devices: {},
+                        latestSnapshotKey: snapshotKey,
+                        manifestVersion: 1,
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: "manifest.json",
+                overwrite: true,
+            });
+
+            const originalDownloadObject =
+                provider.downloadObject.bind(provider);
+            vi.spyOn(provider, "downloadObject").mockImplementation(
+                async (key) => {
+                    if (key === snapshotKey) {
+                        throw new Error("temporary provider failure");
+                    }
+
+                    return originalDownloadObject(key);
+                }
+            );
+            const deleteSpy = vi.spyOn(provider, "deleteObject");
+            const uploadSpy = vi.spyOn(provider, "uploadObject");
+            const warnSpy = vi
+                .spyOn(logger, "warn")
+                .mockImplementation(() => {});
+
+            const localSite: Site = {
+                identifier: "local.example.com",
+                monitoring: true,
+                monitors: [],
+                name: "Local site",
+            };
+            const orchestrator = new InMemoryOrchestrator([localSite]);
+            const settings = new InMemorySettingsAdapter();
+            await settings.set("cloud.sync.deviceId", "local-device");
+            const engine = new SyncEngine({ orchestrator, settings });
+
+            await expect(engine.syncNow(provider)).rejects.toThrow(
+                "Failed to read cloud sync snapshot"
+            );
+
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[SyncEngine] Failed to load remote snapshot; aborting sync",
+                {
+                    key: snapshotKey,
+                    message: expect.stringContaining(
+                        "Failed to read cloud sync snapshot"
+                    ),
+                }
+            );
+            expect(deleteSpy).not.toHaveBeenCalled();
+            expect(uploadSpy).not.toHaveBeenCalled();
+            expect(await orchestrator.getSites()).toEqual([localSite]);
+            expect(
+                await settings.get("cloud.sync.baseline.v1")
+            ).toBeUndefined();
+        } finally {
+            vi.restoreAllMocks();
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
     });

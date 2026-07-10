@@ -176,6 +176,10 @@ export class SyncEngine {
         const remoteManifest =
             manifestCandidate ??
             ProviderCloudSyncTransport.createEmptyManifest();
+        const { snapshotState, snapshotTrusted } = await this.loadSnapshotState(
+            transport,
+            remoteManifest
+        );
 
         const resetAt = remoteManifest.resetAt ?? 0;
         // Ensure any locally-emitted sync objects use a createdAt >= resetAt.
@@ -228,10 +232,6 @@ export class SyncEngine {
         }
 
         const previousSnapshotKey = remoteManifest.latestSnapshotKey;
-        const { snapshotState, snapshotTrusted } = await this.loadSnapshotState(
-            transport,
-            remoteManifest
-        );
 
         const allOpObjects = await transport.listOperationObjects();
         const opObjects =
@@ -564,16 +564,13 @@ export class SyncEngine {
             };
         } catch (error) {
             logger.warn(
-                "[SyncEngine] Failed to load remote snapshot; rebuilding from operation log",
+                "[SyncEngine] Failed to load remote snapshot; aborting sync",
                 {
                     key: manifest.latestSnapshotKey,
                     message: getUserFacingErrorDetail(error),
                 }
             );
-            return {
-                snapshotState: EMPTY_STATE,
-                snapshotTrusted: false,
-            };
+            throw error;
         }
     }
 
