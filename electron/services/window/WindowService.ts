@@ -43,7 +43,7 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as electron from "electron";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { arrayIncludes, setHas } from "ts-extras";
+import { arrayIncludes } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -54,13 +54,10 @@ import {
     isPathWithinDirectory,
 } from "./utils/pathGuards";
 import {
-    applyProductionDocumentSecurityHeaders,
-    getProductionCspHeaderValue,
-} from "./utils/productionSecurityHeaders";
-import {
     VITE_DEV_SERVER_CONFIG,
     waitForViteDevServer,
 } from "./ViteDevServerWaiter";
+import { WindowSessionSecurity } from "./WindowSessionSecurity";
 
 const BrowserWindowCtor: typeof electron.BrowserWindow = electron.BrowserWindow;
 type BrowserWindowInstance = InstanceType<typeof BrowserWindowCtor>;
@@ -260,14 +257,8 @@ export class WindowService {
      */
     private isMainWindowClosing = false;
 
-    /** Tracks whether production security headers were attached. */
-    private hasAttachedProductionSecurityHeaders = false;
-
-    /** Tracks permission types we've already logged to avoid log spam. */
-    private readonly loggedDeniedPermissions = new Set<string>();
-
-    /** Tracks whether display media denial has been logged. */
-    private hasLoggedDisplayMediaDenial = false;
+    /** Installs session-level permission and response-header policies. */
+    private readonly sessionSecurity = new WindowSessionSecurity(logger);
 
     /**
      * Named event handler for did-fail-load event
@@ -707,148 +698,8 @@ export class WindowService {
             width: 1200,
         });
 
-        // Deny all permission requests by default.
-        // This prevents unexpected permission prompts and reduces the attack
-        // surface for compromised renderer content.
-        try {
-            const { session } = this.mainWindow.webContents;
-            type PermissionRequestHandler = NonNullable<
-                Parameters<typeof session.setPermissionRequestHandler>[0]
-            >;
-
-            session.setPermissionCheckHandler(() => false);
-            const handlePermissionRequest: PermissionRequestHandler = (
-                _webContents,
-                permission,
-                grantPermission
-            ) => {
-                if (
-                    !setHas<string, string>(
-                        this.loggedDeniedPermissions,
-                        permission
-                    )
-                ) {
-                    this.loggedDeniedPermissions.add(permission);
-                    logger.warn("[WindowService] Denied permission request", {
-                        permission,
-                    });
-                }
-
-                // Electron expects a boolean "grant" flag here, not an
-                // error-first Node.js callback.
-                grantPermission(false);
-            };
-            session.setPermissionRequestHandler(handlePermissionRequest);
-
-            // Extra hardening (Electron APIs differ slightly across versions).
-            if (typeof session.setDevicePermissionHandler === "function") {
-                session.setDevicePermissionHandler(() => false);
-            }
-
-            if (typeof session.setDisplayMediaRequestHandler === "function") {
-                type DisplayMediaRequestHandler = NonNullable<
-                    Parameters<typeof session.setDisplayMediaRequestHandler>[0]
-                >;
-                const handleDisplayMediaRequest: DisplayMediaRequestHandler = (
-                    _request,
-                    callback
-                ) => {
-                    if (!this.hasLoggedDisplayMediaDenial) {
-                        this.hasLoggedDisplayMediaDenial = true;
-                        logger.warn(
-                            "[WindowService] Denied display media (screen capture) request"
-                        );
-                    }
-
-                    // Deny by providing no stream targets.
-                    // (With exactOptionalPropertyTypes enabled, explicitly
-                    // assigning `undefined` is not allowed for optional
-                    // properties. Omitting the keys is the typed way to deny.)
-                    callback({});
-                };
-                session.setDisplayMediaRequestHandler(
-                    handleDisplayMediaRequest
-                );
-            }
-        } catch (error: unknown) {
-            logger.warn(
-                "[WindowService] Failed to attach permission handlers",
-                ensureError(error)
-            );
-        }
-
-        // Enhance security headers for all responses loaded in the window
-        // Only apply security headers in production to avoid DevTools conflicts
-        const isProduction = !isDev();
-        if (isProduction && !this.hasAttachedProductionSecurityHeaders) {
-            // A production-only CSP header provides a much stronger baseline
-            // than relying on a static HTML meta tag (which must often remain
-            // relaxed for Vite dev mode/HMR).
-            //
-            // Keep this policy intentionally conservative. If a new renderer
-            // feature requires expanding it, do so intentionally and with a
-            // targeted allow-list.
-            const productionCsp = getProductionCspHeaderValue();
-
-            try {
-                const sess = this.mainWindow.webContents.session;
-                type OnHeadersReceivedHandler = NonNullable<
-                    Parameters<typeof sess.webRequest.onHeadersReceived>[0]
-                >;
-                const onHeadersReceived: OnHeadersReceivedHandler = (
-                    details,
-                    callback
-                ) => {
-                    // Only documents should receive CSP and related headers.
-                    // When Electron provides resourceType, use it to avoid
-                    // mutating headers for non-document resources.
-                    const { resourceType } = details;
-                    if (
-                        typeof resourceType === "string" &&
-                        resourceType !== "mainFrame" &&
-                        resourceType !== "subFrame"
-                    ) {
-                        const { responseHeaders } = details;
-                        if (!responseHeaders) {
-                            callback({ cancel: false });
-                            return;
-                        }
-
-                        callback({
-                            cancel: false,
-                            responseHeaders,
-                        });
-                        return;
-                    }
-
-                    const { responseHeaders: headers } = details;
-
-                    const responseHeaders =
-                        applyProductionDocumentSecurityHeaders({
-                            productionCsp,
-                            responseHeaders: headers,
-                        });
-
-                    callback({
-                        cancel: false,
-                        responseHeaders,
-                    });
-                };
-
-                sess.webRequest.onHeadersReceived(onHeadersReceived);
-
-                this.hasAttachedProductionSecurityHeaders = true;
-            } catch (error: unknown) {
-                logger.warn(
-                    "[WindowService] Failed to attach security header middleware",
-                    ensureError(error)
-                );
-            }
-        } else {
-            logger.debug(
-                "[WindowService] Skipping security headers in development mode for DevTools compatibility"
-            );
-        }
+        const { session } = this.mainWindow.webContents;
+        this.sessionSecurity.configure(session, !isDev());
 
         // Install window event handlers (including navigation restrictions)
         // before loading any content.

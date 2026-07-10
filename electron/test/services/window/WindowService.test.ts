@@ -14,6 +14,7 @@ import {
     type BrowserWindowConstructorOptions,
     type Event,
     type OnHeadersReceivedListenerDetails,
+    type Session,
     type WebPreferences,
 } from "electron";
 import { pathToFileURL } from "node:url";
@@ -29,6 +30,8 @@ import { logger } from "../../../utils/logger";
 
 const electronFixtures = vi.hoisted(() => {
     const createMockSession = () => ({
+        setDevicePermissionHandler: vi.fn(),
+        setDisplayMediaRequestHandler: vi.fn(),
         setPermissionCheckHandler: vi.fn(),
         setPermissionRequestHandler: vi.fn(),
         webRequest: {
@@ -169,6 +172,12 @@ type DidFailLoadListener = (
     errorCode: number,
     errorDescription: string
 ) => void;
+type DisplayMediaRequestHandler = NonNullable<
+    Parameters<Session["setDisplayMediaRequestHandler"]>[0]
+>;
+type PermissionRequestHandler = NonNullable<
+    Parameters<Session["setPermissionRequestHandler"]>[0]
+>;
 
 // Mock logger
 vi.mock("../../../utils/logger", () => {
@@ -342,6 +351,133 @@ describe(WindowService, () => {
             });
 
             expect(window).toBeDefined();
+        });
+
+        it("should deny permission requests and log each permission once", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: WindowService", "component");
+
+            const window = windowService.createMainWindow();
+            const session = window.webContents.session;
+            const requestHandler = vi.mocked(
+                session.setPermissionRequestHandler
+            ).mock.calls[0]?.[0] as PermissionRequestHandler | undefined;
+            if (!requestHandler) {
+                throw new Error(
+                    "Permission request handler was not registered"
+                );
+            }
+
+            const firstGrant = vi.fn();
+            const secondGrant = vi.fn();
+            const permissionDetails = malformedElectronInput<
+                Parameters<PermissionRequestHandler>[3]
+            >({});
+            requestHandler(
+                window.webContents,
+                "media",
+                firstGrant,
+                permissionDetails
+            );
+            requestHandler(
+                window.webContents,
+                "media",
+                secondGrant,
+                permissionDetails
+            );
+
+            expect(firstGrant).toHaveBeenCalledWith(false);
+            expect(secondGrant).toHaveBeenCalledWith(false);
+            expect(
+                vi
+                    .mocked(logger.warn)
+                    .mock.calls.filter(
+                        ([message]) =>
+                            message ===
+                            "[WindowService] Denied permission request"
+                    )
+            ).toEqual([
+                [
+                    "[WindowService] Denied permission request",
+                    { permission: "media" },
+                ],
+            ]);
+        });
+
+        it("should deny device and display-media permission handlers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: WindowService", "component");
+
+            const window = windowService.createMainWindow();
+            const session = window.webContents.session;
+            const deviceHandler = vi.mocked(session.setDevicePermissionHandler)
+                .mock.calls[0]?.[0];
+            const displayHandler = vi.mocked(
+                session.setDisplayMediaRequestHandler
+            ).mock.calls[0]?.[0] as DisplayMediaRequestHandler | undefined;
+            if (!deviceHandler || !displayHandler) {
+                throw new Error(
+                    "Optional permission handlers were not registered"
+                );
+            }
+
+            expect(
+                deviceHandler(
+                    malformedElectronInput<Parameters<typeof deviceHandler>[0]>(
+                        {}
+                    )
+                )
+            ).toBe(false);
+
+            const firstCallback = vi.fn();
+            const secondCallback = vi.fn();
+            const displayRequest = malformedElectronInput<
+                Parameters<DisplayMediaRequestHandler>[0]
+            >({});
+            displayHandler(displayRequest, firstCallback);
+            displayHandler(displayRequest, secondCallback);
+
+            expect(firstCallback).toHaveBeenCalledWith({});
+            expect(secondCallback).toHaveBeenCalledWith({});
+            expect(
+                vi
+                    .mocked(logger.warn)
+                    .mock.calls.filter(
+                        ([message]) =>
+                            message ===
+                            "[WindowService] Denied display media (screen capture) request"
+                    )
+            ).toHaveLength(1);
+        });
+
+        it("should log permission-handler setup failures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: WindowService", "component");
+
+            const session = getMockBrowserWindow().webContents.session;
+            vi.mocked(session.setPermissionCheckHandler).mockImplementationOnce(
+                () => {
+                    throw new Error("permission session unavailable");
+                }
+            );
+
+            windowService.createMainWindow();
+
+            expect(logger.warn).toHaveBeenCalledWith(
+                "[WindowService] Failed to attach permission handlers",
+                expect.objectContaining({
+                    message: "permission session unavailable",
+                })
+            );
         });
 
         it("should setup window events", async ({ task, annotate }) => {
@@ -1412,6 +1548,48 @@ describe(WindowService, () => {
                 expect.objectContaining({
                     message: "session unavailable",
                 })
+            );
+
+            const firstWindow = windowService.getMainWindow();
+            if (!firstWindow) {
+                throw new Error("Main window was not created");
+            }
+            const closedHandler = getRegisteredListener<() => void>(
+                vi.mocked(firstWindow.on).mock.calls,
+                "closed"
+            );
+            closedHandler();
+
+            windowService.createMainWindow();
+
+            expect(headerSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("should attach production headers once per Electron session", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: WindowService", "component");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const firstWindow = windowService.createMainWindow();
+            const headerSpy = vi.mocked(
+                firstWindow.webContents.session.webRequest.onHeadersReceived
+            );
+            const closedHandler = getRegisteredListener<() => void>(
+                vi.mocked(firstWindow.on).mock.calls,
+                "closed"
+            );
+            closedHandler();
+
+            windowService.createMainWindow();
+
+            expect(headerSpy).toHaveBeenCalledTimes(1);
+            expect(logger.debug).not.toHaveBeenCalledWith(
+                "[WindowService] Skipping security headers in development mode for DevTools compatibility"
             );
         });
     });
