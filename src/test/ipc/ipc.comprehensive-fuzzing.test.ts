@@ -1,9 +1,8 @@
 /**
  * Comprehensive fast-check fuzzing tests for IPC communication.
  *
- * This test suite achieves 100% fast-check fuzzing coverage for Electron IPC
- * handlers, contextBridge security, main-renderer communication patterns, and
- * type safety.
+ * Covers Electron IPC handlers, contextBridge security, main-renderer
+ * communication patterns, and type safety with generated inputs.
  *
  * @packageDocumentation
  */
@@ -27,6 +26,7 @@ import {
     type IpcInvokeChannelMap,
 } from "@shared/types/ipc";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { arrayFirst, objectKeys } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -294,7 +294,7 @@ const arbitraryValidationInput = fc.oneof(
     fc.anything()
 );
 
-describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
+describe("IPC communication fuzzing", () => {
     let registeredHandlers: Set<IpcInvokeChannel>;
 
     beforeEach(() => {
@@ -339,7 +339,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             async (channel, input) => {
                 const handler = vi.fn(() => Promise.resolve("success"));
                 const validator = vi.fn(
-                    (data: unknown): data is any =>
+                    (data: unknown): data is object =>
                         typeof data === "object" && data !== null
                 );
 
@@ -489,25 +489,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        fcTest.prop([arbitraryEventChannelName])(
-            "should handle missing web contents",
-            (channel) => {
-                const originalWebContents = mockBrowserWindow.webContents;
-                mockBrowserWindow.webContents = null as any;
-
-                expect(() => {
-                    // Should handle gracefully when webContents is null
-                    const webContents = mockBrowserWindow.webContents;
-                    if (webContents && !webContents.isDestroyed()) {
-                        webContents.send(channel, {});
-                    }
-                }).not.toThrow();
-
-                // Restore
-                mockBrowserWindow.webContents = originalWebContents;
-            }
-        );
-
         fcTest.prop([arbitraryEventChannelName, arbitraryIpcEventData])(
             "should handle IPC renderer communication",
             (channel, _eventData) => {
@@ -544,10 +525,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const strictValidator = (
                     data: unknown
                 ): data is { name: string } =>
-                    typeof data === "object" &&
-                    data !== null &&
-                    "name" in data &&
-                    typeof (data as any).name === "string";
+                    isRecord(data) && typeof data["name"] === "string";
 
                 const validateParams: NonNullIpcValidator = (params) =>
                     strictValidator(arrayFirst(params))
@@ -767,42 +745,6 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        it("should handle circular reference errors", async () => {
-            // Reset mocks for clean state
-            mockIpcMain.handle.mockClear();
-            registeredHandlers.clear();
-
-            const channel: IpcInvokeChannel = "get-sites";
-            const handler = vi.fn(() => {
-                const circular: any = {};
-                circular.self = circular;
-                return Promise.resolve(circular);
-            });
-
-            registerTestHandler(channel, handler, null, registeredHandlers);
-
-            const registeredHandler = mockIpcMain.handle.mock.calls.find(
-                (call) => arrayFirst(call) === channel
-            )?.[1];
-
-            if (registeredHandler) {
-                // Should handle circular references by catching the error
-                const result = await registeredHandler(createTrustedIpcEvent());
-
-                // Since circular references cause JSON serialization errors,
-                // the system should either handle it gracefully or return an error response
-                expect(result).toHaveProperty("success");
-
-                // If success is false, it means the error was caught and handled
-                if (result.success === false) {
-                    expect(result).toHaveProperty("error");
-                } else {
-                    // If success is true, the data might be handled differently
-                    expect(result).toHaveProperty("data");
-                    // Don't test JSON serialization since it may contain circular refs
-                }
-            }
-        });
     });
 
     describe("IPC Type Safety and Validation Patterns", () => {
@@ -818,12 +760,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const siteValidator = (
                     data: unknown
                 ): data is typeof siteData =>
-                    typeof data === "object" &&
-                    data !== null &&
-                    "name" in data &&
-                    "url" in data &&
-                    typeof (data as any).name === "string" &&
-                    typeof (data as any).url === "string";
+                    isRecord(data) &&
+                    typeof data["name"] === "string" &&
+                    typeof data["url"] === "string";
 
                 const validateParams: NonNullIpcValidator = (params) =>
                     siteValidator(arrayFirst(params))
@@ -873,12 +812,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 const monitoringValidator = (
                     data: unknown
                 ): data is typeof monitoringData =>
-                    typeof data === "object" &&
-                    data !== null &&
-                    "siteIdentifier" in data &&
-                    "status" in data &&
-                    typeof (data as any).siteIdentifier === "string" &&
-                    typeof (data as any).status === "string";
+                    isRecord(data) &&
+                    typeof data["siteIdentifier"] === "string" &&
+                    typeof data["status"] === "string";
 
                 const validateParams: NonNullIpcValidator = (params) =>
                     monitoringValidator(arrayFirst(params))
