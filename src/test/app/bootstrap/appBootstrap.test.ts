@@ -115,6 +115,7 @@ describe("appBootstrap", () => {
 
         await runAppBootstrap({
             cleanupRefs,
+            isCurrentGeneration: () => true,
             setIsInitialized: vi.fn(),
             subscribeToUpdateStatusEvents,
             updateCountRefs: {
@@ -174,6 +175,7 @@ describe("appBootstrap", () => {
         await runAppBootstrap({
             abortSignal: abortController.signal,
             cleanupRefs,
+            isCurrentGeneration: () => true,
             setIsInitialized,
             subscribeToUpdateStatusEvents,
             updateCountRefs: {
@@ -197,5 +199,86 @@ describe("appBootstrap", () => {
         expect(cleanupRefs.syncEventsCleanupRef.current).toBeNull();
         expect(cleanupRefs.updateStatusEventsCleanupRef.current).toBeNull();
         expect(mocks.setError).not.toHaveBeenCalled();
+    });
+
+    it("does not let a superseded bootstrap clean replacement subscriptions", async () => {
+        const { runAppBootstrap } =
+            await import("../../../app/bootstrap/appBootstrap");
+
+        const abortController = new AbortController();
+        let isCurrentGeneration = true;
+        let resolveSettingsInitialization: (() => void) | undefined;
+        const initializeSettings = vi.fn(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolveSettingsInitialization = resolve;
+                })
+        );
+        const unsubscribeFromStatusUpdates = vi.fn();
+        const disposeSettingsSubscriptions = vi.fn();
+
+        mocks.useSettingsStore.getState.mockReturnValue({
+            disposeSettingsSubscriptions,
+            initializeSettings,
+        });
+        mocks.useSitesStore.getState.mockReturnValue({
+            unsubscribeFromStatusUpdates,
+        });
+
+        const replacementCacheCleanup = vi.fn();
+        const replacementSyncEventsCleanup = vi.fn();
+        const replacementUpdateStatusCleanup = vi.fn();
+        const cleanupRefs = {
+            cacheSyncCleanupRef: { current: null as (() => void) | null },
+            syncEventsCleanupRef: { current: null as (() => void) | null },
+            updateStatusEventsCleanupRef: {
+                current: null as (() => void) | null,
+            },
+        };
+
+        const bootstrapPromise = runAppBootstrap({
+            abortSignal: abortController.signal,
+            cleanupRefs,
+            isCurrentGeneration: () => isCurrentGeneration,
+            setIsInitialized: vi.fn(),
+            subscribeToUpdateStatusEvents: vi.fn(() => vi.fn()),
+            updateCountRefs: {
+                alertsUpdateCountRef: { current: 0 },
+                errorUpdateCountRef: { current: 0 },
+                settingsUpdateCountRef: { current: 0 },
+                sitesUpdateCountRef: { current: 0 },
+                uiUpdateCountRef: { current: 0 },
+                updatesUpdateCountRef: { current: 0 },
+            },
+        });
+
+        await vi.waitFor(() => {
+            expect(initializeSettings).toHaveBeenCalledTimes(1);
+        });
+
+        abortController.abort();
+        isCurrentGeneration = false;
+        cleanupRefs.cacheSyncCleanupRef.current = replacementCacheCleanup;
+        cleanupRefs.syncEventsCleanupRef.current = replacementSyncEventsCleanup;
+        cleanupRefs.updateStatusEventsCleanupRef.current =
+            replacementUpdateStatusCleanup;
+
+        resolveSettingsInitialization?.();
+        await bootstrapPromise;
+
+        expect(unsubscribeFromStatusUpdates).not.toHaveBeenCalled();
+        expect(disposeSettingsSubscriptions).not.toHaveBeenCalled();
+        expect(replacementCacheCleanup).not.toHaveBeenCalled();
+        expect(replacementSyncEventsCleanup).not.toHaveBeenCalled();
+        expect(replacementUpdateStatusCleanup).not.toHaveBeenCalled();
+        expect(cleanupRefs.cacheSyncCleanupRef.current).toBe(
+            replacementCacheCleanup
+        );
+        expect(cleanupRefs.syncEventsCleanupRef.current).toBe(
+            replacementSyncEventsCleanup
+        );
+        expect(cleanupRefs.updateStatusEventsCleanupRef.current).toBe(
+            replacementUpdateStatusCleanup
+        );
     });
 });

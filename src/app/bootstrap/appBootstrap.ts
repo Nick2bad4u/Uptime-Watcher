@@ -59,6 +59,8 @@ export interface RunAppBootstrapOptions {
     /** Signal aborted when the owning React lifecycle has been cleaned up. */
     abortSignal?: AbortSignal;
     cleanupRefs: AppBootstrapCleanupRefs;
+    /** Whether this run still owns the shared bootstrap resources. */
+    isCurrentGeneration: () => boolean;
     /** Mark the app as fully initialized (used to enable loading overlays). */
     setIsInitialized: (next: boolean) => void;
     subscribeToUpdateStatusEvents: () => () => void;
@@ -117,18 +119,21 @@ export async function runAppBootstrap(
 ): Promise<void> {
     logger.debug("[App:init] initializeApp invoked");
 
-    const cleanupIfAborted = (): boolean => {
-        if (options.abortSignal?.aborted !== true) {
+    const stopIfInactive = (): boolean => {
+        const isCurrentGeneration = options.isCurrentGeneration();
+        if (options.abortSignal?.aborted !== true && isCurrentGeneration) {
             return false;
         }
 
-        cleanupAppBootstrap({
-            cleanupRefs: options.cleanupRefs,
-        });
+        if (isCurrentGeneration) {
+            cleanupAppBootstrap({
+                cleanupRefs: options.cleanupRefs,
+            });
+        }
         return true;
     };
 
-    if (cleanupIfAborted()) {
+    if (stopIfInactive()) {
         return;
     }
 
@@ -153,7 +158,7 @@ export async function runAppBootstrap(
         if (typeof initializeSettings === "function") {
             logger.debug("[App:init] invoking settings initialize");
             await initializeSettings.call(settingsStore);
-            if (cleanupIfAborted()) {
+            if (stopIfInactive()) {
                 return;
             }
             logger.debug("[App:init] settings initialized");
@@ -168,7 +173,7 @@ export async function runAppBootstrap(
                 "[App:init] initializing notification preference bridge"
             );
             await NotificationPreferenceService.initialize();
-            if (cleanupIfAborted()) {
+            if (stopIfInactive()) {
                 return;
             }
         } catch (error) {
@@ -182,7 +187,7 @@ export async function runAppBootstrap(
             "[App:init] running initial notification preference synchronization"
         );
         await synchronizeNotificationPreferences();
-        if (cleanupIfAborted()) {
+        if (stopIfInactive()) {
             return;
         }
         logger.debug(
@@ -193,7 +198,7 @@ export async function runAppBootstrap(
         if (typeof initializeSites === "function") {
             logger.debug("[App:init] invoking sites initialize");
             await initializeSites.call(sitesStore);
-            if (cleanupIfAborted()) {
+            if (stopIfInactive()) {
                 return;
             }
             logger.debug("[App:init] sites initialized");
@@ -207,7 +212,7 @@ export async function runAppBootstrap(
         const cacheSyncCleanup = setupCacheSync();
         logger.debug("[App:init] cache synchronization enabled");
         options.cleanupRefs.cacheSyncCleanupRef.current = cacheSyncCleanup;
-        if (cleanupIfAborted()) {
+        if (stopIfInactive()) {
             return;
         }
 
@@ -217,7 +222,7 @@ export async function runAppBootstrap(
             logger.debug("[App:init] subscribing to sync events");
             options.cleanupRefs.syncEventsCleanupRef.current =
                 subscribeToSyncEvents();
-            if (cleanupIfAborted()) {
+            if (stopIfInactive()) {
                 return;
             }
             logger.debug("[App:init] sync events subscription established");
@@ -237,7 +242,7 @@ export async function runAppBootstrap(
                     logStatusUpdateDebugInfo(update);
                 }
             );
-            if (cleanupIfAborted()) {
+            if (stopIfInactive()) {
                 return;
             }
 
@@ -252,7 +257,7 @@ export async function runAppBootstrap(
         logger.debug("[App:init] subscribing to update status events");
         options.cleanupRefs.updateStatusEventsCleanupRef.current =
             options.subscribeToUpdateStatusEvents();
-        if (cleanupIfAborted()) {
+        if (stopIfInactive()) {
             return;
         }
         logger.debug(
@@ -275,7 +280,7 @@ export async function runAppBootstrap(
                 options.updateCountRefs.updatesUpdateCountRef.current,
         });
     } catch (error) {
-        if (cleanupIfAborted()) {
+        if (stopIfInactive()) {
             return;
         }
 

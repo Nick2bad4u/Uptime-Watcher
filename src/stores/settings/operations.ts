@@ -35,7 +35,12 @@ const historyLimitSubscriptionInitRef: {
     current: undefined,
 };
 
+const historyLimitSubscriptionGenerationRef = {
+    current: 0,
+};
+
 const disposeHistoryLimitSubscription = (): void => {
+    historyLimitSubscriptionGenerationRef.current += 1;
     historyLimitSubscriptionRef.current?.();
     historyLimitSubscriptionRef.current = undefined;
     historyLimitSubscriptionInitRef.current = undefined;
@@ -76,6 +81,7 @@ export const createSettingsOperationsSlice = (
 
         let initPromise = historyLimitSubscriptionInitRef.current;
         if (!initPromise) {
+            const generation = historyLimitSubscriptionGenerationRef.current;
             initPromise = (async (): Promise<void> => {
                 try {
                     const cleanup = await EventsService.onHistoryLimitUpdated(
@@ -116,6 +122,14 @@ export const createSettingsOperationsSlice = (
                             });
                         }
                     );
+
+                    if (
+                        generation !==
+                        historyLimitSubscriptionGenerationRef.current
+                    ) {
+                        cleanup();
+                        return;
+                    }
 
                     historyLimitSubscriptionRef.current = cleanup;
                 } catch (error: unknown) {

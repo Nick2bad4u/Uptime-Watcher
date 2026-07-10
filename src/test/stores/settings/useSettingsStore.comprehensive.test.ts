@@ -24,6 +24,7 @@ import {
 
 import type { AppSettings } from "../../../stores/types";
 import type { ElectronAPI } from "../../../types";
+import type { WaitForElectronBridgeOptions } from "../../../services/utils/electronBridgeReadiness";
 
 import {
     defaultSettings,
@@ -655,6 +656,59 @@ describe(useSettingsStore, () => {
                     timestamp: eventPayload.timestamp,
                 }
             );
+        });
+
+        it("cleans up subscription setup that resolves after disposal", async () => {
+            let resolveEventsBridge: (() => void) | undefined;
+            const eventsBridgeReady = new Promise<void>((resolve) => {
+                resolveEventsBridge = resolve;
+            });
+            const staleCleanup = vi.fn();
+            const currentCleanup = vi.fn();
+
+            mockWaitForElectronBridge.mockImplementation(
+                (options: WaitForElectronBridgeOptions) => {
+                    const waitsForEvents = options.contracts?.some(
+                        (contract) => contract.domain === "events"
+                    );
+
+                    return waitsForEvents
+                        ? eventsBridgeReady
+                        : Promise.resolve(undefined);
+                }
+            );
+            mockElectronAPI.events.onHistoryLimitUpdated
+                .mockReturnValueOnce(staleCleanup)
+                .mockReturnValueOnce(currentCleanup);
+
+            const firstInitialization = useSettingsStore
+                .getState()
+                .initializeSettings();
+
+            await vi.waitFor(() => {
+                expect(mockWaitForElectronBridge).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        contracts: expect.arrayContaining([
+                            expect.objectContaining({ domain: "events" }),
+                        ]),
+                    })
+                );
+            });
+
+            useSettingsStore.getState().disposeSettingsSubscriptions();
+            resolveEventsBridge?.();
+            await firstInitialization;
+
+            expect(staleCleanup).toHaveBeenCalledTimes(1);
+
+            await useSettingsStore.getState().initializeSettings();
+
+            expect(currentCleanup).not.toHaveBeenCalled();
+
+            useSettingsStore.getState().disposeSettingsSubscriptions();
+
+            expect(currentCleanup).toHaveBeenCalledTimes(1);
+            expect(staleCleanup).toHaveBeenCalledTimes(1);
         });
     });
 

@@ -225,6 +225,7 @@ export const App: NamedExoticComponent = memo(
         const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
         const syncEventsCleanupRef = useRef<(() => void) | null>(null);
         const updateStatusEventsCleanupRef = useRef<(() => void) | null>(null);
+        const bootstrapGenerationRef = useRef(0);
         const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
         const sidebarMediaQueryUnsubscribeRef = useRef<(() => void) | null>(
             null
@@ -290,6 +291,9 @@ export const App: NamedExoticComponent = memo(
          */
         const initializeApp = useCallback(
             async (signal: AbortSignal) => {
+                const generation = bootstrapGenerationRef.current + 1;
+                bootstrapGenerationRef.current = generation;
+
                 await runAppBootstrap({
                     abortSignal: signal,
                     cleanupRefs: {
@@ -297,6 +301,8 @@ export const App: NamedExoticComponent = memo(
                         syncEventsCleanupRef,
                         updateStatusEventsCleanupRef,
                     },
+                    isCurrentGeneration: () =>
+                        bootstrapGenerationRef.current === generation,
                     setIsInitialized,
                     subscribeToUpdateStatusEvents,
                     updateCountRefs: {
@@ -320,6 +326,7 @@ export const App: NamedExoticComponent = memo(
          * to prevent memory leaks and background operations.
          */
         const cleanupApp = useCallback(() => {
+            bootstrapGenerationRef.current += 1;
             cleanupAppBootstrap({
                 cleanupRefs: {
                     cacheSyncCleanupRef,
