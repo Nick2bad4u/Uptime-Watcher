@@ -32,7 +32,6 @@
     ],
     "extends": "../../tsconfig.json",
     "include": [
-        "../../global.d.ts",
         "../../electron/**/*",
         "../../shared/**/*"
     ]

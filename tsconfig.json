@@ -78,7 +78,6 @@
         "paths": {
             "@app/*": ["src/*"],
             "@assets/*": ["assets/*"],
-            "@electron/*": ["electron/*"],
             "@shared/*": ["shared/*"]
         },
         "plugins": [
@@ -149,7 +148,7 @@
         ".storybook/**",
         "storybook-static/**"
     ],
-    "include": ["global.d.ts", "src/**/*"],
+    "include": ["src/**/*"],
     "references": [
         {
             "path": "./tsconfig.shared.json"

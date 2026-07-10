@@ -5,9 +5,6 @@
         "incremental": true,
         "outDir": ".cache/builds/app",
         "paths": {
-            "@app/*": ["src/*"],
-            "@assets/*": ["assets/*"],
-            "@electron/*": ["electron/*"],
             "@shared/*": ["shared/*"]
         },
         "tsBuildInfoFile": "./.cache/tsbuildinfo/tsconfig.shared.tsbuildinfo",
