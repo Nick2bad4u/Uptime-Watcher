@@ -131,65 +131,17 @@ describe(useUpdatesStore, () => {
         });
     });
 
-    describe("persistence", () => {
-        const getPersistMerge = () => {
-            const { merge } = useUpdatesStore.persist.getOptions();
-
-            if (typeof merge !== "function") {
-                throw new TypeError("Updates store persist merge is missing");
-            }
-
-            return merge;
-        };
-
-        it("hydrates valid persisted update status", async ({
+    describe("lifecycle state", () => {
+        it("should not persist updater lifecycle state", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
             await annotate("Category: Core", "category");
-            await annotate("Type: Persistence", "type");
+            await annotate("Type: State Management", "type");
 
-            const merged = getPersistMerge()(
-                { updateStatus: "downloaded" },
-                useUpdatesStore.getState()
-            );
-
-            expect(merged.updateStatus).toBe("downloaded");
-        });
-
-        it("ignores invalid persisted update status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUpdatesStore", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Persistence", "type");
-
-            const merged = getPersistMerge()(
-                { updateStatus: "launching" },
-                useUpdatesStore.getState()
-            );
-
-            expect(merged.updateStatus).toBe("idle");
-        });
-
-        it("ignores non-object persisted state", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUpdatesStore", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Persistence", "type");
-
-            useUpdatesStore.getState().applyUpdateStatus("checking");
-
-            const merged = getPersistMerge()(
-                "downloaded",
-                useUpdatesStore.getState()
-            );
-
-            expect(merged.updateStatus).toBe("checking");
+            expect("persist" in useUpdatesStore).toBeFalsy();
         });
     });
 
@@ -588,6 +540,7 @@ describe(useUpdatesStore, () => {
             });
 
             const message = result.current.updateError ?? "";
+            expect(result.current.updateStatus).toBe("error");
             expect(message).not.toContain("SUPER_SECRET_TOKEN");
             expect(message).not.toContain("\n");
             expect(message).not.toContain("\t");
