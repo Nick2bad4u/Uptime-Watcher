@@ -506,7 +506,7 @@ describe("main.ts - Electron Main Process", () => {
                 }
             );
         });
-        it("should delay re-quitting until one cleanup completes", async ({
+        it("should delay exiting until one cleanup completes", async ({
             task,
             annotate,
         }) => {
@@ -535,11 +535,8 @@ describe("main.ts - Electron Main Process", () => {
                 }),
             } as ElectronEvent;
             const repeatedQuitEvent = createElectronEvent();
-            const reentrantQuitEvent = createElectronEvent();
-
-            mockApp.quit.mockImplementationOnce(() => {
-                order.push("quit");
-                willQuitHandler(reentrantQuitEvent);
+            mockApp.exit.mockImplementationOnce(() => {
+                order.push("exit");
             });
 
             willQuitHandler(initialQuitEvent);
@@ -548,24 +545,24 @@ describe("main.ts - Electron Main Process", () => {
             expect(initialQuitEvent.preventDefault).toHaveBeenCalledOnce();
             expect(repeatedQuitEvent.preventDefault).toHaveBeenCalledOnce();
             expect(mockApplicationService.cleanup).toHaveBeenCalledOnce();
-            expect(mockApp.quit).not.toHaveBeenCalled();
+            expect(mockApp.exit).not.toHaveBeenCalled();
             expect(order).toStrictEqual(["preventDefault", "cleanup"]);
 
             resolveCleanup();
 
             await vi.waitFor(() => {
-                expect(mockApp.quit).toHaveBeenCalledOnce();
+                expect(mockApp.exit).toHaveBeenCalledOnce();
             });
 
             expect(order).toStrictEqual([
                 "preventDefault",
                 "cleanup",
-                "quit",
+                "exit",
             ]);
-            expect(reentrantQuitEvent.preventDefault).not.toHaveBeenCalled();
+            expect(mockApp.exit).toHaveBeenCalledWith(0);
             expect(mockApplicationService.cleanup).toHaveBeenCalledOnce();
         });
-        it("should resume quitting when normal cleanup rejects", async ({
+        it("should exit when normal cleanup rejects", async ({
             task,
             annotate,
         }) => {
@@ -585,7 +582,7 @@ describe("main.ts - Electron Main Process", () => {
             willQuitHandler(event);
 
             await vi.waitFor(() => {
-                expect(mockApp.quit).toHaveBeenCalledOnce();
+                expect(mockApp.exit).toHaveBeenCalledWith(0);
             });
 
             expect(event.preventDefault).toHaveBeenCalledOnce();
@@ -594,7 +591,7 @@ describe("main.ts - Electron Main Process", () => {
                 cleanupError
             );
         });
-        it("should bound normal cleanup before resuming quit", async ({
+        it("should bound normal cleanup before exiting", async ({
             task,
             annotate,
         }) => {
@@ -617,11 +614,11 @@ describe("main.ts - Electron Main Process", () => {
                 willQuitHandler(event);
 
                 expect(event.preventDefault).toHaveBeenCalledOnce();
-                expect(mockApp.quit).not.toHaveBeenCalled();
+                expect(mockApp.exit).not.toHaveBeenCalled();
 
                 await vi.advanceTimersByTimeAsync(5000);
 
-                expect(mockApp.quit).toHaveBeenCalledOnce();
+                expect(mockApp.exit).toHaveBeenCalledWith(0);
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "[Main] App quit cleanup failed",
                     expect.objectContaining({
@@ -660,7 +657,7 @@ describe("main.ts - Electron Main Process", () => {
             willQuitHandler(createElectronEvent());
 
             await vi.waitFor(() => {
-                expect(mockApp.quit).toHaveBeenCalledOnce();
+                expect(mockApp.exit).toHaveBeenCalledWith(0);
             });
 
             expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);

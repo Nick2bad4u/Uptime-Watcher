@@ -500,9 +500,6 @@ class Main {
     /** Keeps fatal shutdown orchestration independent from normal app quits. */
     private fatalShutdownStarted = false;
 
-    /** Allows the re-entrant `will-quit` emitted by the guarded `app.quit()`. */
-    private normalQuitApproved = false;
-
     /** Bounded normal-shutdown task shared by repeated quit requests. */
     private normalQuitPromise: Promise<void> | undefined;
 
@@ -612,10 +609,6 @@ class Main {
      * Named event handler for safe cleanup on app quit.
      */
     private readonly handleAppQuit = (event: Event): void => {
-        if (this.normalQuitApproved) {
-            return;
-        }
-
         event.preventDefault();
         if (this.normalQuitPromise) {
             return;
@@ -696,7 +689,8 @@ class Main {
     }
 
     /**
-     * Waits for normal cleanup to settle, then re-enters Electron's quit flow.
+     * Waits for normal cleanup to settle, then exits without re-entering the
+     * intercepted quit event.
      */
     private async performNormalQuit(): Promise<void> {
         let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -717,17 +711,7 @@ class Main {
             logger.error("[Main] App quit cleanup failed", ensureError(error));
         } finally {
             clearTimeout(timeoutId);
-            this.normalQuitApproved = true;
-
-            try {
-                app.quit();
-            } catch (error: unknown) {
-                logger.error(
-                    "[Main] Failed to resume app quit after cleanup",
-                    ensureError(error)
-                );
-                app.exit(1);
-            }
+            app.exit(0);
         }
     }
 
