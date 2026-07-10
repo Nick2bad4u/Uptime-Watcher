@@ -8,6 +8,7 @@ import { arrayAt } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+    cancelActiveConfirmation,
     type ConfirmDialogOptions,
     type ConfirmDialogStoreState,
     type ConfirmDialogTone,
@@ -91,6 +92,18 @@ describe("confirm dialog store", () => {
 
         await expect(confirmation).resolves.toBeFalsy();
         expect(bridge.getState().request).toBeNull();
+    });
+
+    it("cancels an active dialog through the public cleanup boundary", async () => {
+        const confirmation = requestConfirmation({
+            message: "Preview cleanup",
+            title: "Storybook preview",
+        });
+
+        cancelActiveConfirmation();
+
+        await expect(confirmation).resolves.toBeFalsy();
+        expect(getConfirmDialogBridge().getState().request).toBeNull();
     });
 
     it("cancels an active dialog when opening a new confirmation request", async () => {

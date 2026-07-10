@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChangeEvent, ComponentProps, ReactElement } from "react";
 
 import { OverviewTab } from "@app/components/SiteDetails/tabs/OverviewTab";
-import { timeoutMsToSeconds } from "@app/utils/timeoutUtils";
+import { getTimeoutSeconds } from "@app/utils/timeoutUtils";
 import { useCallback, useMemo, useState } from "react";
 import { action } from "storybook/actions";
 
@@ -109,7 +109,7 @@ const meta: Meta<typeof OverviewTab> = {
         intervalChanged: false,
         isLoading: false,
         localCheckIntervalMs: baseMonitor.checkInterval,
-        localTimeoutSeconds: timeoutMsToSeconds(baseMonitor.timeout),
+        localTimeoutSeconds: getTimeoutSeconds(baseMonitor.timeout),
         onCheckNow: (): void => {
             action("overview/checkNow")();
         },

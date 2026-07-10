@@ -6,7 +6,10 @@ import type { ConfirmDialogTone } from "@app/stores/ui/useConfirmDialogStore";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import { ConfirmDialog } from "@app/components/common/ConfirmDialog/ConfirmDialog";
-import { useConfirmDialogStore } from "@app/stores/ui/useConfirmDialogStore";
+import {
+    cancelActiveConfirmation,
+    requestConfirmation,
+} from "@app/stores/ui/useConfirmDialogStore";
 import { useEffect } from "react";
 
 interface ConfirmDialogStoryArgs {
@@ -23,7 +26,7 @@ const withDialogState: Decorator = (StoryComponent, context) => {
 
     useEffect(
         function openConfirmDialog(): () => void {
-            const request = {
+            void requestConfirmation({
                 cancelLabel: "Cancel",
                 confirmLabel: tone === "danger" ? "Delete" : "Confirm",
                 message:
@@ -36,23 +39,9 @@ const withDialogState: Decorator = (StoryComponent, context) => {
                     details:
                         "This action cannot be undone and will remove all monitoring history.",
                 }),
-            } satisfies ReturnType<
-                typeof useConfirmDialogStore.getState
-            >["request"];
-
-            useConfirmDialogStore.setState({
-                request,
-                resolve: () => {
-                    // Storybook preview only
-                },
             });
 
-            return function resetConfirmDialog(): void {
-                useConfirmDialogStore.setState({
-                    request: null,
-                    resolve: null,
-                });
-            };
+            return cancelActiveConfirmation;
         },
         [isWithDetails, tone]
     );

@@ -254,3 +254,17 @@ export async function requestConfirmation(
         open(request, resolve);
     });
 }
+
+/**
+ * Cancels the active confirmation request, if one exists.
+ *
+ * @remarks
+ * Provides a narrow imperative cleanup boundary for automation, Storybook, and
+ * application lifecycle integrations without exposing the underlying Zustand
+ * store.
+ *
+ * @public
+ */
+export function cancelActiveConfirmation(): void {
+    useConfirmDialogStore.getState().cancel();
+}
