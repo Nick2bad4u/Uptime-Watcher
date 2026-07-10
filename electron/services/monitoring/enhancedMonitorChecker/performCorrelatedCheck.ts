@@ -66,7 +66,10 @@ export async function runExclusiveMonitorCheck<T>(args: {
  * Performs a correlated monitor check using an operation coordinator.
  */
 export async function performCorrelatedCheck(args: {
-    readonly cleanupOperation: (operationId: string) => void;
+    readonly cleanupFailedOperation: (
+        monitorId: string,
+        operationId: string
+    ) => Promise<void>;
     readonly executeMonitorCheck: (
         context: MonitorCheckContext & { operationId: string }
     ) => Promise<StatusUpdateMonitorCheckResult>;
@@ -93,7 +96,7 @@ export async function performCorrelatedCheck(args: {
     ) => Promise<boolean>;
 }): Promise<StatusUpdate | undefined> {
     const {
-        cleanupOperation,
+        cleanupFailedOperation,
         executeMonitorCheck,
         externalSignal,
         handleSuccessfulCheck,
@@ -159,7 +162,7 @@ export async function performCorrelatedCheck(args: {
                 logger.error("Monitor check failed", error, {
                     monitorId: getSafeIdentifierForLogging(monitorId),
                 });
-                cleanupOperation(operationId);
+                await cleanupFailedOperation(monitorId, operationId);
             }
 
             return undefined;

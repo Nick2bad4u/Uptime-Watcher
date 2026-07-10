@@ -1,5 +1,7 @@
 import type { Monitor } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import type { MonitorRepository } from "../../database/MonitorRepository";
 import type { MonitorOperationRegistry } from "../MonitorOperationRegistry";
 import type { OperationTimeoutManager } from "../OperationTimeoutManager";
@@ -104,6 +106,26 @@ export class MonitorOperationCoordinator {
         this.monitorRepository = config.monitorRepository;
         this.operationRegistry = config.operationRegistry;
         this.timeoutManager = config.timeoutManager;
+    }
+
+    public async cleanupFailedOperation(
+        monitorId: string,
+        operationId: string
+    ): Promise<void> {
+        try {
+            await this.monitorRepository.clearActiveOperations(monitorId);
+        } catch (error) {
+            logger.warn(
+                "Failed to clear persisted operations after monitor check failure",
+                error,
+                {
+                    monitorId: getSafeIdentifierForLogging(monitorId),
+                    operationId,
+                }
+            );
+        } finally {
+            this.cleanupOperation(operationId);
+        }
     }
 
     public cleanupOperation(operationId: string): void {

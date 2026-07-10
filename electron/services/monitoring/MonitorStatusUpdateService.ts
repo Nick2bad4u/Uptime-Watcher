@@ -203,6 +203,7 @@ export class MonitorStatusUpdateService {
                 `Failed to update monitor status for ${safeMonitorId}`,
                 error
             );
+            await this.clearPersistedOperationState(result.monitorId);
             return false;
         } finally {
             this.cleanupOperationResources(result.operationId);
@@ -213,6 +214,20 @@ export class MonitorStatusUpdateService {
         // Clear timer first so the process doesn't retain a pending timeout.
         this.timeoutManager.clearTimeout(operationId);
         this.operationRegistry.completeOperation(operationId);
+    }
+
+    private async clearPersistedOperationState(
+        monitorId: string
+    ): Promise<void> {
+        try {
+            await this.monitorRepository.clearActiveOperations(monitorId);
+        } catch (error) {
+            logger.warn(
+                "Failed to clear persisted operations after status update failure",
+                error,
+                { monitorId: getSafeIdentifier(monitorId) }
+            );
+        }
     }
 
     private async pruneOperationFromMonitor(

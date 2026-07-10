@@ -74,7 +74,7 @@ function createCorrelatedCheckArgs(
     overrides: Partial<CorrelatedCheckArgs> = {}
 ): CorrelatedCheckArgs {
     return {
-        cleanupOperation: vi.fn(),
+        cleanupFailedOperation: vi.fn().mockResolvedValue(undefined),
         executeMonitorCheck: vi
             .fn()
             .mockResolvedValue(createCheckResult(monitor.id)),
@@ -130,7 +130,7 @@ describe(performCorrelatedCheck, () => {
         } satisfies StatusUpdateMonitorCheckResult;
 
         await performCorrelatedCheck({
-            cleanupOperation: vi.fn(),
+            cleanupFailedOperation: vi.fn().mockResolvedValue(undefined),
             executeMonitorCheck: vi.fn().mockResolvedValue(checkResult),
             handleSuccessfulCheck: vi.fn().mockResolvedValue(undefined),
             logger,
@@ -156,6 +156,27 @@ describe(performCorrelatedCheck, () => {
         expect(serializedInfoLogs).not.toContain("site-secret");
         expect(serializedInfoLogs).not.toContain("pass");
         expect(serializedInfoLogs).not.toContain("frag");
+    });
+
+    it("clears persisted and in-memory operation state when a check fails", async () => {
+        const monitor = createMonitor("monitor-failure-cleanup");
+        const cleanupFailedOperation = vi.fn().mockResolvedValue(undefined);
+
+        await expect(
+            performCorrelatedCheck(
+                createCorrelatedCheckArgs(monitor, {
+                    cleanupFailedOperation,
+                    executeMonitorCheck: vi
+                        .fn()
+                        .mockRejectedValue(new Error("check failed")),
+                })
+            )
+        ).resolves.toBeUndefined();
+
+        expect(cleanupFailedOperation).toHaveBeenCalledWith(
+            monitor.id,
+            `operation-${monitor.id}`
+        );
     });
 
     it("waits for a same-monitor correlated check before manual side effects", async () => {

@@ -28,6 +28,7 @@ const createAbortSignal = (): AbortSignal => new AbortController().signal;
 
 describe(MonitorOperationCoordinator, () => {
     let monitorRepositoryUpdate: ReturnType<typeof vi.fn>;
+    let monitorRepositoryClearActiveOperations: ReturnType<typeof vi.fn>;
     let monitorRepository: MonitorRepository;
     let operationRegistryInitiateCheck: ReturnType<typeof vi.fn>;
     let operationRegistryCompleteOperation: ReturnType<typeof vi.fn>;
@@ -41,7 +42,11 @@ describe(MonitorOperationCoordinator, () => {
 
     beforeEach(() => {
         monitorRepositoryUpdate = vi.fn().mockResolvedValue(undefined);
+        monitorRepositoryClearActiveOperations = vi
+            .fn()
+            .mockResolvedValue(undefined);
         monitorRepository = {
+            clearActiveOperations: monitorRepositoryClearActiveOperations,
             update: monitorRepositoryUpdate,
         } as unknown as MonitorRepository;
 
@@ -119,6 +124,33 @@ describe(MonitorOperationCoordinator, () => {
 
     it("cleans up registered operations", () => {
         coordinator.cleanupOperation("operation-xyz");
+
+        expect(operationRegistryCompleteOperation).toHaveBeenCalledWith(
+            "operation-xyz"
+        );
+        expect(timeoutManagerClear).toHaveBeenCalledWith("operation-xyz");
+    });
+
+    it("clears persisted state before cleaning up a failed operation", async () => {
+        await coordinator.cleanupFailedOperation("monitor-1", "operation-xyz");
+
+        expect(monitorRepositoryClearActiveOperations).toHaveBeenCalledWith(
+            "monitor-1"
+        );
+        expect(operationRegistryCompleteOperation).toHaveBeenCalledWith(
+            "operation-xyz"
+        );
+        expect(timeoutManagerClear).toHaveBeenCalledWith("operation-xyz");
+    });
+
+    it("cleans up local state when persisted cleanup fails", async () => {
+        monitorRepositoryClearActiveOperations.mockRejectedValueOnce(
+            new Error("db failure")
+        );
+
+        await expect(
+            coordinator.cleanupFailedOperation("monitor-1", "operation-xyz")
+        ).resolves.toBeUndefined();
 
         expect(operationRegistryCompleteOperation).toHaveBeenCalledWith(
             "operation-xyz"

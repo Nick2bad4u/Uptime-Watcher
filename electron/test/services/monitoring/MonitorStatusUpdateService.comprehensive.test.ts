@@ -96,6 +96,7 @@ const createOperationRegistryMock = () => ({
 });
 
 const createMonitorRepositoryMock = () => ({
+    clearActiveOperations: vi.fn(),
     findByIdentifier: vi.fn(),
     update: vi.fn(),
 });
@@ -444,6 +445,9 @@ describe(MonitorStatusUpdateService, () => {
             expect(mockTimeoutManager.clearTimeout).toHaveBeenCalledWith(
                 "op-123"
             );
+            expect(
+                mockMonitorRepository.clearActiveOperations
+            ).toHaveBeenCalledWith(testResult.monitorId);
         });
 
         it("should handle site not found in cache", async ({
