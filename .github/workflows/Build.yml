@@ -1194,7 +1194,6 @@ jobs:
                     git push origin ${{ github.ref_name }}
                     echo "Changelogs updated and pushed to repository"
                   fi
-              continue-on-error: true
 
             - name: "Update Check Run - Changelogs Generated"
               continue-on-error: true
