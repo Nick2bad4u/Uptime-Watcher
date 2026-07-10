@@ -10,6 +10,8 @@ import type { Site } from "@shared/types";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+
 import {
     ServiceContainer,
     type ServiceContainerConfig,
@@ -315,6 +317,19 @@ vi.mock("../../services/window/WindowService", () => ({
         };
     },
 }));
+
+const createMainOrchestratorMock = () => ({
+    emitTyped: vi.fn<UptimeOrchestrator["emitTyped"]>(),
+});
+
+const getPrivateMainOrchestrator = (container: ServiceContainer): unknown => {
+    const getter: unknown = Reflect.get(container, "getMainOrchestrator");
+    if (typeof getter !== "function") {
+        throw new TypeError("Expected ServiceContainer.getMainOrchestrator");
+    }
+
+    return Reflect.apply(getter, container, []);
+};
 
 describe("ServiceContainer - Comprehensive Coverage", () => {
     beforeEach(() => {
@@ -932,16 +947,15 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
     describe("Event Forwarding", () => {
         let container: ServiceContainer;
-        let mockMainOrchestrator: any;
+        let mockMainOrchestrator: ReturnType<typeof createMainOrchestratorMock>;
 
         beforeEach(() => {
             container = ServiceContainer.getInstance({
                 enableDebugLogging: true,
             });
 
-            mockMainOrchestrator = {
-                emitTyped: vi.fn().mockResolvedValue(undefined),
-            };
+            mockMainOrchestrator = createMainOrchestratorMock();
+            mockMainOrchestrator.emitTyped.mockResolvedValue(undefined);
         });
 
         it("should set up event forwarding for SiteManager", async ({
@@ -1002,8 +1016,11 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             await annotate("Type: Event Processing", "type");
 
             // Mock getMainOrchestrator to return the mock orchestrator
-            const privateContainer = container as any;
-            privateContainer.uptimeOrchestrator = mockMainOrchestrator;
+            Reflect.set(
+                container,
+                "uptimeOrchestrator",
+                mockMainOrchestrator as unknown as UptimeOrchestrator
+            );
 
             // Create SiteManager to trigger event forwarding setup
             const siteManager = container.getSiteManager();
@@ -1026,8 +1043,11 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             mockMainOrchestrator.emitTyped.mockRejectedValue(
                 new Error("Forwarding error")
             );
-            const privateContainer = container as any;
-            privateContainer.uptimeOrchestrator = mockMainOrchestrator;
+            Reflect.set(
+                container,
+                "uptimeOrchestrator",
+                mockMainOrchestrator as unknown as UptimeOrchestrator
+            );
 
             const siteManager = container.getSiteManager();
 
@@ -1333,8 +1353,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
-            const privateContainer = container as any;
-            const result = privateContainer.getMainOrchestrator();
+            const result = getPrivateMainOrchestrator(container);
 
             expect(result).toBeNull();
         });
@@ -1352,8 +1371,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container.getSiteManager();
 
             const orchestrator = container.getUptimeOrchestrator();
-            const privateContainer = container as any;
-            const result = privateContainer.getMainOrchestrator();
+            const result = getPrivateMainOrchestrator(container);
 
             expect(result).toBe(orchestrator);
         });
