@@ -207,6 +207,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private initializationPromise: Promise<void> | undefined;
 
+    /** Shared teardown task for idempotent concurrent shutdown requests. */
+    private shutdownPromise: Promise<void> | undefined;
+
     /**
      * Factory for creating contextual errors via {@link ContextualErrorFactory}.
      */
@@ -763,13 +766,42 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when shutdown is complete.
      */
     public async shutdown(): Promise<void> {
+        this.shutdownPromise ??= this.performShutdown();
+        await this.shutdownPromise;
+    }
+
+    private async performShutdown(): Promise<void> {
         try {
             logger.info("[UptimeOrchestrator] Starting shutdown...");
 
-            this.subscriptions.unregister();
+            const shutdownErrors: unknown[] = [];
+            try {
+                await this.stopMonitoring();
+            } catch (error: unknown) {
+                shutdownErrors.push(error);
+            }
 
-            // Clear all middleware
-            this.clearMiddleware();
+            try {
+                this.subscriptions.unregister();
+            } catch (error: unknown) {
+                shutdownErrors.push(error);
+            }
+
+            try {
+                this.clearMiddleware();
+            } catch (error: unknown) {
+                shutdownErrors.push(error);
+            }
+
+            if (shutdownErrors.length === 1) {
+                throw shutdownErrors[0];
+            }
+            if (shutdownErrors.length > 1) {
+                throw new AggregateError(
+                    shutdownErrors,
+                    "Multiple orchestrator shutdown operations failed"
+                );
+            }
 
             logger.info("[UptimeOrchestrator] Shutdown completed successfully");
         } catch (error) {

@@ -83,6 +83,12 @@ import { ServiceContainer } from "../ServiceContainer";
  * @public
  */
 export class ApplicationService {
+    /** Startup task shared with cleanup to prevent lifecycle overlap. */
+    private initializationPromise: Promise<void> | undefined;
+
+    /** Prevents late Electron ready events from starting work during cleanup. */
+    private isShuttingDown = false;
+
     /**
      * The container for all app services.
      *
@@ -99,12 +105,16 @@ export class ApplicationService {
      * Named event handler for app ready event.
      */
     private readonly handleAppReady = (): void => {
+        if (this.isShuttingDown || this.initializationPromise) {
+            return;
+        }
+
+        const initializationPromise = this.onAppReady();
+        this.initializationPromise = initializationPromise;
         fireAndForgetLogged({
             logger,
             message: LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
-            task: async () => {
-                await this.onAppReady();
-            },
+            task: () => initializationPromise,
         });
     };
 
@@ -157,9 +167,17 @@ export class ApplicationService {
      * @public
      */
     public async cleanup(): Promise<void> {
+        this.isShuttingDown = true;
         logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_START);
 
         try {
+            // Stop accepting lifecycle events immediately, then wait for any
+            // startup work that already began before touching its services.
+            this.removeApplicationEventListeners();
+            if (this.initializationPromise) {
+                await Promise.allSettled([this.initializationPromise]);
+            }
+
             const services = this.serviceContainer.getInitializedServices();
             const getInitializedService = (serviceName: string): unknown =>
                 services.find(({ name }) => name === serviceName)?.service;
@@ -172,9 +190,6 @@ export class ApplicationService {
                     )
                 );
             }
-
-            // Remove app event listeners
-            this.removeApplicationEventListeners();
 
             this.scopedSubscriptions.clearAll({
                 onError: (error) => {
@@ -212,14 +227,14 @@ export class ApplicationService {
                 cleanupIpc?.call(ipcService);
             }
 
-            // Stop monitoring
+            // Stop monitoring and detach orchestrator subscriptions.
             const orchestrator = getInitializedService("UptimeOrchestrator");
             if (orchestrator) {
-                const stopMonitoring = getCallableDataProperty(
+                const shutdownOrchestrator = getCallableDataProperty(
                     orchestrator,
-                    "stopMonitoring"
+                    "shutdown"
                 );
-                await stopMonitoring?.call(orchestrator);
+                await shutdownOrchestrator?.call(orchestrator);
             }
 
             // Close windows

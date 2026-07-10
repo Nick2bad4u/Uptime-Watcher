@@ -3,12 +3,7 @@
  *   coordination, lifecycle management, and event handling
  */
 
-import type {
-    Monitor,
-    MonitoringStopSummary,
-    Site,
-    StatusUpdate,
-} from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { App, BrowserWindow } from "electron";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
@@ -50,9 +45,26 @@ const mockApp = vi.hoisted(() => ({
 function getAppEventHandler(
     event: ApplicationAppEvent
 ): ApplicationAppEventHandler | undefined {
-    return mockApp.on.mock.calls.find(([registeredEvent]) =>
+    return mockApp.on.mock.calls.findLast(([registeredEvent]) =>
         Object.is(registeredEvent, event)
     )?.[1];
+}
+
+function createDeferred(): {
+    promise: Promise<void>;
+    resolve: () => void;
+} {
+    let resolvePromise: (() => void) | undefined;
+    const promise = new Promise<void>((resolve) => {
+        resolvePromise = resolve;
+    });
+
+    return {
+        promise,
+        resolve: (): void => {
+            resolvePromise?.();
+        },
+    };
 }
 
 // Mock Electron app
@@ -161,24 +173,13 @@ const mockIpcService = {
 const mockUptimeOrchestrator = {
     onTyped: vi.fn<UptimeOrchestrator["onTyped"]>(),
     removeAllListeners: vi.fn<UptimeOrchestrator["removeAllListeners"]>(),
-    stopMonitoring: vi.fn<UptimeOrchestrator["stopMonitoring"]>(),
+    shutdown: vi.fn<UptimeOrchestrator["shutdown"]>(),
 } satisfies Pick<
     UptimeOrchestrator,
     | "onTyped"
     | "removeAllListeners"
-    | "stopMonitoring"
+    | "shutdown"
 >;
-
-const monitoringStopSummary = {
-    alreadyInactive: false,
-    attempted: 0,
-    failed: 0,
-    isMonitoring: false,
-    partialFailures: false,
-    siteCount: 0,
-    skipped: 0,
-    succeeded: 0,
-} satisfies MonitoringStopSummary;
 
 type RawUptimeEventHandler = (payload: unknown) => unknown;
 
@@ -257,10 +258,8 @@ describe(ApplicationService, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockUptimeOrchestrator.stopMonitoring.mockReset();
-        mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
-            monitoringStopSummary
-        );
+        mockUptimeOrchestrator.shutdown.mockReset();
+        mockUptimeOrchestrator.shutdown.mockResolvedValue(undefined);
         mockUptimeOrchestrator.onTyped.mockReset();
         mockUptimeOrchestrator.removeAllListeners.mockReset();
 
@@ -272,6 +271,8 @@ describe(ApplicationService, () => {
         mockServiceContainer.shutdownCloudSyncScheduler.mockResolvedValue(
             undefined
         );
+        mockServiceContainer.initialize.mockReset();
+        mockServiceContainer.initialize.mockResolvedValue(undefined);
 
         mockApp.isReady.mockReturnValue(false);
 
@@ -536,6 +537,50 @@ describe(ApplicationService, () => {
                 mockWindowService
             );
         });
+        it("should wait for active startup before tearing down services", async () => {
+            const initialization = createDeferred();
+            mockServiceContainer.initialize.mockReturnValueOnce(
+                initialization.promise
+            );
+            const readyHandler = getAppEventHandler("ready");
+
+            readyHandler?.();
+            await vi.waitFor(() => {
+                expect(mockServiceContainer.initialize).toHaveBeenCalledOnce();
+            });
+
+            const cleanupPromise = applicationService.cleanup();
+            await Promise.resolve();
+
+            expect(
+                mockServiceContainer.shutdownCloudSyncScheduler
+            ).not.toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.shutdown).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+
+            initialization.resolve();
+            await cleanupPromise;
+
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledOnce();
+            expect(mockDatabaseService.close).toHaveBeenCalledOnce();
+            expect(
+                mockServiceContainer.initialize.mock.invocationCallOrder[0]
+            ).toBeLessThan(
+                mockUptimeOrchestrator.shutdown.mock.invocationCallOrder[0] ?? 0
+            );
+        });
+
+        it("should ignore a late ready event after cleanup starts", async () => {
+            const readyHandler = getAppEventHandler("ready");
+
+            await applicationService.cleanup();
+            readyHandler?.();
+            await Promise.resolve();
+
+            expect(mockServiceContainer.initialize).not.toHaveBeenCalled();
+            expect(mockWindowService.createMainWindow).not.toHaveBeenCalled();
+        });
+
         it("should cleanup all services successfully", async ({
             task,
             annotate,
@@ -554,9 +599,7 @@ describe(ApplicationService, () => {
             );
 
             // Arrange
-            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
-                monitoringStopSummary
-            );
+            mockUptimeOrchestrator.shutdown.mockResolvedValue(undefined);
 
             // Simulate cleanup with signal monitoring
             const cleanupPromise = applicationService.cleanup();
@@ -579,9 +622,7 @@ describe(ApplicationService, () => {
             ).toHaveBeenCalledTimes(1);
             expect(mockAutoUpdaterService.cleanup).toHaveBeenCalledTimes(1);
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledTimes(1);
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
             expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -606,18 +647,14 @@ describe(ApplicationService, () => {
             });
             expect(mockAutoUpdaterService.cleanup).not.toHaveBeenCalled();
             expect(mockIpcService.cleanup).not.toHaveBeenCalled();
-            expect(
-                mockUptimeOrchestrator.stopMonitoring
-            ).not.toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.shutdown).not.toHaveBeenCalled();
             expect(mockDatabaseService.close).not.toHaveBeenCalled();
 
             releaseScheduler();
             await cleanupPromise;
 
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledTimes(1);
             expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });
         it("should handle cleanup errors properly", async ({
@@ -638,7 +675,7 @@ describe(ApplicationService, () => {
 
             // Arrange
             const error = new Error("Cleanup failed");
-            mockUptimeOrchestrator.stopMonitoring.mockRejectedValue(error);
+            mockUptimeOrchestrator.shutdown.mockRejectedValue(error);
 
             // Act & Assert
             await expect(applicationService.cleanup()).rejects.toThrow(
@@ -675,11 +712,11 @@ describe(ApplicationService, () => {
             const customSignal = abortController.signal;
 
             // Mock a long-running cleanup operation
-            mockUptimeOrchestrator.stopMonitoring.mockReturnValueOnce(
-                new Promise((resolve, reject) => {
+            mockUptimeOrchestrator.shutdown.mockReturnValueOnce(
+                new Promise<void>((resolve, reject) => {
                     // Simulate async operation that can be cancelled
                     const timeout = setTimeout(() => {
-                        resolve(monitoringStopSummary);
+                        resolve();
                     }, 1000);
 
                     // Handle cancellation properly
@@ -711,9 +748,7 @@ describe(ApplicationService, () => {
             expect(signal.aborted).toBeFalsy();
 
             // Ensure subsequent tests start with resolved cleanup behavior
-            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
-                monitoringStopSummary
-            );
+            mockUptimeOrchestrator.shutdown.mockResolvedValue(undefined);
         });
         it("should cleanup IPC service if cleanup method exists", async ({
             task,
@@ -759,9 +794,7 @@ describe(ApplicationService, () => {
             await applicationService.cleanup();
 
             // Assert - Should not throw and should continue with other cleanup
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledTimes(1);
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
             expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });
@@ -798,9 +831,7 @@ describe(ApplicationService, () => {
             await applicationService.cleanup();
 
             expect(accessCount).toBe(0);
-            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledTimes(1);
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
             expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });

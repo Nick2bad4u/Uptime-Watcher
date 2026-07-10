@@ -998,6 +998,71 @@ describe(UptimeOrchestrator, () => {
             expect(mockMonitorManager.stopMonitoring).toHaveBeenCalled();
             expect(summary.isMonitoring).toBeFalsy();
         });
+
+        it("should share one complete teardown across concurrent shutdown calls", async () => {
+            let resolveStop:
+                ((summary: MonitoringStopSummary) => void) | undefined;
+            const stopPromise = new Promise<MonitoringStopSummary>(
+                (resolve) => {
+                    resolveStop = resolve;
+                }
+            );
+            vi.mocked(mockMonitorManager.stopMonitoring).mockReturnValueOnce(
+                stopPromise
+            );
+            const clearMiddlewareSpy = vi.spyOn(
+                orchestrator,
+                "clearMiddleware"
+            );
+            const offSpy = vi.spyOn(orchestrator, "off");
+
+            const firstShutdown = orchestrator.shutdown();
+            const secondShutdown = orchestrator.shutdown();
+
+            await vi.waitFor(() => {
+                expect(
+                    mockMonitorManager.stopMonitoring
+                ).toHaveBeenCalledOnce();
+            });
+            expect(offSpy).not.toHaveBeenCalled();
+            expect(clearMiddlewareSpy).not.toHaveBeenCalled();
+
+            resolveStop?.({
+                alreadyInactive: false,
+                attempted: 0,
+                failed: 0,
+                isMonitoring: false,
+                partialFailures: false,
+                siteCount: 0,
+                skipped: 0,
+                succeeded: 0,
+            });
+            await expect(
+                Promise.all([firstShutdown, secondShutdown])
+            ).resolves.toEqual([undefined, undefined]);
+
+            expect(mockMonitorManager.stopMonitoring).toHaveBeenCalledOnce();
+            expect(offSpy).toHaveBeenCalled();
+            expect(clearMiddlewareSpy).toHaveBeenCalledOnce();
+        });
+
+        it("should detach subscriptions even when monitoring shutdown fails", async () => {
+            vi.mocked(mockMonitorManager.stopMonitoring).mockRejectedValueOnce(
+                new Error("monitor stop failed")
+            );
+            const clearMiddlewareSpy = vi.spyOn(
+                orchestrator,
+                "clearMiddleware"
+            );
+            const offSpy = vi.spyOn(orchestrator, "off");
+
+            await expect(orchestrator.shutdown()).rejects.toMatchObject({
+                code: "ORCHESTRATOR_SHUTDOWN_FAILED",
+            });
+
+            expect(offSpy).toHaveBeenCalled();
+            expect(clearMiddlewareSpy).toHaveBeenCalledOnce();
+        });
     });
 
     describe("Data Management", () => {
