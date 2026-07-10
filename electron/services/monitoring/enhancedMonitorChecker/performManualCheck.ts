@@ -3,9 +3,9 @@
  * {@link electron/services/monitoring/EnhancedMonitorChecker#EnhancedMonitorChecker}.
  *
  * @remarks
- * Manual checks intentionally bypass operation correlation, but they can race
- * with scheduled correlated checks. To avoid overlapping writes, manual checks
- * cancel correlated operations and clear `activeOperations` before proceeding.
+ * Manual checks intentionally bypass operation correlation. They cancel any
+ * correlated operation, then use the shared per-monitor gate so the cancelled
+ * operation finishes unwinding before direct-check side effects begin.
  *
  * @packageDocumentation
  */
@@ -16,6 +16,7 @@ import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDepend
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 import { resolveMonitorBaseTimeoutMs } from "../shared/timeoutUtils";
+import { runExclusiveMonitorCheck } from "./performCorrelatedCheck";
 
 /**
  * Executes a manual monitor check.
@@ -45,14 +46,20 @@ export async function performManualCheckOperation(args: {
     // Cancel correlated operations to avoid overlapping writes.
     config.operationRegistry.cancelOperations(monitorId);
 
-    // Ensure active operation IDs don't accumulate if a cancelled
-    // operation never settles.
-    await config.monitorRepository.clearActiveOperations(monitorId);
+    return runExclusiveMonitorCheck({
+        monitorId,
+        operation: async () => {
+            // Clear persisted correlation state only after the cancelled check
+            // has finished its own persistence and cleanup work.
+            await config.monitorRepository.clearActiveOperations(monitorId);
 
-    const timeoutSignal = createTimeoutSignal(
-        resolveMonitorBaseTimeoutMs(monitor.timeout),
-        signal
-    );
+            const timeoutSignal = createTimeoutSignal(
+                resolveMonitorBaseTimeoutMs(monitor.timeout),
+                signal
+            );
 
-    return performDirectCheck(site, monitor, true, timeoutSignal);
+            return performDirectCheck(site, monitor, true, timeoutSignal);
+        },
+        skipIfBusy: false,
+    });
 }
