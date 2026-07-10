@@ -14,6 +14,7 @@ import { isDev } from "../../electronUtils";
 import { fireAndForget } from "../../utils/fireAndForget";
 import { logger as backendLogger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
+import { createMonitorCheckExecution } from "./MonitorSchedulerExecution";
 import { computeMonitorSchedulerDelay } from "./MonitorSchedulerPolicy";
 import {
     resolveMonitorBaseTimeoutMs,
@@ -149,72 +150,41 @@ export class MonitorScheduler {
         job.isRunning = true;
         const abortController = new AbortController();
         job.abortController = abortController;
-        const timeoutState = { timedOut: false };
-        const timeoutRef: { handle: NodeJS.Timeout | null } = { handle: null };
-
-        const checkPromise = (async (): Promise<
-            | { error: Error; kind: "error" }
-            | { kind: "cancelled" }
-            | { kind: "success" }
-        > => {
-            try {
-                await checkOperation(
-                    job.siteIdentifier,
-                    job.monitorId,
-                    abortController.signal
-                );
-                return { kind: "success" };
-            } catch (error: unknown) {
-                // If a timeout has already fired, treat any subsequent errors
-                // as noise (often abort-related) and avoid double-counting.
-                if (timeoutState.timedOut) {
-                    return { kind: "success" };
-                }
-
-                if (abortController.signal.aborted) {
-                    return { kind: "cancelled" };
-                }
-
-                return { error: ensureError(error), kind: "error" };
-            } finally {
-                // Important: if we timed out, keep the job marked as running
-                // until the underlying async work settles so we don't run
-                // overlapping checks.
+        const execution = createMonitorCheckExecution({
+            abortController,
+            onSettled: (timedOut) => {
+                // A timed-out job remains running until its underlying work
+                // settles, preventing a second check from overlapping it.
                 const currentJob = this.jobs.get(intervalKey);
-                if (currentJob === job) {
-                    currentJob.abortController = undefined;
-
-                    if (timeoutState.timedOut) {
-                        currentJob.isRunning = false;
-                        const isStartedQueuedManual =
-                            this.startQueuedManualCheckIfAny(
-                                intervalKey,
-                                currentJob
-                            );
-
-                        if (
-                            !isStartedQueuedManual &&
-                            currentJob.needsReschedule
-                        ) {
-                            currentJob.needsReschedule = false;
-                            this.scheduleNextRun(intervalKey);
-                        }
-                    }
+                if (currentJob !== job) {
+                    return;
                 }
-            }
-        })();
 
-        const timeoutPromise = new Promise<{ kind: "timeout" }>((resolve) => {
-            timeoutRef.handle = setTimeout(() => {
-                timeoutState.timedOut = true;
-                abortController.abort("Monitor job timed out");
-                resolve({ kind: "timeout" });
-            }, job.timeoutMs);
-            timeoutRef.handle.unref();
+                currentJob.abortController = undefined;
+
+                if (!timedOut) {
+                    return;
+                }
+
+                currentJob.isRunning = false;
+                const isStartedQueuedManual = this.startQueuedManualCheckIfAny(
+                    intervalKey,
+                    currentJob
+                );
+
+                if (!isStartedQueuedManual && currentJob.needsReschedule) {
+                    currentJob.needsReschedule = false;
+                    this.scheduleNextRun(intervalKey);
+                }
+            },
+            operation: (signal) =>
+                checkOperation(job.siteIdentifier, job.monitorId, signal),
+            timeoutMs: job.timeoutMs,
+            timeoutReason: "Monitor job timed out",
         });
 
         try {
-            const result = await Promise.race([checkPromise, timeoutPromise]);
+            const result = await execution.outcome;
 
             const currentJob = this.jobs.get(intervalKey);
             if (currentJob !== job) {
@@ -253,12 +223,9 @@ export class MonitorScheduler {
                 }
             }
         } finally {
-            if (timeoutRef.handle) {
-                clearTimeout(timeoutRef.handle);
-                timeoutRef.handle = null;
-            }
+            execution.clearTimeout();
 
-            if (!timeoutState.timedOut) {
+            if (!execution.hasTimedOut()) {
                 const currentJob = this.jobs.get(intervalKey);
                 if (currentJob === job) {
                     currentJob.isRunning = false;
@@ -268,8 +235,8 @@ export class MonitorScheduler {
 
             const currentJob = this.jobs.get(intervalKey);
             // If we timed out, rescheduling is deferred until the underlying
-            // check settles (see checkPromise.finally) to avoid timer churn.
-            if (currentJob === job && !timeoutState.timedOut) {
+            // check settles (see execution.onSettled) to avoid timer churn.
+            if (currentJob === job && !execution.hasTimedOut()) {
                 const isStartedQueuedManual = this.startQueuedManualCheckIfAny(
                     intervalKey,
                     currentJob

@@ -95,6 +95,24 @@ describe("MonitorScheduler – comprehensive", () => {
         vi.clearAllMocks();
     });
 
+    it("clears execution state when a check throws synchronously", async () => {
+        mockCheckCallback = createCheckCallbackMock().mockImplementation(() => {
+            throw new Error("synchronous check failure");
+        });
+        scheduler.setCheckCallback(mockCheckCallback);
+
+        scheduler.startMonitor("site-1", createMonitor());
+        await flushAsync();
+
+        expect(
+            scheduler.getJobsForTesting().get("site-1|monitor-1")
+        ).toMatchObject({
+            backoffAttempt: 1,
+            hasAbortController: false,
+            isRunning: false,
+        });
+    });
+
     it("applies exponential backoff, emits telemetry, and resets after success", async () => {
         mockCheckCallback = createCheckCallbackMock()
             .mockRejectedValueOnce(new Error("boom"))
@@ -207,6 +225,40 @@ describe("MonitorScheduler – comprehensive", () => {
             timeoutMs: guardDuration,
             timestamp: FIXED_NOW,
         });
+        expect(
+            scheduler.getJobsForTesting().get("site-1|monitor-1")
+                ?.backoffAttempt
+        ).toBe(1);
+    });
+
+    it("emits timeout telemetry when an abort-aware check rejects", async () => {
+        const timeoutMs = 120;
+        mockCheckCallback = createCheckCallbackMock().mockImplementation(
+            async (_siteIdentifier, _monitorId, signal) =>
+                new Promise<void>((_resolve, reject) => {
+                    signal.addEventListener(
+                        "abort",
+                        () => {
+                            reject(new Error("check aborted after timeout"));
+                        },
+                        { once: true }
+                    );
+                })
+        );
+        scheduler.setCheckCallback(mockCheckCallback);
+
+        scheduler.startMonitor("site-1", createMonitor({ timeout: timeoutMs }));
+        await flushAsync();
+
+        const guardDuration = timeoutMs + MONITOR_TIMEOUT_BUFFER_MS;
+        await vi.advanceTimersByTimeAsync(guardDuration);
+        await flushAsync();
+
+        expect(
+            eventRecorder.calls.filter(
+                ([eventName]) => eventName === "monitor:timeout"
+            )
+        ).toHaveLength(1);
         expect(
             scheduler.getJobsForTesting().get("site-1|monitor-1")
                 ?.backoffAttempt
