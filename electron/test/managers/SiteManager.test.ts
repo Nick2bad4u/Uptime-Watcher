@@ -13,20 +13,39 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type Mock,
+    type Mocked,
+    vi,
+} from "vitest";
 
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
+import type { SiteManagerDependencies } from "../../managers/SiteManager.types";
 
 import { SiteManager } from "../../managers/SiteManager";
 import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
 
 describe(SiteManager, () => {
     let manager: SiteManager;
-    let mockDependencies: any;
-    // Let mockSitesCache: any; // Currently unused
+    let mockDependencies: Mocked<SiteManagerDependencies>;
+
+    const getTransactionMock = () =>
+        mockDependencies.databaseService.executeTransaction as unknown as Mock<
+            (operation: (database: Database) => unknown) => Promise<unknown>
+        >;
+
+    const getEmitTypedMock = () =>
+        mockDependencies.eventEmitter.emitTyped as unknown as Mock<
+            (...args: unknown[]) => Promise<void>
+        >;
 
     beforeEach(() => {
         // Const mockSitesCache = { // Currently unused
@@ -101,7 +120,7 @@ describe(SiteManager, () => {
                 delete: vi.fn(),
                 exists: vi.fn(),
             },
-        };
+        } as unknown as Mocked<SiteManagerDependencies>;
         manager = new SiteManager(mockDependencies);
     });
     describe("constructor", () => {
@@ -141,10 +160,8 @@ describe(SiteManager, () => {
                 ],
             };
 
-            mockDependencies[
-                "databaseService"
-            ].executeTransaction.mockImplementation(
-                async (fn: any) => await fn()
+            getTransactionMock().mockImplementation(
+                async (fn) => await fn({} as Database)
             );
 
             const createSiteSpy = vi
@@ -210,9 +227,7 @@ describe(SiteManager, () => {
                 monitors: [],
             };
 
-            mockDependencies[
-                "databaseService"
-            ].executeTransaction.mockRejectedValue(
+            getTransactionMock().mockRejectedValue(
                 new Error("Database transaction failed")
             );
 
@@ -366,12 +381,12 @@ describe(SiteManager, () => {
                 .spyOn(manager["siteWriterService"], "deleteSite")
                 .mockResolvedValue(true);
 
-            mockDependencies.siteRepository.delete.mockResolvedValue(true);
-            mockDependencies[
-                "databaseService"
-            ].executeTransaction.mockImplementation(async (fn: any) => {
+            vi.mocked(mockDependencies.siteRepository.delete).mockResolvedValue(
+                true
+            );
+            getTransactionMock().mockImplementation(async (fn) => {
                 const mockDb = { prepare: vi.fn(), run: vi.fn() };
-                return await fn(mockDb);
+                return await fn(mockDb as unknown as Database);
             });
 
             const isResult = await manager.removeSite("site1");
@@ -507,10 +522,8 @@ describe(SiteManager, () => {
             // Mock the updateSitesCache method
             vi.spyOn(manager, "updateSitesCache").mockResolvedValue(undefined);
 
-            mockDependencies[
-                "databaseService"
-            ].executeTransaction.mockImplementation(
-                async (fn: any) => await fn()
+            getTransactionMock().mockImplementation(
+                async (fn) => await fn({} as Database)
             );
 
             const result = await manager.updateSite("site1", updates);
@@ -574,7 +587,7 @@ describe(SiteManager, () => {
         });
 
         it("removes the specified monitor via SiteWriterService", async () => {
-            mockDependencies.eventEmitter.emitTyped.mockClear();
+            getEmitTypedMock().mockClear();
             const site = buildSite();
             manager["sitesCache"].set(site.identifier, site);
 
@@ -618,7 +631,7 @@ describe(SiteManager, () => {
         });
 
         it("throws when attempting to remove the last monitor", async () => {
-            mockDependencies.eventEmitter.emitTyped.mockClear();
+            getEmitTypedMock().mockClear();
             const site = buildSite();
             site.monitors = [structuredClone(site.monitors[0]!)];
             manager["sitesCache"].set(site.identifier, site);
@@ -650,7 +663,7 @@ describe(SiteManager, () => {
         });
 
         it("hydrates the cache from the database when the site is absent", async () => {
-            mockDependencies.eventEmitter.emitTyped.mockClear();
+            getEmitTypedMock().mockClear();
             const site = buildSite();
             manager["sitesCache"].clear();
 
@@ -881,16 +894,17 @@ describe(SiteManager, () => {
                 };
 
                 // Mock the configuration manager to return validation failure
-                mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce(
-                    {
-                        success: false,
-                        errors: [
-                            "Invalid site identifier",
-                            "Invalid site name",
-                            "Invalid URL format",
-                        ],
-                    }
-                );
+                vi.mocked(
+                    mockDependencies.configurationManager
+                        .validateSiteConfiguration
+                ).mockResolvedValueOnce({
+                    success: false,
+                    errors: [
+                        "Invalid site identifier",
+                        "Invalid site name",
+                        "Invalid URL format",
+                    ],
+                });
                 await expect(
                     manager["validateSite"](invalidSite)
                 ).rejects.toThrow();
@@ -1170,23 +1184,23 @@ describe(SiteManager, () => {
             );
         });
         it("should handle malformed site data gracefully", async () => {
-            const malformedSite = {
+            const malformedSite: unknown = {
                 // Missing required fields
                 name: "Malformed Site",
-            } as any;
+            };
 
             // Mock the configuration manager to return validation failure for malformed data
-            mockDependencies.configurationManager.validateSiteConfiguration.mockResolvedValueOnce(
-                {
-                    success: false,
-                    errors: [
-                        "Missing required identifier field",
-                        "Missing required monitoring field",
-                    ],
-                }
-            );
+            vi.mocked(
+                mockDependencies.configurationManager.validateSiteConfiguration
+            ).mockResolvedValueOnce({
+                success: false,
+                errors: [
+                    "Missing required identifier field",
+                    "Missing required monitoring field",
+                ],
+            });
             await expect(
-                manager["validateSite"](malformedSite)
+                manager["validateSite"](malformedSite as Site)
             ).rejects.toThrow();
         });
     });

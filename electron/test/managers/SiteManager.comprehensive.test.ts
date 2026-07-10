@@ -10,7 +10,11 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { IMonitoringOperations } from "../../managers/SiteManager.types";
+import type {
+    IMonitoringOperations,
+    SiteManagerDependencies,
+} from "../../managers/SiteManager.types";
+import type { MonitoringConfig } from "../../services/database/interfaces";
 
 import { SiteManager } from "../../managers/SiteManager";
 import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
@@ -32,6 +36,16 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
         history: [],
         ...overrides,
     };
+}
+
+function createMalformedValidationErrors(value: unknown): readonly string[] {
+    if (!Array.isArray(value)) {
+        throw new TypeError(
+            "Malformed validation errors fixture must be an array"
+        );
+    }
+
+    return value as unknown as readonly string[];
 }
 
 // Mock all the dependencies
@@ -189,7 +203,7 @@ const { mockSiteWriterServiceInstance } = siteWriterMocks;
 
 describe("SiteManager - Comprehensive", () => {
     let siteManager: SiteManager;
-    let mockDeps: any;
+    let mockDeps: SiteManagerDependencies;
     let mockSite: Site;
     let mockMonitoringOperations: IMonitoringOperations;
 
@@ -324,7 +338,7 @@ describe("SiteManager - Comprehensive", () => {
                 delete: vi.fn(),
                 exists: vi.fn(),
             },
-        };
+        } as unknown as SiteManagerDependencies;
     });
 
     describe("constructor", () => {
@@ -484,7 +498,7 @@ describe("SiteManager - Comprehensive", () => {
                 mockDeps.configurationManager.validateSiteConfiguration
             ).mockResolvedValue({
                 success: false,
-                errors: [undefined as any],
+                errors: createMalformedValidationErrors([undefined]),
             });
 
             await expect(siteManager.addSite(mockSite)).rejects.toThrow(
@@ -836,7 +850,7 @@ describe("SiteManager - Comprehensive", () => {
         beforeEach(() => {
             siteManager = new SiteManager(mockDeps);
             mockCache.clear();
-            mockDeps.eventEmitter.emitTyped.mockClear();
+            vi.mocked(mockDeps.eventEmitter.emitTyped).mockClear();
             mockSiteWriterServiceInstance.updateSite.mockReset();
             mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
                 undefined
@@ -1431,7 +1445,12 @@ describe("SiteManager - Comprehensive", () => {
             vi.mocked(
                 mockSiteWriterService.handleMonitorIntervalChanges
             ).mockImplementation(
-                async (_id: any, _orig: any, _monitors: any, config: any) => {
+                async (
+                    _id: string,
+                    _orig: Site,
+                    _monitors: Site["monitors"],
+                    config: MonitoringConfig
+                ) => {
                     await config.setHistoryLimit(100);
                 }
             );
@@ -1817,7 +1836,11 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(formatSiteValidationErrors([undefined as any])).toBe("");
+            expect(
+                formatSiteValidationErrors(
+                    createMalformedValidationErrors([undefined])
+                )
+            ).toBe("");
         });
     });
 

@@ -21,12 +21,16 @@ vi.mock("../../electronUtils", () => ({
 const { monitorValidatorMockInstance, siteValidatorMockInstance } = vi.hoisted(
     () => ({
         monitorValidatorMockInstance: {
-            shouldApplyDefaultInterval: vi.fn(),
-            validateMonitorConfiguration: vi.fn(),
+            shouldApplyDefaultInterval:
+                vi.fn<MonitorValidator["shouldApplyDefaultInterval"]>(),
+            validateMonitorConfiguration:
+                vi.fn<MonitorValidator["validateMonitorConfiguration"]>(),
         },
         siteValidatorMockInstance: {
-            shouldIncludeInExport: vi.fn(),
-            validateSiteConfiguration: vi.fn(),
+            shouldIncludeInExport:
+                vi.fn<SiteValidator["shouldIncludeInExport"]>(),
+            validateSiteConfiguration:
+                vi.fn<SiteValidator["validateSiteConfiguration"]>(),
         },
     })
 );
@@ -75,10 +79,37 @@ function createMockSite(overrides: Partial<Site> = {}): Site {
     };
 }
 
+interface NullValuedMonitorFields {
+    host: null;
+    lastChecked: null;
+    port: null;
+    url: null;
+}
+
+type NullValuedMonitorFixture = NullValuedMonitorFields &
+    Omit<Monitor, keyof NullValuedMonitorFields>;
+
+function hasNullValuedMonitorFields(
+    value: unknown
+): value is NullValuedMonitorFields {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "host" in value &&
+        value.host === null &&
+        "lastChecked" in value &&
+        value.lastChecked === null &&
+        "port" in value &&
+        value.port === null &&
+        "url" in value &&
+        value.url === null
+    );
+}
+
 describe(ConfigurationManager, () => {
     let configManager: ConfigurationManager;
-    let mockMonitorValidator: any;
-    let mockSiteValidator: any;
+    let mockMonitorValidator: typeof monitorValidatorMockInstance;
+    let mockSiteValidator: typeof siteValidatorMockInstance;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -712,12 +743,17 @@ describe(ConfigurationManager, () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitor = createMockMonitor();
-            // Set null values to test edge cases
-            (monitor as any).url = null;
-            (monitor as any).host = null;
-            (monitor as any).port = null;
-            (monitor as any).lastChecked = null;
+            const malformedMonitor: unknown = {
+                ...createMockMonitor(),
+                host: null,
+                lastChecked: null,
+                port: null,
+                url: null,
+            } satisfies NullValuedMonitorFixture;
+            if (!hasNullValuedMonitorFields(malformedMonitor)) {
+                throw new TypeError("Expected a null-valued monitor fixture");
+            }
+            const monitor = malformedMonitor as unknown as Monitor;
 
             const expectedResult: ValidationResult = {
                 success: true,
