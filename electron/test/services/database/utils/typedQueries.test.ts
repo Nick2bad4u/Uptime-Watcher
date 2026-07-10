@@ -47,15 +47,18 @@ function createMockDatabase(): Database {
     } as unknown as Database;
 }
 
+type MockAll = (...args: Parameters<Database["all"]>) => unknown[];
+type MockGet = (...args: Parameters<Database["get"]>) => unknown;
+
 describe("typedQueries - Comprehensive Database Query Helpers", () => {
     let mockDb: Database;
-    let mockGet: MockedFunction<any>;
-    let mockAll: MockedFunction<any>;
+    let mockGet: MockedFunction<MockGet>;
+    let mockAll: MockedFunction<MockAll>;
 
     beforeEach(() => {
         mockDb = createMockDatabase();
-        mockGet = mockDb.get as MockedFunction<any>;
-        mockAll = mockDb.all as MockedFunction<any>;
+        mockGet = mockDb.get as unknown as MockedFunction<MockGet>;
+        mockAll = mockDb.all as unknown as MockedFunction<MockAll>;
     });
     describe(insertWithReturning, () => {
         it("should return inserted record with generated fields", async ({

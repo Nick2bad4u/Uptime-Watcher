@@ -13,7 +13,7 @@
  */
 
 import type { StatusHistory } from "@shared/types";
-import type { Database } from "node-sqlite3-wasm";
+import type { Database, Statement } from "node-sqlite3-wasm";
 
 import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { fc } from "@fast-check/vitest";
@@ -196,7 +196,7 @@ describe(HistoryRepository, () => {
                 finalize: vi.fn(),
             };
             vi.mocked(mockDatabase.prepare).mockReturnValue(
-                mockStatement as any
+                mockStatement as unknown as Statement
             );
 
             await historyRepository.bulkInsert(monitorId, historyEntries);
@@ -225,7 +225,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const monitorId = "monitor-123";
-            const historyEntries: any[] = [];
+            const historyEntries: StatusHistory[] = [];
 
             await historyRepository.bulkInsert(monitorId, historyEntries);
 
@@ -252,7 +252,7 @@ describe(HistoryRepository, () => {
                 finalize: vi.fn(),
             };
             vi.mocked(mockDatabase.prepare).mockReturnValue(
-                mockStatement as any
+                mockStatement as unknown as Statement
             );
 
             await expect(
@@ -1127,7 +1127,7 @@ describe(HistoryRepository, () => {
                             const dbError = new Error(
                                 `Mock ${errorType} error`
                             );
-                            (dbError as any).code = errorType;
+                            Reflect.set(dbError, "code", errorType);
 
                             // Mock various functions to throw errors
                             const mockedAddHistoryEntry = vi.mocked(
