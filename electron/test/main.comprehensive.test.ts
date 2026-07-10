@@ -3,10 +3,23 @@
  * tests cover app initialization, logging configuration, and cleanup
  */
 
-import type { App, BrowserWindow, WebContents } from "electron";
+import type {
+    BrowserWindow,
+    Event as ElectronEvent,
+    RenderProcessGoneDetails,
+    WebContents,
+} from "electron";
 
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockInstance,
+    vi,
+} from "vitest";
 
 import type { ApplicationService as ApplicationServiceType } from "../services/application/ApplicationService";
 
@@ -48,9 +61,11 @@ vi.mock("electron-devtools-installer", () => ({
 }));
 
 // Mock ApplicationService
-const mockApplicationService = {
-    cleanup: vi.fn(),
-};
+const createApplicationServiceMock = () => ({
+    cleanup: vi.fn<ApplicationServiceType["cleanup"]>(),
+});
+
+const mockApplicationService = createApplicationServiceMock();
 
 vi.mock("../services/application/ApplicationService", () => ({
     ApplicationService: vi.fn(function ApplicationServiceMock() {
@@ -85,31 +100,79 @@ vi.mock("../electronUtils", () => ({
 }));
 
 // Create comprehensive electron mock
-const mockApp: Partial<App> = {
-    isPackaged: false,
-    whenReady: vi.fn(() => Promise.resolve()),
-    on: vi.fn(),
-};
+type AppLifecycleHandler = (...args: readonly unknown[]) => void;
 
-const mockBrowserWindow = Object.assign(vi.fn(), {
-    fromWebContents: vi.fn(),
+const createAppMock = () => ({
+    isPackaged: false,
+    on: vi.fn<(eventName: string, handler: AppLifecycleHandler) => void>(),
+    whenReady: vi.fn<() => Promise<void>>(() => Promise.resolve()),
 });
 
-type MockFunctionCalls = Readonly<{
-    mock: Readonly<{
-        calls: readonly (readonly unknown[])[];
-    }>;
-}>;
+const mockApp = createAppMock();
+
+type BrowserWindowConstructor = typeof import("electron").BrowserWindow;
+
+const createBrowserWindowConstructorMock = () =>
+    Object.assign(vi.fn(), {
+        fromWebContents: vi.fn<BrowserWindowConstructor["fromWebContents"]>(),
+    }) satisfies Pick<BrowserWindowConstructor, "fromWebContents">;
+
+const mockBrowserWindow = createBrowserWindowConstructorMock();
+
+const createElectronEvent = (): ElectronEvent =>
+    ({
+        defaultPrevented: false,
+        preventDefault: vi.fn(),
+    }) as ElectronEvent;
+
+const createWebContentsMock = (id: number, url: string): WebContents =>
+    ({
+        getURL: vi.fn(() => url),
+        id,
+    }) as unknown as WebContents;
+
+const createBrowserWindowReference = (id: number): BrowserWindow =>
+    ({ id }) as unknown as BrowserWindow;
 
 function getRegisteredAppHandler(
-    eventName: string
-): (...args: readonly unknown[]) => void {
-    const calls = (mockApp.on as unknown as MockFunctionCalls).mock.calls;
+    eventName: "browser-window-created"
+): (event: ElectronEvent, window: BrowserWindow) => void;
+function getRegisteredAppHandler(
+    eventName: "render-process-gone"
+): (
+    event: ElectronEvent,
+    webContents: WebContents,
+    details: RenderProcessGoneDetails
+) => void;
+function getRegisteredAppHandler(
+    eventName: "will-quit"
+): (event: ElectronEvent) => void;
+
+function getRegisteredAppHandler(eventName: string): AppLifecycleHandler {
+    const calls: readonly (readonly unknown[])[] = vi.mocked(mockApp.on).mock
+        .calls;
     const handler = calls.find((call) => call[0] === eventName)?.[1];
 
-    expect(handler).toEqual(expect.any(Function));
+    if (typeof handler !== "function") {
+        throw new TypeError(
+            `No handler registered for app event '${eventName}'`
+        );
+    }
 
-    return handler as (...args: readonly unknown[]) => void;
+    return (...args) => {
+        Reflect.apply(handler, mockApp, args);
+    };
+}
+
+async function waitForAppReadyCall(): Promise<void> {
+    const result = vi.mocked(mockApp.whenReady).mock.results[0];
+    const value: unknown = result?.value;
+
+    if (!(value instanceof Promise)) {
+        throw new TypeError("app.whenReady did not return a Promise");
+    }
+
+    await value;
 }
 
 // Mock electron with both named exports and default export
@@ -133,7 +196,7 @@ vi.mock("electron-debug", () => ({
 
 describe("main.ts - Electron Main Process", () => {
     let originalArgv: string[];
-    let originalVersions: any;
+    let originalVersions: NodeJS.ProcessVersions;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -147,19 +210,19 @@ describe("main.ts - Electron Main Process", () => {
 
         // Reset mocks to default states
         mockIsDev.mockReturnValue(true);
-        (mockApp as any).isPackaged = false;
-        mockBrowserWindow.fromWebContents.mockReturnValue({ id: 456 });
+        Reflect.set(mockApp, "isPackaged", false);
+        vi.mocked(mockBrowserWindow.fromWebContents).mockReturnValue(
+            createBrowserWindowReference(456)
+        );
         mockInstallExtension.mockResolvedValue([
             { name: "React Developer Tools" },
             { name: "Redux DevTools" },
         ]);
-        // Ensure cleanup is a mock function before setting mockResolvedValue
-        if (
-            typeof mockApplicationService.cleanup !== "function" ||
-            !("mockResolvedValue" in mockApplicationService.cleanup)
-        ) {
-            mockApplicationService.cleanup = vi.fn();
-        }
+        Reflect.set(
+            mockApplicationService,
+            "cleanup",
+            createApplicationServiceMock().cleanup
+        );
         mockApplicationService.cleanup.mockResolvedValue(undefined);
 
         // Set up process.versions.electron to indicate we're in Electron
@@ -252,7 +315,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Type: Business Logic", "type");
 
             process.argv = ["node", "main.js"];
-            (mockApp as any).isPackaged = false;
+            Reflect.set(mockApp, "isPackaged", false);
 
             vi.resetModules();
             await import("../main");
@@ -270,7 +333,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Type: Business Logic", "type");
 
             process.argv = ["node", "main.js"];
-            (mockApp as any).isPackaged = true;
+            Reflect.set(mockApp, "isPackaged", true);
 
             vi.resetModules();
             await import("../main");
@@ -383,19 +446,15 @@ describe("main.ts - Electron Main Process", () => {
             const browserWindowCreatedHandler = getRegisteredAppHandler(
                 "browser-window-created"
             );
-            const webContents = {
-                getURL: vi.fn(
-                    () =>
-                        "https://user:password@example.com/private?token=secret#hash"
-                ),
-                id: 123,
-            } as unknown as WebContents;
-
-            renderProcessGoneHandler(
-                new Event("render-process-gone"),
-                webContents,
-                { exitCode: 1, reason: "crashed" }
+            const webContents = createWebContentsMock(
+                123,
+                "https://user:password@example.com/private?token=secret#hash"
             );
+
+            renderProcessGoneHandler(createElectronEvent(), webContents, {
+                exitCode: 1,
+                reason: "crashed",
+            });
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[Main] Renderer process gone",
@@ -423,10 +482,7 @@ describe("main.ts - Electron Main Process", () => {
                 },
             } as unknown as BrowserWindow;
 
-            browserWindowCreatedHandler(
-                new Event("browser-window-created"),
-                window
-            );
+            browserWindowCreatedHandler(createElectronEvent(), window);
             windowHandlers.get("unresponsive")?.();
             windowHandlers.get("responsive")?.();
 
@@ -462,16 +518,14 @@ describe("main.ts - Electron Main Process", () => {
             const beforeExitHandler = processOnSpy.mock.calls.find(
                 (call) => call[0] === "beforeExit"
             )?.[1];
-            const willQuitHandler = (mockApp.on as any).mock.calls.find(
-                (call: any) => call[0] === "will-quit"
-            )?.[1];
+            const willQuitHandler = getRegisteredAppHandler("will-quit");
 
             expect(beforeExitHandler).toBeDefined();
             expect(willQuitHandler).toBeDefined();
 
             // Call both handlers to simulate multiple shutdown events
             if (beforeExitHandler) beforeExitHandler();
-            if (willQuitHandler) willQuitHandler();
+            willQuitHandler(createElectronEvent());
 
             await new Promise((resolve) => setTimeout(resolve, 10)); // Allow async cleanup to complete
 
@@ -536,9 +590,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockApp.whenReady).toHaveBeenCalled();
 
             // Manually trigger the whenReady promise resolution
-            const whenReadyPromise = (mockApp.whenReady as any).mock.results[0]
-                .value;
-            await whenReadyPromise;
+            await waitForAppReadyCall();
 
             // Wait for the additional setTimeout delay (1ms) that happens after whenReady
             await new Promise<void>((resolve) => {
@@ -574,9 +626,7 @@ describe("main.ts - Electron Main Process", () => {
             await import("../main");
 
             // Wait for whenReady to be called and resolved
-            const whenReadyPromise = (mockApp.whenReady as any).mock.results[0]
-                .value;
-            await whenReadyPromise;
+            await waitForAppReadyCall();
 
             expect(mockInstallExtension).not.toHaveBeenCalled();
         });
@@ -597,9 +647,7 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            const whenReadyPromise = (mockApp.whenReady as any).mock.results[0]
-                .value;
-            await whenReadyPromise;
+            await waitForAppReadyCall();
 
             // Wait for the setTimeout(resolve, 1) and extension installation code to complete
             await new Promise((resolve) => setTimeout(resolve, 10));
@@ -624,9 +672,7 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            const whenReadyPromise = (mockApp.whenReady as any).mock.results[0]
-                .value;
-            await whenReadyPromise;
+            await waitForAppReadyCall();
 
             expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 1);
         });
@@ -669,7 +715,7 @@ describe("main.ts - Electron Main Process", () => {
                 value: { ...originalVersions },
                 writable: true,
             });
-            delete (process.versions as any).electron;
+            Reflect.deleteProperty(process.versions, "electron");
 
             const { ApplicationService } =
                 await import("../services/application/ApplicationService");
@@ -690,7 +736,7 @@ describe("main.ts - Electron Main Process", () => {
             await annotate("Type: Business Logic", "type");
 
             vi.resetModules();
-            (mockApplicationService as any).cleanup = undefined;
+            Reflect.set(mockApplicationService, "cleanup", undefined);
             const processOnSpy = vi.spyOn(process, "on");
 
             await import("../main");
@@ -721,7 +767,9 @@ describe("main.ts - Electron Main Process", () => {
             // `mockReturnValue` uses a non-constructable arrow implementation.
             // We use a constructable function implementation instead.
             mockConstructableReturnValue(
-                ApplicationService as any,
+                vi.mocked(ApplicationService) as unknown as MockInstance<
+                    () => ApplicationServiceType
+                >,
                 {} as unknown as ApplicationServiceType
             );
 
@@ -740,7 +788,9 @@ describe("main.ts - Electron Main Process", () => {
 
             // Restore default implementation for subsequent tests
             mockConstructableReturnValue(
-                ApplicationService as any,
+                vi.mocked(ApplicationService) as unknown as MockInstance<
+                    () => ApplicationServiceType
+                >,
                 mockApplicationService as unknown as ApplicationServiceType
             );
         });
