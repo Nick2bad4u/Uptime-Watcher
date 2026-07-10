@@ -473,6 +473,33 @@ describe("StateSyncService", () => {
         expect(callback).toHaveBeenCalledTimes(2);
     });
 
+    it("allows an event retry when the consumer failed to apply it", async () => {
+        const callback = vi
+            .fn<(event: unknown) => void>()
+            .mockImplementationOnce(() => {
+                throw new Error("consumer failed");
+            });
+        const event = {
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            revision: 1,
+            siteCount: 0,
+            siteIdentifier: "all",
+            sites: [],
+            source: "database",
+            timestamp: Date.now(),
+        };
+
+        await StateSyncService.onStateSyncEvent(callback);
+
+        expect(() => capturedHandler?.(event)).toThrow("consumer failed");
+        expect(() => capturedHandler?.(event)).not.toThrow();
+        expect(callback).toHaveBeenCalledTimes(2);
+        expect(mockLogger.debug).not.toHaveBeenCalledWith(
+            "[StateSyncService] Ignoring stale state sync event",
+            expect.anything()
+        );
+    });
+
     it("clears recovery timer and expectation when cleanup is invoked", async () => {
         vi.useFakeTimers();
 

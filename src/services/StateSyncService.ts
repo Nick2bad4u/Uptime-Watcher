@@ -434,8 +434,6 @@ export const StateSyncService: StateSyncServiceContract = {
                         }
                     }
 
-                    lastSeenRevision = parsedEvent.data.revision;
-
                     const expectedLocalRecoveryRevision =
                         pendingRecoveryExpectation?.appliedLocally === true
                             ? pendingRecoveryExpectation.expectedRevision
@@ -447,6 +445,11 @@ export const StateSyncService: StateSyncServiceContract = {
                     if (!shouldSkipCallback) {
                         handler(parsedEvent.data);
                     }
+
+                    // Only acknowledge delivery after the consumer applies the
+                    // event. If it throws, an identical retry must remain
+                    // eligible instead of being discarded as stale.
+                    lastSeenRevision = parsedEvent.data.revision;
 
                     if (isExpectedRecoveryBroadcastResult) {
                         logger.info(
