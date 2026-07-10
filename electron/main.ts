@@ -485,6 +485,8 @@ if (isDev()) {
 class Main {
     private static readonly FATAL_SHUTDOWN_TIMEOUT_MS = 5000;
 
+    private static readonly NORMAL_SHUTDOWN_TIMEOUT_MS = 5000;
+
     private static instance: Main | undefined = undefined;
 
     /** Application service instance for managing app lifecycle and features */
@@ -492,8 +494,20 @@ class Main {
         cleanup: () => Promise<void>;
     };
 
-    /** Flag to ensure cleanup is only called once */
-    private cleanedUp = false;
+    /** Shared cleanup task so every shutdown path invokes the service once. */
+    private cleanupPromise: Promise<void> | undefined;
+
+    /** Keeps fatal shutdown orchestration independent from normal app quits. */
+    private fatalShutdownStarted = false;
+
+    /** Allows the re-entrant `will-quit` emitted by the guarded `app.quit()`. */
+    private normalQuitApproved = false;
+
+    /** Bounded normal-shutdown task shared by repeated quit requests. */
+    private normalQuitPromise: Promise<void> | undefined;
+
+    /** Prevents repeatable Node `beforeExit` events from rescheduling cleanup. */
+    private processExitCleanupScheduled = false;
 
     private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
@@ -569,11 +583,11 @@ class Main {
      * Named event handler for safe cleanup on process exit.
      */
     private readonly handleProcessExit = (): void => {
-        if (this.cleanedUp) {
+        if (this.processExitCleanupScheduled) {
             return;
         }
 
-        this.cleanedUp = true;
+        this.processExitCleanupScheduled = true;
         // Handle cleanup asynchronously without blocking process exit
         // Use setImmediate to avoid blocking the event loop
         setImmediate((): void => {
@@ -597,30 +611,17 @@ class Main {
     /**
      * Named event handler for safe cleanup on app quit.
      */
-    private readonly handleAppQuit = (): void => {
-        if (this.cleanedUp) {
+    private readonly handleAppQuit = (event: Event): void => {
+        if (this.normalQuitApproved) {
             return;
         }
 
-        this.cleanedUp = true;
-        // Handle cleanup asynchronously during app quit
-        setImmediate((): void => {
-            fireAndForget(
-                async () => {
-                    await this.performCleanup();
-                },
-                {
-                    onError: (error) => {
-                        logger.error(
-                            "[Main] Unexpected error during app quit cleanup",
-                            error
-                        );
-                        // Don't throw - app is already quitting, just exit with error code
-                        app.exit(1);
-                    },
-                }
-            );
-        });
+        event.preventDefault();
+        if (this.normalQuitPromise) {
+            return;
+        }
+
+        this.normalQuitPromise = this.performNormalQuit();
     };
 
     /**
@@ -657,11 +658,11 @@ class Main {
         reason: "uncaughtException" | "unhandledRejection",
         error: Error
     ): Promise<void> {
-        if (this.cleanedUp) {
+        if (this.fatalShutdownStarted) {
             return;
         }
 
-        this.cleanedUp = true;
+        this.fatalShutdownStarted = true;
 
         logger.error("[Main] Initiating fatal shutdown", {
             message: error.message,
@@ -694,6 +695,42 @@ class Main {
         app.exit(1);
     }
 
+    /**
+     * Waits for normal cleanup to settle, then re-enters Electron's quit flow.
+     */
+    private async performNormalQuit(): Promise<void> {
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        const timeout = new Promise<never>((_resolve, reject) => {
+            timeoutId = setTimeout(() => {
+                reject(
+                    new Error(
+                        `App cleanup timed out after ${Main.NORMAL_SHUTDOWN_TIMEOUT_MS}ms`
+                    )
+                );
+            }, Main.NORMAL_SHUTDOWN_TIMEOUT_MS);
+            timeoutId.unref();
+        });
+
+        try {
+            await Promise.race([this.performCleanup(), timeout]);
+        } catch (error: unknown) {
+            logger.error("[Main] App quit cleanup failed", ensureError(error));
+        } finally {
+            clearTimeout(timeoutId);
+            this.normalQuitApproved = true;
+
+            try {
+                app.quit();
+            } catch (error: unknown) {
+                logger.error(
+                    "[Main] Failed to resume app quit after cleanup",
+                    ensureError(error)
+                );
+                app.exit(1);
+            }
+        }
+    }
+
     private startFatalShutdown(
         reason: "uncaughtException" | "unhandledRejection",
         error: Error
@@ -716,6 +753,11 @@ class Main {
      * @returns Promise that resolves when cleanup is complete
      */
     private async performCleanup(): Promise<void> {
+        this.cleanupPromise ??= this.performApplicationServiceCleanup();
+        await this.cleanupPromise;
+    }
+
+    private async performApplicationServiceCleanup(): Promise<void> {
         try {
             if (!this.applicationService) {
                 return;
@@ -724,7 +766,7 @@ class Main {
             await this.applicationService.cleanup();
         } catch (error) {
             logger.error("[Main] Cleanup failed", error);
-            // Don't re-throw as this is called during shutdown
+            throw error;
         }
     }
 

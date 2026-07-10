@@ -103,8 +103,11 @@ vi.mock("../electronUtils", () => ({
 type AppLifecycleHandler = (...args: readonly unknown[]) => void;
 
 const createAppMock = () => ({
+    exit: vi.fn<(exitCode?: number) => void>(),
     isPackaged: false,
+    off: vi.fn<(eventName: string, handler: AppLifecycleHandler) => void>(),
     on: vi.fn<(eventName: string, handler: AppLifecycleHandler) => void>(),
+    quit: vi.fn<() => void>(),
     whenReady: vi.fn<() => Promise<void>>(() => Promise.resolve()),
 });
 
@@ -211,6 +214,8 @@ describe("main.ts - Electron Main Process", () => {
         // Reset mocks to default states
         mockIsDev.mockReturnValue(true);
         Reflect.set(mockApp, "isPackaged", false);
+        mockApp.exit.mockReset();
+        mockApp.quit.mockReset();
         vi.mocked(mockBrowserWindow.fromWebContents).mockReturnValue(
             createBrowserWindowReference(456)
         );
@@ -501,7 +506,133 @@ describe("main.ts - Electron Main Process", () => {
                 }
             );
         });
-        it("should only cleanup once when multiple shutdown events occur", async ({
+        it("should delay re-quitting until one cleanup completes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const order: string[] = [];
+            let resolveCleanup!: () => void;
+            mockApplicationService.cleanup.mockImplementationOnce(
+                () =>
+                    new Promise<void>((resolve) => {
+                        order.push("cleanup");
+                        resolveCleanup = resolve;
+                    })
+            );
+
+            await import("../main");
+
+            const willQuitHandler = getRegisteredAppHandler("will-quit");
+            const initialQuitEvent = {
+                defaultPrevented: false,
+                preventDefault: vi.fn(() => {
+                    order.push("preventDefault");
+                }),
+            } as ElectronEvent;
+            const repeatedQuitEvent = createElectronEvent();
+            const reentrantQuitEvent = createElectronEvent();
+
+            mockApp.quit.mockImplementationOnce(() => {
+                order.push("quit");
+                willQuitHandler(reentrantQuitEvent);
+            });
+
+            willQuitHandler(initialQuitEvent);
+            willQuitHandler(repeatedQuitEvent);
+
+            expect(initialQuitEvent.preventDefault).toHaveBeenCalledOnce();
+            expect(repeatedQuitEvent.preventDefault).toHaveBeenCalledOnce();
+            expect(mockApplicationService.cleanup).toHaveBeenCalledOnce();
+            expect(mockApp.quit).not.toHaveBeenCalled();
+            expect(order).toStrictEqual(["preventDefault", "cleanup"]);
+
+            resolveCleanup();
+
+            await vi.waitFor(() => {
+                expect(mockApp.quit).toHaveBeenCalledOnce();
+            });
+
+            expect(order).toStrictEqual([
+                "preventDefault",
+                "cleanup",
+                "quit",
+            ]);
+            expect(reentrantQuitEvent.preventDefault).not.toHaveBeenCalled();
+            expect(mockApplicationService.cleanup).toHaveBeenCalledOnce();
+        });
+        it("should resume quitting when normal cleanup rejects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const cleanupError = new Error("Cleanup failed");
+            mockApplicationService.cleanup.mockRejectedValueOnce(cleanupError);
+
+            await import("../main");
+
+            const willQuitHandler = getRegisteredAppHandler("will-quit");
+            const event = createElectronEvent();
+
+            willQuitHandler(event);
+
+            await vi.waitFor(() => {
+                expect(mockApp.quit).toHaveBeenCalledOnce();
+            });
+
+            expect(event.preventDefault).toHaveBeenCalledOnce();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[Main] App quit cleanup failed",
+                cleanupError
+            );
+        });
+        it("should bound normal cleanup before resuming quit", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockApplicationService.cleanup.mockImplementationOnce(
+                () => new Promise<void>(() => {})
+            );
+
+            await import("../main");
+            vi.useFakeTimers();
+
+            try {
+                const willQuitHandler = getRegisteredAppHandler("will-quit");
+                const event = createElectronEvent();
+
+                willQuitHandler(event);
+
+                expect(event.preventDefault).toHaveBeenCalledOnce();
+                expect(mockApp.quit).not.toHaveBeenCalled();
+
+                await vi.advanceTimersByTimeAsync(5000);
+
+                expect(mockApp.quit).toHaveBeenCalledOnce();
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "[Main] App quit cleanup failed",
+                    expect.objectContaining({
+                        message: "App cleanup timed out after 5000ms",
+                    })
+                );
+            } finally {
+                vi.useRealTimers();
+            }
+        });
+        it("should only cleanup once when process and app shutdown overlap", async ({
             task,
             annotate,
         }) => {
@@ -514,7 +645,6 @@ describe("main.ts - Electron Main Process", () => {
 
             await import("../main");
 
-            // Get the cleanup handler
             const beforeExitHandler = processOnSpy.mock.calls.find(
                 (call) => call[0] === "beforeExit"
             )?.[1];
@@ -523,13 +653,16 @@ describe("main.ts - Electron Main Process", () => {
             expect(beforeExitHandler).toBeDefined();
             expect(willQuitHandler).toBeDefined();
 
-            // Call both handlers to simulate multiple shutdown events
-            if (beforeExitHandler) beforeExitHandler();
+            if (beforeExitHandler) {
+                beforeExitHandler();
+                beforeExitHandler();
+            }
             willQuitHandler(createElectronEvent());
 
-            await new Promise((resolve) => setTimeout(resolve, 10)); // Allow async cleanup to complete
+            await vi.waitFor(() => {
+                expect(mockApp.quit).toHaveBeenCalledOnce();
+            });
 
-            // Cleanup should only be called once
             expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
         });
         it("should handle cleanup errors gracefully", async ({
