@@ -17,22 +17,21 @@ import {
 const mockEventBus = vi.hoisted(() => {
     // Return constructor function that creates new event bus instances
     function MockTypedEventBus(busId?: string) {
-        const emitter = new EventTarget() as any;
-
-        // Add TypedEventBus specific methods
-        emitter.emitTyped = vi.fn().mockResolvedValue(undefined);
-        emitter.on = vi.fn().mockReturnThis();
-        emitter.onTyped = vi.fn().mockReturnThis();
-        emitter.off = vi.fn().mockReturnThis();
-        emitter.offTyped = vi.fn().mockReturnThis();
-        emitter.once = vi.fn().mockReturnThis();
-        emitter.onceTyped = vi.fn().mockReturnThis();
-        emitter.removeTypedListener = vi.fn().mockReturnThis();
-        emitter.removeAllTypedListeners = vi.fn().mockReturnThis();
-        emitter.getListenerCount = vi.fn().mockReturnValue(0);
-        emitter.hasListeners = vi.fn().mockReturnValue(false);
-        emitter.busId = busId || "test-bus";
-        emitter.destroy = vi.fn();
+        const emitter = Object.assign(new EventTarget(), {
+            busId: busId || "test-bus",
+            destroy: vi.fn(),
+            emitTyped: vi.fn().mockResolvedValue(undefined),
+            getListenerCount: vi.fn().mockReturnValue(0),
+            hasListeners: vi.fn().mockReturnValue(false),
+            off: vi.fn().mockReturnThis(),
+            offTyped: vi.fn().mockReturnThis(),
+            on: vi.fn().mockReturnThis(),
+            once: vi.fn().mockReturnThis(),
+            onceTyped: vi.fn().mockReturnThis(),
+            onTyped: vi.fn().mockReturnThis(),
+            removeAllTypedListeners: vi.fn().mockReturnThis(),
+            removeTypedListener: vi.fn().mockReturnThis(),
+        });
 
         return emitter;
     }

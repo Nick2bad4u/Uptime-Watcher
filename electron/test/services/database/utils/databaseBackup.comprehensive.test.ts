@@ -729,7 +729,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                         ),
                         async (testPath, errorCode) => {
                             const error = new Error(`Mock error: ${errorCode}`);
-                            (error as any).code = errorCode;
+                            Reflect.set(error, "code", errorCode);
 
                             mockReadFile.mockRejectedValue(error);
 

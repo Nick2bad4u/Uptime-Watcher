@@ -327,10 +327,10 @@ describe(performPortCheckWithRetry, () => {
             const config = vi.mocked(withOperationalHooks).mock.calls[0]![1];
             const onRetryFunction = config.onRetry as (
                 attempt: number,
-                error: Error
+                error: unknown
             ) => void;
 
-            onRetryFunction(1, "String error" as any);
+            onRetryFunction(1, "String error");
 
             // Assert
             expect(logger.debug).toHaveBeenCalledWith(

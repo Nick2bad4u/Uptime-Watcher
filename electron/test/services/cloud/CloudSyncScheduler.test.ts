@@ -151,12 +151,12 @@ describe(CloudSyncScheduler, () => {
                 const error = new Error("boom");
                 // Simulate an axios-style error shape which could include
                 // sensitive headers/body.
-                (error as any).config = {
+                Reflect.set(error, "config", {
                     headers: {
                         Authorization: "Bearer VERY_SECRET_TOKEN",
                     },
                     data: "refresh_token=VERY_SECRET_TOKEN",
-                };
+                });
                 throw error;
             }),
         };

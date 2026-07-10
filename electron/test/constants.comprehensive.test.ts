@@ -377,7 +377,9 @@ describe("Backend Constants", () => {
 
             // In strict mode, attempt to modify should throw an error
             expect(() => {
-                (RETRY_BACKOFF as any).INITIAL_DELAY = 999;
+                Object.defineProperty(RETRY_BACKOFF, "INITIAL_DELAY", {
+                    value: 999,
+                });
             }).toThrow();
 
             // Verify values remain unchanged

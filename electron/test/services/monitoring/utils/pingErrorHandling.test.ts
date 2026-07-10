@@ -15,7 +15,7 @@ import * as loggerModule from "../../../../utils/logger";
 
 // Mock the logger
 vi.mock("../../../../utils/logger");
-const mockLogger = loggerModule.logger as any;
+const mockLogger = vi.mocked(loggerModule.logger);
 
 describe("pingErrorHandling", () => {
     const defaultContext: PingOperationContext = {
@@ -26,7 +26,6 @@ describe("pingErrorHandling", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockLogger.error = vi.fn();
     });
     afterEach(() => {
         vi.resetAllMocks();

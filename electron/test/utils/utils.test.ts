@@ -15,7 +15,7 @@ vi.mock("electron", () => ({
 }));
 
 describe("Electron Utils", () => {
-    let mockApp: any;
+    let mockApp: { isPackaged: boolean };
     let originalNodeEnv: string | undefined;
 
     beforeEach(async () => {

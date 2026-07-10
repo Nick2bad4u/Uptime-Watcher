@@ -160,12 +160,12 @@ describe("SiteValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const site: any = {
+            const site = {
                 identifier: "valid-site",
                 name: "Test Site",
                 monitoring: true,
                 monitors: "not-an-array",
-            };
+            } as unknown as Site;
 
             const result = siteValidator.validateSiteConfiguration(site);
 

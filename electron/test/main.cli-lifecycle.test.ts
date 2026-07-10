@@ -50,6 +50,11 @@ const mockDiagnosticsLogger = {
     error: vi.fn(),
 };
 
+const originalElectronVersionDescriptor = Object.getOwnPropertyDescriptor(
+    process.versions,
+    "electron"
+);
+
 vi.mock("../utils/logger", () => ({
     logger: mockLogger,
     diagnosticsLogger: mockDiagnosticsLogger,
@@ -116,10 +121,19 @@ describe("main process CLI and lifecycle behavior", () => {
         mockInstallExtension.mockResolvedValue([]);
 
         // Clear process.versions.electron to test the conditional
-        delete (process.versions as any).electron;
+        Reflect.deleteProperty(process.versions, "electron");
     });
     afterEach(() => {
         process.argv = originalArgv;
+        if (originalElectronVersionDescriptor) {
+            Object.defineProperty(
+                process.versions,
+                "electron",
+                originalElectronVersionDescriptor
+            );
+        } else {
+            Reflect.deleteProperty(process.versions, "electron");
+        }
         vi.restoreAllMocks();
     });
     describe("Command Line Argument Processing", () => {

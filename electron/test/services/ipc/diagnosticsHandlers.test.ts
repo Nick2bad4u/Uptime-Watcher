@@ -4,6 +4,7 @@ import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
+import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 
 import {
@@ -49,7 +50,7 @@ const createDiagnosticsHandlerHarness = () => {
     const emitTyped = vi.fn().mockResolvedValue(undefined);
     const eventEmitter = {
         emitTyped,
-    } as unknown as TypedEventBus<any>;
+    } as unknown as TypedEventBus<UptimeEvents>;
 
     registerDiagnosticsHandlers({
         eventEmitter,

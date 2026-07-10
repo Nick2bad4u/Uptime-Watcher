@@ -14,36 +14,45 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { DatabaseService } from "../../../services/database/DatabaseService";
+
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
+
+const createMockDatabaseService = () => {
+    const mockDatabase = {
+        all: vi.fn(),
+        get: vi.fn(),
+        prepare: vi.fn().mockReturnValue({
+            all: vi.fn(),
+            finalize: vi.fn(),
+            get: vi.fn(),
+            run: vi.fn(),
+        }),
+        run: vi.fn().mockReturnValue({ changes: 1, lastInsertRowid: 1 }),
+    };
+
+    return {
+        executeTransaction: vi
+            .fn()
+            .mockImplementation(
+                async (callback: (database: typeof mockDatabase) => unknown) =>
+                    callback(mockDatabase)
+            ),
+        getDatabase: vi.fn().mockReturnValue(mockDatabase),
+    };
+};
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
 
 describe(MonitorRepository, () => {
     let repository: MonitorRepository;
-    let mockDatabaseService: any;
+    let mockDatabaseService: MockDatabaseService;
 
     beforeEach(() => {
-        // Mock the database object that will be returned by getDatabase()
-        const mockDatabase = {
-            all: vi.fn(),
-            get: vi.fn(),
-            run: vi.fn().mockReturnValue({ changes: 1, lastInsertRowid: 1 }),
-            prepare: vi.fn().mockReturnValue({
-                all: vi.fn(),
-                get: vi.fn(),
-                run: vi.fn(),
-                finalize: vi.fn(),
-            }),
-        };
-
-        // Mock the DatabaseService
-        mockDatabaseService = {
-            getDatabase: vi.fn().mockReturnValue(mockDatabase),
-            executeTransaction: vi
-                .fn()
-                .mockImplementation(async (callback) => callback(mockDatabase)),
-        };
+        mockDatabaseService = createMockDatabaseService();
 
         repository = new MonitorRepository({
-            databaseService: mockDatabaseService,
+            databaseService: mockDatabaseService as unknown as DatabaseService,
         });
     });
     describe("findBySiteIdentifier", () => {

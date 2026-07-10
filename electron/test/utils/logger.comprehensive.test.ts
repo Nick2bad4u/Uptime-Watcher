@@ -291,7 +291,9 @@ describe("Logger Utilities", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const circular: any = { name: "test" };
+                const circular: { name: string; self?: unknown } = {
+                    name: "test",
+                };
                 circular.self = circular;
 
                 expect(() => {
