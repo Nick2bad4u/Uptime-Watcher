@@ -89,4 +89,46 @@ describe("providerConnectionState", () => {
             secretStore.getSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
         ).resolves.toBe("existing-google-secret");
     });
+
+    it("attempts every settings rollback when token restoration fails", async () => {
+        const settings = createInMemoryCloudSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "new-label",
+            [SETTINGS_KEY_PROVIDER]: "google-drive",
+        });
+        const tokenError = new Error("token restore failed");
+        const secretStore = {
+            deleteSecret: async (): Promise<void> => undefined,
+            getSecret: async (): Promise<string | undefined> => undefined,
+            setSecret: async (): Promise<void> => {
+                throw tokenError;
+            },
+        };
+
+        const restore = restoreProviderConnectionState({
+            ctx: { secretStore, settings },
+            restoreGoogleDriveAccountLabel: true,
+            snapshot: {
+                previousFilesystemBaseDirectory: "/tmp/original",
+                previousGoogleDriveAccountLabel: "existing-label",
+                previousProvider: "filesystem",
+                previousStoredTokens: "existing-google-secret",
+            },
+            tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+        });
+
+        await expect(restore).rejects.toThrow(AggregateError);
+        await expect(restore).rejects.toThrow(
+            "Failed to restore one or more previous provider settings"
+        );
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "filesystem"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/original");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
+    });
 });

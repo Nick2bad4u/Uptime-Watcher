@@ -1,5 +1,7 @@
 import type { CloudServiceOperationContext } from "../CloudService.operationContext";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import {
     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
@@ -67,28 +69,53 @@ export async function restoreProviderConnectionState(args: {
     readonly snapshot: ProviderConnectionStateSnapshot;
     readonly tokenStorageKey: string;
 }): Promise<void> {
-    if (args.snapshot.previousStoredTokens) {
-        await args.ctx.secretStore.setSecret(
-            args.tokenStorageKey,
-            args.snapshot.previousStoredTokens
-        );
-    } else {
-        await args.ctx.secretStore.deleteSecret(args.tokenStorageKey);
-    }
+    const rollbackErrors: Error[] = [];
+    const attempt = async (operation: () => Promise<void>): Promise<void> => {
+        try {
+            await operation();
+        } catch (error: unknown) {
+            rollbackErrors.push(ensureError(error));
+        }
+    };
+
+    await attempt(async () => {
+        if (args.snapshot.previousStoredTokens) {
+            await args.ctx.secretStore.setSecret(
+                args.tokenStorageKey,
+                args.snapshot.previousStoredTokens
+            );
+        } else {
+            await args.ctx.secretStore.deleteSecret(args.tokenStorageKey);
+        }
+    });
 
     if (args.restoreGoogleDriveAccountLabel) {
-        await args.ctx.settings.set(
-            SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-            args.snapshot.previousGoogleDriveAccountLabel
-        );
+        await attempt(async () => {
+            await args.ctx.settings.set(
+                SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                args.snapshot.previousGoogleDriveAccountLabel
+            );
+        });
     }
 
-    await args.ctx.settings.set(
-        SETTINGS_KEY_PROVIDER,
-        args.snapshot.previousProvider
-    );
-    await args.ctx.settings.set(
-        SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-        args.snapshot.previousFilesystemBaseDirectory
-    );
+    await attempt(async () => {
+        await args.ctx.settings.set(
+            SETTINGS_KEY_PROVIDER,
+            args.snapshot.previousProvider
+        );
+    });
+    await attempt(async () => {
+        await args.ctx.settings.set(
+            SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+            args.snapshot.previousFilesystemBaseDirectory
+        );
+    });
+
+    if (rollbackErrors.length > 0) {
+        throw new AggregateError(
+            rollbackErrors,
+            "Failed to restore one or more previous provider settings",
+            { cause: rollbackErrors[0] }
+        );
+    }
 }

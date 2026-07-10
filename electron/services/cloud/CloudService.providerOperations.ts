@@ -286,6 +286,7 @@ export async function connectDropbox(
     return ctx.runCloudOperation("connectDropbox", async () => {
         const previousState = await captureProviderConnectionState({
             ctx,
+            includeGoogleDriveAccountLabel: true,
             tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
         });
 
@@ -304,39 +305,57 @@ export async function connectDropbox(
             tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
         });
 
-        await tokenManager.storeTokens(tokens);
-
-        // Verify the connection immediately so the UI doesn't end up in a
-        // confusing "configured but down" state.
+        let statusSummary: CloudStatusSummary;
+        let failurePrefix =
+            "Dropbox connect failed while persisting credentials";
         try {
+            await tokenManager.storeTokens(tokens);
+
+            // Verify the connection immediately so the UI doesn't end up in a
+            // confusing "configured but down" state.
+            failurePrefix = "Dropbox connection verification failed";
             const provider = new DropboxCloudStorageProvider({
                 tokenManager,
             });
             await provider.getAccountLabel();
-        } catch (error) {
+
+            // Commit the provider switch only after the OAuth flow and
+            // verification have succeeded. Keep the provider write last so
+            // readers cannot observe a half-configured Dropbox provider.
+            failurePrefix =
+                "Dropbox connect failed while persisting configuration";
+            await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+            await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
+            await ctx.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
+            failurePrefix = "Dropbox connect failed while building status";
+            statusSummary = await ctx.buildStatusSummary();
+        } catch (error: unknown) {
             // Roll back any partial state so the user can retry cleanly.
             //
             // @remarks
             // This must restore the previous provider settings rather than
             // blindly clearing them. Otherwise a failed attempt to connect a
             // new provider would disconnect the previously configured one.
-            await restoreProviderConnectionState({
-                ctx,
-                snapshot: previousState,
-                tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
-            });
-
             const resolved = ensureError(error);
-            throw new Error(
-                `Dropbox connection verification failed: ${resolved.message}`,
-                { cause: error }
-            );
-        }
+            try {
+                await restoreProviderConnectionState({
+                    ctx,
+                    restoreGoogleDriveAccountLabel: true,
+                    snapshot: previousState,
+                    tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
+                });
+            } catch (rollbackError: unknown) {
+                throw new AggregateError(
+                    [resolved, ensureError(rollbackError)],
+                    "Dropbox connect failed and previous provider state could not be fully restored",
+                    { cause: rollbackError }
+                );
+            }
 
-        // Commit the provider switch only after the OAuth flow + verification
-        // has succeeded.
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "dropbox");
-        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
+            throw new Error(`${failurePrefix}: ${resolved.message}`, {
+                cause: error,
+            });
+        }
 
         // Clear Google Drive secrets after a successful provider switch.
         await deleteProviderSecretsBestEffort({
@@ -344,10 +363,9 @@ export async function connectDropbox(
             secretKeys: [SETTINGS_KEY_GOOGLE_DRIVE_TOKENS],
             secretStore: ctx.secretStore,
         });
-        await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Connected Dropbox provider");
-        return ctx.buildStatusSummary();
+        return statusSummary;
     });
 }
 
@@ -395,6 +413,7 @@ export async function connectGoogleDrive(
             storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
         });
 
+        let statusSummary: CloudStatusSummary;
         try {
             await tokenManager.setTokens({
                 accessToken: auth.accessToken,
@@ -411,17 +430,26 @@ export async function connectGoogleDrive(
 
             await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
             await ctx.settings.set(SETTINGS_KEY_PROVIDER, "google-drive");
+            statusSummary = await ctx.buildStatusSummary();
         } catch (error: unknown) {
             // Roll back any partial state so a previously configured provider
             // remains intact.
-            await restoreProviderConnectionState({
-                ctx,
-                restoreGoogleDriveAccountLabel: true,
-                snapshot: previousState,
-                tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-            });
-
             const resolved = ensureError(error);
+            try {
+                await restoreProviderConnectionState({
+                    ctx,
+                    restoreGoogleDriveAccountLabel: true,
+                    snapshot: previousState,
+                    tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                });
+            } catch (rollbackError: unknown) {
+                throw new AggregateError(
+                    [resolved, ensureError(rollbackError)],
+                    "Google Drive connect failed and previous provider state could not be fully restored",
+                    { cause: rollbackError }
+                );
+            }
+
             throw new Error(
                 `Google Drive connect failed while persisting configuration: ${resolved.message}`,
                 { cause: error }
@@ -436,6 +464,6 @@ export async function connectGoogleDrive(
         });
 
         logger.info("[CloudService] Connected Google Drive provider");
-        return ctx.buildStatusSummary();
+        return statusSummary;
     });
 }

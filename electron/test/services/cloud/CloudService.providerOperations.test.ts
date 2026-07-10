@@ -55,13 +55,16 @@ function createSettingsAdapter(seed?: Record<string, string>): {
 }
 
 function createOperationContext(args: {
+    buildStatusSummary?:
+        CloudServiceOperationContext["buildStatusSummary"] | undefined;
     loadDropboxDeps: CloudServiceOperationContext["loadDropboxDeps"];
     loadGoogleDriveDeps: CloudServiceOperationContext["loadGoogleDriveDeps"];
     secretStore: CloudServiceOperationContext["secretStore"];
     settings: CloudServiceOperationContext["settings"];
 }): CloudServiceOperationContext {
     return {
-        buildStatusSummary: async () => createBaseStatus(),
+        buildStatusSummary:
+            args.buildStatusSummary ?? (async () => createBaseStatus()),
         decryptBackupOrThrow: async () => {
             throw new Error("not used");
         },
@@ -150,6 +153,291 @@ describe("CloudService.providerOperations", () => {
         await expect(
             settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
         ).resolves.toBe("/tmp/uw");
+    });
+
+    it("restores previous provider state when Dropbox settings persistence fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const baseSettings = createSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
+            [SETTINGS_KEY_PROVIDER]: "filesystem",
+        });
+        const settings: CloudServiceOperationContext["settings"] = {
+            ...baseSettings,
+            set: async (key, value) => {
+                if (key === SETTINGS_KEY_PROVIDER && value === "dropbox") {
+                    throw new Error("provider persistence failed");
+                }
+                await baseSettings.set(key, value);
+            },
+        };
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "old-tokens");
+
+        const loadDropboxDeps = vi
+            .fn<CloudServiceOperationContext["loadDropboxDeps"]>()
+            .mockResolvedValue({
+                DropboxAuthFlow: class {
+                    public async connect(): Promise<unknown> {
+                        return {
+                            accessToken: "new",
+                            expiresAtEpochMs: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                        };
+                    }
+                },
+                DropboxTokenManager: class {
+                    public async storeTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_DROPBOX_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                    }
+                },
+                DropboxCloudStorageProvider: class {
+                    public async getAccountLabel(): Promise<string> {
+                        return "account";
+                    }
+                },
+            } as never);
+        const ctx = createOperationContext({
+            loadDropboxDeps,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        await expect(connectDropbox(ctx)).rejects.toThrow(
+            "Dropbox connect failed while persisting configuration: provider persistence failed"
+        );
+
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe("old-tokens");
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "filesystem"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/uw");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
+    });
+
+    it("restores an existing Dropbox login when reconnect token storage fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const settings = createSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "",
+            [SETTINGS_KEY_PROVIDER]: "dropbox",
+        });
+        await secretStore.setSecret(
+            SETTINGS_KEY_DROPBOX_TOKENS,
+            "existing-dropbox-tokens"
+        );
+
+        const loadDropboxDeps = vi
+            .fn<CloudServiceOperationContext["loadDropboxDeps"]>()
+            .mockResolvedValue({
+                DropboxAuthFlow: class {
+                    public async connect(): Promise<unknown> {
+                        return {
+                            accessToken: "new",
+                            expiresAtEpochMs: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                        };
+                    }
+                },
+                DropboxTokenManager: class {
+                    public async storeTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_DROPBOX_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                        throw new Error("token persistence failed");
+                    }
+                },
+                DropboxCloudStorageProvider: class {
+                    public async getAccountLabel(): Promise<string> {
+                        return "unreachable";
+                    }
+                },
+            } as never);
+        const ctx = createOperationContext({
+            loadDropboxDeps,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        await expect(connectDropbox(ctx)).rejects.toThrow(
+            "Dropbox connect failed while persisting credentials: token persistence failed"
+        );
+
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe("existing-dropbox-tokens");
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "dropbox"
+        );
+    });
+
+    it("restores provider state before cross-provider cleanup when Dropbox status construction fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const settings = createSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
+            [SETTINGS_KEY_PROVIDER]: "google-drive",
+        });
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "old-dropbox");
+        await secretStore.setSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS, "google");
+
+        const loadDropboxDeps = vi
+            .fn<CloudServiceOperationContext["loadDropboxDeps"]>()
+            .mockResolvedValue({
+                DropboxAuthFlow: class {
+                    public async connect(): Promise<unknown> {
+                        return {
+                            accessToken: "new",
+                            expiresAtEpochMs: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                        };
+                    }
+                },
+                DropboxTokenManager: class {
+                    public async storeTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_DROPBOX_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                    }
+                },
+                DropboxCloudStorageProvider: class {
+                    public async getAccountLabel(): Promise<string> {
+                        return "account";
+                    }
+                },
+            } as never);
+        const ctx = createOperationContext({
+            buildStatusSummary: async () => {
+                throw new Error("status failed");
+            },
+            loadDropboxDeps,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        await expect(connectDropbox(ctx)).rejects.toThrow(
+            "Dropbox connect failed while building status: status failed"
+        );
+
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe("old-dropbox");
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
+        ).resolves.toBe("google");
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "google-drive"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/uw");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
+    });
+
+    it("retains the connect error while attempting every Dropbox rollback step", async () => {
+        const storedSecrets = new Map<string, string>([
+            [SETTINGS_KEY_DROPBOX_TOKENS, "old-tokens"],
+        ]);
+        let rejectTokenRestore = false;
+        const tokenRollbackError = new Error("token rollback failed");
+        const secretStore: CloudServiceOperationContext["secretStore"] = {
+            deleteSecret: async (key) => {
+                storedSecrets.delete(key);
+            },
+            getSecret: async (key) => storedSecrets.get(key),
+            setSecret: async (key, value) => {
+                if (rejectTokenRestore && value === "old-tokens") {
+                    throw tokenRollbackError;
+                }
+                storedSecrets.set(key, value);
+            },
+        };
+        const settings = createSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
+            [SETTINGS_KEY_PROVIDER]: "filesystem",
+        });
+        const verificationError = new Error("verification failed");
+        const loadDropboxDeps = vi
+            .fn<CloudServiceOperationContext["loadDropboxDeps"]>()
+            .mockResolvedValue({
+                DropboxAuthFlow: class {
+                    public async connect(): Promise<unknown> {
+                        return {
+                            accessToken: "new",
+                            expiresAtEpochMs: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                        };
+                    }
+                },
+                DropboxTokenManager: class {
+                    public async storeTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_DROPBOX_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                    }
+                },
+                DropboxCloudStorageProvider: class {
+                    public async getAccountLabel(): Promise<string> {
+                        rejectTokenRestore = true;
+                        throw verificationError;
+                    }
+                },
+            } as never);
+        const ctx = createOperationContext({
+            loadDropboxDeps,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        try {
+            await connectDropbox(ctx);
+            throw new Error("Expected connectDropbox to reject");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(AggregateError);
+            const aggregate = error as AggregateError;
+            expect(aggregate.errors).toHaveLength(2);
+            expect(aggregate.errors[0]).toBe(verificationError);
+            expect(aggregate.errors[1]).toBeInstanceOf(AggregateError);
+            expect((aggregate.errors[1] as AggregateError).errors).toContain(
+                tokenRollbackError
+            );
+        }
+
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "filesystem"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/uw");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
     });
 
     it("does not clobber existing provider when Google Drive label fetch fails", async () => {
@@ -325,6 +613,82 @@ describe("CloudService.providerOperations", () => {
         await expect(
             secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
         ).resolves.toBe("dropbox");
+    });
+
+    it("restores Google Drive state before Dropbox cleanup when status construction fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const settings = createSettingsAdapter({
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "existing-label",
+            [SETTINGS_KEY_PROVIDER]: "filesystem",
+        });
+        await secretStore.setSecret(
+            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+            "old-google"
+        );
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "dropbox");
+
+        const loadGoogleDriveDeps = vi
+            .fn<CloudServiceOperationContext["loadGoogleDriveDeps"]>()
+            .mockResolvedValue({
+                fetchGoogleAccountLabel: async () => "new-label",
+                GoogleDriveAuthFlow: class {
+                    public async run(): Promise<{
+                        accessToken: string;
+                        expiresAt: number;
+                        refreshToken: string;
+                        scope?: string;
+                        tokenType?: string;
+                    }> {
+                        return {
+                            accessToken: "access",
+                            expiresAt: Date.now() + 60_000,
+                            refreshToken: "refresh",
+                            scope: "scope",
+                            tokenType: "Bearer",
+                        };
+                    }
+                },
+                GoogleDriveTokenManager: class {
+                    public async setTokens(tokens: unknown): Promise<void> {
+                        await secretStore.setSecret(
+                            SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+                            JSON.stringify(tokens)
+                        );
+                    }
+                },
+            } as never);
+        const ctx = createOperationContext({
+            buildStatusSummary: async () => {
+                throw new Error("status failed");
+            },
+            loadDropboxDeps: async () => {
+                throw new Error("not used");
+            },
+            loadGoogleDriveDeps,
+            secretStore,
+            settings,
+        });
+
+        await expect(connectGoogleDrive(ctx)).rejects.toThrow(
+            "Google Drive connect failed while persisting configuration: status failed"
+        );
+
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
+        ).resolves.toBe("old-google");
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe("dropbox");
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "filesystem"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("/tmp/uw");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("existing-label");
     });
 
     it("does not commit filesystem provider when base directory persistence fails", async () => {
