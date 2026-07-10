@@ -335,6 +335,70 @@ describe(useCloudStore, () => {
         expect(useCloudStore.getState().status?.provider).toBe("filesystem");
     });
 
+    it("ignores a stale status refresh after a provider connection", async () => {
+        const staleStatus = createDeferred<CloudStatusSummary>();
+        cloudServiceMock.CloudService.getStatus.mockReturnValue(
+            staleStatus.promise
+        );
+        cloudServiceMock.CloudService.connectDropbox.mockResolvedValue({
+            ...baseStatus,
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            provider: "dropbox",
+        });
+
+        const refreshPromise = useCloudStore.getState().refreshStatus();
+        await useCloudStore.getState().connectDropbox();
+
+        staleStatus.resolve(baseStatus);
+        await refreshPromise;
+
+        expect(useCloudStore.getState().isRefreshingStatus).toBeFalsy();
+        expect(useCloudStore.getState().status?.provider).toBe("dropbox");
+    });
+
+    it("serializes provider connections and keeps the latest request authoritative", async () => {
+        const dropboxStatus = createDeferred<CloudStatusSummary>();
+        cloudServiceMock.CloudService.connectDropbox.mockReturnValue(
+            dropboxStatus.promise
+        );
+        cloudServiceMock.CloudService.connectGoogleDrive.mockResolvedValue({
+            ...baseStatus,
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            provider: "google-drive",
+        });
+
+        const dropboxPromise = useCloudStore.getState().connectDropbox();
+        const googleDrivePromise = useCloudStore
+            .getState()
+            .connectGoogleDrive();
+
+        expect(useCloudStore.getState().isConnectingDropbox).toBeTruthy();
+        expect(useCloudStore.getState().isConnectingGoogleDrive).toBeTruthy();
+        expect(
+            cloudServiceMock.CloudService.connectGoogleDrive
+        ).not.toHaveBeenCalled();
+
+        dropboxStatus.resolve({
+            ...baseStatus,
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            provider: "dropbox",
+        });
+        await Promise.all([dropboxPromise, googleDrivePromise]);
+
+        expect(
+            cloudServiceMock.CloudService.connectGoogleDrive
+        ).toHaveBeenCalledTimes(1);
+        expect(useCloudStore.getState().status?.provider).toBe("google-drive");
+        expect(useCloudStore.getState().isConnectingDropbox).toBeFalsy();
+        expect(useCloudStore.getState().isConnectingGoogleDrive).toBeFalsy();
+    });
+
     it("listBackups updates backups and resets busy flag", async () => {
         cloudServiceMock.CloudService.listBackups.mockResolvedValue([
             {

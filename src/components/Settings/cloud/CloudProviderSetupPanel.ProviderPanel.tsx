@@ -14,9 +14,6 @@ import { CloudProviderSetupPanelOAuthProviderPanel } from "./CloudProviderSetupP
 /**
  * Props for {@link CloudProviderSetupPanelProviderPanel}.
  */
-/**
- * Props for {@link CloudProviderSetupPanelProviderPanel}.
- */
 export interface CloudProviderSetupPanelProviderPanelProperties {
     readonly activeProviderTab: CloudProviderSetupPanelTabKey | null;
     readonly configured: boolean;
@@ -26,6 +23,7 @@ export interface CloudProviderSetupPanelProviderPanelProperties {
     readonly isConfiguringFilesystemProvider: boolean;
     readonly isConnectingDropbox: boolean;
     readonly isConnectingGoogleDrive: boolean;
+    readonly isProviderOperationPending: boolean;
     readonly onConfigureFilesystemProviderClick: () => void;
     readonly onConnectDropbox: () => void;
     readonly onConnectGoogleDrive: () => void;
@@ -59,6 +57,7 @@ function renderUnavailableProviderPanel(args: {
 
 function renderFilesystemProviderPanel(args: {
     connected: boolean;
+    disabled: boolean;
     filesystemBaseDirectory: string;
     filesystemConfiguredBaseDirectory: null | string;
     isConfiguringFilesystemProvider: boolean;
@@ -68,8 +67,7 @@ function renderFilesystemProviderPanel(args: {
     ) => void;
 }): JSX.Element {
     const isAriaDisabled =
-        args.isConfiguringFilesystemProvider ||
-        args.filesystemBaseDirectory.trim().length === 0;
+        args.disabled || args.filesystemBaseDirectory.trim().length === 0;
 
     const handleFilesystemBaseDirectoryChange =
         args.onFilesystemBaseDirectoryChange;
@@ -144,6 +142,7 @@ export const CloudProviderSetupPanelProviderPanel = ({
     isConfiguringFilesystemProvider,
     isConnectingDropbox,
     isConnectingGoogleDrive,
+    isProviderOperationPending,
     onConfigureFilesystemProviderClick,
     onConnectDropbox,
     onConnectGoogleDrive,
@@ -175,6 +174,7 @@ export const CloudProviderSetupPanelProviderPanel = ({
                     configured={isConfiguredForSelectedProvider}
                     connected={isConnectedForSelectedProvider}
                     description="Opens your default browser to authorize Dropbox access (OAuth + PKCE). Uptime Watcher stores an encrypted token on this device (no password is stored)."
+                    disabled={isProviderOperationPending}
                     isConnecting={isConnectingDropbox}
                     onConnect={onConnectDropbox}
                     providerKey="dropbox"
@@ -185,6 +185,7 @@ export const CloudProviderSetupPanelProviderPanel = ({
         case "filesystem": {
             return renderFilesystemProviderPanel({
                 connected: isConnectedForSelectedProvider,
+                disabled: isProviderOperationPending,
                 filesystemBaseDirectory,
                 filesystemConfiguredBaseDirectory,
                 isConfiguringFilesystemProvider,
@@ -198,6 +199,7 @@ export const CloudProviderSetupPanelProviderPanel = ({
                     configured={isConfiguredForSelectedProvider}
                     connected={isConnectedForSelectedProvider}
                     description="Opens your default browser to authorize Google Drive access (OAuth + PKCE). Data is stored in Drive’s app data area (appDataFolder), so it won’t appear in your normal Drive folders."
+                    disabled={isProviderOperationPending}
                     isConnecting={isConnectingGoogleDrive}
                     onConnect={onConnectGoogleDrive}
                     providerKey="google-drive"

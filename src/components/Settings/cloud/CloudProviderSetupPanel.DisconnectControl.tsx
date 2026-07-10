@@ -11,6 +11,7 @@ export interface CloudProviderSetupPanelDisconnectControlProperties {
     readonly configured: boolean;
     readonly connected: boolean;
     readonly isDisconnecting: boolean;
+    readonly isProviderOperationPending: boolean;
     readonly onDisconnect: () => void;
 }
 
@@ -22,6 +23,7 @@ export const CloudProviderSetupPanelDisconnectControl = ({
     configured,
     connected,
     isDisconnecting,
+    isProviderOperationPending,
     onDisconnect,
 }: CloudProviderSetupPanelDisconnectControlProperties): JSX.Element | null => {
     const handleDisconnectClick = useCallback((): void => {
@@ -31,7 +33,7 @@ export const CloudProviderSetupPanelDisconnectControl = ({
     if (connected) {
         return (
             <ThemedButton
-                disabled={isDisconnecting}
+                disabled={isProviderOperationPending}
                 onClick={handleDisconnectClick}
                 size="sm"
                 variant="error"
@@ -44,7 +46,7 @@ export const CloudProviderSetupPanelDisconnectControl = ({
     if (configured) {
         return (
             <ThemedButton
-                disabled={isDisconnecting}
+                disabled={isProviderOperationPending}
                 onClick={handleDisconnectClick}
                 size="sm"
                 variant="secondary"

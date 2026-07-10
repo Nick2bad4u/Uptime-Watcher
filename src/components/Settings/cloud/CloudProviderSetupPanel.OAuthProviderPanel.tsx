@@ -16,6 +16,7 @@ export interface CloudProviderSetupPanelOAuthProviderPanelProperties {
     readonly configured: boolean;
     readonly connected: boolean;
     readonly description: string;
+    readonly disabled: boolean;
     readonly isConnecting: boolean;
     readonly onConnect: () => void;
     readonly providerKey: "dropbox" | "google-drive";
@@ -44,6 +45,7 @@ export const CloudProviderSetupPanelOAuthProviderPanel = ({
     configured,
     connected,
     description,
+    disabled,
     isConnecting,
     onConnect,
     providerKey,
@@ -138,8 +140,8 @@ export const CloudProviderSetupPanelOAuthProviderPanel = ({
             {connected ? null : (
                 <div className="mt-3 flex flex-wrap gap-2">
                     <ThemedButton
-                        aria-disabled={isConnecting}
-                        disabled={isConnecting}
+                        aria-disabled={disabled}
+                        disabled={disabled}
                         icon={providerIconNode}
                         onClick={handleConnectClick}
                         size="sm"

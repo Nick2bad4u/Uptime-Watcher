@@ -54,6 +54,11 @@ export const CloudProviderSetupPanel = ({
 }: CloudProviderSetupPanelProperties): JSX.Element => {
     const isConfigured = status?.configured ?? false;
     const isConnected = status?.connected ?? false;
+    const isProviderOperationPending =
+        isConfiguringFilesystemProvider ||
+        isConnectingDropbox ||
+        isConnectingGoogleDrive ||
+        isDisconnecting;
 
     const providerLabel = resolveProviderLabel(status);
     const connectionSiteStatus = resolveConnectionSiteStatus(status);
@@ -161,7 +166,9 @@ export const CloudProviderSetupPanel = ({
 
                 <div className="settings-subcard__actions">
                     <ThemedButton
-                        disabled={isRefreshingStatus}
+                        disabled={
+                            isRefreshingStatus || isProviderOperationPending
+                        }
                         onClick={handleRefreshStatusClick}
                         size="sm"
                         variant="secondary"
@@ -173,6 +180,7 @@ export const CloudProviderSetupPanel = ({
                         configured={isConfigured}
                         connected={isConnected}
                         isDisconnecting={isDisconnecting}
+                        isProviderOperationPending={isProviderOperationPending}
                         onDisconnect={onDisconnect}
                     />
                 </div>
@@ -242,6 +250,7 @@ export const CloudProviderSetupPanel = ({
                     }
                     isConnectingDropbox={isConnectingDropbox}
                     isConnectingGoogleDrive={isConnectingGoogleDrive}
+                    isProviderOperationPending={isProviderOperationPending}
                     onConfigureFilesystemProviderClick={
                         handleConfigureFilesystemProviderClick
                     }
