@@ -31,6 +31,7 @@ electron-app/package-lock.json
 
 # Ignore specific files
 **/coverage-results.json
+public/mockServiceWorker.js
 
 # Ignore prompts (Changed " to ' for tools messes up agents)
 

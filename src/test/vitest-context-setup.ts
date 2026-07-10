@@ -49,7 +49,6 @@ fc.configureGlobal({
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
     // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
-
 });
 
 // No custom context injection needed - Vitest provides task and annotate automatically

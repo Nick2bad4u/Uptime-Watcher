@@ -10,9 +10,7 @@ import { BaseFormField } from "../../../components/AddSiteForm/BaseFormField";
 
 type BaseFormFieldTestProperties = Partial<Parameters<typeof BaseFormField>[0]>;
 
-const renderBaseFormField = (
-    props: BaseFormFieldTestProperties = {}
-) =>
+const renderBaseFormField = (props: BaseFormFieldTestProperties = {}) =>
     render(
         <BaseFormField id="test-field" label="Test Label" {...props}>
             {(ariaProps: AriaProperties) => (

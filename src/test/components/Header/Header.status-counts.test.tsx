@@ -443,8 +443,8 @@ describe("Header status count accumulation", () => {
     });
 
     /**
-     * Test to detect both incorrect accumulations by testing with multiple sites having both
-     * paused and pending monitors
+     * Test to detect both incorrect accumulations by testing with multiple
+     * sites having both paused and pending monitors
      *
      * This test creates a comprehensive scenario that would reveal incorrect
      * counting if either assignment operation is mutated.

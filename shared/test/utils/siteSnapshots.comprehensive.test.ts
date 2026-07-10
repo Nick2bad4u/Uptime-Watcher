@@ -129,8 +129,9 @@ describe("siteSnapshots", () => {
         expect(
             isMonitorSnapshot(createMonitor({ history: [createHistory()] }))
         ).toBeTruthy();
-        expect(isMonitorSnapshot(createMonitorCandidate({ history: [{}] })))
-            .toBeFalsy();
+        expect(
+            isMonitorSnapshot(createMonitorCandidate({ history: [{}] }))
+        ).toBeFalsy();
 
         for (const invalidHistory of [
             createHistory({ responseTime: -2 }),
@@ -154,7 +155,9 @@ describe("siteSnapshots", () => {
 
         // Exercise the invalid-status branch while other fields are present.
         expect(
-            isMonitorSnapshot(createMonitorCandidate({ status: "not-a-status" }))
+            isMonitorSnapshot(
+                createMonitorCandidate({ status: "not-a-status" })
+            )
         ).toBeFalsy();
 
         for (const responseTime of [-2, 10.5]) {
@@ -184,7 +187,9 @@ describe("siteSnapshots", () => {
         // Exercise the monitors.every(...) false branch.
         expect(
             isSiteSnapshot(
-                createSiteCandidate({ monitors: [createMonitor(), { id: "bad" }] })
+                createSiteCandidate({
+                    monitors: [createMonitor(), { id: "bad" }],
+                })
             )
         ).toBeFalsy();
     });

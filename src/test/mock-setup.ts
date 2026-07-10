@@ -141,7 +141,6 @@ fc.configureGlobal({
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
     // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
-
 });
 
 // Mock Electron APIs (not available in test environment) - matches new domain-based preload API structure

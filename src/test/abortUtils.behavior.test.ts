@@ -9,7 +9,11 @@ import {
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const toRuntimeSignals = (
-    signals: readonly (AbortSignal | null | undefined)[]
+    signals: readonly (
+        | AbortSignal
+        | null
+        | undefined
+    )[]
 ): AbortSignal[] => signals as unknown as AbortSignal[];
 
 describe("abortUtils behavior", () => {

@@ -34,7 +34,9 @@ describe("monitorTitleFormatters property-based behavior", () => {
         ...overrides,
     });
 
-    const createRuntimeMonitor = (overrides: Record<string, unknown>): Monitor =>
+    const createRuntimeMonitor = (
+        overrides: Record<string, unknown>
+    ): Monitor =>
         ({
             ...createBaseMonitor(),
             ...overrides,

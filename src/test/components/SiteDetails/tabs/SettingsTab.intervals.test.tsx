@@ -1,9 +1,9 @@
 /**
  * Interval and retry arithmetic tests for SettingsTab.tsx
  *
- * Verifies arithmetic operations for displayed intervals and retry attempts. These
- * tests ensure proper calculations in interval display, retry calculations, and
- * duration formatting.
+ * Verifies arithmetic operations for displayed intervals and retry attempts.
+ * These tests ensure proper calculations in interval display, retry
+ * calculations, and duration formatting.
  */
 
 import type { Monitor, Site } from "@shared/types";

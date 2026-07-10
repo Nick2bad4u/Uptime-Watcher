@@ -3,9 +3,9 @@
  *
  * @module PortErrorHandling
  *
- * @file Tests for port error handling utilities in the Uptime
- *   Watcher app, including error constants, result interfaces, custom error
- *   classes, and error handling functions.
+ * @file Tests for port error handling utilities in the Uptime Watcher app,
+ *   including error constants, result interfaces, custom error classes, and
+ *   error handling functions.
  *
  * @since 2025-08-11
  *

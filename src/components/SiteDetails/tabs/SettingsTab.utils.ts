@@ -77,8 +77,7 @@ export function useIdentifierLabel(selectedMonitor: Monitor): string {
         () => getMonitorTypeDisplayLabel(monitorType),
         [monitorType]
     );
-    const [resolvedLabel, setResolvedLabel] =
-        useState<IdentifierLabelState>();
+    const [resolvedLabel, setResolvedLabel] = useState<IdentifierLabelState>();
     const label =
         resolvedLabel?.monitorType === monitorType
             ? resolvedLabel.label

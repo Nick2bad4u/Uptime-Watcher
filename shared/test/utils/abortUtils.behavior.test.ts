@@ -1,6 +1,6 @@
 /**
- * Behavior tests for abortUtils edge cases. Tests specific
- * function paths that might not be covered by fuzzing tests.
+ * Behavior tests for abortUtils edge cases. Tests specific function paths that
+ * might not be covered by fuzzing tests.
  *
  * @packageDocumentation
  */

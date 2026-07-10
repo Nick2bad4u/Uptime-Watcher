@@ -744,7 +744,6 @@ describe("IPC communication fuzzing", () => {
                 }
             }
         );
-
     });
 
     describe("IPC Type Safety and Validation Patterns", () => {

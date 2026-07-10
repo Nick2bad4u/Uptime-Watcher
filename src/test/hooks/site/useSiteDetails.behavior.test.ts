@@ -142,10 +142,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -183,10 +180,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -224,10 +218,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -267,10 +258,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -317,10 +305,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -367,10 +352,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -414,10 +396,7 @@ describe("useSiteDetails - Behavior Tests", () => {
     describe("Monitoring Operations", () => {
         it("should handle start monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -443,10 +422,7 @@ describe("useSiteDetails - Behavior Tests", () => {
 
         it("should handle stop monitoring", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -477,10 +453,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -502,10 +475,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Saving", "type");
 
@@ -542,10 +512,7 @@ describe("useSiteDetails - Behavior Tests", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useSiteDetails.behavior",
-                "component"
-            );
+            await annotate("Component: useSiteDetails.behavior", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Validation", "type");
 

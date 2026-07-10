@@ -70,10 +70,11 @@ interface StatusHistoryData {
     timestamp: number;
 }
 
-type MonitorOverrides<TMonitor extends { type: string }> =
-    Partial<Omit<TMonitor, "type">> & {
-        type?: unknown;
-    };
+type MonitorOverrides<TMonitor extends { type: string }> = Partial<
+    Omit<TMonitor, "type">
+> & {
+    type?: unknown;
+};
 
 /**
  * Creates a valid base monitor object with all required fields

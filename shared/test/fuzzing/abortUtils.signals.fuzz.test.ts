@@ -1,6 +1,6 @@
 /**
- * Property-based tests for abort signal edge cases.
- * Targets specific edge cases that may not be covered by existing tests.
+ * Property-based tests for abort signal edge cases. Targets specific edge cases
+ * that may not be covered by existing tests.
  *
  * @packageDocumentation
  */

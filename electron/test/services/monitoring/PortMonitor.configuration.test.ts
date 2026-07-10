@@ -83,10 +83,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -101,10 +98,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
@@ -119,10 +113,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -139,10 +130,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -157,10 +145,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -174,10 +159,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -191,10 +173,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -210,10 +189,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -229,10 +205,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
@@ -245,10 +218,7 @@ describe("PortMonitor configuration and checks", () => {
 
         it("should merge partial configuration", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -262,10 +232,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -281,10 +248,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -298,10 +262,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -315,10 +276,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
@@ -331,10 +289,7 @@ describe("PortMonitor configuration and checks", () => {
 
         it("should handle empty config update", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
@@ -350,10 +305,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -371,10 +323,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -402,10 +351,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -424,10 +370,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -451,10 +394,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -475,10 +415,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -499,10 +436,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -524,10 +458,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -549,10 +480,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -588,10 +516,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -608,10 +533,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -641,10 +563,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -676,10 +595,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -700,10 +616,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -733,10 +646,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -759,10 +669,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -778,10 +685,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -800,10 +704,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -833,10 +734,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -854,10 +752,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -881,10 +776,7 @@ describe("PortMonitor configuration and checks", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: PortMonitor-configuration",
-                "component"
-            );
+            await annotate("Component: PortMonitor-configuration", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 

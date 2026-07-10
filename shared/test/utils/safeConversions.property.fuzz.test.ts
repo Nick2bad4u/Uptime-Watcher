@@ -5,9 +5,10 @@
  *
  * @version 1.0.0
  *
- *   This file provides property-based edge-case tests for the safeConversions module
- *   using fast-check property-based testing. It validates type safety, edge
- *   cases, and comprehensive input handling across all conversion functions.
+ *   This file provides property-based edge-case tests for the safeConversions
+ *   module using fast-check property-based testing. It validates type safety,
+ *   edge cases, and comprehensive input handling across all conversion
+ *   functions.
  *
  *   Coverage Goals:
  *

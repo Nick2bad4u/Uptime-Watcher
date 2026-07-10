@@ -25,11 +25,15 @@ describe(SettingItem, () => {
             />
         );
 
-        const item = screen.getByText("Desktop alerts").closest(".setting-item");
+        const item = screen
+            .getByText("Desktop alerts")
+            .closest(".setting-item");
 
         expect(item).toHaveClass("custom-setting");
         expect(
-            screen.getByText("Send a desktop notification when a monitor fails.")
+            screen.getByText(
+                "Send a desktop notification when a monitor fails."
+            )
         ).toBeInTheDocument();
         expect(
             screen.getByRole("textbox", { name: "Enable alerts" })
@@ -64,8 +68,9 @@ describe(SettingItem, () => {
             />
         );
 
-        expect(screen.getByText("Muted setting").closest(".setting-item"))
-            .toHaveClass("disabled");
+        expect(
+            screen.getByText("Muted setting").closest(".setting-item")
+        ).toHaveClass("disabled");
         expect(screen.getByTestId("legacy-icon")).toBeInTheDocument();
 
         rerender(

@@ -5,6 +5,7 @@
  *
  * @file Tests for compile-time event-name contract behavior in the Uptime
  *   Watcher event system.
+ *
  * @since 2025-08-11
  *
  * @category Events

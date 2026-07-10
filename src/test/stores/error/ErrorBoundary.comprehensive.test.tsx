@@ -45,9 +45,7 @@ describe(ErrorBoundary, () => {
     let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-        consoleErrorSpy = vi
-            .spyOn(console, "error")
-            .mockReturnValue(undefined);
+        consoleErrorSpy = vi.spyOn(console, "error").mockReturnValue(undefined);
     });
 
     afterEach(() => {

@@ -17,7 +17,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -46,7 +49,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -63,7 +69,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -80,7 +89,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -98,7 +110,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -116,7 +131,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -131,7 +149,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -148,7 +169,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Data Retrieval", "type");
 
@@ -216,7 +240,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -245,7 +272,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -285,7 +315,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
@@ -315,7 +348,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -332,7 +368,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -351,7 +390,10 @@ describe("Validation schemas result handling", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas.validation-results", "component");
+            await annotate(
+                "Component: schemas.validation-results",
+                "component"
+            );
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 

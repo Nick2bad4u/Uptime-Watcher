@@ -327,18 +327,14 @@ describe("shared/types/database additional function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeGetRowProperty({}, "any", "default")).toBe(
-                "default"
-            );
-            expect(safeGetRowProperty(null, "any", "default")).toBe(
-                "default"
-            );
+            expect(safeGetRowProperty({}, "any", "default")).toBe("default");
+            expect(safeGetRowProperty(null, "any", "default")).toBe("default");
             expect(safeGetRowProperty(undefined, "any", "default")).toBe(
                 "default"
             );
-            expect(
-                safeGetRowProperty("not an object", "any", "default")
-            ).toBe("default");
+            expect(safeGetRowProperty("not an object", "any", "default")).toBe(
+                "default"
+            );
         });
 
         it("should handle special property names", async ({

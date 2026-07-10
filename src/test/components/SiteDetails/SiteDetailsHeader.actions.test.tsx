@@ -140,18 +140,12 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -183,18 +177,12 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
@@ -240,18 +228,12 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -307,10 +289,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
@@ -348,10 +327,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Privacy", "type");
 
@@ -399,10 +375,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Safeguard", "type");
 
@@ -433,10 +406,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Interaction", "type");
 
@@ -467,10 +437,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Presentation", "type");
 
@@ -504,10 +471,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: UI", "type");
 
@@ -532,10 +496,7 @@ describe("SiteDetailsHeader - Additional Behavior", () => {
             annotate,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
-            annotate(
-                "Component: SiteDetailsHeader.actions",
-                "component"
-            );
+            annotate("Component: SiteDetailsHeader.actions", "component");
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
