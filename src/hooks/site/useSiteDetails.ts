@@ -349,7 +349,7 @@ export function useSiteDetails({
         handleStartSiteMonitoring,
         handleStopMonitoring,
         handleStopSiteMonitoring,
-    } = useSiteDetailsMonitoringHandlers(
+    } = useSiteDetailsMonitoringHandlers({
         checkSiteNow,
         clearError,
         currentSite,
@@ -357,8 +357,8 @@ export function useSiteDetails({
         startSiteMonitoring,
         startSiteMonitorMonitoring,
         stopSiteMonitoring,
-        stopSiteMonitorMonitoring
-    );
+        stopSiteMonitorMonitoring,
+    });
 
     const {
         handleIntervalChange,
@@ -367,9 +367,9 @@ export function useSiteDetails({
         handleSaveRetryAttempts,
         handleSaveTimeout,
         handleTimeoutChange,
-    } = useSiteDetailsSettingsHandlers(
+    } = useSiteDetailsSettingsHandlers({
         clearError,
-        currentSite.identifier,
+        currentSiteIdentifier: currentSite.identifier,
         localCheckIntervalMs,
         localRetryAttempts,
         localTimeoutSeconds,
@@ -377,12 +377,12 @@ export function useSiteDetails({
         selectedMonitorId,
         selectedMonitorRetryAttempts,
         selectedMonitorTimeout,
-        selectedMonitor?.type,
+        selectedMonitorType: selectedMonitor?.type,
         setMonitorEditStateById,
         updateMonitorRetryAttempts,
         updateMonitorTimeout,
-        updateSiteCheckInterval
-    );
+        updateSiteCheckInterval,
+    });
 
     const { handleSaveName } = useSiteDetailsNameHandler(
         clearError,

@@ -109,15 +109,20 @@ const isMutedSiteIdentifierArray = (value: unknown): value is string[] =>
 const normalizeMutedSiteIdentifiers = (
     value: unknown,
     fallback: string[]
-): string[] =>
-    value === undefined || value === fallback
-        ? fallback
-        : isMutedSiteIdentifierArray(value)
-          ? [...new Set(value)].slice(
-                0,
-                MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS
-            )
-          : fallback;
+): string[] => {
+    if (value === undefined || value === fallback) {
+        return fallback;
+    }
+
+    if (!isMutedSiteIdentifierArray(value)) {
+        return fallback;
+    }
+
+    return [...new Set(value)].slice(
+        0,
+        MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS
+    );
+};
 
 const normalizeThemeSetting = (
     value: unknown,

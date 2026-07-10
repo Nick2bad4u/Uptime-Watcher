@@ -33,7 +33,17 @@
 import type { Except } from "type-fest";
 
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
-import validator from "validator";
+import type { IsURLOptions } from "validator/lib/isURL";
+import isAlphanumeric from "validator/lib/isAlphanumeric";
+import isEmpty from "validator/lib/isEmpty";
+import isFloat from "validator/lib/isFloat";
+import isFQDN from "validator/lib/isFQDN";
+import isHexadecimal from "validator/lib/isHexadecimal";
+import isInt from "validator/lib/isInt";
+import isIP from "validator/lib/isIP";
+import isPort from "validator/lib/isPort";
+import isSemVer from "validator/lib/isSemVer";
+import isURL from "validator/lib/isURL";
 
 import {
     isNonEmptyString as isNonEmptyStringGuard,
@@ -54,10 +64,7 @@ import {
  * enforces camelCase identifiers, so we also accept `disallowAuth` and map it
  * to the underlying validator option.
  */
-export type UrlValidationOptions = Except<
-    validator.IsURLOptions,
-    "disallow_auth"
-> & {
+export type UrlValidationOptions = Except<IsURLOptions, "disallow_auth"> & {
     /** Allow backticks in the URL string (disabled by default). */
     readonly allowBackticks?: boolean;
     /**
@@ -114,9 +121,9 @@ export function isNonEmptyString(value: unknown): value is string {
  */
 export function isValidFQDN(
     value: unknown,
-    options?: Parameters<typeof validator.isFQDN>[1]
+    options?: Parameters<typeof isFQDN>[1]
 ): value is string {
-    return typeof value === "string" && validator.isFQDN(value, options);
+    return typeof value === "string" && isFQDN(value, options);
 }
 
 /**
@@ -124,7 +131,7 @@ export function isValidFQDN(
  *
  * @remarks
  * Wrapper around validator.js `isSemVer`. Keeping this in a shared module
- * avoids scattering direct `validator/*` imports across the codebase.
+ * avoids scattering direct validation call sites across the codebase.
  *
  * @param value - Value to validate.
  *
@@ -133,7 +140,7 @@ export function isValidFQDN(
  * @public
  */
 export function isValidSemVer(value: unknown): value is string {
-    return typeof value === "string" && validator.isSemVer(value);
+    return typeof value === "string" && isSemVer(value);
 }
 
 /**
@@ -155,7 +162,7 @@ export function isValidSemVer(value: unknown): value is string {
  * @public
  */
 export function isValidIdentifier(value: unknown): value is string {
-    if (typeof value !== "string" || validator.isEmpty(value.trim())) {
+    if (typeof value !== "string" || isEmpty(value.trim())) {
         return false;
     }
 
@@ -165,7 +172,7 @@ export function isValidIdentifier(value: unknown): value is string {
 
     // Must have at least one alphanumeric character remaining
 
-    return cleanedValue.length > 0 && validator.isAlphanumeric(cleanedValue);
+    return cleanedValue.length > 0 && isAlphanumeric(cleanedValue);
 }
 
 /**
@@ -213,9 +220,9 @@ export function isValidIdentifierArray(value: unknown): value is string[] {
  */
 export function isValidInteger(
     value: unknown,
-    options?: Parameters<typeof validator.isInt>[1]
+    options?: Parameters<typeof isInt>[1]
 ): value is string {
-    return typeof value === "string" && validator.isInt(value, options);
+    return typeof value === "string" && isInt(value, options);
 }
 
 /**
@@ -237,7 +244,7 @@ export function isValidInteger(
  */
 export function isValidNumeric(
     value: unknown,
-    options?: Parameters<typeof validator.isFloat>[1]
+    options?: Parameters<typeof isFloat>[1]
 ): value is string {
     if (typeof value !== "string") {
         return false;
@@ -253,7 +260,7 @@ export function isValidNumeric(
         return false;
     }
 
-    return validator.isFloat(value, options);
+    return isFloat(value, options);
 }
 
 function isAsciiDigit(character: string | undefined): boolean {
@@ -333,13 +340,13 @@ export function isValidHost(value: unknown): value is string {
     }
 
     // Check if it's a valid IP address
-    if (validator.isIP(value)) {
+    if (isIP(value)) {
         return true;
     }
 
     // Check if it's a valid FQDN
     if (
-        validator.isFQDN(value, {
+        isFQDN(value, {
             allow_numeric_tld: false,
             allow_trailing_dot: false,
             allow_underscores: false,
@@ -381,12 +388,12 @@ export function isValidPort(value: unknown): boolean {
     if (typeof value === "string") {
         // Exclude port "0" as it's reserved and not suitable for user configuration
         if (value === "0") return false;
-        return validator.isPort(value);
+        return isPort(value);
     }
     return false;
 }
 
-type ValidatorIsUrlOptions = NonNullable<Parameters<typeof validator.isURL>[1]>;
+type ValidatorIsUrlOptions = IsURLOptions;
 
 const buildValidatorUrlOptions = (
     options: UrlValidationOptions
@@ -497,7 +504,7 @@ export function isValidUrl(
         return false;
     }
 
-    return validator.isURL(value, urlOptions);
+    return isURL(value, urlOptions);
 }
 
 /**
@@ -531,7 +538,7 @@ export function isValidLowercaseHexString(
         return false;
     }
 
-    return validator.isHexadecimal(value);
+    return isHexadecimal(value);
 }
 
 /**

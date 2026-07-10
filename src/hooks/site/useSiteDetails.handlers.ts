@@ -46,22 +46,34 @@ import {
  *
  * @public
  */
-export function useSiteDetailsMonitoringHandlers(
-    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>,
-    clearError: () => void,
-    currentSite: Site,
-    selectedMonitorId: string,
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>,
-    startSiteMonitorMonitoring: (
+export function useSiteDetailsMonitoringHandlers({
+    checkSiteNow,
+    clearError,
+    currentSite,
+    selectedMonitorId,
+    startSiteMonitoring,
+    startSiteMonitorMonitoring,
+    stopSiteMonitoring,
+    stopSiteMonitorMonitoring,
+}: {
+    readonly checkSiteNow: (
         siteIdentifier: string,
         monitorId: string
-    ) => Promise<void>,
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>,
-    stopSiteMonitorMonitoring: (
+    ) => Promise<void>;
+    readonly clearError: () => void;
+    readonly currentSite: Site;
+    readonly selectedMonitorId: string;
+    readonly startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    readonly startSiteMonitorMonitoring: (
         siteIdentifier: string,
         monitorId: string
-    ) => Promise<void>
-): {
+    ) => Promise<void>;
+    readonly stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    readonly stopSiteMonitorMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+}): {
     readonly handleCheckNow: () => Promise<void>;
     readonly handleStartMonitoring: () => Promise<void>;
     readonly handleStartSiteMonitoring: () => Promise<void>;
@@ -333,34 +345,49 @@ export function useSiteDetailsSelectionHandlers(
  *
  * @public
  */
-export function useSiteDetailsSettingsHandlers(
-    clearError: () => void,
-    currentSiteIdentifier: string,
-    localCheckIntervalMs: number,
-    localRetryAttempts: number,
-    localTimeoutSeconds: number,
-    selectedMonitorCheckInterval: number | undefined,
-    selectedMonitorId: string,
-    selectedMonitorRetryAttempts: number | undefined,
-    selectedMonitorTimeout: number | undefined,
-    selectedMonitorType: Monitor["type"] | undefined,
-    setMonitorEditStateById: MonitorEditStateByIdSetter,
-    updateMonitorRetryAttempts: (
+export function useSiteDetailsSettingsHandlers({
+    clearError,
+    currentSiteIdentifier,
+    localCheckIntervalMs,
+    localRetryAttempts,
+    localTimeoutSeconds,
+    selectedMonitorCheckInterval,
+    selectedMonitorId,
+    selectedMonitorRetryAttempts,
+    selectedMonitorTimeout,
+    selectedMonitorType,
+    setMonitorEditStateById,
+    updateMonitorRetryAttempts,
+    updateMonitorTimeout,
+    updateSiteCheckInterval,
+}: {
+    readonly clearError: () => void;
+    readonly currentSiteIdentifier: string;
+    readonly localCheckIntervalMs: number;
+    readonly localRetryAttempts: number;
+    readonly localTimeoutSeconds: number;
+    readonly selectedMonitorCheckInterval: number | undefined;
+    readonly selectedMonitorId: string;
+    readonly selectedMonitorRetryAttempts: number | undefined;
+    readonly selectedMonitorTimeout: number | undefined;
+    readonly selectedMonitorType: Monitor["type"] | undefined;
+    readonly setMonitorEditStateById: MonitorEditStateByIdSetter;
+    readonly updateMonitorRetryAttempts: (
         siteIdentifier: string,
         monitorId: string,
         retryAttempts: number
-    ) => Promise<void>,
-    updateMonitorTimeout: (
+    ) => Promise<void>;
+    readonly updateMonitorTimeout: (
         siteIdentifier: string,
         monitorId: string,
         timeout: number
-    ) => Promise<void>,
-    updateSiteCheckInterval: (
+    ) => Promise<void>;
+    readonly updateSiteCheckInterval: (
         siteIdentifier: string,
         monitorId: string,
         checkInterval: number
-    ) => Promise<void>
-): {
+    ) => Promise<void>;
+}): {
     readonly handleIntervalChange: (e: ChangeEvent<HTMLSelectElement>) => void;
     readonly handleRetryAttemptsChange: (
         e: ChangeEvent<HTMLInputElement>

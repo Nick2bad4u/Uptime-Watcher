@@ -17,12 +17,13 @@ const MAX_FALLBACK_BODY_CHARS = 500;
 const MAX_SAFE_DETAIL_CHARS = 500;
 
 const toSafeDetailString = (value: unknown): string | undefined => {
-    const detail =
-        typeof value === "string"
-            ? value
-            : typeof value === "number" || typeof value === "boolean"
-              ? String(value)
-              : undefined;
+    let detail: string | undefined;
+
+    if (typeof value === "string") {
+        detail = value;
+    } else if (typeof value === "number" || typeof value === "boolean") {
+        detail = String(value);
+    }
 
     if (!detail) {
         return undefined;

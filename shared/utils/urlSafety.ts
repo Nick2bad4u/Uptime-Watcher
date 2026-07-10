@@ -14,7 +14,7 @@ import { hasNestedHttpSchemeAfterFirstDelimiter } from "@shared/utils/urlSchemeV
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { arrayJoin, isDefined, isInteger, stringSplit } from "ts-extras";
-import validator from "validator";
+import isEmail from "validator/lib/isEmail";
 
 import { validateUrlStringCandidate } from "./urlCandidateValidation";
 
@@ -530,7 +530,7 @@ function isAllowedExternalOpenUrl(rawUrl: string): boolean {
             return parsed.hostname.length > 0;
         }
         case "mailto:": {
-            return validator.isEmail(parsed.pathname);
+            return isEmail(parsed.pathname);
         }
         default: {
             return false;
@@ -603,7 +603,7 @@ export function validateExternalOpenUrlCandidate(
         }
 
         const email = mailtoUrl.pathname;
-        if (!validator.isEmail(email)) {
+        if (!isEmail(email)) {
             return {
                 ok: false,
                 reason: "mailto URL must include a valid email address",

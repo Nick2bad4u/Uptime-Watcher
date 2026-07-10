@@ -56,9 +56,8 @@ export abstract class ConfigurableMonitorServiceBase<
     }
 
     protected validateConfigUpdate(
-        config: Partial<MonitorServiceConfig>
+        _config: Partial<MonitorServiceConfig> // eslint-disable-line @typescript-eslint/no-unused-vars -- Subclasses may validate the incoming config update; the base hook intentionally does nothing.
     ): void {
-        void config;
         // Default: no additional validation beyond accessor-safe config merge.
     }
 }

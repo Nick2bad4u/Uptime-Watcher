@@ -50,12 +50,7 @@ const cloudSyncStateInternalSchema = z
     .superRefine((state, ctx) => {
         for (const entityType of CLOUD_SYNC_STATE_ENTITY_TYPES) {
             for (const [entityId, entity] of objectEntries(state[entityType])) {
-                const idSchema =
-                    entityType === "monitor"
-                        ? monitorIdSchema
-                        : entityType === "site"
-                          ? siteIdentifierSchema
-                          : undefined;
+                const idSchema = getCloudSyncEntityIdSchema(entityType);
 
                 if (idSchema && !idSchema.safeParse(entityId).success) {
                     ctx.addIssue({
@@ -95,6 +90,25 @@ const cloudSyncStateInternalSchema = z
             }
         }
     });
+
+function getCloudSyncEntityIdSchema(
+    entityType: (typeof CLOUD_SYNC_STATE_ENTITY_TYPES)[number]
+) {
+    switch (entityType) {
+        case "monitor": {
+            return monitorIdSchema;
+        }
+        case "settings": {
+            return undefined;
+        }
+        case "site": {
+            return siteIdentifierSchema;
+        }
+        default: {
+            return undefined;
+        }
+    }
+}
 
 /** Runtime schema for validating {@link CloudSyncState}. */
 const cloudSyncStateSchema: z.ZodType<CloudSyncState> =

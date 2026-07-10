@@ -166,7 +166,7 @@ export const SettingsTabMonitoringConfigurationCard = ({
     const timeoutHelperText = useMemo<ReactNode>(
         () => (
             <span>
-                Maximum time to wait per attempt before it is treated as failed.
+                Maximum time to wait per attempt before it is treated as failed.{" "}
                 <span className="ml-2 inline-flex items-center gap-1 font-medium">
                     <DurationIcon aria-hidden size={14} />
                     Current: {formatSecondsWithMinutes(localTimeoutSeconds)}
@@ -240,7 +240,7 @@ export const SettingsTabMonitoringConfigurationCard = ({
                     <div className="mt-2">
                         <SiteSettingsHelpText>
                             How often Uptime Watcher runs a check for this
-                            monitor.
+                            monitor.{" "}
                             <span className="ml-2 inline-flex items-center gap-1 font-medium">
                                 <DurationIcon aria-hidden size={14} />
                                 Current:{" "}

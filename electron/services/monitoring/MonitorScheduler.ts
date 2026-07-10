@@ -33,6 +33,10 @@ const noopEventEmitter: MonitorSchedulerEventBus = {
     },
 };
 
+const INTERVAL_KEY_BACKSLASH = String.fromCodePoint(0x5c);
+const ESCAPED_INTERVAL_KEY_BACKSLASH = `${INTERVAL_KEY_BACKSLASH}${INTERVAL_KEY_BACKSLASH}`;
+const ESCAPED_INTERVAL_KEY_SEPARATOR = `${INTERVAL_KEY_BACKSLASH}|`;
+
 interface MonitorJob {
     abortController: AbortController | undefined;
     backoffAttempt: number;
@@ -799,7 +803,11 @@ export class MonitorScheduler {
      * collide with the scheduler's internal separator.
      */
     private createIntervalKeyComponent(value: string): string {
-        return value.replaceAll("\\", "\\\\").replaceAll("|", "\\|");
+        return value
+            .split(INTERVAL_KEY_BACKSLASH)
+            .join(ESCAPED_INTERVAL_KEY_BACKSLASH)
+            .split("|")
+            .join(ESCAPED_INTERVAL_KEY_SEPARATOR);
     }
 
     /**

@@ -373,20 +373,32 @@ function resolveFailureLogLevel<T>(
     return isOperationalLogLevel(failureLogLevel) ? failureLogLevel : "error";
 }
 
+interface HandleFailureArgs<T> {
+    readonly attempt: number;
+    readonly config: OperationalHooksConfig<T>;
+    readonly context: OperationalHookContext;
+    readonly error: Error;
+    readonly logLevel?: OperationalLogLevel;
+    readonly operationId: OperationId;
+    readonly operationName: string;
+    readonly startTime: number;
+    readonly throwOnFailure?: boolean;
+}
+
 /**
  * Handle operation failure.
  */
-async function handleFailure<T>(
-    error: Error,
-    config: OperationalHooksConfig<T>,
-    operationName: string,
-    startTime: number,
-    attempt: number,
-    operationId: OperationId,
-    context: OperationalHookContext,
+async function handleFailure<T>({
+    attempt,
+    config,
+    context,
+    error,
+    logLevel = "error",
+    operationId,
+    operationName,
+    startTime,
     throwOnFailure = true,
-    logLevel: OperationalLogLevel = "error"
-): Promise<T | null> {
+}: HandleFailureArgs<T>): Promise<T | null> {
     const { emitEvents, eventEmitter, onFailure } = config;
     const duration = getElapsedDurationMs(startTime);
 
@@ -649,17 +661,17 @@ export async function withOperationalHooks<T>(
             const abortError = createAbortError({
                 cause: getAbortSignalReason(signal),
             });
-            return handleFailure(
-                abortError,
+            return handleFailure({
+                attempt: attempt - 1,
                 config,
+                context,
+                error: abortError,
+                logLevel: "warn",
+                operationId,
                 operationName,
                 startTime,
-                attempt - 1,
-                operationId,
-                context,
                 throwOnFailure,
-                "warn"
-            );
+            });
         }
 
         try {
@@ -689,17 +701,17 @@ export async function withOperationalHooks<T>(
                 // unrelated exception that happened to be thrown around the
                 // same time the signal aborted.
                 const abortError = createAbortError({ cause: lastError });
-                return handleFailure(
-                    abortError,
+                return handleFailure({
+                    attempt,
                     config,
+                    context,
+                    error: abortError,
+                    logLevel: "warn",
+                    operationId,
                     operationName,
                     startTime,
-                    attempt,
-                    operationId,
-                    context,
                     throwOnFailure,
-                    "warn"
-                );
+                });
             }
 
             /* V8 ignore next 2 */ logger.debug(
@@ -720,17 +732,17 @@ export async function withOperationalHooks<T>(
 
             // If this was the last attempt, handle failure
             if (attempt === maxRetries) {
-                return handleFailure(
-                    lastError,
+                return handleFailure({
+                    attempt,
                     config,
+                    context,
+                    error: lastError,
+                    logLevel: failureLogLevel,
+                    operationId,
                     operationName,
                     startTime,
-                    attempt,
-                    operationId,
-                    context,
                     throwOnFailure,
-                    failureLogLevel
-                );
+                });
             }
 
             // Handle retry - intentionally sequential for retry logic
@@ -746,17 +758,20 @@ export async function withOperationalHooks<T>(
                 );
             } catch (retryError) {
                 const normalizedRetryError = ensureError(retryError);
-                return handleFailure(
-                    normalizedRetryError,
+                const retryFailureLogLevel: OperationalLogLevel =
+                    signal?.aborted ? "warn" : "error";
+
+                return handleFailure({
+                    attempt,
                     config,
+                    context,
+                    error: normalizedRetryError,
+                    logLevel: retryFailureLogLevel,
+                    operationId,
                     operationName,
                     startTime,
-                    attempt,
-                    operationId,
-                    context,
                     throwOnFailure,
-                    signal?.aborted ? "warn" : "error"
-                );
+                });
             }
         }
     }

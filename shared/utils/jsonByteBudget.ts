@@ -203,7 +203,7 @@ function addJsonBytesForObject(
             const key = String(i);
             const descriptor = Object.getOwnPropertyDescriptor(value, key);
             if (!descriptor) {
-                if (key in value) {
+                if (Reflect.has(value, key)) {
                     addBytes(state, state.maxBytes + 1);
                     return;
                 }

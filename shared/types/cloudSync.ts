@@ -150,6 +150,23 @@ export interface CloudSyncDeleteEntityOperation {
 export type CloudSyncOperation =
     CloudSyncDeleteEntityOperation | CloudSyncSetFieldOperation;
 
+function getCloudSyncEntityIdSchema(entityType: CloudSyncEntityType) {
+    switch (entityType) {
+        case "monitor": {
+            return monitorIdSchema;
+        }
+        case "settings": {
+            return undefined;
+        }
+        case "site": {
+            return siteIdentifierSchema;
+        }
+        default: {
+            return undefined;
+        }
+    }
+}
+
 const setFieldOperationSchema = z
     .object({
         deviceId: persistedDeviceIdSchema,
@@ -183,12 +200,7 @@ const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> = z
         setFieldOperationSchemaTyped,
     ])
     .superRefine((operation, ctx) => {
-        const idSchema =
-            operation.entityType === "monitor"
-                ? monitorIdSchema
-                : operation.entityType === "site"
-                  ? siteIdentifierSchema
-                  : undefined;
+        const idSchema = getCloudSyncEntityIdSchema(operation.entityType);
 
         if (idSchema && !idSchema.safeParse(operation.entityId).success) {
             ctx.addIssue({
