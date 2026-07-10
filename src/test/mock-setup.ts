@@ -442,9 +442,6 @@ const mockElectronAPI: DeepMocked<ElectronAPI> = {
         onHistoryLimitUpdated: vi.fn<
             ElectronAPI["events"]["onHistoryLimitUpdated"]
         >((_callback) => () => undefined),
-        onMonitorDown: vi.fn<ElectronAPI["events"]["onMonitorDown"]>(
-            (_callback) => () => undefined
-        ),
         onMonitoringStarted: vi.fn<
             ElectronAPI["events"]["onMonitoringStarted"]
         >((_callback) => () => undefined),
@@ -454,22 +451,7 @@ const mockElectronAPI: DeepMocked<ElectronAPI> = {
         onMonitorStatusChanged: vi.fn<
             ElectronAPI["events"]["onMonitorStatusChanged"]
         >((_callback) => () => undefined),
-        onMonitorUp: vi.fn<ElectronAPI["events"]["onMonitorUp"]>(
-            (_callback) => () => undefined
-        ),
-        onSiteAdded: vi.fn<ElectronAPI["events"]["onSiteAdded"]>(
-            (_callback) => () => undefined
-        ),
-        onSiteRemoved: vi.fn<ElectronAPI["events"]["onSiteRemoved"]>(
-            (_callback) => () => undefined
-        ),
-        onSiteUpdated: vi.fn<ElectronAPI["events"]["onSiteUpdated"]>(
-            (_callback) => () => undefined
-        ),
         onStateSyncEvent: vi.fn<ElectronAPI["events"]["onStateSyncEvent"]>(
-            (_callback) => () => undefined
-        ),
-        onTestEvent: vi.fn<ElectronAPI["events"]["onTestEvent"]>(
             (_callback) => () => undefined
         ),
         onUpdateStatus: vi.fn<ElectronAPI["events"]["onUpdateStatus"]>(

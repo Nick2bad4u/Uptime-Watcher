@@ -107,10 +107,10 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
         errors: {
             APPLICATION_CLEANUP_ERROR: "APPLICATION_CLEANUP_ERROR",
             APPLICATION_UPDATE_CHECK_ERROR: "APPLICATION_UPDATE_CHECK_ERROR",
-            APPLICATION_FORWARD_MONITOR_UP_ERROR:
-                "APPLICATION_FORWARD_MONITOR_UP_ERROR",
-            APPLICATION_FORWARD_MONITOR_DOWN_ERROR:
-                "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
+            APPLICATION_HANDLE_MONITOR_UP_ERROR:
+                "APPLICATION_HANDLE_MONITOR_UP_ERROR",
+            APPLICATION_HANDLE_MONITOR_DOWN_ERROR:
+                "APPLICATION_HANDLE_MONITOR_DOWN_ERROR",
             APPLICATION_SYSTEM_ERROR: "APPLICATION_SYSTEM_ERROR",
             APPLICATION_FORWARD_MONITORING_STARTED_ERROR:
                 "APPLICATION_FORWARD_MONITORING_STARTED_ERROR",
@@ -131,10 +131,7 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
         },
         debug: {
             APPLICATION_CLEANUP_SERVICE: "APPLICATION_CLEANUP_SERVICE",
-            APPLICATION_FORWARDING_MONITOR_UP:
-                "APPLICATION_FORWARDING_MONITOR_UP",
-            APPLICATION_FORWARDING_MONITOR_DOWN:
-                "APPLICATION_FORWARDING_MONITOR_DOWN",
+            APPLICATION_MONITOR_RECOVERED: "APPLICATION_MONITOR_RECOVERED",
             APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED:
                 "APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED",
             APPLICATION_FORWARDING_MONITORING_STARTED:
@@ -151,7 +148,7 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED",
         },
         warnings: {
-            APPLICATION_MONITOR_DOWN: "APPLICATION_MONITOR_DOWN",
+            APPLICATION_MONITOR_FAILURE: "APPLICATION_MONITOR_FAILURE",
         },
     },
 }));
@@ -1106,7 +1103,7 @@ describe(ApplicationService, () => {
             await readyHandler?.();
         });
         describe("monitor:up event", () => {
-            it("should forward monitor up event to renderer", async ({
+            it("should notify when a monitor recovers", async ({
                 task,
                 annotate,
             }) => {
@@ -1127,43 +1124,14 @@ describe(ApplicationService, () => {
                 // Assert
                 expect(
                     mockRendererEventBridge.sendToRenderers
-                ).toHaveBeenCalledWith("monitor:up", eventData);
+                ).not.toHaveBeenCalled();
                 expect(
                     mockNotificationService.notifyMonitorUp
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
             });
-            it("should handle monitor up forwarding errors", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: ApplicationService", "component");
-
-                // Arrange
-                const monitorUpHandler = getUptimeEventHandler("monitor:up");
-                const eventData = {
-                    site: { identifier: "site-1", name: "Test Site" },
-                    monitor: { id: "monitor-1" },
-                    timestamp: "2023-01-01T00:00:00Z",
-                };
-                const error = new Error("Forward failed");
-                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
-                    () => {
-                        throw error;
-                    }
-                );
-                // Act
-                monitorUpHandler?.(eventData);
-
-                // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith(
-                    "APPLICATION_FORWARD_MONITOR_UP_ERROR",
-                    error
-                );
-            });
         });
         describe("monitor:down event", () => {
-            it("should forward monitor down event to renderer", async ({
+            it("should notify when a monitor goes down", async ({
                 task,
                 annotate,
             }) => {
@@ -1185,40 +1153,10 @@ describe(ApplicationService, () => {
                 // Assert
                 expect(
                     mockRendererEventBridge.sendToRenderers
-                ).toHaveBeenCalledWith("monitor:down", eventData);
+                ).not.toHaveBeenCalled();
                 expect(
                     mockNotificationService.notifyMonitorDown
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
-            });
-            it("should handle monitor down forwarding errors", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: ApplicationService", "component");
-
-                // Arrange
-                const monitorDownHandler =
-                    getUptimeEventHandler("monitor:down");
-                const eventData = {
-                    site: { identifier: "site-1", name: "Test Site" },
-                    monitor: { id: "monitor-1" },
-                    timestamp: "2023-01-01T00:00:00Z",
-                };
-                const error = new Error("Forward failed");
-                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
-                    () => {
-                        throw error;
-                    }
-                );
-                // Act
-                monitorDownHandler?.(eventData);
-
-                // Assert
-                expect(mockLogger.error).toHaveBeenCalledWith(
-                    "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
-                    error
-                );
             });
         });
         describe("monitor:check-completed event", () => {

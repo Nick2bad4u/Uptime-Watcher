@@ -83,7 +83,7 @@ This architecture is optimized for **desktop UI responsiveness** and **local con
 ### 1. Enhanced Type Safety
 
 ```typescript
-interface UptimeEvents extends Record<string, unknown> {
+interface UptimeEvents {
  "site:added": {
   site: Site;
   source: SiteAddedSource;

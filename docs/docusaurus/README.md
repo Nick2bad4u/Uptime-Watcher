@@ -1,7 +1,7 @@
 # 📚 Uptime Watcher Documentation Site
 
 [![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus&logoColor=white)](https://docusaurus.io/)
-[![Node.js badge.](https://img.shields.io/badge/Node.js-24.18.0_LTS-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js badge.](https://img.shields.io/badge/Node.js-24.18.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ## 📖 Official documentation website for Uptime Watcher
@@ -32,7 +32,7 @@ This documentation site is part of the main Uptime Watcher project and serves as
 
 ### Prerequisites
 
-- **Node.js**: 24.18.0 LTS (recommended; >=24.8.0 required)
+- **Node.js**: 24.18.0 (recommended; >=24.8.0 required)
 - **npm**: 11.16.0 (declared by `packageManager`)
 - **Git**: Latest version
 
@@ -260,7 +260,7 @@ npm run build
 #### Local Development Issues
 
 ```bash
-# Check Node.js version (24.18.0 LTS recommended; >=24.8.0 required)
+# Check Node.js version (24.18.0 recommended; >=24.8.0 required)
 node --version
 
 # Reinstall dependencies

@@ -190,18 +190,12 @@ export const DEBUG_LOGS = {
         "[ApplicationService] Forwarding manual monitor check completion to renderer",
     APPLICATION_FORWARDING_MONITOR_STATUS:
         "[ApplicationService] Forwarding monitor status change to renderer",
-    APPLICATION_FORWARDING_MONITOR_UP:
-        "[ApplicationService] Monitor recovered - forwarding to renderer",
+    APPLICATION_MONITOR_RECOVERED:
+        "[ApplicationService] Monitor recovered - sending desktop notification",
     APPLICATION_FORWARDING_MONITORING_STARTED:
         "[ApplicationService] Forwarding monitoring started to renderer",
     APPLICATION_FORWARDING_MONITORING_STOPPED:
         "[ApplicationService] Forwarding monitoring stopped to renderer",
-    APPLICATION_FORWARDING_SITE_ADDED:
-        "[ApplicationService] Forwarding site added to renderer",
-    APPLICATION_FORWARDING_SITE_REMOVED:
-        "[ApplicationService] Forwarding site removed to renderer",
-    APPLICATION_FORWARDING_SITE_UPDATED:
-        "[ApplicationService] Forwarding site updated to renderer",
     APPLICATION_FORWARDING_STATE_SYNC:
         "[ApplicationService] Forwarding state sync event to renderer",
 
@@ -290,22 +284,16 @@ export const ERROR_LOGS = {
         "[ApplicationService] Failed to forward history limit update to renderer",
     APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR:
         "[ApplicationService] Failed to forward manual monitor check completion to renderer",
-    APPLICATION_FORWARD_MONITOR_DOWN_ERROR:
-        "[ApplicationService] Failed to forward monitor down to renderer",
+    APPLICATION_HANDLE_MONITOR_DOWN_ERROR:
+        "[ApplicationService] Failed to handle monitor down notification",
     APPLICATION_FORWARD_MONITOR_STATUS_ERROR:
         "[ApplicationService] Failed to forward monitor status change to renderer",
-    APPLICATION_FORWARD_MONITOR_UP_ERROR:
-        "[ApplicationService] Failed to forward monitor up to renderer",
+    APPLICATION_HANDLE_MONITOR_UP_ERROR:
+        "[ApplicationService] Failed to handle monitor up notification",
     APPLICATION_FORWARD_MONITORING_STARTED_ERROR:
         "[ApplicationService] Failed to forward monitoring started to renderer",
     APPLICATION_FORWARD_MONITORING_STOPPED_ERROR:
         "[ApplicationService] Failed to forward monitoring stopped to renderer",
-    APPLICATION_FORWARD_SITE_ADDED_ERROR:
-        "[ApplicationService] Failed to forward site added to renderer",
-    APPLICATION_FORWARD_SITE_REMOVED_ERROR:
-        "[ApplicationService] Failed to forward site removed to renderer",
-    APPLICATION_FORWARD_SITE_UPDATED_ERROR:
-        "[ApplicationService] Failed to forward site updated to renderer",
     APPLICATION_FORWARD_STATE_SYNC_ERROR:
         "[ApplicationService] Failed to forward state sync event to renderer",
     APPLICATION_INITIALIZATION_ERROR:
@@ -370,8 +358,8 @@ export const ERROR_LOGS = {
  */
 export const WARNING_LOGS = {
     /** Application warnings */
-    APPLICATION_MONITOR_DOWN:
-        "[ApplicationService] Monitor failure detected - forwarding to renderer",
+    APPLICATION_MONITOR_FAILURE:
+        "[ApplicationService] Monitor failure detected - sending desktop notification",
 
     DATABASE_BUSY_TIMEOUT_PRAGMA_FAILED:
         "[DatabaseService] Failed to apply PRAGMA busy_timeout",

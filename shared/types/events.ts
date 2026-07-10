@@ -879,55 +879,16 @@ export type DatabaseOperation =
     | "update";
 
 /**
- * Payload for test events (used in development/testing).
- *
- * @remarks
- * Used for development or testing purposes to transmit arbitrary data.
- *
- * @example // Example: Sending a test event with custom data
- *
- * ```typescript
- * const event: TestEventData = {
- *     foo: "bar",
- *     count: 42,
- * };
- * ```
- *
- * @public
- */
-export type TestEventData = UnknownRecord;
-
-/**
  * Renderer event payload contracts keyed by their IPC channel identifiers.
  */
 export interface RendererEventPayloadMap {
     "cache:invalidated": CacheInvalidatedEventData;
     "monitor:check-completed": MonitorCheckCompletedEventData;
-    "monitor:down": MonitorDownEventData;
     "monitor:status-changed": MonitorStatusChangedEventData;
-    "monitor:up": MonitorUpEventData;
     "monitoring:started": MonitoringStartedEventData;
     "monitoring:stopped": MonitoringStoppedEventData;
     "settings:history-limit-updated": HistoryLimitUpdatedEventData;
-    "site:added": {
-        site: Site;
-        source: SiteAddedSource;
-        timestamp: number;
-    };
-    "site:removed": {
-        cascade: boolean;
-        siteIdentifier: string;
-        siteName: string;
-        timestamp: number;
-    };
-    "site:updated": {
-        previousSite: Site;
-        site: Site;
-        timestamp: number;
-        updatedFields: string[];
-    };
     "state-sync-event": StateSyncEventData;
-    "test-event": TestEventData;
     "update-status": UpdateStatusEventData;
 }
 

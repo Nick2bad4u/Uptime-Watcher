@@ -935,8 +935,6 @@ const mockElectronAPI = {
  },
  events: {
   onMonitorStatusChanged: vi.fn(() => () => {}),
-  onMonitorUp: vi.fn(() => () => {}),
-  onMonitorDown: vi.fn(() => () => {}),
  },
 };
 

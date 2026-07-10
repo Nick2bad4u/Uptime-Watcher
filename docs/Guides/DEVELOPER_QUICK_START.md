@@ -38,7 +38,7 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 
 ### Prerequisites
 
-- **Node.js**: 24.18.0 LTS (recommended; >=24.8.0 required)
+- **Node.js**: 24.18.0 (recommended; >=24.8.0 required)
 - **npm**: 11.16.0 (declared by `packageManager`)
 - **Git**: Latest version
 
@@ -294,23 +294,13 @@ await this.eventBus.emitTyped("site:added", {
  timestamp: Date.now(),
 });
 
-import { EventsService } from "@app/services/EventsService";
+import { useSitesStore } from "@app/stores/sites/useSitesStore";
 
-// Frontend: Listen for events via the renderer services facade
+// Frontend bootstrap: subscribe once to the validated state-sync stream
 useEffect(() => {
- let unsubscribe: (() => void) | undefined;
+ const unsubscribe = useSitesStore.getState().subscribeToSyncEvents();
 
- void (async () => {
-  unsubscribe = await EventsService.onSiteAdded((data) => {
-   // Type-safe event data
-   sitesStore.addSite(data.site);
-   showNotification(`Site ${data.site.name} added successfully`);
-  });
- })();
-
- return () => {
-  unsubscribe?.();
- };
+ return unsubscribe;
 }, []);
 ```
 

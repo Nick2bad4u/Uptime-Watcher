@@ -99,17 +99,11 @@ classDiagram
         <<interface>>
         +"cache:invalidated": CacheInvalidatedEventData
         +"monitor:check-completed": MonitorCheckCompletedEventData
-        +"monitor:down": MonitorDownEventData
         +"monitor:status-changed": MonitorStatusChangedEventData
-        +"monitor:up": MonitorUpEventData
         +"monitoring:started": MonitoringStartedEventData
         +"monitoring:stopped": MonitoringStoppedEventData
         +"settings:history-limit-updated": HistoryLimitUpdatedEventData
-        +"site:added": SiteAddedEventData
-        +"site:removed": SiteRemovedEventData
-        +"site:updated": SiteUpdatedEventData
         +"state-sync-event": StateSyncEventData
-        +"test-event": TestEventData
         +"update-status": UpdateStatusEventData
     }
 
@@ -118,33 +112,13 @@ classDiagram
         +monitorId: string
         +status: MonitorStatus
         +responseTime?: number
-        +timestamp: number
+        +timestamp: string
     }
 
     class MonitorCheckCompletedEventData {
         +siteIdentifier: string
         +monitorId: string
         +statusUpdate: StatusUpdate
-        +timestamp: number
-    }
-
-    class SiteAddedEventData {
-        +site: Site
-        +source: SiteAddedSource
-        +timestamp: number
-    }
-
-    class SiteUpdatedEventData {
-        +previousSite: Site
-        +site: Site
-        +updatedFields: string[]
-        +timestamp: number
-    }
-
-    class SiteRemovedEventData {
-        +siteIdentifier: string
-        +siteName: string
-        +cascade: boolean
         +timestamp: number
     }
 
@@ -171,9 +145,6 @@ classDiagram
 
     RendererEventPayloadMap --> MonitorStatusChangedEventData
     RendererEventPayloadMap --> MonitorCheckCompletedEventData
-    RendererEventPayloadMap --> SiteAddedEventData
-    RendererEventPayloadMap --> SiteUpdatedEventData
-    RendererEventPayloadMap --> SiteRemovedEventData
     RendererEventPayloadMap --> HistoryLimitUpdatedEventData
     RendererEventPayloadMap --> UpdateStatusEventData
     TypedEventBus --> RendererEventPayloadMap

@@ -11,14 +11,11 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 
 import {
     type CacheInvalidatedEventData,
-    type MonitorDownEventData,
     MONITORING_CONTROL_REASON,
     type MonitoringControlEventData,
     type MonitorStatusChangedEventData,
-    type MonitorUpEventData,
     type MonitoringStartedEventData as SharedMonitoringStartedEventData,
     type MonitoringStoppedEventData as SharedMonitoringStoppedEventData,
-    type TestEventData,
     type UpdateStatusEventData,
 } from "@shared/types/events";
 import { arrayAt, safeCastTo } from "ts-extras";
@@ -47,7 +44,6 @@ const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const buildEventCallbacks = () => ({
     cacheInvalidated:
         createMockFunction<(data: CacheInvalidatedEventData) => void>(),
-    monitorDown: createMockFunction<(data: MonitorDownEventData) => void>(),
     monitorCheckCompleted:
         createMockFunction<(data: MonitorCheckCompletedEventPayload) => void>(),
     monitoringStarted:
@@ -56,8 +52,6 @@ const buildEventCallbacks = () => ({
         createMockFunction<(data: MonitoringStoppedEventData) => void>(),
     monitorStatusChanged:
         createMockFunction<(data: MonitorStatusChangedEventData) => void>(),
-    monitorUp: createMockFunction<(data: MonitorUpEventData) => void>(),
-    testEvent: createMockFunction<(data: TestEventData) => void>(),
     updateStatus: createMockFunction<(data: UpdateStatusEventData) => void>(),
 });
 
@@ -106,7 +100,6 @@ function createMockEventApi() {
         onCacheInvalidated: vi.fn(() => createEventCleanupFunction()),
         onMonitorCheckCompleted: vi.fn(() => createEventCleanupFunction()),
         onHistoryLimitUpdated: vi.fn(() => createEventCleanupFunction()),
-        onMonitorDown: vi.fn(() => createEventCleanupFunction()),
         onMonitoringStarted: vi.fn((_handler: MonitoringStartedEventHandler) =>
             createEventCleanupFunction()
         ),
@@ -114,11 +107,6 @@ function createMockEventApi() {
             createEventCleanupFunction()
         ),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
-        onMonitorUp: vi.fn(() => createEventCleanupFunction()),
-        onSiteAdded: vi.fn(() => createEventCleanupFunction()),
-        onSiteRemoved: vi.fn(() => createEventCleanupFunction()),
-        onSiteUpdated: vi.fn(() => createEventCleanupFunction()),
-        onTestEvent: vi.fn(() => createEventCleanupFunction()),
         onUpdateStatus: vi.fn(() => createEventCleanupFunction()),
     };
 }
@@ -220,15 +208,9 @@ describe("EventsService", () => {
                 "onCacheInvalidated",
                 "onHistoryLimitUpdated",
                 "onMonitorCheckCompleted",
-                "onMonitorDown",
                 "onMonitoringStarted",
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
-                "onMonitorUp",
-                "onSiteAdded",
-                "onSiteRemoved",
-                "onSiteUpdated",
-                "onTestEvent",
                 "onUpdateStatus",
             ] as const;
 
@@ -350,32 +332,6 @@ describe("EventsService", () => {
                 "[EventsService] Failed to cleanup onCacheInvalidated listener:",
                 cleanupError
             );
-        });
-    });
-
-    describe("onMonitorDown", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onMonitorDown(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onMonitorDown).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onMonitorDown(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onMonitorDown).not.toHaveBeenCalled();
         });
     });
 
@@ -617,136 +573,6 @@ describe("EventsService", () => {
         });
     });
 
-    describe("onMonitorUp", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onMonitorUp(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onMonitorUp).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onMonitorUp(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onMonitorUp).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("onSiteAdded", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onSiteAdded(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onSiteAdded).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onSiteAdded(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onSiteAdded).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("onSiteRemoved", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onSiteRemoved(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onSiteRemoved).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onSiteRemoved(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onSiteRemoved).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("onSiteUpdated", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onSiteUpdated(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onSiteUpdated).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onSiteUpdated(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onSiteUpdated).not.toHaveBeenCalled();
-        });
-    });
-
-    describe("onTestEvent", () => {
-        it("should register event listener after initialization", async () => {
-            const callback = vi.fn();
-
-            const cleanup = await EventsService.onTestEvent(callback);
-
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
-                callback
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should fail if initialization fails", async () => {
-            const initError = new Error("Init failed");
-            mockWaitForElectronBridge.mockRejectedValue(initError);
-            const callback = vi.fn();
-
-            await expect(EventsService.onTestEvent(callback)).rejects.toThrow(
-                "Init failed"
-            );
-
-            expect(mockElectronAPI.events.onTestEvent).not.toHaveBeenCalled();
-        });
-    });
-
     describe("onUpdateStatus", () => {
         it("should register event listener after initialization", async () => {
             const callback = vi.fn();
@@ -818,13 +644,10 @@ describe("EventsService", () => {
             // Test all event methods return proper cleanup functions
             const cleanupFunctions = await Promise.all([
                 EventsService.onCacheInvalidated(testCallback),
-                EventsService.onMonitorDown(testCallback),
                 EventsService.onMonitorCheckCompleted(testCallback),
                 EventsService.onMonitoringStarted(testCallback),
                 EventsService.onMonitoringStopped(testCallback),
                 EventsService.onMonitorStatusChanged(testCallback),
-                EventsService.onMonitorUp(testCallback),
-                EventsService.onTestEvent(testCallback),
                 EventsService.onUpdateStatus(testCallback),
             ]);
 
@@ -844,7 +667,6 @@ describe("EventsService", () => {
 
             const cleanupFunctions = await Promise.all([
                 EventsService.onCacheInvalidated(callbacks.cacheInvalidated),
-                EventsService.onMonitorDown(callbacks.monitorDown),
                 EventsService.onMonitorCheckCompleted(
                     callbacks.monitorCheckCompleted
                 ),
@@ -861,13 +683,11 @@ describe("EventsService", () => {
                 EventsService.onMonitorStatusChanged(
                     callbacks.monitorStatusChanged
                 ),
-                EventsService.onMonitorUp(callbacks.monitorUp),
-                EventsService.onTestEvent(callbacks.testEvent),
                 EventsService.onUpdateStatus(callbacks.updateStatus),
             ]);
 
             // All registrations should succeed
-            expect(cleanupFunctions).toHaveLength(9);
+            expect(cleanupFunctions).toHaveLength(6);
             for (const cleanup of cleanupFunctions) {
                 expect(typeof cleanup).toBe("function");
             }
@@ -876,9 +696,6 @@ describe("EventsService", () => {
             expect(
                 mockElectronAPI.events.onCacheInvalidated
             ).toHaveBeenCalledWith(callbacks.cacheInvalidated);
-            expect(mockElectronAPI.events.onMonitorDown).toHaveBeenCalledWith(
-                callbacks.monitorDown
-            );
             expect(
                 mockElectronAPI.events.onMonitorCheckCompleted
             ).toHaveBeenCalledWith(callbacks.monitorCheckCompleted);
@@ -891,12 +708,6 @@ describe("EventsService", () => {
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
             ).toHaveBeenCalledWith(callbacks.monitorStatusChanged);
-            expect(mockElectronAPI.events.onMonitorUp).toHaveBeenCalledWith(
-                callbacks.monitorUp
-            );
-            expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
-                callbacks.testEvent
-            );
             expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
                 callbacks.updateStatus
             );

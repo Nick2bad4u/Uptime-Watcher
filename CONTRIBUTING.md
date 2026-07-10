@@ -6,7 +6,7 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Prerequisites
 
-- **Node.js** 24.18.0 LTS (recommended; >=24.8.0 required)
+- **Node.js** 24.18.0 (recommended; >=24.8.0 required)
 - **npm** 11.16.0 (declared by `packageManager`)
 - **Git** (latest version)
 

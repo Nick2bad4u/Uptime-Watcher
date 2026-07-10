@@ -17,17 +17,11 @@ type HistoryLimitUpdatedPayload =
     RendererEventPayloadMap["settings:history-limit-updated"];
 type MonitorCheckCompletedPayload =
     RendererEventPayloadMap["monitor:check-completed"];
-type MonitorDownPayload = RendererEventPayloadMap["monitor:down"];
 type MonitoringStartedPayload = RendererEventPayloadMap["monitoring:started"];
 type MonitoringStoppedPayload = RendererEventPayloadMap["monitoring:stopped"];
 type MonitorStatusChangedPayload =
     RendererEventPayloadMap["monitor:status-changed"];
-type MonitorUpPayload = RendererEventPayloadMap["monitor:up"];
-type SiteAddedPayload = RendererEventPayloadMap["site:added"];
-type SiteRemovedPayload = RendererEventPayloadMap["site:removed"];
-type SiteUpdatedPayload = RendererEventPayloadMap["site:updated"];
 type StateSyncEventPayload = RendererEventPayloadMap["state-sync-event"];
-type TestEventPayload = RendererEventPayloadMap["test-event"];
 type UpdateStatusPayload = RendererEventPayloadMap["update-status"];
 
 /**
@@ -74,18 +68,6 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Subscribe to events emitted on the `monitor:down` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `monitor:down`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onMonitorDown: (
-        callback: (data: MonitorDownPayload) => void
-    ) => () => void;
-
-    /**
      * Subscribe to events emitted on the `monitoring:started` channel.
      *
      * @param callback - Invoked with payloads emitted on the
@@ -122,54 +104,6 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Subscribe to events emitted on the `monitor:up` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `monitor:up`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onMonitorUp: (
-        callback: (data: MonitorUpPayload) => void
-    ) => () => void;
-
-    /**
-     * Subscribe to events emitted on the `site:added` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `site:added`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onSiteAdded: (
-        callback: (data: SiteAddedPayload) => void
-    ) => () => void;
-
-    /**
-     * Subscribe to events emitted on the `site:removed` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `site:removed`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onSiteRemoved: (
-        callback: (data: SiteRemovedPayload) => void
-    ) => () => void;
-
-    /**
-     * Subscribe to events emitted on the `site:updated` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `site:updated`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onSiteUpdated: (
-        callback: (data: SiteUpdatedPayload) => void
-    ) => () => void;
-
-    /**
      * Subscribe to events emitted on the `state-sync-event` channel.
      *
      * @param callback - Invoked with payloads emitted on the `state-sync-event`
@@ -179,18 +113,6 @@ export interface EventsDomainBridge {
      */
     readonly onStateSyncEvent: (
         callback: (data: StateSyncEventPayload) => void
-    ) => () => void;
-
-    /**
-     * Subscribe to events emitted on the `test-event` channel.
-     *
-     * @param callback - Invoked with payloads emitted on the `test-event`
-     *   channel.
-     *
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onTestEvent: (
-        callback: (data: TestEventPayload) => void
     ) => () => void;
 
     /**

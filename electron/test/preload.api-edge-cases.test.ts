@@ -369,7 +369,7 @@ describe("preload bridge API edge cases", () => {
             });
             // Should handle callback errors gracefully
             expect(() =>
-                exposedAPI.events.onTestEvent(errorCallback)
+                exposedAPI.events.onCacheInvalidated(errorCallback)
             ).not.toThrow();
         });
         it("should handle invalid event names", async () => {
@@ -385,7 +385,7 @@ describe("preload bridge API edge cases", () => {
         it("should handle rapid event registration/removal", async () => {
             // Rapid event operations
             for (let i = 0; i < 100; i++) {
-                exposedAPI.events.onTestEvent(vi.fn());
+                exposedAPI.events.onCacheInvalidated(vi.fn());
                 if (i % 2 === 0) {
                     removeAllListenersWithUntrustedChannel(
                         exposedAPI,
@@ -397,7 +397,9 @@ describe("preload bridge API edge cases", () => {
             expect(mockIpcRenderer.on).toHaveBeenCalledTimes(100);
             expect(
                 mockIpcRenderer.on.mock.calls.map(([channel]) => channel)
-            ).toStrictEqual(Array.from({ length: 100 }, () => "test-event"));
+            ).toStrictEqual(
+                Array.from({ length: 100 }, () => "cache:invalidated")
+            );
             expect(mockIpcRenderer.removeListener).not.toHaveBeenCalled();
         });
         it("should handle event listener registration", async () => {
@@ -407,19 +409,26 @@ describe("preload bridge API edge cases", () => {
             expect(() =>
                 exposedAPI.events.onUpdateStatus(callback)
             ).not.toThrow();
-            expect(() => exposedAPI.events.onMonitorUp(callback)).not.toThrow();
             expect(() =>
-                exposedAPI.events.onMonitorDown(callback)
+                exposedAPI.events.onMonitorCheckCompleted(callback)
             ).not.toThrow();
-            expect(() => exposedAPI.events.onTestEvent(callback)).not.toThrow();
             expect(() =>
                 exposedAPI.events.onCacheInvalidated(callback)
+            ).not.toThrow();
+            expect(() =>
+                exposedAPI.events.onHistoryLimitUpdated(callback)
             ).not.toThrow();
             expect(() =>
                 exposedAPI.events.onMonitoringStarted(callback)
             ).not.toThrow();
             expect(() =>
                 exposedAPI.events.onMonitoringStopped(callback)
+            ).not.toThrow();
+            expect(() =>
+                exposedAPI.events.onMonitorStatusChanged(callback)
+            ).not.toThrow();
+            expect(() =>
+                exposedAPI.events.onStateSyncEvent(callback)
             ).not.toThrow();
         });
     });
@@ -430,7 +439,7 @@ describe("preload bridge API edge cases", () => {
 
             // Add many listeners
             for (const [index, callback] of callbacks.entries()) {
-                exposedAPI.events.onTestEvent(callback);
+                exposedAPI.events.onCacheInvalidated(callback);
                 if (index % 100 === 0) {
                     removeAllListenersWithUntrustedChannel(
                         exposedAPI,
@@ -442,7 +451,9 @@ describe("preload bridge API edge cases", () => {
             expect(mockIpcRenderer.on).toHaveBeenCalledTimes(1000);
             expect(
                 mockIpcRenderer.on.mock.calls.map(([channel]) => channel)
-            ).toStrictEqual(Array.from({ length: 1000 }, () => "test-event"));
+            ).toStrictEqual(
+                Array.from({ length: 1000 }, () => "cache:invalidated")
+            );
             expect(mockIpcRenderer.removeListener).not.toHaveBeenCalled();
         });
         it("should handle listener cleanup during app shutdown", async () => {
@@ -450,9 +461,9 @@ describe("preload bridge API edge cases", () => {
 
             // Simulate app shutdown scenario
             exposedAPI.events.onUpdateStatus(callback);
-            exposedAPI.events.onMonitorUp(callback);
+            exposedAPI.events.onCacheInvalidated(callback);
             exposedAPI.events.removeAllListeners("update-status");
-            exposedAPI.events.removeAllListeners("monitor:up");
+            exposedAPI.events.removeAllListeners("cache:invalidated");
 
             expect(mockIpcRenderer.on).toHaveBeenCalledTimes(2);
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
@@ -460,7 +471,7 @@ describe("preload bridge API edge cases", () => {
                 expect.any(Function)
             );
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "monitor:up",
+                "cache:invalidated",
                 expect.any(Function)
             );
             expect(mockIpcRenderer.removeListener).toHaveBeenCalledTimes(2);
@@ -469,7 +480,7 @@ describe("preload bridge API edge cases", () => {
                 expect.any(Function)
             );
             expect(mockIpcRenderer.removeListener).toHaveBeenCalledWith(
-                "monitor:up",
+                "cache:invalidated",
                 expect.any(Function)
             );
         });

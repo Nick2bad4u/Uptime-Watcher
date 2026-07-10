@@ -213,7 +213,7 @@ useEffect(() => {
 
  const setupListeners = async () => {
   cleanupFunctions.push(
-   await EventsService.onSiteUpdated(handleSiteUpdate),
+   await StateSyncService.onStateSyncEvent(handleStateSync),
    await EventsService.onMonitorStatusChanged(handleMonitorStatus)
   );
  };

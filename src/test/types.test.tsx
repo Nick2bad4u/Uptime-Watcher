@@ -449,23 +449,11 @@ describe("Types Module", () => {
                         const cleanup = () => {};
                         return cleanup;
                     },
-                    onMonitorUp: () => {
-                        const cleanup = () => {};
-                        return cleanup;
-                    },
-                    onMonitorDown: () => {
-                        const cleanup = () => {};
-                        return cleanup;
-                    },
                     onMonitoringStarted: () => {
                         const cleanup = () => {};
                         return cleanup;
                     },
                     onMonitoringStopped: () => {
-                        const cleanup = () => {};
-                        return cleanup;
-                    },
-                    onTestEvent: () => {
                         const cleanup = () => {};
                         return cleanup;
                     },
@@ -587,8 +575,6 @@ describe("Types Module", () => {
             expect(typeof mockAPI.events.onMonitorStatusChanged).toBe(
                 "function"
             );
-            expect(typeof mockAPI.events.onMonitorUp).toBe("function");
-            expect(typeof mockAPI.events.onMonitorDown).toBe("function");
             expect(typeof mockAPI.events.removeAllListeners).toBe("function");
 
             expect(typeof mockAPI.monitoring.startMonitoring).toBe("function");

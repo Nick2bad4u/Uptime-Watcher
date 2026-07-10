@@ -3,7 +3,7 @@
  *
  * @remarks
  * This module provides event listener functions for the events domain. It
- * includes listeners for cache invalidation, monitor status, test events, and
+ * includes listeners for cache invalidation, monitor status, state sync, and
  * update status events.
  *
  * Exception handling: This domain API intentionally does not handle exceptions.
@@ -19,12 +19,8 @@ import type {
     CacheInvalidatedEventData,
     HistoryLimitUpdatedEventData,
     MonitorCheckCompletedEventData,
-    MonitorDownEventData,
     MonitoringControlEventData,
-    MonitorLifecycleEventData,
     MonitorStatusChangedEventData,
-    MonitorUpEventData,
-    TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
@@ -40,21 +36,13 @@ import {
     CACHE_INVALIDATION_TYPE_VALUES,
     isStateSyncEventData,
     MONITORING_CONTROL_REASON_VALUES,
-    SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS } from "@shared/utils/userFacingErrors";
-import { validateSiteSnapshot } from "@shared/validation/guards";
-import {
-    isEnrichedMonitorStatusChangedEventData,
-    isMonitorStatusChangedEventData,
-} from "@shared/validation/monitorStatusEvents";
+import { isMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
-import {
-    siteIdentifierSchema,
-    siteNameSchema,
-} from "@shared/validation/siteFieldSchemas";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { isDefined, objectValues } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
@@ -87,15 +75,6 @@ const isRendererEventChannel = createStringUnionGuard(
     RENDERER_EVENT_CHANNEL_VALUES
 );
 
-type SiteAddedEventDataPayload = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
->;
-type SiteRemovedEventDataPayload = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
->;
-type SiteUpdatedEventDataPayload = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
->;
 type MonitorCheckCompletedEventDataPayload = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED
 >;
@@ -262,31 +241,6 @@ const isStateSyncEventDataPayload = (
     payload: unknown
 ): payload is StateSyncEventDataPayload => isStateSyncEventData(payload);
 
-const isMonitorLifecycleCandidate = (
-    payload: unknown
-): payload is MonitorLifecycleEventData =>
-    isEnrichedMonitorStatusChangedEventData(payload);
-
-const isMonitorDownEventDataPayload = (
-    payload: unknown
-): payload is MonitorDownEventData => {
-    if (!isMonitorLifecycleCandidate(payload)) {
-        return false;
-    }
-
-    return payload.status === "down";
-};
-
-const isMonitorUpEventDataPayload = (
-    payload: unknown
-): payload is MonitorUpEventData => {
-    if (!isMonitorLifecycleCandidate(payload)) {
-        return false;
-    }
-
-    return payload.status === "up";
-};
-
 const isUpdateStatusEventDataPayload = (
     payload: unknown
 ): payload is UpdateStatusEventData => {
@@ -324,9 +278,6 @@ const mapUpdateStatusEventDataPayload = (
               status: payload.status,
           };
 };
-
-const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
-    isUnknownRecord(payload);
 
 const isMonitorCheckCompletedEventDataPayload = (
     payload: unknown
@@ -428,132 +379,6 @@ const mapHistoryLimitUpdatedEventDataPayload = (
           };
 };
 
-const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);
-
-const mapSiteAddedEventDataPayload = (
-    payload: unknown
-): SiteAddedEventDataPayload | undefined => {
-    if (!isUnknownRecord(payload)) {
-        return undefined;
-    }
-
-    const record = payload;
-    const { site, source, timestamp } = record;
-    const parsedSite = validateSiteSnapshot(site);
-
-    if (!parsedSite.success) {
-        return undefined;
-    }
-
-    if (!isSiteAddedSource(source)) {
-        return undefined;
-    }
-
-    if (!hasFiniteTimestamp(timestamp)) {
-        return undefined;
-    }
-
-    return {
-        site: parsedSite.data,
-        source,
-        timestamp,
-    };
-};
-
-const isSiteAddedEventDataPayload = (
-    payload: unknown
-): payload is SiteAddedEventDataPayload =>
-    mapSiteAddedEventDataPayload(payload) !== undefined;
-
-const isSiteRemovedEventDataPayload = (
-    payload: unknown
-): payload is SiteRemovedEventDataPayload => {
-    if (!isUnknownRecord(payload)) {
-        return false;
-    }
-
-    const { cascade, siteIdentifier, siteName, timestamp } = payload;
-
-    if (typeof cascade !== "boolean") {
-        return false;
-    }
-
-    if (!siteIdentifierSchema.safeParse(siteIdentifier).success) {
-        return false;
-    }
-
-    if (!siteNameSchema.safeParse(siteName).success) {
-        return false;
-    }
-
-    return hasFiniteTimestamp(timestamp);
-};
-
-const mapSiteRemovedEventDataPayload = (
-    payload: unknown
-): SiteRemovedEventDataPayload | undefined => {
-    if (!isSiteRemovedEventDataPayload(payload)) {
-        return undefined;
-    }
-
-    return {
-        cascade: payload.cascade,
-        siteIdentifier: payload.siteIdentifier,
-        siteName: payload.siteName,
-        timestamp: payload.timestamp,
-    };
-};
-
-const mapSiteUpdatedEventDataPayload = (
-    payload: unknown
-): SiteUpdatedEventDataPayload | undefined => {
-    if (!isUnknownRecord(payload)) {
-        return undefined;
-    }
-
-    const record = payload;
-    const {
-        previousSite,
-        site,
-        timestamp,
-        updatedFields: updatedFieldsCandidate,
-    } = record;
-    const parsedCurrentSite = validateSiteSnapshot(site);
-    const parsedPreviousSite = validateSiteSnapshot(previousSite);
-
-    if (!parsedCurrentSite.success || !parsedPreviousSite.success) {
-        return undefined;
-    }
-
-    if (!hasFiniteTimestamp(timestamp)) {
-        return undefined;
-    }
-
-    if (!Array.isArray(updatedFieldsCandidate)) {
-        return undefined;
-    }
-
-    const updatedFields = updatedFieldsCandidate.filter(
-        (field): field is string => typeof field === "string"
-    );
-
-    if (updatedFields.length !== updatedFieldsCandidate.length) {
-        return undefined;
-    }
-
-    return {
-        previousSite: parsedPreviousSite.data,
-        site: parsedCurrentSite.data,
-        timestamp,
-        updatedFields: [...updatedFields],
-    };
-};
-
-const isSiteUpdatedEventDataPayload = (
-    payload: unknown
-): payload is SiteUpdatedEventDataPayload =>
-    mapSiteUpdatedEventDataPayload(payload) !== undefined;
-
 interface GuardSubscriptionOptions<TPayload> {
     readonly domain?: string;
     readonly guardName?: string;
@@ -636,7 +461,6 @@ export function createEventsApi(): EventsApi {
         monitorCheckCompleted: createEventManager(
             RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED
         ),
-        monitorDown: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_DOWN),
         monitoringStarted: createEventManager(
             RENDERER_EVENT_CHANNELS.MONITORING_STARTED
         ),
@@ -646,12 +470,7 @@ export function createEventsApi(): EventsApi {
         monitorStatusChanged: createEventManager(
             RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED
         ),
-        monitorUp: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_UP),
-        siteAdded: createEventManager(RENDERER_EVENT_CHANNELS.SITE_ADDED),
-        siteRemoved: createEventManager(RENDERER_EVENT_CHANNELS.SITE_REMOVED),
-        siteUpdated: createEventManager(RENDERER_EVENT_CHANNELS.SITE_UPDATED),
         stateSync: createEventManager(RENDERER_EVENT_CHANNELS.STATE_SYNC),
-        testEvent: createEventManager(RENDERER_EVENT_CHANNELS.TEST_EVENT),
         updateStatus: createEventManager(RENDERER_EVENT_CHANNELS.UPDATE_STATUS),
     } as const;
 
@@ -661,12 +480,10 @@ export function createEventsApi(): EventsApi {
             RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
             managers.monitorCheckCompleted,
         ],
-        [RENDERER_EVENT_CHANNELS.MONITOR_DOWN, managers.monitorDown],
         [
             RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
             managers.monitorStatusChanged,
         ],
-        [RENDERER_EVENT_CHANNELS.MONITOR_UP, managers.monitorUp],
         [
             RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
             managers.monitoringStarted,
@@ -679,11 +496,7 @@ export function createEventsApi(): EventsApi {
             RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
             managers.historyLimitUpdated,
         ],
-        [RENDERER_EVENT_CHANNELS.SITE_ADDED, managers.siteAdded],
-        [RENDERER_EVENT_CHANNELS.SITE_REMOVED, managers.siteRemoved],
-        [RENDERER_EVENT_CHANNELS.SITE_UPDATED, managers.siteUpdated],
         [RENDERER_EVENT_CHANNELS.STATE_SYNC, managers.stateSync],
-        [RENDERER_EVENT_CHANNELS.TEST_EVENT, managers.testEvent],
         [RENDERER_EVENT_CHANNELS.UPDATE_STATUS, managers.updateStatus],
     ]);
 
@@ -727,18 +540,6 @@ export function createEventsApi(): EventsApi {
                     mapPayload: mapMonitorCheckCompletedEventDataPayload,
                 }
             ),
-        onMonitorDown: (
-            callback: (data: MonitorDownEventData) => void
-        ): (() => void) =>
-            subscribeWithGuard(
-                managers.monitorDown,
-                RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
-                isMonitorDownEventDataPayload,
-                callback,
-                {
-                    guardName: "isMonitorDownEventDataPayload",
-                }
-            ),
         onMonitoringStarted: (
             callback: (data: MonitoringStartedEventDataPayload) => void
         ): (() => void) =>
@@ -775,57 +576,6 @@ export function createEventsApi(): EventsApi {
                     guardName: "isMonitorStatusChangedEventData",
                 }
             ),
-        onMonitorUp: (
-            callback: (data: MonitorUpEventData) => void
-        ): (() => void) =>
-            subscribeWithGuard(
-                managers.monitorUp,
-                RENDERER_EVENT_CHANNELS.MONITOR_UP,
-                isMonitorUpEventDataPayload,
-                callback,
-                {
-                    guardName: "isMonitorUpEventDataPayload",
-                }
-            ),
-        onSiteAdded: (
-            callback: (data: SiteAddedEventDataPayload) => void
-        ): (() => void) =>
-            subscribeWithGuard(
-                managers.siteAdded,
-                RENDERER_EVENT_CHANNELS.SITE_ADDED,
-                isSiteAddedEventDataPayload,
-                callback,
-                {
-                    guardName: "isSiteAddedEventDataPayload",
-                    mapPayload: mapSiteAddedEventDataPayload,
-                }
-            ),
-        onSiteRemoved: (
-            callback: (data: SiteRemovedEventDataPayload) => void
-        ): (() => void) =>
-            subscribeWithGuard(
-                managers.siteRemoved,
-                RENDERER_EVENT_CHANNELS.SITE_REMOVED,
-                isSiteRemovedEventDataPayload,
-                callback,
-                {
-                    guardName: "isSiteRemovedEventDataPayload",
-                    mapPayload: mapSiteRemovedEventDataPayload,
-                }
-            ),
-        onSiteUpdated: (
-            callback: (data: SiteUpdatedEventDataPayload) => void
-        ): (() => void) =>
-            subscribeWithGuard(
-                managers.siteUpdated,
-                RENDERER_EVENT_CHANNELS.SITE_UPDATED,
-                isSiteUpdatedEventDataPayload,
-                callback,
-                {
-                    guardName: "isSiteUpdatedEventDataPayload",
-                    mapPayload: mapSiteUpdatedEventDataPayload,
-                }
-            ),
         onStateSyncEvent: (
             callback: (data: StateSyncEventDataPayload) => void
         ): (() => void) =>
@@ -836,16 +586,6 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isStateSyncEventDataPayload",
-                }
-            ),
-        onTestEvent: (callback: (data: TestEventData) => void): (() => void) =>
-            subscribeWithGuard(
-                managers.testEvent,
-                RENDERER_EVENT_CHANNELS.TEST_EVENT,
-                isTestEventDataPayload,
-                callback,
-                {
-                    guardName: "isTestEventDataPayload",
                 }
             ),
         onUpdateStatus: (

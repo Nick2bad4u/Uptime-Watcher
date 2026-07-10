@@ -209,7 +209,7 @@ The database retention policy is surfaced to renderers through the `settings:his
 
 ```typescript
 // 1\. Define event interfaces
-interface DomainEvents extends Record<string, unknown> {
+interface DomainEvents {
  "domain:action-completed": {
   entityId: string;
   timestamp: number;

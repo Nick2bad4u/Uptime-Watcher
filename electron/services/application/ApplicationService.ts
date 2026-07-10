@@ -60,7 +60,7 @@ import {
 } from "@shared/utils/logTemplates";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { app } from "electron";
-import { arrayJoin, isEmpty } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -405,17 +405,18 @@ export class ApplicationService {
      * Sets up typed event handlers for uptime monitoring system events.
      *
      * @remarks
-     * Establishes communication bridge between the uptime monitoring system and
-     * the renderer process by forwarding typed events including: - Monitor
-     * status changes (up/down/status-changed)
+     * Establishes communication between the uptime monitoring system, desktop
+     * notifications, and the renderer process. Renderer broadcasts include:
      *
+     * - Monitor status changes (`monitor:status-changed`)
      * - Monitoring lifecycle events (started/stopped)
      * - Cache invalidation events
      * - System errors
      *
-     * Also triggers desktop notifications for monitor state changes. All event
-     * forwarding includes error handling to prevent event processing failures
-     * from affecting monitoring operations.
+     * Monitor up/down transitions are consumed locally for desktop
+     * notifications; state synchronization keeps renderer site data current.
+     * Every handler contains its own error boundary so notification or renderer
+     * failures do not affect monitoring operations.
      *
      * @internal
      */
@@ -472,7 +473,7 @@ export class ApplicationService {
                 );
                 try {
                     logger.info(
-                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
+                        LOG_TEMPLATES.debug.APPLICATION_MONITOR_RECOVERED,
                         {
                             monitorId: payload.monitor.id,
                             siteIdentifier: payload.site.identifier,
@@ -480,10 +481,6 @@ export class ApplicationService {
                         }
                     );
 
-                    this.emitRendererEvent(
-                        RENDERER_EVENT_CHANNELS.MONITOR_UP,
-                        payload
-                    );
                     notificationService.notifyMonitorUp(
                         payload.site,
                         payload.monitor.id
@@ -491,7 +488,7 @@ export class ApplicationService {
                 } catch (error: unknown) {
                     logger.error(
                         LOG_TEMPLATES.errors
-                            .APPLICATION_FORWARD_MONITOR_UP_ERROR,
+                            .APPLICATION_HANDLE_MONITOR_UP_ERROR,
                         ensureError(error)
                     );
                 }
@@ -509,7 +506,7 @@ export class ApplicationService {
                 );
                 try {
                     logger.warn(
-                        LOG_TEMPLATES.warnings.APPLICATION_MONITOR_DOWN,
+                        LOG_TEMPLATES.warnings.APPLICATION_MONITOR_FAILURE,
                         {
                             monitorId: payload.monitor.id,
                             siteIdentifier: payload.site.identifier,
@@ -517,10 +514,6 @@ export class ApplicationService {
                         }
                     );
 
-                    this.emitRendererEvent(
-                        RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
-                        payload
-                    );
                     notificationService.notifyMonitorDown(
                         payload.site,
                         payload.monitor.id
@@ -528,7 +521,7 @@ export class ApplicationService {
                 } catch (error: unknown) {
                     logger.error(
                         LOG_TEMPLATES.errors
-                            .APPLICATION_FORWARD_MONITOR_DOWN_ERROR,
+                            .APPLICATION_HANDLE_MONITOR_DOWN_ERROR,
                         ensureError(error)
                     );
                 }
@@ -667,99 +660,6 @@ export class ApplicationService {
                     logger.error(
                         LOG_TEMPLATES.errors
                             .APPLICATION_FORWARD_MONITORING_STOPPED_ERROR,
-                        ensureError(error)
-                    );
-                }
-            }
-        );
-
-        this.scopedSubscriptions.onTyped<UptimeEvents, "site:added">(
-            orchestrator,
-            "site:added",
-            (data) => {
-                const payload = this.stripOrchestratorPayloadMetadata(
-                    "site:added",
-                    data
-                );
-                try {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_ADDED,
-                        {
-                            identifier: payload.site.identifier,
-                            source: payload.source,
-                        }
-                    );
-                    this.emitRendererEvent(
-                        RENDERER_EVENT_CHANNELS.SITE_ADDED,
-                        payload
-                    );
-                } catch (error: unknown) {
-                    logger.error(
-                        LOG_TEMPLATES.errors
-                            .APPLICATION_FORWARD_SITE_ADDED_ERROR,
-                        ensureError(error)
-                    );
-                }
-            }
-        );
-
-        this.scopedSubscriptions.onTyped<UptimeEvents, "site:removed">(
-            orchestrator,
-            "site:removed",
-            (data) => {
-                const payload = this.stripOrchestratorPayloadMetadata(
-                    "site:removed",
-                    data
-                );
-                try {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_REMOVED,
-                        {
-                            cascade: payload.cascade,
-                            siteIdentifier: payload.siteIdentifier,
-                        }
-                    );
-                    this.emitRendererEvent(
-                        RENDERER_EVENT_CHANNELS.SITE_REMOVED,
-                        payload
-                    );
-                } catch (error: unknown) {
-                    logger.error(
-                        LOG_TEMPLATES.errors
-                            .APPLICATION_FORWARD_SITE_REMOVED_ERROR,
-                        ensureError(error)
-                    );
-                }
-            }
-        );
-
-        this.scopedSubscriptions.onTyped<UptimeEvents, "site:updated">(
-            orchestrator,
-            "site:updated",
-            (data) => {
-                const payload = this.stripOrchestratorPayloadMetadata(
-                    "site:updated",
-                    data
-                );
-                try {
-                    logger.debug(
-                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
-                        {
-                            identifier: payload.site.identifier,
-                            updatedFields: arrayJoin(
-                                payload.updatedFields,
-                                ", "
-                            ),
-                        }
-                    );
-                    this.emitRendererEvent(
-                        RENDERER_EVENT_CHANNELS.SITE_UPDATED,
-                        payload
-                    );
-                } catch (error: unknown) {
-                    logger.error(
-                        LOG_TEMPLATES.errors
-                            .APPLICATION_FORWARD_SITE_UPDATED_ERROR,
                         ensureError(error)
                     );
                 }

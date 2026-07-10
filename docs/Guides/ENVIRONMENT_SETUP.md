@@ -34,7 +34,7 @@ tags:
 
 ### Required Software
 
-- **Node.js**: 24.18.0 LTS (recommended; >=24.8.0 required)
+- **Node.js**: 24.18.0 (recommended; >=24.8.0 required)
 - **npm**: 11.16.0 (declared by `packageManager`)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
@@ -67,7 +67,7 @@ choco install nodejs --version=24.18.0
 #### Verification
 
 ```bash
-node --version  # Should be 24.18.0 LTS recommended; >=24.8.0 required
+node --version  # Should be 24.18.0 recommended; >=24.8.0 required
 npm --version   # Should be 11.16.0
 ```
 
@@ -539,7 +539,7 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- \[ ] Node.js 24.18.0 LTS installed and active (>=24.8.0 required)
+- \[ ] Node.js 24.18.0 installed and active (>=24.8.0 required)
 - \[ ] npm 11.16.0 available
 - \[ ] Git configured with user details
 - \[ ] VS Code with recommended extensions

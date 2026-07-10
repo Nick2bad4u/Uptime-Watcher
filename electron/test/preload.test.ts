@@ -1117,8 +1117,8 @@ describe("Electron Preload Script", () => {
                 const eventsAPI = exposedAPI.events;
 
                 expect(eventsAPI).toHaveProperty("onMonitorStatusChanged");
-                expect(eventsAPI).toHaveProperty("onMonitorUp");
-                expect(eventsAPI).toHaveProperty("onMonitorDown");
+                expect(eventsAPI).toHaveProperty("onMonitorCheckCompleted");
+                expect(eventsAPI).toHaveProperty("onStateSyncEvent");
                 expect(eventsAPI).toHaveProperty("onUpdateStatus");
                 expect(eventsAPI).toHaveProperty("removeAllListeners");
             });

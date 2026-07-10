@@ -348,12 +348,8 @@ await eventBus.emitTyped("site:updated", {
  timestamp: Date.now(),
 });
 
-// Frontend handling via EventsService
-const cleanup = await EventsService.onSiteUpdated((data) => {
- // data is fully typed with automatic metadata
- console.log(`Site ${data.site.identifier} updated`, data._meta?.correlationId);
- handleSiteUpdate(data);
-});
+// Renderer state converges through one validated state-sync subscription.
+const cleanup = useSitesStore.getState().subscribeToSyncEvents();
 ```
 
 ### 🔧 Architecture Transformation

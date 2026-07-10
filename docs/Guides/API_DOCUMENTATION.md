@@ -55,66 +55,22 @@ Important channels:
 
 The renderer uses a dedicated Zustand store (`useSitesStore`) that consumes IPC-backed services (`SiteService`, `StateSyncService`, and others) and reacts to typed events. For a complete, up-to-date code sample, see the **Store Integration with Event Listeners** section later in this document.
 
-### Site lifecycle subscriptions via `EventsService`
+### Site lifecycle synchronization via `StateSyncService`
 
 ````markdown
-The renderer now exposes dedicated helpers for site lifecycle events. Using the
-service keeps cleanup logic consistent with other IPC subscriptions and avoids
-directly referencing `window.electronAPI` throughout the UI layer.
+The renderer consumes one validated state synchronization stream for site
+updates, deletions, and full snapshots. Application bootstrap owns this shared
+subscription so feature components do not install competing lifecycle
+listeners.
 
 ```typescript
-import { useEffect } from "react";
+import { useSitesStore } from "../stores/sites/useSitesStore";
 
-import { EventsService } from "../services/EventsService";
-import { useSitesStore } from "../stores/useSitesStore";
+const sitesStore = useSitesStore.getState();
+const disposeStateSync = sitesStore.subscribeToSyncEvents();
 
-export function useSiteLifecycleEvents(): void {
- const addSite = useSitesStore((state) => state.addSite);
- const updateSite = useSitesStore((state) => state.updateSite);
- const removeSite = useSitesStore((state) => state.removeSite);
-
- useEffect(() => {
-  const disposers: Array<() => void> = [];
-  let cancelled = false;
-
-  void EventsService.initialize()
-   .then(async () => {
-    if (cancelled) {
-     return;
-    }
-
-    disposers.push(
-     await EventsService.onSiteAdded(({ site }) => {
-      addSite(site);
-     }),
-     await EventsService.onSiteUpdated(({ site }) => {
-      updateSite(site.identifier, site);
-     }),
-     await EventsService.onSiteRemoved(({ siteIdentifier }) => {
-      removeSite(siteIdentifier);
-     })
-    );
-   })
-   .catch((error) => {
-    console.error("Failed to subscribe to site events", error);
-   });
-
-  return () => {
-   cancelled = true;
-   disposers.splice(0).forEach((dispose) => {
-    try {
-     dispose();
-    } catch (error) {
-     console.error("Failed to dispose site event handler", error);
-    }
-   });
-  };
- }, [
-  addSite,
-  updateSite,
-  removeSite,
- ]);
-}
+// Application teardown
+disposeStateSync();
 ```
 
 ```typescript

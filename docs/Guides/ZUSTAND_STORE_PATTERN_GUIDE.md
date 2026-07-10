@@ -245,41 +245,19 @@ export const useUIStore = create<UIStore>()((set, get) => ({
 
 ### Event-Driven Store Updates
 
-Both patterns integrate with the TypedEventBus for real-time updates:
+The application bootstrap owns the shared site synchronization subscription.
+Feature components should consume the store and must not create duplicate site
+lifecycle listeners:
 
 ```typescript
-// Event listener setup (usually in root component)
-import { EventsService } from "@app/services/EventsService";
+// src/app/bootstrap/appBootstrap.ts
+const sitesStore = useSitesStore.getState();
 
-export const useStoreEventListeners = () => {
- const sitesStore = useSitesStore();
- const settingsStore = useSettingsStore();
+cleanupRefs.syncEventsCleanupRef.current =
+ sitesStore.subscribeToSyncEvents();
 
- useEffect(() => {
-  let cleanupFunctions: Array<() => void> = [];
-
-  void (async () => {
-   cleanupFunctions = await Promise.all([
-    // Sites events
-    EventsService.onSiteAdded((data) => {
-     sitesStore.applySiteSnapshot(data.site);
-    }),
-    EventsService.onSiteRemoved((data) => {
-     sitesStore.removeSite(data.siteIdentifier);
-    }),
-    EventsService.onSiteUpdated((data) => {
-     sitesStore.applySiteSnapshot(data.site);
-    }),
-   ]);
-  })();
-
-  return () => {
-   cleanupFunctions.forEach((cleanup) => {
-    cleanup?.();
-   });
-  };
- }, []);
-};
+cleanupRefs.statusUpdatesCleanupRef.current =
+ sitesStore.subscribeToStatusUpdates();
 ```
 
 ### State Persistence Patterns

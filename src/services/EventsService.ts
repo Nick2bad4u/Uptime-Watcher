@@ -13,12 +13,9 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
-    MonitorDownEventData,
     MonitoringStartedEventData,
     MonitoringStoppedEventData,
     MonitorStatusChangedEventData,
-    MonitorUpEventData,
-    TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
 
@@ -40,15 +37,9 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
                         "onCacheInvalidated",
                         "onHistoryLimitUpdated",
                         "onMonitorCheckCompleted",
-                        "onMonitorDown",
                         "onMonitoringStarted",
                         "onMonitoringStopped",
                         "onMonitorStatusChanged",
-                        "onMonitorUp",
-                        "onSiteAdded",
-                        "onSiteRemoved",
-                        "onSiteUpdated",
-                        "onTestEvent",
                         "onUpdateStatus",
                     ],
                 },
@@ -59,9 +50,6 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
     }
 })();
 
-type SiteAddedEventData = RendererEventPayloadMap["site:added"];
-type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
-type SiteUpdatedEventData = RendererEventPayloadMap["site:updated"];
 type MonitorCheckCompletedEventPayload =
     RendererEventPayloadMap["monitor:check-completed"];
 type HistoryLimitUpdatedEventPayload =
@@ -97,9 +85,6 @@ interface EventsServiceContract {
     onMonitorCheckCompleted: (
         callback: (data: MonitorCheckCompletedEventPayload) => void
     ) => Promise<() => void>;
-    onMonitorDown: (
-        callback: (data: MonitorDownEventData) => void
-    ) => Promise<() => void>;
     onMonitoringStarted: (
         callback: (data: MonitoringStartedEventData) => void
     ) => Promise<() => void>;
@@ -108,21 +93,6 @@ interface EventsServiceContract {
     ) => Promise<() => void>;
     onMonitorStatusChanged: (
         callback: (update: MonitorStatusChangedEventData) => void
-    ) => Promise<() => void>;
-    onMonitorUp: (
-        callback: (data: MonitorUpEventData) => void
-    ) => Promise<() => void>;
-    onSiteAdded: (
-        callback: (data: SiteAddedEventData) => void
-    ) => Promise<() => void>;
-    onSiteRemoved: (
-        callback: (data: SiteRemovedEventData) => void
-    ) => Promise<() => void>;
-    onSiteUpdated: (
-        callback: (data: SiteUpdatedEventData) => void
-    ) => Promise<() => void>;
-    onTestEvent: (
-        callback: (data: TestEventData) => void
     ) => Promise<() => void>;
     onUpdateStatus: (
         callback: (data: UpdateStatusEventData) => void
@@ -215,37 +185,6 @@ export const EventsService: EventsServiceContract = {
             )
     ),
     /**
-     * Register a callback for monitor down events.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onMonitorDown((data) => {
-     *     logger.warn("Monitor down", {
-     *         monitorId: data.monitorId,
-     *         site: data.siteIdentifier,
-     *     });
-     * });
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function to invoke when a monitor is down.
-     *
-     * @returns A function to remove the listener.
-     *
-     * @throws If the electron API is unavailable.
-     */
-    onMonitorDown: wrap(
-        "onMonitorDown",
-        async (api, callback: (data: MonitorDownEventData) => void) =>
-            subscribeWithValidation("onMonitorDown", () =>
-                api.events.onMonitorDown(callback)
-            )
-    ),
-
-    /**
      * Register a callback for monitoring started events.
      *
      * @example
@@ -335,151 +274,6 @@ export const EventsService: EventsServiceContract = {
         ) =>
             subscribeWithValidation("onMonitorStatusChanged", () =>
                 api.events.onMonitorStatusChanged(callback)
-            )
-    ),
-
-    /**
-     * Register a callback for monitor up events.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onMonitorUp((data) => {
-     *     logger.info("Monitor up", {
-     *         monitorId: data.monitorId,
-     *         site: data.siteIdentifier,
-     *     });
-     * });
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function to invoke when a monitor is up.
-     *
-     * @returns A function to remove the listener.
-     *
-     * @throws If the electron API is unavailable.
-     */
-    onMonitorUp: wrap(
-        "onMonitorUp",
-        async (api, callback: (data: MonitorUpEventData) => void) =>
-            subscribeWithValidation("onMonitorUp", () =>
-                api.events.onMonitorUp(callback)
-            )
-    ),
-
-    /**
-     * Register a callback for site added events.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onSiteAdded(({ site }) => {
-     *     logger.info("New site registered", site.identifier);
-     * });
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function invoked whenever a sanitized site addition
-     *   event reaches the renderer.
-     *
-     * @returns A cleanup function that removes the listener.
-     */
-    onSiteAdded: wrap(
-        "onSiteAdded",
-        async (api, callback: (data: SiteAddedEventData) => void) =>
-            subscribeWithValidation("onSiteAdded", () =>
-                api.events.onSiteAdded(callback)
-            )
-    ),
-
-    /**
-     * Register a callback for site removal events.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onSiteRemoved((data) => {
-     *     logger.warn("Site removed", data.siteIdentifier);
-     * });
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function invoked with the removal payload whenever a
-     *   site is deleted.
-     *
-     * @returns A cleanup function that removes the listener.
-     */
-    onSiteRemoved: wrap(
-        "onSiteRemoved",
-        async (api, callback: (data: SiteRemovedEventData) => void) =>
-            subscribeWithValidation("onSiteRemoved", () =>
-                api.events.onSiteRemoved(callback)
-            )
-    ),
-
-    /**
-     * Register a callback for site updated events.
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onSiteUpdated(
-     *     ({ site, updatedFields }) => {
-     *         logger.debug("Site updated", {
-     *             id: site.identifier,
-     *             updatedFields,
-     *         });
-     *     }
-     * );
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function invoked when a site mutation is broadcast to
-     *   the renderer.
-     *
-     * @returns A cleanup function that removes the listener.
-     */
-    onSiteUpdated: wrap(
-        "onSiteUpdated",
-        async (api, callback: (data: SiteUpdatedEventData) => void) =>
-            subscribeWithValidation("onSiteUpdated", () =>
-                api.events.onSiteUpdated(callback)
-            )
-    ),
-
-    /**
-     * Register a callback for test events (development/debugging).
-     *
-     * @example
-     *
-     * ```typescript
-     * import { logger } from "@app/services/logger";
-     *
-     * const cleanup = await EventsService.onTestEvent((data) => {
-     *     logger.debug("Test event", data);
-     * });
-     * // Later: cleanup();
-     * ```
-     *
-     * @param callback - Function to invoke on test event.
-     *
-     * @returns A function to remove the listener.
-     *
-     * @throws If the electron API is unavailable.
-     */
-    onTestEvent: wrap(
-        "onTestEvent",
-        async (api, callback: (data: TestEventData) => void) =>
-            subscribeWithValidation("onTestEvent", () =>
-                api.events.onTestEvent(callback)
             )
     ),
 

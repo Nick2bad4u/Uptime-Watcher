@@ -72,15 +72,9 @@ const mockEventsService = {
     onCacheInvalidated: createSubscriptionMock(),
     onMonitorCheckCompleted: createSubscriptionMock(),
     onHistoryLimitUpdated: createSubscriptionMock(),
-    onMonitorDown: createSubscriptionMock(),
     onMonitoringStarted: createSubscriptionMock(),
     onMonitoringStopped: createSubscriptionMock(),
     onMonitorStatusChanged: createSubscriptionMock(),
-    onMonitorUp: createSubscriptionMock(),
-    onSiteAdded: createSubscriptionMock(),
-    onSiteRemoved: createSubscriptionMock(),
-    onSiteUpdated: createSubscriptionMock(),
-    onTestEvent: createSubscriptionMock(),
     onUpdateStatus: createSubscriptionMock(),
 };
 
@@ -150,17 +144,11 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
         onCacheInvalidated: hasEvents
             ? vi.fn((_callback: unknown) => noopCleanup)
             : vi.fn().mockReturnValue(noopCleanup),
-        onMonitorDown: vi.fn((_callback: unknown) => noopCleanup),
         onMonitorCheckCompleted: vi.fn((_callback: unknown) => noopCleanup),
         onHistoryLimitUpdated: vi.fn((_callback: unknown) => noopCleanup),
         onMonitoringStarted: vi.fn((_callback: unknown) => noopCleanup),
         onMonitoringStopped: vi.fn((_callback: unknown) => noopCleanup),
         onMonitorStatusChanged: vi.fn((_callback: unknown) => noopCleanup),
-        onMonitorUp: vi.fn((_callback: unknown) => noopCleanup),
-        onSiteAdded: vi.fn((_callback: unknown) => noopCleanup),
-        onSiteRemoved: vi.fn((_callback: unknown) => noopCleanup),
-        onSiteUpdated: vi.fn((_callback: unknown) => noopCleanup),
-        onTestEvent: vi.fn((_callback: unknown) => noopCleanup),
         onUpdateStatus: vi.fn((_callback: unknown) => noopCleanup),
         removeAllListeners: vi.fn(),
     },

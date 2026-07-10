@@ -16,17 +16,11 @@ import { describe, expect, it } from "vitest";
 const EXPECTED_CHANNEL_MAP = {
     CACHE_INVALIDATED: "cache:invalidated",
     MONITOR_CHECK_COMPLETED: "monitor:check-completed",
-    MONITOR_DOWN: "monitor:down",
     MONITOR_STATUS_CHANGED: "monitor:status-changed",
-    MONITOR_UP: "monitor:up",
     MONITORING_STARTED: "monitoring:started",
     MONITORING_STOPPED: "monitoring:stopped",
     SETTINGS_HISTORY_LIMIT_UPDATED: "settings:history-limit-updated",
-    SITE_ADDED: "site:added",
-    SITE_REMOVED: "site:removed",
-    SITE_UPDATED: "site:updated",
     STATE_SYNC: "state-sync-event",
-    TEST_EVENT: "test-event",
     UPDATE_STATUS: "update-status",
 } as const;
 

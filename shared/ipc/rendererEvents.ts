@@ -34,28 +34,16 @@ export const RENDERER_EVENT_CHANNELS = {
     CACHE_INVALIDATED: "cache:invalidated",
     /** Broadcast monitor check completion events. */
     MONITOR_CHECK_COMPLETED: "monitor:check-completed",
-    /** Broadcast monitor down events. */
-    MONITOR_DOWN: "monitor:down",
     /** Broadcast monitor status change events with enriched payloads. */
     MONITOR_STATUS_CHANGED: "monitor:status-changed",
-    /** Broadcast monitor up events. */
-    MONITOR_UP: "monitor:up",
     /** Broadcast monitoring lifecycle start events. */
     MONITORING_STARTED: "monitoring:started",
     /** Broadcast monitoring lifecycle stop events. */
     MONITORING_STOPPED: "monitoring:stopped",
     /** Broadcast history limit updates originating from the database. */
     SETTINGS_HISTORY_LIMIT_UPDATED: "settings:history-limit-updated",
-    /** Broadcast site added events. */
-    SITE_ADDED: "site:added",
-    /** Broadcast site removed events. */
-    SITE_REMOVED: "site:removed",
-    /** Broadcast site updated events. */
-    SITE_UPDATED: "site:updated",
     /** Broadcast incremental state synchronisation snapshots. */
     STATE_SYNC: "state-sync-event",
-    /** Broadcast development/test events. */
-    TEST_EVENT: "test-event",
     /** Broadcast auto-updater status transitions. */
     UPDATE_STATUS: "update-status",
 } as const;

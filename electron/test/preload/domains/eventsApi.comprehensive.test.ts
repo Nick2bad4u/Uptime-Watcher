@@ -8,11 +8,8 @@ import type {
     CacheInvalidatedEventData,
     HistoryLimitUpdatedEventData,
     MonitorCheckCompletedEventData,
-    MonitorDownEventData,
     MonitoringControlEventData,
     MonitorStatusChangedEventData,
-    MonitorUpEventData,
-    TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
 
@@ -110,17 +107,11 @@ describe("Events Domain API", () => {
         it("should expose all required event listener methods", () => {
             const expectedMethods = [
                 "onCacheInvalidated",
-                "onMonitorDown",
                 "onMonitorCheckCompleted",
                 "onHistoryLimitUpdated",
                 "onMonitoringStarted",
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
-                "onMonitorUp",
-                "onSiteAdded",
-                "onSiteRemoved",
-                "onSiteUpdated",
-                "onTestEvent",
                 "onUpdateStatus",
                 "removeAllListeners",
             ];
@@ -294,120 +285,6 @@ describe("Events Domain API", () => {
             expect(typeof cleanup2).toBe("function");
         });
     });
-
-    describe("onMonitorDown", () => {
-        it("should register event listener for monitor down events", () => {
-            const callback = vi.fn();
-
-            const cleanup = eventsApi.onMonitorDown(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "monitor:down",
-                expect.any(Function)
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should call callback with monitor down data", () => {
-            const callback = vi.fn();
-            const monitor = createMonitorFixture({
-                id: "test-monitor",
-                status: "down",
-            });
-            const site = createSiteFixture({
-                identifier: "test-site",
-                monitors: [monitor],
-            });
-            const mockEventData: MonitorDownEventData = {
-                details: "Synthetic outage detected",
-                monitor,
-                monitorId: monitor.id,
-                previousStatus: "up",
-                responseTime: monitor.responseTime,
-                site,
-                siteIdentifier: site.identifier,
-                status: "down",
-                timestamp: new Date().toISOString(),
-            };
-
-            eventsApi.onMonitorDown(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            const mockEvent = { sender: {} };
-            eventHandler?.(mockEvent, mockEventData);
-
-            expect(callback).toHaveBeenCalledWith(mockEventData);
-        });
-
-        it("should handle monitor down events with minimal data", () => {
-            const callback = vi.fn();
-            const monitor = createMonitorFixture({ id: "minimal-monitor" });
-            const site = createSiteFixture({
-                identifier: "site",
-                monitors: [monitor],
-            });
-            const mockEventData: MonitorDownEventData = {
-                monitor,
-                monitorId: monitor.id,
-                site,
-                siteIdentifier: site.identifier,
-                status: "down",
-                timestamp: new Date().toISOString(),
-            };
-
-            eventsApi.onMonitorDown(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, mockEventData);
-
-            expect(callback).toHaveBeenCalledWith(mockEventData);
-        });
-    });
-
-    describe("onMonitorUp", () => {
-        it("should register event listener for monitor up events", () => {
-            const callback = vi.fn();
-
-            const cleanup = eventsApi.onMonitorUp(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "monitor:up",
-                expect.any(Function)
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should call callback with monitor up data", () => {
-            const callback = vi.fn();
-            const monitor = createMonitorFixture({
-                id: "test-monitor",
-                status: "up",
-            });
-            const site = createSiteFixture({
-                identifier: "test-site",
-                monitors: [monitor],
-            });
-            const mockEventData: MonitorUpEventData = {
-                monitor,
-                monitorId: monitor.id,
-                previousStatus: "down",
-                responseTime: monitor.responseTime,
-                site,
-                siteIdentifier: site.identifier,
-                status: "up",
-                timestamp: new Date().toISOString(),
-            };
-
-            eventsApi.onMonitorUp(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            const mockEvent = { sender: {} };
-            eventHandler?.(mockEvent, mockEventData);
-
-            expect(callback).toHaveBeenCalledWith(mockEventData);
-        });
-    });
-
     describe("onMonitoringStarted and onMonitoringStopped", () => {
         it("should register listeners for monitoring control events", () => {
             const startCallback = vi.fn();
@@ -828,385 +705,6 @@ describe("Events Domain API", () => {
             );
         });
     });
-
-    describe("onSiteAdded", () => {
-        it("should register listener for site added events", () => {
-            const callback = vi.fn();
-            const site = createSiteFixture();
-            const payload = {
-                site,
-                source: "user" as const,
-                timestamp: Date.now(),
-            };
-
-            const cleanup = eventsApi.onSiteAdded(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "site:added",
-                expect.any(Function)
-            );
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            expect(callback).toHaveBeenCalledWith(payload);
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should normalize site added payloads without assigning to the original payload", () => {
-            const callback = vi.fn();
-            const site = createSiteFixture();
-            const timestamp = Date.now();
-            let siteSetterCalls = 0;
-            const payload = {
-                source: "user" as const,
-                timestamp,
-            } as Record<string, unknown>;
-
-            Object.defineProperty(payload, "site", {
-                configurable: true,
-                enumerable: true,
-                get: () => site,
-                set() {
-                    siteSetterCalls += 1;
-                    throw new Error("site setter should not run");
-                },
-            });
-
-            eventsApi.onSiteAdded(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            const received = callback.mock.calls[0]?.[0];
-            expect(siteSetterCalls).toBe(0);
-            expect(received).not.toBe(payload);
-            expect(received).toEqual({
-                site,
-                source: "user",
-                timestamp,
-            });
-        });
-
-        it("should reject malformed site added payloads", () => {
-            const callback = vi.fn();
-
-            eventsApi.onSiteAdded(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.(
-                {},
-                { site: {}, source: "invalid", timestamp: "bad" }
-            );
-
-            expect(callback).not.toHaveBeenCalled();
-            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
-                "[eventsApi] Dropped malformed payload for 'site:added'",
-                expect.objectContaining({
-                    guard: "isSiteAddedEventDataPayload",
-                    payloadType: "object",
-                })
-            );
-            expect(guardFailureSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    channel: "site:added",
-                    guard: "isSiteAddedEventDataPayload",
-                    reason: "payload-validation",
-                })
-            );
-        });
-    });
-
-    describe("onSiteRemoved", () => {
-        it("should register listener for site removed events", () => {
-            const callback = vi.fn();
-            const payload = {
-                cascade: false,
-                siteIdentifier: "site-abc",
-                siteName: "Example",
-                timestamp: Date.now(),
-            };
-
-            const cleanup = eventsApi.onSiteRemoved(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "site:removed",
-                expect.any(Function)
-            );
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            expect(callback).toHaveBeenCalledWith(payload);
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should strip unexpected site removed event fields", () => {
-            const callback = vi.fn();
-            const payload = {
-                cascade: false,
-                refreshToken: "secret-token",
-                siteIdentifier: "site-abc",
-                siteName: "Example",
-                timestamp: Date.now(),
-            };
-
-            eventsApi.onSiteRemoved(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            expect(callback).toHaveBeenCalledWith({
-                cascade: false,
-                siteIdentifier: "site-abc",
-                siteName: "Example",
-                timestamp: payload.timestamp,
-            });
-        });
-
-        it("should reject malformed site removed payloads", () => {
-            const callback = vi.fn();
-
-            eventsApi.onSiteRemoved(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, { cascade: "nope", timestamp: "invalid" });
-
-            expect(callback).not.toHaveBeenCalled();
-            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
-                "[eventsApi] Dropped malformed payload for 'site:removed'",
-                expect.objectContaining({
-                    guard: "isSiteRemovedEventDataPayload",
-                    payloadType: "object",
-                })
-            );
-            expect(guardFailureSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    channel: "site:removed",
-                    guard: "isSiteRemovedEventDataPayload",
-                    reason: "payload-validation",
-                })
-            );
-        });
-
-        it("should reject site removed payloads with invalid site fields", () => {
-            const callback = vi.fn();
-
-            eventsApi.onSiteRemoved(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.(
-                {},
-                {
-                    cascade: false,
-                    siteIdentifier: "site\nabc",
-                    siteName: "Example",
-                    timestamp: Date.now(),
-                }
-            );
-            eventHandler?.(
-                {},
-                {
-                    cascade: false,
-                    siteIdentifier: "site-abc",
-                    siteName: " ".repeat(3),
-                    timestamp: Date.now(),
-                }
-            );
-
-            expect(callback).not.toHaveBeenCalled();
-            expect(guardFailureSpy).toHaveBeenCalledTimes(2);
-            expect(guardFailureSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    channel: "site:removed",
-                    guard: "isSiteRemovedEventDataPayload",
-                    reason: "payload-validation",
-                })
-            );
-        });
-    });
-
-    describe("onSiteUpdated", () => {
-        it("should register listener for site updated events", () => {
-            const callback = vi.fn();
-            const previousSite = createSiteFixture({ name: "Old" });
-            const site = createSiteFixture({ name: "New" });
-            const payload = {
-                previousSite,
-                site,
-                timestamp: Date.now(),
-                updatedFields: ["name"],
-            };
-
-            const cleanup = eventsApi.onSiteUpdated(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "site:updated",
-                expect.any(Function)
-            );
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            expect(callback).toHaveBeenCalledWith(payload);
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should normalize site updated payloads without assigning to the original payload", () => {
-            const callback = vi.fn();
-            const previousSite = createSiteFixture({ name: "Old" });
-            const site = createSiteFixture({ name: "New" });
-            const timestamp = Date.now();
-            let setterCalls = 0;
-            const payload = {
-                timestamp,
-                updatedFields: ["name"],
-            } as Record<string, unknown>;
-
-            Object.defineProperty(payload, "previousSite", {
-                configurable: true,
-                enumerable: true,
-                get: () => previousSite,
-                set() {
-                    setterCalls += 1;
-                    throw new Error("previousSite setter should not run");
-                },
-            });
-            Object.defineProperty(payload, "site", {
-                configurable: true,
-                enumerable: true,
-                get: () => site,
-                set() {
-                    setterCalls += 1;
-                    throw new Error("site setter should not run");
-                },
-            });
-
-            eventsApi.onSiteUpdated(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, payload);
-
-            const received = callback.mock.calls[0]?.[0];
-            expect(setterCalls).toBe(0);
-            expect(received).not.toBe(payload);
-            expect(received).toEqual({
-                previousSite,
-                site,
-                timestamp,
-                updatedFields: ["name"],
-            });
-            expect(received.updatedFields).not.toBe(payload["updatedFields"]);
-        });
-
-        it("should reject malformed site updated payloads", () => {
-            const callback = vi.fn();
-
-            eventsApi.onSiteUpdated(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.(
-                {},
-                { previousSite: {}, site: {}, updatedFields: "oops" }
-            );
-
-            expect(callback).not.toHaveBeenCalled();
-            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
-                "[eventsApi] Dropped malformed payload for 'site:updated'",
-                expect.objectContaining({
-                    guard: "isSiteUpdatedEventDataPayload",
-                    payloadType: "object",
-                })
-            );
-            expect(guardFailureSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    channel: "site:updated",
-                    guard: "isSiteUpdatedEventDataPayload",
-                    reason: "payload-validation",
-                })
-            );
-        });
-    });
-
-    describe("onTestEvent", () => {
-        it("should register listener for test events", () => {
-            const callback = vi.fn();
-
-            const cleanup = eventsApi.onTestEvent(callback);
-
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "test-event",
-                expect.any(Function)
-            );
-            expect(typeof cleanup).toBe("function");
-        });
-
-        it("should handle test event data", () => {
-            const callback = vi.fn();
-            const mockEventData: TestEventData = {
-                message: "Test event triggered",
-                timestamp: Date.now(),
-                data: { someValue: 42 },
-            };
-
-            eventsApi.onTestEvent(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, mockEventData);
-
-            expect(callback).toHaveBeenCalledWith(mockEventData);
-        });
-
-        it("should handle null-prototype test event data", () => {
-            const callback = vi.fn();
-            const mockEventData = Object.assign(Object.create(null), {
-                message: "Test event triggered",
-                timestamp: Date.now(),
-            }) as TestEventData;
-
-            eventsApi.onTestEvent(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            eventHandler?.({}, mockEventData);
-
-            expect(callback).toHaveBeenCalledWith(mockEventData);
-        });
-
-        it("should drop exotic object test event data", () => {
-            for (const mockEventData of [
-                new Date(),
-                new Map<string, unknown>(),
-                Object.create({ inherited: true }) as Record<string, unknown>,
-            ]) {
-                mockIpcRenderer.on.mockClear();
-                diagnosticsWarnSpy.mockClear();
-                guardFailureSpy.mockClear();
-                const callback = vi.fn();
-
-                eventsApi.onTestEvent(callback);
-
-                const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-                eventHandler?.({}, mockEventData);
-
-                expect(callback).not.toHaveBeenCalled();
-                expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
-                    "[eventsApi] Dropped malformed payload for 'test-event'",
-                    expect.objectContaining({
-                        guard: "isTestEventDataPayload",
-                        payloadType: "object",
-                    })
-                );
-                expect(guardFailureSpy).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                        channel: "test-event",
-                        guard: "isTestEventDataPayload",
-                        reason: "payload-validation",
-                    })
-                );
-            }
-        });
-    });
-
     describe("onUpdateStatus", () => {
         it("should register listener for update status events", () => {
             const callback = vi.fn();
@@ -1291,17 +789,11 @@ describe("Events Domain API", () => {
             const cleanupHandlers: [string, unknown][] = [];
 
             eventsApi.onCacheInvalidated(() => {});
-            eventsApi.onMonitorDown(() => {});
             eventsApi.onMonitorCheckCompleted(() => {});
             eventsApi.onHistoryLimitUpdated(() => {});
             eventsApi.onMonitoringStarted(() => {});
             eventsApi.onMonitoringStopped(() => {});
             eventsApi.onMonitorStatusChanged(() => {});
-            eventsApi.onMonitorUp(() => {});
-            eventsApi.onSiteAdded(() => {});
-            eventsApi.onSiteRemoved(() => {});
-            eventsApi.onSiteUpdated(() => {});
-            eventsApi.onTestEvent(() => {});
             eventsApi.onUpdateStatus(() => {});
 
             // Capture handlers as they were registered.
@@ -1469,64 +961,6 @@ describe("Events Domain API", () => {
                 { numRuns: 10 }
             );
         });
-
-        it("should handle various event channels dynamically", () => {
-            const eventMethods = [
-                {
-                    method: eventsApi.onCacheInvalidated,
-                    channel: "cache:invalidated",
-                },
-                { method: eventsApi.onMonitorDown, channel: "monitor:down" },
-                { method: eventsApi.onMonitorUp, channel: "monitor:up" },
-                { method: eventsApi.onTestEvent, channel: "test-event" },
-            ];
-
-            fc.assert(
-                fc.property(
-                    fc.integer({ min: 0, max: eventMethods.length - 1 }),
-                    (index) => {
-                        const eventMethod = eventMethods[index];
-                        if (eventMethod) {
-                            const { method, channel } = eventMethod;
-                            const callback = vi.fn();
-
-                            method(callback);
-
-                            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                                channel,
-                                expect.any(Function)
-                            );
-                        }
-                    }
-                ),
-                { numRuns: 20 }
-            );
-        });
-
-        it("should handle event data with various timestamp values", () => {
-            fc.assert(
-                fc.property(
-                    fc.integer({ min: 0, max: Date.now() + 86_400_000 }), // Current time + 1 day
-                    (timestamp) => {
-                        const callback = vi.fn();
-                        const eventData = {
-                            message: "Test",
-                            timestamp,
-                            data: {},
-                        };
-
-                        eventsApi.onTestEvent(callback);
-
-                        const eventHandler =
-                            mockIpcRenderer.on.mock.calls.at(-1)?.[1];
-                        eventHandler?.({}, eventData);
-
-                        expect(callback).toHaveBeenCalledWith(eventData);
-                    }
-                ),
-                { numRuns: 15 }
-            );
-        });
     });
 
     describe("Integration and concurrency scenarios", () => {
@@ -1551,12 +985,12 @@ describe("Events Domain API", () => {
 
         it("should handle mixed event types simultaneously", () => {
             const cacheCallback = vi.fn();
-            const monitorCallback = vi.fn();
-            const testCallback = vi.fn();
+            const statusCallback = vi.fn();
+            const updateCallback = vi.fn();
 
             eventsApi.onCacheInvalidated(cacheCallback);
-            eventsApi.onMonitorDown(monitorCallback);
-            eventsApi.onTestEvent(testCallback);
+            eventsApi.onMonitorStatusChanged(statusCallback);
+            eventsApi.onUpdateStatus(updateCallback);
 
             expect(mockIpcRenderer.on).toHaveBeenCalledTimes(3);
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
@@ -1564,11 +998,11 @@ describe("Events Domain API", () => {
                 expect.any(Function)
             );
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "monitor:down",
+                "monitor:status-changed",
                 expect.any(Function)
             );
             expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "test-event",
+                "update-status",
                 expect.any(Function)
             );
         });
@@ -1578,7 +1012,7 @@ describe("Events Domain API", () => {
 
             // Register and immediately cleanup
             for (const callback of callbacks) {
-                const cleanup = eventsApi.onTestEvent(callback);
+                const cleanup = eventsApi.onCacheInvalidated(callback);
                 cleanup();
             }
 
@@ -1591,7 +1025,7 @@ describe("Events Domain API", () => {
             const callback2 = vi.fn();
 
             const cleanup1 = eventsApi.onCacheInvalidated(callback1);
-            const cleanup2 = eventsApi.onMonitorDown(callback2);
+            const cleanup2 = eventsApi.onMonitorStatusChanged(callback2);
 
             const monitor = createMonitorFixture({ id: "monitor" });
             const site = createSiteFixture({
@@ -1640,13 +1074,21 @@ describe("Events Domain API", () => {
                 throw new Error("Callback error");
             });
 
-            eventsApi.onTestEvent(throwingCallback);
+            eventsApi.onCacheInvalidated(throwingCallback);
 
             const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
 
             // Should not throw when calling the event handler
             expect(() => {
-                eventHandler?.({}, { message: "test", timestamp: Date.now() });
+                eventHandler?.(
+                    {},
+                    {
+                        identifier: "site-123",
+                        reason: "update",
+                        timestamp: Date.now(),
+                        type: "site",
+                    }
+                );
             }).not.toThrow();
 
             expect(throwingCallback).toHaveBeenCalled();
@@ -1655,23 +1097,23 @@ describe("Events Domain API", () => {
         it("should handle undefined event data", () => {
             const callback = vi.fn();
 
-            eventsApi.onTestEvent(callback);
+            eventsApi.onCacheInvalidated(callback);
 
             const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
             eventHandler?.({}, undefined);
 
             expect(callback).not.toHaveBeenCalled();
             expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
-                "[eventsApi] Dropped malformed payload for 'test-event'",
+                "[eventsApi] Dropped malformed payload for 'cache:invalidated'",
                 expect.objectContaining({
-                    guard: expect.stringContaining("isTestEventDataPayload"),
+                    guard: "isCacheInvalidatedEventDataPayload",
                     payloadType: "undefined",
                 })
             );
             expect(guardFailureSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    channel: "test-event",
-                    guard: expect.stringContaining("isTestEventDataPayload"),
+                    channel: "cache:invalidated",
+                    guard: "isCacheInvalidatedEventDataPayload",
                 })
             );
         });
@@ -1770,7 +1212,7 @@ describe("Events Domain API", () => {
         it("should handle cleanup function called multiple times", () => {
             const callback = vi.fn();
 
-            const cleanup = eventsApi.onTestEvent(callback);
+            const cleanup = eventsApi.onCacheInvalidated(callback);
 
             cleanup();
             cleanup(); // Should not error on second call
@@ -1778,22 +1220,6 @@ describe("Events Domain API", () => {
 
             // Should only remove listener once per actual registration
             expect(mockIpcRenderer.removeListener).toHaveBeenCalledTimes(1);
-        });
-
-        it("should handle event data with circular references", () => {
-            const callback = vi.fn();
-            const circularData: Record<string, unknown> = { message: "test" };
-            circularData["self"] = circularData; // Create circular reference
-
-            eventsApi.onTestEvent(callback);
-
-            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-
-            expect(() => {
-                eventHandler?.({}, circularData);
-            }).not.toThrow();
-
-            expect(callback).toHaveBeenCalledWith(circularData);
         });
     });
 
@@ -1807,22 +1233,11 @@ describe("Events Domain API", () => {
                 api.onCacheInvalidated((data: CacheInvalidatedEventData) => {
                     expect(typeof data.type).toBe("string");
                 }),
-                api.onMonitorDown((data: MonitorDownEventData) => {
-                    expect(typeof data.siteIdentifier).toBe("string");
-                    expect(data.status).toBe("down");
-                }),
-                api.onMonitorUp((data: MonitorUpEventData) => {
-                    expect(typeof data.siteIdentifier).toBe("string");
-                    expect(data.status).toBe("up");
-                }),
                 api.onMonitorStatusChanged(
                     (data: MonitorStatusChangedEventData) => {
                         expect(typeof data.siteIdentifier).toBe("string");
                     }
                 ),
-                api.onTestEvent((data: TestEventData) => {
-                    expect(typeof data["message"]).toBe("string");
-                }),
                 api.onUpdateStatus((data: UpdateStatusEventData) => {
                     expect(typeof data.status).toBe("string");
                 }),
@@ -1836,7 +1251,7 @@ describe("Events Domain API", () => {
 
         it("should return proper cleanup function types", () => {
             const callback = vi.fn();
-            const cleanup = eventsApi.onTestEvent(callback);
+            const cleanup = eventsApi.onCacheInvalidated(callback);
 
             // Should be a function that returns void
             const result = cleanup();
@@ -1844,12 +1259,12 @@ describe("Events Domain API", () => {
         });
 
         it("should handle function context properly", () => {
-            const { onTestEvent, removeAllListeners } = eventsApi;
+            const { onCacheInvalidated, removeAllListeners } = eventsApi;
             const callback = vi.fn();
 
             // Destructured functions should work correctly
             expect(() => {
-                const cleanup = onTestEvent(callback);
+                const cleanup = onCacheInvalidated(callback);
                 removeAllListeners();
                 cleanup();
             }).not.toThrow();

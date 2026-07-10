@@ -135,7 +135,7 @@ describe("logTemplates behavior", () => {
                 expect(
                     DEBUG_LOGS.APPLICATION_FORWARDING_MONITOR_STATUS
                 ).toContain("[ApplicationService]");
-                expect(DEBUG_LOGS.APPLICATION_FORWARDING_MONITOR_UP).toContain(
+                expect(DEBUG_LOGS.APPLICATION_MONITOR_RECOVERED).toContain(
                     "[ApplicationService]"
                 );
                 expect(
@@ -241,13 +241,13 @@ describe("logTemplates behavior", () => {
                     ERROR_LOGS.APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR
                 ).toContain("[ApplicationService]");
                 expect(
-                    ERROR_LOGS.APPLICATION_FORWARD_MONITOR_DOWN_ERROR
+                    ERROR_LOGS.APPLICATION_HANDLE_MONITOR_DOWN_ERROR
                 ).toContain("[ApplicationService]");
                 expect(
                     ERROR_LOGS.APPLICATION_FORWARD_MONITOR_STATUS_ERROR
                 ).toContain("[ApplicationService]");
                 expect(
-                    ERROR_LOGS.APPLICATION_FORWARD_MONITOR_UP_ERROR
+                    ERROR_LOGS.APPLICATION_HANDLE_MONITOR_UP_ERROR
                 ).toContain("[ApplicationService]");
                 expect(ERROR_LOGS.APPLICATION_INITIALIZATION_ERROR).toContain(
                     "[ApplicationService]"
@@ -342,7 +342,7 @@ describe("logTemplates behavior", () => {
 
         describe("WARNING_LOGS", () => {
             it("should contain application warning templates", () => {
-                expect(WARNING_LOGS.APPLICATION_MONITOR_DOWN).toContain(
+                expect(WARNING_LOGS.APPLICATION_MONITOR_FAILURE).toContain(
                     "[ApplicationService]"
                 );
             });

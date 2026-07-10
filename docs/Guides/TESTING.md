@@ -141,7 +141,6 @@ const mockElectronAPI = {
   getAll: vi.fn(),
  },
  events: {
-  onSiteUpdated: vi.fn(),
   onMonitorStatusChanged: vi.fn(),
   onCacheInvalidated: vi.fn(),
   onStateSyncEvent: vi.fn(),
@@ -218,13 +217,13 @@ describe("EventsService", () => {
  it("should register event listeners", async () => {
   const callback = vi.fn();
   const cleanup = vi.fn();
-  window.electronAPI.events.onSiteUpdated.mockReturnValue(cleanup);
+  window.electronAPI.events.onMonitorStatusChanged.mockReturnValue(cleanup);
 
-  const result = await EventsService.onSiteUpdated(callback);
+  const result = await EventsService.onMonitorStatusChanged(callback);
 
-  expect(window.electronAPI.events.onSiteUpdated).toHaveBeenCalledWith(
-   callback
-  );
+  expect(
+   window.electronAPI.events.onMonitorStatusChanged
+  ).toHaveBeenCalledWith(callback);
   expect(result).toBe(cleanup);
  });
 });

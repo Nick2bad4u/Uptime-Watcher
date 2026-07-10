@@ -141,7 +141,7 @@ Event contracts are defined in `@shared/types/events.ts` to ensure type safety b
 ### Core Event Types
 
 ```typescript
-import type { RendererEventPayloadMap } from "@shared/types/events";
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 
 // Canonical renderer event payloads are keyed by IPC channel:
 type StateSyncEventData = RendererEventPayloadMap["state-sync-event"];
@@ -150,9 +150,11 @@ type CacheInvalidatedEventData = RendererEventPayloadMap["cache:invalidated"];
 // Monitor status events reuse the shared StatusUpdate payload.
 type MonitorStatusChangedEventData =
  RendererEventPayloadMap["monitor:status-changed"];
-type MonitorUpEventData = RendererEventPayloadMap["monitor:up"];
-type MonitorDownEventData = RendererEventPayloadMap["monitor:down"];
 ```
+
+`monitor:up`, `monitor:down`, and site lifecycle events remain internal main-process
+events. The renderer receives the consolidated `monitor:status-changed` event and
+the validated `state-sync-event` stream instead of parallel lifecycle channels.
 
 ### Base Event Interface
 
@@ -163,9 +165,9 @@ interface BaseEventData {
  timestamp: number; // Unix timestamp when event occurred
 }
 
-// Note: not every renderer event uses BaseEventData. Status events such as
-// `monitor:status-changed`/`monitor:up`/`monitor:down` reuse `StatusUpdate`
-// instead (`StatusUpdate.timestamp` is an ISO string).
+// Note: not every renderer event uses BaseEventData. The
+// `monitor:status-changed` channel reuses `StatusUpdate` instead
+// (`StatusUpdate.timestamp` is an ISO string).
 ```
 
 ## EventsService Integration
@@ -188,18 +190,10 @@ await Promise.all([EventsService.initialize(), StateSyncService.initialize()]);
 // Register event listeners with automatic cleanup
 const cleanupFunctions: (() => void)[] = [];
 
-// Monitor status events
+// Monitor status changes include up/down transitions
 cleanupFunctions.push(
- await EventsService.onMonitorUp((data) => {
-  console.log(
-   `Monitor ${data.monitorId} is up - Response time: ${data.responseTime}ms`
-  );
- })
-);
-
-cleanupFunctions.push(
- await EventsService.onMonitorDown((data) => {
-  console.error(`Monitor ${data.monitorId} is down - Error: ${data.error}`);
+ await EventsService.onMonitorStatusChanged((data) => {
+  console.log(`Monitor ${data.monitorId} is ${data.status}`);
  })
 );
 
@@ -240,41 +234,30 @@ const cleanup = () => {
 ```typescript
 import { useEffect, useState } from "react";
 import { EventsService } from "@/services/EventsService";
-import type {
- MonitorUpEventData,
- MonitorDownEventData,
-} from "@shared/types/events";
+import type { MonitorStatus } from "@shared/types";
+import type { MonitorStatusChangedEventData } from "@shared/types/events";
 
 interface MonitorStatusProps {
  monitorId: string;
 }
 
 export const MonitorStatus: React.FC<MonitorStatusProps> = ({ monitorId }) => {
- const [status, setStatus] = useState<"up" | "down" | "unknown">("unknown");
- const [lastUpdate, setLastUpdate] = useState<number | null>(null);
+ const [status, setStatus] = useState<MonitorStatus | "unknown">("unknown");
+ const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
  useEffect(() => {
   const cleanupFunctions: (() => void)[] = [];
 
   const setupEventListeners = async () => {
-   // Monitor up events
    cleanupFunctions.push(
-    await EventsService.onMonitorUp((data: MonitorUpEventData) => {
-     if (data.monitorId === monitorId) {
-      setStatus("up");
-      setLastUpdate(data.timestamp);
+    await EventsService.onMonitorStatusChanged(
+     (data: MonitorStatusChangedEventData) => {
+      if (data.monitorId === monitorId) {
+       setStatus(data.status);
+       setLastUpdate(data.timestamp);
+      }
      }
-    })
-   );
-
-   // Monitor down events
-   cleanupFunctions.push(
-    await EventsService.onMonitorDown((data: MonitorDownEventData) => {
-     if (data.monitorId === monitorId) {
-      setStatus("down");
-      setLastUpdate(data.timestamp);
-     }
-    })
+    )
    );
   };
 
@@ -525,13 +508,16 @@ eventBus.onTyped("site:updated", async (data) => {
 Always clean up event listeners:
 
 ```typescript
+import { EventsService } from "@/services/EventsService";
+import { StateSyncService } from "@/services/StateSyncService";
+
 // React component
 useEffect(() => {
  const cleanupFunctions: (() => void)[] = [];
 
  const setupListeners = async () => {
   cleanupFunctions.push(
-   await EventsService.onSiteUpdated(handleSiteUpdate),
+   await StateSyncService.onStateSyncEvent(handleStateSync),
    await EventsService.onMonitorStatusChanged(handleMonitorStatus)
   );
  };
@@ -635,7 +621,6 @@ import { EventsService } from "@/services/EventsService";
 // Mock electron API
 const mockElectronAPI = {
  events: {
-  onSiteUpdated: vi.fn(),
   onMonitorStatusChanged: vi.fn(),
   onCacheInvalidated: vi.fn(),
  },
@@ -652,18 +637,20 @@ describe("EventsService", () => {
 
  it("should register event listeners", async () => {
   const callback = vi.fn();
-  mockElectronAPI.events.onSiteUpdated.mockReturnValue(() => {});
+  mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(() => {});
 
-  await EventsService.onSiteUpdated(callback);
+  await EventsService.onMonitorStatusChanged(callback);
 
-  expect(mockElectronAPI.events.onSiteUpdated).toHaveBeenCalledWith(callback);
+  expect(mockElectronAPI.events.onMonitorStatusChanged).toHaveBeenCalledWith(
+   callback
+  );
  });
 
  it("should return cleanup function", async () => {
   const cleanup = vi.fn();
-  mockElectronAPI.events.onSiteUpdated.mockReturnValue(cleanup);
+  mockElectronAPI.events.onMonitorStatusChanged.mockReturnValue(cleanup);
 
-  const result = await EventsService.onSiteUpdated(() => {});
+  const result = await EventsService.onMonitorStatusChanged(() => {});
 
   expect(result).toBe(cleanup);
  });

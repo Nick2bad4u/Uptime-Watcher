@@ -542,12 +542,10 @@ await this.eventBus.emitTyped("site:added", {
  timestamp: Date.now(),
 });
 
-import { EventsService } from "@app/services/EventsService";
+import { useSitesStore } from "@app/stores/sites/useSitesStore";
 
-// Frontend listens for event
-const cleanup = await EventsService.onSiteAdded((data) => {
- sitesStore.addSite(data.site);
-});
+// Renderer bootstrap subscribes once to the validated state-sync stream.
+const cleanup = useSitesStore.getState().subscribeToSyncEvents();
 ```
 
 ### 3. Cleanup Pattern

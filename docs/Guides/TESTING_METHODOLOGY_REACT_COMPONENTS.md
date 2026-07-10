@@ -55,8 +55,6 @@ const mockElectronAPI = {
  },
  events: {
   onMonitorStatusChanged: vi.fn(() => () => {}),
-  onMonitorUp: vi.fn(() => () => {}),
-  onMonitorDown: vi.fn(() => () => {}),
   onCacheInvalidated: vi.fn(() => () => {}),
  },
  system: {
@@ -173,8 +171,6 @@ import { EventsService } from "../services/EventsService";
 vi.mock("../services/EventsService", () => ({
  EventsService: {
   onMonitorStatusChanged: vi.fn(() => vi.fn()), // Returns cleanup function
-  onMonitorUp: vi.fn(() => vi.fn()),
-  onMonitorDown: vi.fn(() => vi.fn()),
   onCacheInvalidated: vi.fn(() => vi.fn()),
  },
 }));
@@ -185,8 +181,6 @@ describe("Event Integration", () => {
 
   await waitFor(() => {
    expect(EventsService.onMonitorStatusChanged).toHaveBeenCalled();
-   expect(EventsService.onMonitorUp).toHaveBeenCalled();
-   expect(EventsService.onMonitorDown).toHaveBeenCalled();
   });
  });
 
@@ -329,8 +323,6 @@ const mockElectronAPI = {
  },
  events: {
   onMonitorStatusChanged: vi.fn(() => () => {}),
-  onMonitorUp: vi.fn(() => () => {}),
-  onMonitorDown: vi.fn(() => () => {}),
   onCacheInvalidated: vi.fn(() => () => {}),
  },
 };

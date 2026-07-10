@@ -64,14 +64,8 @@
 | `cache:invalidated`              | Events emitted on the `cache:invalidated` channel.              | `RendererEventPayloadMap["cache:invalidated"]`              |
 | `settings:history-limit-updated` | Events emitted on the `settings:history-limit-updated` channel. | `RendererEventPayloadMap["settings:history-limit-updated"]` |
 | `monitor:check-completed`        | Events emitted on the `monitor:check-completed` channel.        | `RendererEventPayloadMap["monitor:check-completed"]`        |
-| `monitor:down`                   | Events emitted on the `monitor:down` channel.                   | `RendererEventPayloadMap["monitor:down"]`                   |
 | `monitoring:started`             | Events emitted on the `monitoring:started` channel.             | `RendererEventPayloadMap["monitoring:started"]`             |
 | `monitoring:stopped`             | Events emitted on the `monitoring:stopped` channel.             | `RendererEventPayloadMap["monitoring:stopped"]`             |
 | `monitor:status-changed`         | Events emitted on the `monitor:status-changed` channel.         | `RendererEventPayloadMap["monitor:status-changed"]`         |
-| `monitor:up`                     | Events emitted on the `monitor:up` channel.                     | `RendererEventPayloadMap["monitor:up"]`                     |
-| `site:added`                     | Events emitted on the `site:added` channel.                     | `RendererEventPayloadMap["site:added"]`                     |
-| `site:removed`                   | Events emitted on the `site:removed` channel.                   | `RendererEventPayloadMap["site:removed"]`                   |
-| `site:updated`                   | Events emitted on the `site:updated` channel.                   | `RendererEventPayloadMap["site:updated"]`                   |
 | `state-sync-event`               | Events emitted on the `state-sync-event` channel.               | `RendererEventPayloadMap["state-sync-event"]`               |
-| `test-event`                     | Events emitted on the `test-event` channel.                     | `RendererEventPayloadMap["test-event"]`                     |
 | `update-status`                  | Events emitted on the `update-status` channel.                  | `RendererEventPayloadMap["update-status"]`                  |
