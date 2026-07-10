@@ -189,7 +189,7 @@ interface CacheItemInput<TValue, TKey extends string> {
  * - Bulk operations
  */
 export class StandardizedCache<TValue = unknown, TKey extends string = string> {
-    private readonly cache = new Map<TKey, CacheEntry<TValue>>();
+    private cache = new Map<TKey, CacheEntry<TValue>>();
 
     private readonly config: {
         enableStats: boolean;
@@ -271,23 +271,48 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Replace all cache entries atomically.
      *
      * @remarks
-     * Clears existing entries before applying the supplied items via
-     * {@link bulkUpdate}. When the incoming items array is empty the cache emits
-     * both the standard `internal:cache:cleared` event and an
-     * `internal:cache:bulk-updated` event (with `itemCount: 0`) to keep
-     * downstream telemetry consistent with the refresh contract.
+     * Builds the complete replacement before swapping the live cache. If the
+     * iterable or one of its entries throws, the existing cache remains
+     * unchanged and no replacement events or invalidation callbacks run. An
+     * empty replacement still emits both the standard `internal:cache:cleared`
+     * event and an `internal:cache:bulk-updated` event (with `itemCount: 0`) to
+     * keep downstream telemetry consistent with the refresh contract.
      */
     public replaceAll(items: Iterable<CacheItemInput<TValue, TKey>>): void {
-        this.clear();
+        const replacement = new Map<TKey, CacheEntry<TValue>>();
+        let itemCount = 0;
 
-        const entries = [...items];
+        for (const item of items) {
+            const { data, key, ttl } = item;
 
-        if (isEmpty(entries)) {
-            this.emitEvent("internal:cache:bulk-updated", { itemCount: 0 });
-            return;
+            if (
+                this.config.maxSize <= replacement.size &&
+                !replacement.has(key)
+            ) {
+                const oldestKey = this.findLruKey(replacement);
+                if (isDefined(oldestKey)) {
+                    replacement.delete(oldestKey);
+                }
+            }
+
+            replacement.set(key, this.createEntry(data, ttl));
+            itemCount++;
         }
 
-        this.bulkUpdate(entries);
+        const previousSize = this.cache.size;
+        this.cache = replacement;
+        this.updateSize();
+
+        logger.debug("Cache replaced", {
+            cacheName: this.config.name,
+            itemCount,
+            replacedItemCount: previousSize,
+        });
+        this.emitEvent("internal:cache:cleared", { itemCount: previousSize });
+        if (previousSize > 0) {
+            this.notifyInvalidation();
+        }
+        this.emitEvent("internal:cache:bulk-updated", { itemCount });
     }
 
     /**
@@ -620,19 +645,9 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Evict least recently used item.
      */
     private evictLRU(): void {
-        let oldestKey: TKey | undefined;
-        let oldestTime = Number.POSITIVE_INFINITY;
+        const oldestKey = this.findLruKey(this.cache);
 
-        for (const [key, entry] of this.cache) {
-            if (entry.timestamp >= oldestTime) {
-                continue;
-            }
-
-            oldestTime = entry.timestamp;
-            oldestKey = key;
-        }
-
-        if (oldestKey) {
+        if (isDefined(oldestKey)) {
             this.cache.delete(oldestKey);
             this.updateSize();
             logger.debug("Cache LRU item evicted", {
@@ -645,6 +660,24 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             });
             this.notifyInvalidation(oldestKey);
         }
+    }
+
+    private findLruKey(
+        cache: ReadonlyMap<TKey, CacheEntry<TValue>>
+    ): TKey | undefined {
+        let oldestKey: TKey | undefined;
+        let oldestTime = Number.POSITIVE_INFINITY;
+
+        for (const [key, entry] of cache) {
+            if (entry.timestamp >= oldestTime) {
+                continue;
+            }
+
+            oldestTime = entry.timestamp;
+            oldestKey = key;
+        }
+
+        return oldestKey;
     }
 
     /**
@@ -729,17 +762,9 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             this.evictLRU();
         }
 
-        const now = Date.now();
         const requestedTTL = ttl ?? this.config.ttl;
 
-        const entry: CacheEntry<TValue> = {
-            data,
-            hits: 0,
-            timestamp: now,
-            ...(requestedTTL > 0 && { expiresAt: now + requestedTTL }),
-        };
-
-        this.cache.set(key, entry);
+        this.cache.set(key, this.createEntry(data, ttl));
         this.updateSize();
 
         if (options?.logAction ?? true) {
@@ -757,5 +782,17 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
                 ...(requestedTTL > 0 && { ttl: requestedTTL }),
             });
         }
+    }
+
+    private createEntry(data: TValue, ttl?: number): CacheEntry<TValue> {
+        const now = Date.now();
+        const requestedTTL = ttl ?? this.config.ttl;
+
+        return {
+            data,
+            hits: 0,
+            timestamp: now,
+            ...(requestedTTL > 0 && { expiresAt: now + requestedTTL }),
+        };
     }
 }

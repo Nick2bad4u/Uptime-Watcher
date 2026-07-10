@@ -722,9 +722,11 @@ describe(SiteManager, () => {
         });
         it("should handle initialization errors", async () => {
             // Mock an error in the initialization process
-            vi.spyOn(manager["sitesCache"], "clear").mockImplementation(() => {
-                throw new Error("Cache initialization failed");
-            });
+            vi.spyOn(manager["sitesCache"], "replaceAll").mockImplementation(
+                () => {
+                    throw new Error("Cache initialization failed");
+                }
+            );
             await expect(manager.initialize()).rejects.toThrow(
                 "Cache initialization failed"
             );

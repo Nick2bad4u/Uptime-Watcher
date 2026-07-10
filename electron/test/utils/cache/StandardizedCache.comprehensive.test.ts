@@ -495,6 +495,28 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.has("key3")).toBeTruthy();
         });
 
+        it("should evict an empty-string key when it is least recently used", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const smallCache = new StandardizedCache({
+                name: "small-cache",
+                maxSize: 1,
+            });
+
+            smallCache.set("", "oldest");
+            smallCache.set("replacement", "current");
+
+            expect(smallCache.size).toBe(1);
+            expect(smallCache.has("")).toBeFalsy();
+            expect(smallCache.get("replacement")).toBe("current");
+        });
+
         it("should handle eviction when cache is empty", async ({
             task,
             annotate,
@@ -769,8 +791,13 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             const clearedSpy = vi.fn();
             const bulkSpy = vi.fn();
+            let keysObservedDuringInvalidation: string[] = [];
+            const invalidationSpy = vi.fn(() => {
+                keysObservedDuringInvalidation = cache.keys();
+            });
             eventBus.on("internal:cache:cleared", clearedSpy);
             eventBus.on("internal:cache:bulk-updated", bulkSpy);
+            cache.onInvalidation(invalidationSpy);
 
             cache.replaceAll([
                 { key: "key1", data: "value1" },
@@ -796,6 +823,78 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("old-key")).toBeUndefined();
             expect(cache.get("key1")).toBe("value1");
             expect(cache.get("key2")).toBe("value2");
+            expect(keysObservedDuringInvalidation).toEqual(["key1", "key2"]);
+        });
+
+        it("should preserve entries when a replaceAll iterable throws", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            cache.set("old-key", "current");
+
+            const clearedSpy = vi.fn();
+            const bulkSpy = vi.fn();
+            const invalidationSpy = vi.fn();
+            eventBus.on("internal:cache:cleared", clearedSpy);
+            eventBus.on("internal:cache:bulk-updated", bulkSpy);
+            cache.onInvalidation(invalidationSpy);
+
+            function* throwingItems(): Generator<{
+                data: string;
+                key: string;
+            }> {
+                yield { key: "new-key", data: "staged" };
+                throw new Error("replacement failed");
+            }
+
+            expect(() => cache.replaceAll(throwingItems())).toThrow(
+                "replacement failed"
+            );
+
+            await flushMicrotasks();
+
+            expect(cache.size).toBe(1);
+            expect(cache.get("old-key")).toBe("current");
+            expect(cache.get("new-key")).toBeUndefined();
+            expect(clearedSpy).not.toHaveBeenCalled();
+            expect(bulkSpy).not.toHaveBeenCalled();
+            expect(invalidationSpy).not.toHaveBeenCalled();
+        });
+
+        it("should preserve entries when a replaceAll item cannot be read", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            cache.set("old-key", "current");
+
+            const unreadableItem = {
+                get data(): string {
+                    throw new Error("entry cannot be read");
+                },
+                key: "unreadable-key",
+            };
+
+            expect(() =>
+                cache.replaceAll([
+                    { key: "new-key", data: "staged" },
+                    unreadableItem,
+                ])
+            ).toThrow("entry cannot be read");
+
+            expect(cache.size).toBe(1);
+            expect(cache.get("old-key")).toBe("current");
+            expect(cache.get("new-key")).toBeUndefined();
+            expect(cache.get("unreadable-key")).toBeUndefined();
         });
 
         it("should emit bulk-updated event with zero count on empty replaceAll", async ({
