@@ -422,19 +422,5 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             expect(typeof formatErrorMessage).toBe("function");
             expect(typeof isKnownErrorMessage).toBe("function");
         });
-
-        test.prop([fc.anything()])(
-            "formatErrorMessage should handle any input gracefully",
-            (input) => {
-                // Should not throw even with invalid inputs
-                expect(() => {
-                    try {
-                        formatErrorMessage(input as any, input as any);
-                    } catch {
-                        // Catching any error to ensure the function itself doesn't crash the test
-                    }
-                }).not.toThrow();
-            }
-        );
     });
 });

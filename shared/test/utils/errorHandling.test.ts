@@ -283,7 +283,7 @@ describe("Error Handling Utils", () => {
             originalError.stack = "original stack trace";
             const operation = vi.fn().mockRejectedValue(originalError);
 
-            let caughtError: any;
+            let caughtError: unknown;
             try {
                 await withErrorHandling(operation, mockBackendContext);
             } catch (error) {
@@ -291,9 +291,11 @@ describe("Error Handling Utils", () => {
             }
 
             expect(caughtError).toBe(originalError);
-            expect(caughtError.message).toBe("Type error");
-            expect(caughtError.stack).toBe("original stack trace");
-            expect(caughtError instanceof TypeError).toBeTruthy();
+            expect(caughtError).toBeInstanceOf(TypeError);
+            expect(caughtError).toMatchObject({
+                message: "Type error",
+                stack: "original stack trace",
+            });
         });
     });
 

@@ -50,11 +50,7 @@ const toProcessSnapshotForTesting = (
 };
 
 describe("environment comprehensive fuzzing tests", () => {
-    // Use a broad type here so our synthetic assignments to `globalThis.process`
-    // in the various fuzzed scenarios do not fight with Node's evolving
-    // Process type surface. The tests only care about a handful of fields
-    // (env, version, versions, etc.), not the full EventEmitter interface.
-    let originalProcess: any = process;
+    let originalProcess: NodeJS.Process = process;
     let originalWindow: typeof globalThis.window = globalThis.window;
     let originalDocument: typeof globalThis.document = globalThis.document;
 

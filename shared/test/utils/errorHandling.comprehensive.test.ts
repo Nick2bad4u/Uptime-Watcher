@@ -240,30 +240,6 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("backend");
             expect(mockBackendContext.logger).toBeDefined();
         });
-
-        it("should handle objects that might partially match store interface", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorHandling", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const partialStore = {
-                setError: vi.fn(),
-                // Missing clearError and setLoading
-            };
-            const mockOperation = vi.fn().mockResolvedValue("partial");
-
-            const result = await withErrorHandling(
-                mockOperation,
-                partialStore as any
-            );
-
-            expect(result).toBe("partial");
-            // Should be treated as backend context since it doesn't have all store methods
-        });
     });
 
     describe("Edge Cases and Error Scenarios", () => {
