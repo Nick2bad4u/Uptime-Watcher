@@ -6,22 +6,30 @@ import type { Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MonitorManager } from "../../managers/MonitorManager";
+import type { EnhancedMonitoringServices } from "../../services/monitoring/EnhancedMonitoringServiceFactory";
+
+import {
+    MonitorManager,
+    type MonitorManagerDependencies,
+} from "../../managers/MonitorManager";
 
 // Hoist the mock function to avoid initialization issues
 const mockInterpolateLogTemplate = vi.hoisted(() =>
-    vi.fn((template: string, params: any) => {
+    vi.fn((template: unknown, params: unknown) => {
         // Simulate the interval interpolation used by production log templates.
         if (
-            template &&
-            typeof template === "string" &&
-            template.includes("interval") &&
-            params &&
-            params.interval !== undefined
+            typeof template !== "string" ||
+            typeof params !== "object" ||
+            params === null
         ) {
-            return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
+            return typeof template === "string" ? template : "";
         }
-        return template || "";
+
+        const interval = Reflect.get(params, "interval");
+        if (template.includes("interval") && interval !== undefined) {
+            return `Applied interval for monitor ${String(Reflect.get(params, "monitorId"))}: ${String(interval)}s`;
+        }
+        return template;
     })
 );
 
@@ -56,98 +64,87 @@ vi.mock("../../../shared/utils/logger", () => ({
     default: mockLogger,
 }));
 
+const createMockDependencies = () => {
+    const updateInternal = vi.fn().mockResolvedValue({});
+
+    return {
+        cache: {
+            delete: vi.fn(),
+            get: vi.fn(),
+            set: vi.fn(),
+        },
+        databaseService: {
+            executeTransaction: vi
+                .fn()
+                .mockImplementation(
+                    async (
+                        handler: (
+                            db: Record<string, unknown>
+                        ) => Promise<unknown> | unknown
+                    ) => handler({})
+                ),
+            getDatabase: vi.fn().mockReturnValue({}),
+        },
+        eventEmitter: {
+            emitTyped: vi.fn(),
+            onTyped: vi.fn(),
+        },
+        getSitesCache: vi.fn().mockReturnValue({
+            delete: vi.fn(),
+            get: vi.fn(),
+            set: vi.fn(),
+        }),
+        historyRepository: {},
+        monitorRepository: {
+            findMonitorsBySiteId: vi.fn().mockResolvedValue([]),
+            updateMonitor: vi.fn().mockResolvedValue({}),
+        },
+        repositories: {
+            monitor: {
+                createTransactionAdapter: vi
+                    .fn()
+                    .mockImplementation((database: unknown) => ({
+                        update: vi.fn((id: string, changes: unknown) =>
+                            updateInternal(database, id, changes)
+                        ),
+                    })),
+                updateInternal,
+            },
+        },
+        siteRepository: {
+            findAllSites: vi.fn().mockResolvedValue([]),
+        },
+    };
+};
+
+const createMockEnhancedServices = () => ({
+    enhancedMonitorChecker: {
+        executeOperation: vi.fn().mockResolvedValue({}),
+    },
+    enhancedScheduler: {
+        isMonitorActive: vi.fn().mockReturnValue(false),
+        startMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
+    },
+});
+
+type MockDependencies = ReturnType<typeof createMockDependencies>;
+type MockEnhancedServices = ReturnType<typeof createMockEnhancedServices>;
+
 describe("MonitorManager interval logging", () => {
     let manager: MonitorManager;
-    let mockDependencies: any;
-    let mockEnhancedServices: any;
+    let mockDependencies: MockDependencies;
+    let mockEnhancedServices: MockEnhancedServices;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockDependencies = createMockDependencies();
+        mockEnhancedServices = createMockEnhancedServices();
 
-        // Reset template interpolation mock to return the seconds value.
-        mockInterpolateLogTemplate.mockImplementation(
-            (template: string, params: any) => {
-                if (
-                    template &&
-                    typeof template === "string" &&
-                    template.includes("interval") &&
-                    params &&
-                    params.interval !== undefined
-                ) {
-                    return `Applied interval for monitor ${params.monitorId}: ${params.interval}s`;
-                }
-                return template || "";
-            }
+        manager = new MonitorManager(
+            mockDependencies as unknown as MonitorManagerDependencies,
+            mockEnhancedServices as unknown as EnhancedMonitoringServices
         );
-
-        mockDependencies = {
-            eventEmitter: {
-                emitTyped: vi.fn(),
-                onTyped: vi.fn(),
-            },
-            siteRepository: {
-                findAllSites: vi.fn().mockResolvedValue([]),
-            },
-            monitorRepository: {
-                findMonitorsBySiteId: vi.fn().mockResolvedValue([]),
-                updateMonitor: vi.fn().mockResolvedValue({}),
-            },
-            historyRepository: {},
-            databaseService: {
-                executeTransaction: vi
-                    .fn()
-                    .mockImplementation(
-                        async (
-                            handler: (
-                                db: Record<string, unknown>
-                            ) => Promise<unknown> | unknown
-                        ) => {
-                            const db = {} as Record<string, unknown>;
-                            return handler(db);
-                        }
-                    ),
-                getDatabase: vi.fn().mockReturnValue({}),
-            },
-            cache: {
-                set: vi.fn(),
-                get: vi.fn(),
-                delete: vi.fn(),
-            },
-            repositories: {
-                monitor: {
-                    updateInternal: vi.fn().mockResolvedValue({}),
-                    createTransactionAdapter: vi
-                        .fn()
-                        .mockImplementation((db: unknown) => ({
-                            update: vi.fn((id: string, changes: unknown) =>
-                                mockDependencies.repositories.monitor.updateInternal(
-                                    db,
-                                    id,
-                                    changes
-                                )
-                            ),
-                        })),
-                },
-            },
-            getSitesCache: vi.fn().mockReturnValue({
-                get: vi.fn(),
-                set: vi.fn(),
-                delete: vi.fn(),
-            }),
-        };
-
-        mockEnhancedServices = {
-            enhancedMonitorChecker: {
-                executeOperation: vi.fn().mockResolvedValue({}),
-            },
-            enhancedScheduler: {
-                isMonitorActive: vi.fn().mockReturnValue(false),
-                startMonitoring: vi.fn().mockResolvedValue(true),
-                stopMonitoring: vi.fn().mockResolvedValue(true),
-            },
-        };
-
-        manager = new MonitorManager(mockDependencies, mockEnhancedServices);
     });
 
     describe("DEFAULT_CHECK_INTERVAL seconds conversion", () => {
@@ -280,7 +277,16 @@ describe("MonitorManager interval logging", () => {
             );
 
             expect(intervalCall).toBeDefined();
-            const loggedInterval = intervalCall![1].interval;
+            const interpolationParams = intervalCall?.[1];
+            const loggedInterval =
+                typeof interpolationParams === "object" &&
+                interpolationParams !== null
+                    ? Reflect.get(interpolationParams, "interval")
+                    : undefined;
+            expect(loggedInterval).toBeTypeOf("number");
+            if (typeof loggedInterval !== "number") {
+                throw new TypeError("Logged interval must be numeric");
+            }
 
             // The interval should be in a reasonable range for seconds (1-3600)
             expect(loggedInterval).toBeGreaterThan(0);
