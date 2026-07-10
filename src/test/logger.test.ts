@@ -30,7 +30,7 @@ vi.mock("electron-log/renderer", () => ({
 const stringifyMockCalls = (calls: unknown): string => JSON.stringify(calls);
 
 describe("Frontend Logger Service", () => {
-    let logger: any;
+    let logger: (typeof import("../services/logger"))["logger"];
 
     beforeEach(() => {
         vi.clearAllMocks();
