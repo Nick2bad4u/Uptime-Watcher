@@ -2,10 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { SiteCardMetrics } from "../components/Dashboard/SiteCard/SiteCardMetrics";
+import type { MetricCardProperties } from "../components/Dashboard/SiteCard/components/MetricCard";
+import type { TooltipProperties } from "../components/common/Tooltip/Tooltip";
 
 // Mock MetricCard to isolate SiteCardMetrics logic
 vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
-    MetricCard: ({ label, value }: any) => (
+    MetricCard: ({ label, value }: MetricCardProperties) => (
         <div data-label={label} data-testid="metric-card" data-value={value}>
             {label}:{value}
         </div>
@@ -14,7 +16,7 @@ vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
 
 // Simplify Tooltip behaviour for deterministic rendering
 vi.mock("../components/common/Tooltip/Tooltip", () => ({
-    Tooltip: ({ children }: any) => (
+    Tooltip: ({ children }: TooltipProperties) => (
         <div data-testid="tooltip-wrapper">
             {typeof children === "function" ? children({}) : children}
         </div>

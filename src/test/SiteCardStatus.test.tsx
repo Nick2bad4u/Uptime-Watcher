@@ -2,10 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { SiteCardStatus } from "../components/Dashboard/SiteCard/SiteCardStatus";
+import type { StatusBadgeProperties } from "../components/common/StatusBadge";
 
 // Mock StatusBadge to isolate SiteCardStatus logic
 vi.mock("../components/common/StatusBadge", () => ({
-    StatusBadge: (props: any) => (
+    StatusBadge: (props: StatusBadgeProperties) => (
         <div
             data-label={props.label}
             data-size={props.size}
