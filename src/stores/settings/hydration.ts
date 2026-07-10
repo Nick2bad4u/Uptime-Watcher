@@ -20,19 +20,21 @@ const hasOwn = <T extends object>(
 // Store timer reference for cleanup capability.
 // Use a const ref object to avoid top-level `let` while still allowing
 // deterministic cleanup in tests.
-const settingsSyncTimer: {
+const settingsSyncState: {
+    generation: number;
     current: null | ReturnType<typeof setTimeout>;
 } = {
     current: null,
+    generation: 0,
 };
 
 function resetSettingsHydrationTimer(): void {
-    if (!settingsSyncTimer.current) {
+    if (!settingsSyncState.current) {
         return;
     }
 
-    clearTimeout(settingsSyncTimer.current);
-    settingsSyncTimer.current = null;
+    clearTimeout(settingsSyncState.current);
+    settingsSyncState.current = null;
 }
 
 /**
@@ -41,6 +43,10 @@ function resetSettingsHydrationTimer(): void {
 export const syncSettingsAfterRehydration = (
     state: SettingsStore | undefined
 ): void => {
+    settingsSyncState.generation += 1;
+    const generation = settingsSyncState.generation;
+    resetSettingsHydrationTimer();
+
     if (!state?.settings) {
         return;
     }
@@ -86,9 +92,11 @@ export const syncSettingsAfterRehydration = (
         return;
     }
 
-    resetSettingsHydrationTimer();
+    const timer = setTimeout(() => {
+        if (settingsSyncState.current === timer) {
+            settingsSyncState.current = null;
+        }
 
-    settingsSyncTimer.current = setTimeout(() => {
         fireAndForget(
             async () => {
                 try {
@@ -97,6 +105,9 @@ export const syncSettingsAfterRehydration = (
                     );
                     const historyLimit =
                         await SettingsService.getHistoryLimit();
+                    if (generation !== settingsSyncState.generation) {
+                        return;
+                    }
                     logger.debug(
                         "[SettingsHydration] applying backend history limit",
                         {
@@ -105,6 +116,9 @@ export const syncSettingsAfterRehydration = (
                     );
                     state.updateSettings({ historyLimit });
                 } catch (error) {
+                    if (generation !== settingsSyncState.generation) {
+                        return;
+                    }
                     logger.warn(
                         "Failed to sync settings after rehydration:",
                         ensureError(error)
@@ -118,8 +132,6 @@ export const syncSettingsAfterRehydration = (
                     state.updateSettings({
                         historyLimit: defaultSettings.historyLimit,
                     });
-                } finally {
-                    settingsSyncTimer.current = null;
                 }
             },
             {
@@ -132,4 +144,5 @@ export const syncSettingsAfterRehydration = (
             }
         );
     }, UI_DELAYS.STATE_UPDATE_DEFER);
+    settingsSyncState.current = timer;
 };
