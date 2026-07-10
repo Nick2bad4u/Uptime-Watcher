@@ -20,11 +20,9 @@ permissions:
     contents: "read"
 jobs:
     bump-version:
-        name: "Validate release version and create tag"
+        name: "Validate release version and signing credentials"
         runs-on: "ubuntu-latest"
         timeout-minutes: 15
-        permissions:
-            contents: "write"
         defaults:
             run:
                 shell: "bash"
@@ -141,14 +139,6 @@ jobs:
                     printf '::error::Official releases require configured signing secrets: %s\n' "${missing_secrets[*]}"
                     exit 1
                   fi
-
-            - name: "Create and push tag for new version"
-              id: "tag_version"
-              shell: "bash"
-              run: |
-                  set -euo pipefail
-                  git tag -a "v${{ steps.validate_release.outputs.new_version }}" -m "Release v${{ steps.validate_release.outputs.new_version }}"
-                  git push origin "v${{ steps.validate_release.outputs.new_version }}"
 
     build:
         name: "Build release artifacts"
@@ -528,26 +518,28 @@ jobs:
               id: "previous_tag"
               shell: "bash"
               run: |
+                  set -euo pipefail
                   git fetch --tags --force
-                  current_tag="v${{ needs.bump-version.outputs.new_version }}"
-                  prev_tag=$(git describe --tags --match "v*" --abbrev=0 "${current_tag}^" 2>/dev/null || true)
+                  release_sha="${{ needs.bump-version.outputs.bump_sha }}"
+                  prev_tag=$(git describe --tags --match "v*" --abbrev=0 "${release_sha}^" 2>/dev/null || true)
                   echo "previous_tag=${prev_tag}" >> "$GITHUB_OUTPUT"
 
             - name: "Generate release notes since previous tag"
               id: "release_notes_full"
               shell: "bash"
               run: |
+                  set -euo pipefail
                   git fetch --tags --force
-                  current_tag="v${{ needs.bump-version.outputs.new_version }}"
+                  release_sha="${{ needs.bump-version.outputs.bump_sha }}"
                   prev_tag="${{ steps.previous_tag.outputs.previous_tag }}"
 
                   if [ -n "$prev_tag" ]; then
-                    range_spec="${prev_tag}..${current_tag}"
+                    range_spec="${prev_tag}..${release_sha}"
                   else
-                    range_spec="${current_tag}"
+                    range_spec="${release_sha}"
                   fi
 
-                  notes=$(git log $range_spec --pretty=format:"- %s%n  - Author: %an <%ae>%n  - Commit: [%h](https://github.com/${{ github.repository }}/commit/%H)%n  - Date: %ad%n" --date=short)
+                  notes=$(git log "$range_spec" --pretty=format:"- %s%n  - Author: %an <%ae>%n  - Commit: [%h](https://github.com/${{ github.repository }}/commit/%H)%n  - Date: %ad%n" --date=short)
                   if [ -z "$notes" ]; then
                     notes="No commits found for range ${range_spec}"
                   fi
@@ -1011,6 +1003,26 @@ jobs:
                   done <<< "$duplicates"
 
                   exit 1
+
+            - name: "Create and push annotated release tag"
+              id: "tag_version"
+              shell: "bash"
+              run: |
+                  set -euo pipefail
+
+                  tag_name="v${{ needs.bump-version.outputs.new_version }}"
+                  release_sha="${{ needs.bump-version.outputs.bump_sha }}"
+
+                  git fetch --tags --force
+                  if git rev-parse --verify --quiet "refs/tags/${tag_name}" >/dev/null; then
+                    echo "::error::Tag ${tag_name} was created while release artifacts were building. Refusing to overwrite it."
+                    exit 1
+                  fi
+
+                  git -c user.name="github-actions[bot]" \
+                    -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+                    tag -a "$tag_name" -m "Release ${tag_name}" "$release_sha"
+                  git push origin "refs/tags/${tag_name}:refs/tags/${tag_name}"
 
             - name: "Create or update release with distributable builds"
               id: "release"
