@@ -7,6 +7,7 @@ import type { StatusUpdateMonitorCheckResult } from "../../../services/monitorin
 
 import { performCorrelatedCheck } from "../../../services/monitoring/enhancedMonitorChecker/performCorrelatedCheck";
 import { performManualCheckOperation } from "../../../services/monitoring/enhancedMonitorChecker/performManualCheck";
+import { stopMonitoringOperation } from "../../../services/monitoring/enhancedMonitorChecker/toggleMonitoring";
 
 interface Deferred<T> {
     readonly promise: Promise<T>;
@@ -79,6 +80,7 @@ function createCorrelatedCheckArgs(
             .fn()
             .mockResolvedValue(createCheckResult(monitor.id)),
         handleSuccessfulCheck: vi.fn().mockResolvedValue(undefined),
+        isOperationValid: vi.fn().mockReturnValue(true),
         logger: createLogger(),
         monitor,
         monitorId: monitor.id,
@@ -133,6 +135,7 @@ describe(performCorrelatedCheck, () => {
             cleanupFailedOperation: vi.fn().mockResolvedValue(undefined),
             executeMonitorCheck: vi.fn().mockResolvedValue(checkResult),
             handleSuccessfulCheck: vi.fn().mockResolvedValue(undefined),
+            isOperationValid: vi.fn().mockReturnValue(true),
             logger,
             monitor,
             monitorId: monitor.id,
@@ -179,6 +182,63 @@ describe(performCorrelatedCheck, () => {
         );
     });
 
+    it("fences stop persistence behind an in-flight correlated check", async () => {
+        const monitor = createMonitor("monitor-stop-fence");
+        const checkStarted = createDeferred<undefined>();
+        const releaseCheck = createDeferred<StatusUpdateMonitorCheckResult>();
+        let isOperationValid = true;
+        const saveHistoryEntry = vi.fn().mockResolvedValue(undefined);
+        const updateMonitorStatus = vi.fn().mockResolvedValue(true);
+        const cleanupFailedOperation = vi.fn().mockResolvedValue(undefined);
+        const correlatedCheck = performCorrelatedCheck(
+            createCorrelatedCheckArgs(monitor, {
+                cleanupFailedOperation,
+                executeMonitorCheck: vi.fn(async () => {
+                    checkStarted.resolve(undefined);
+                    return releaseCheck.promise;
+                }),
+                isOperationValid: vi.fn(() => isOperationValid),
+                saveHistoryEntry,
+                updateMonitorStatus,
+            })
+        );
+        await checkStarted.promise;
+
+        const update = vi.fn().mockResolvedValue(undefined);
+        const stop = stopMonitoringOperation({
+            dependencies: {
+                eventEmitter: {
+                    emitTyped: vi.fn().mockResolvedValue(undefined),
+                } as never,
+                monitorRepository: { update } as never,
+                operationRegistry: {
+                    cancelOperations: vi.fn(() => {
+                        isOperationValid = false;
+                    }),
+                } as never,
+            },
+            monitorId: monitor.id,
+            siteIdentifier: "site-1",
+        });
+
+        expect(update).not.toHaveBeenCalled();
+
+        releaseCheck.resolve(createCheckResult(monitor.id));
+        await correlatedCheck;
+        await expect(stop).resolves.toBeTruthy();
+
+        expect(saveHistoryEntry).not.toHaveBeenCalled();
+        expect(updateMonitorStatus).not.toHaveBeenCalled();
+        expect(cleanupFailedOperation).toHaveBeenCalledWith(
+            monitor.id,
+            `operation-${monitor.id}`
+        );
+        expect(update).toHaveBeenCalledWith(monitor.id, {
+            activeOperations: [],
+            monitoring: false,
+        });
+    });
+
     it("waits for a same-monitor correlated check before manual side effects", async () => {
         const monitor = createMonitor("monitor-exclusive");
         const correlatedStarted = createDeferred<undefined>();
@@ -210,7 +270,10 @@ describe(performCorrelatedCheck, () => {
 
         const manualPromise = performManualCheckOperation({
             config: {
-                monitorRepository: { clearActiveOperations } as never,
+                monitorRepository: {
+                    clearActiveOperations,
+                    findByIdentifier: vi.fn().mockResolvedValue(monitor),
+                } as never,
                 operationRegistry: { cancelOperations } as never,
             },
             monitor,
@@ -260,6 +323,7 @@ describe(performCorrelatedCheck, () => {
             config: {
                 monitorRepository: {
                     clearActiveOperations: vi.fn(),
+                    findByIdentifier: vi.fn().mockResolvedValue(manualMonitor),
                 } as never,
                 operationRegistry: { cancelOperations: vi.fn() } as never,
             },
@@ -317,6 +381,7 @@ describe(performCorrelatedCheck, () => {
                         clearActiveOperations: vi
                             .fn()
                             .mockRejectedValue(setupError),
+                        findByIdentifier: vi.fn().mockResolvedValue(monitor),
                     } as never,
                     operationRegistry: {
                         cancelOperations: vi.fn(),
@@ -341,6 +406,7 @@ describe(performCorrelatedCheck, () => {
                         clearActiveOperations: vi
                             .fn()
                             .mockResolvedValue(undefined),
+                        findByIdentifier: vi.fn().mockResolvedValue(monitor),
                     } as never,
                     operationRegistry: {
                         cancelOperations: vi.fn(),

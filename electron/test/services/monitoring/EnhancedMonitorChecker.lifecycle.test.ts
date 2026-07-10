@@ -83,8 +83,9 @@ const createOperationRegistryMock = () =>
             .mockReturnValue(false),
         initiateCheck:
             vi.fn<CheckerConfig["operationRegistry"]["initiateCheck"]>(),
-        validateOperation:
-            vi.fn<CheckerConfig["operationRegistry"]["validateOperation"]>(),
+        validateOperation: vi
+            .fn<CheckerConfig["operationRegistry"]["validateOperation"]>()
+            .mockReturnValue(true),
     }) satisfies Partial<CheckerConfig["operationRegistry"]>;
 
 const createTimeoutManagerMock = () =>
@@ -276,6 +277,29 @@ describe("EnhancedMonitorChecker lifecycle behavior", () => {
                 mockMonitorRepository.clearActiveOperations
             ).toHaveBeenCalledWith("monitor-1");
             expect(mockMonitorRepository.update).toHaveBeenCalled();
+        });
+
+        it("should discard a manual result when the monitor was deleted", async () => {
+            mockMonitorRepository.findByIdentifier.mockResolvedValue(undefined);
+            mockHttpMonitorService.check.mockResolvedValue({
+                details: "Check successful",
+                responseTime: 200,
+                status: "up",
+            });
+
+            const result = await enhancedChecker.checkMonitor(
+                mockSite,
+                "monitor-1",
+                true
+            );
+
+            expect(result).toBeUndefined();
+            expect(mockHistoryRepository.addEntry).not.toHaveBeenCalled();
+            expect(mockMonitorRepository.update).not.toHaveBeenCalled();
+            expect(mockEventBus.emitTyped).not.toHaveBeenCalledWith(
+                "monitor:status-changed",
+                expect.anything()
+            );
         });
 
         it("should abort manual checks after the monitor timeout", async ({

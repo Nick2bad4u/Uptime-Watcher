@@ -26,6 +26,7 @@ import { toggleMonitoringForSiteOperation } from "../../managers/monitorManager/
 import {
     startAllMonitoringEnhancedFlow,
     startMonitoringForSiteEnhancedFlow,
+    stopMonitoringForSiteEnhancedFlow,
 } from "../../managers/MonitorManagerEnhancedLifecycle";
 import { monitorLogger } from "../../utils/logger";
 import {
@@ -260,6 +261,81 @@ describe("monitorManager helper operations", () => {
         expect(monitorScheduler.startMonitor).not.toHaveBeenCalled();
 
         warnSpy.mockRestore();
+    });
+
+    it("stops the scheduler before waiting for checker shutdown", async () => {
+        const site = createTestSite("s1", {
+            monitors: [createTestMonitor("m1")],
+        });
+        const { checker, config, host, monitorScheduler } =
+            createLifecycleHarness(site);
+        const order: string[] = [];
+        monitorScheduler.stopMonitor.mockImplementation(() => {
+            order.push("scheduler");
+            return true;
+        });
+        checker.stopMonitoring.mockImplementation(async () => {
+            order.push("checker");
+            return true;
+        });
+
+        await expect(
+            stopMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier: "s1",
+                monitorId: "m1",
+            })
+        ).resolves.toBeTruthy();
+
+        expect(order).toEqual(["scheduler", "checker"]);
+    });
+
+    it("restores scheduling when checker shutdown fails", async () => {
+        const site = createTestSite("s1", {
+            monitors: [createTestMonitor("m1")],
+        });
+        const { checker, config, host, monitorScheduler } =
+            createLifecycleHarness(site);
+        checker.stopMonitoring.mockResolvedValue(false);
+
+        await expect(
+            stopMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier: "s1",
+                monitorId: "m1",
+            })
+        ).resolves.toBeFalsy();
+
+        expect(monitorScheduler.stopMonitor).toHaveBeenCalledWith("s1", "m1");
+        expect(monitorScheduler.startMonitor).toHaveBeenCalledWith(
+            "s1",
+            site.monitors[0]
+        );
+    });
+
+    it("restores scheduling when checker shutdown throws", async () => {
+        const site = createTestSite("s1", {
+            monitors: [createTestMonitor("m1")],
+        });
+        const { checker, config, host, monitorScheduler } =
+            createLifecycleHarness(site);
+        checker.stopMonitoring.mockRejectedValue(new Error("shutdown failed"));
+
+        await expect(
+            stopMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier: "s1",
+                monitorId: "m1",
+            })
+        ).resolves.toBeFalsy();
+
+        expect(monitorScheduler.startMonitor).toHaveBeenCalledWith(
+            "s1",
+            site.monitors[0]
+        );
     });
 
     it("handleScheduledCheckOperation warns when site is missing", async () => {

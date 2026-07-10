@@ -183,6 +183,9 @@ describe(EnhancedMonitorChecker, () => {
         fixture.eventEmitter.onTyped("internal:monitor:started", (event) => {
             startedEvents.push(event);
         });
+        fixture.monitorRepositoryMock.findByIdentifier.mockResolvedValue(
+            createTestMonitor()
+        );
 
         const isResult = await checker.startMonitoring(
             "test-site-1",

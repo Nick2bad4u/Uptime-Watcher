@@ -674,7 +674,14 @@ describe("monitorManagerEnhancedLifecycle", () => {
 
             expect(result).toBeFalsy();
             expect(harness.applyMonitorState).not.toHaveBeenCalled();
-            expect(harness.scheduler.stopMonitor).not.toHaveBeenCalled();
+            expect(harness.scheduler.stopMonitor).toHaveBeenCalledWith(
+                "nu",
+                "busy"
+            );
+            expect(harness.scheduler.startMonitor).toHaveBeenCalledWith(
+                "nu",
+                monitor
+            );
         });
 
         it("handles checker exceptions while continuing evaluation", async () => {
@@ -701,6 +708,10 @@ describe("monitorManagerEnhancedLifecycle", () => {
                     kind: "stop",
                     monitorId: "errant",
                 }
+            );
+            expect(harness.scheduler.startMonitor).toHaveBeenCalledWith(
+                "omicron",
+                monitor
             );
         });
 

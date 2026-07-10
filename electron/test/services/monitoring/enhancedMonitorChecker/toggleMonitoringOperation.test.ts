@@ -4,6 +4,7 @@ import {
     startMonitoringOperation,
     stopMonitoringOperation,
 } from "../../../../services/monitoring/enhancedMonitorChecker/toggleMonitoring";
+import { blockMonitorChecks } from "../../../../services/monitoring/MonitorExecutionFence";
 
 type ToggleMonitoringDependencies = Parameters<
     typeof startMonitoringOperation
@@ -33,7 +34,12 @@ describe("toggleMonitoring operations", () => {
         const update = vi.fn().mockResolvedValue(undefined);
         const dependencies = {
             eventEmitter: { emitTyped },
-            monitorRepository: { update },
+            monitorRepository: {
+                findByIdentifier: vi
+                    .fn()
+                    .mockResolvedValue({ id: rawMonitorId }),
+                update,
+            },
             operationRegistry: { cancelOperations: vi.fn() },
         } as unknown as ToggleMonitoringDependencies;
 
@@ -88,5 +94,56 @@ describe("toggleMonitoring operations", () => {
         expect(logPayload).toContain("https://monitor.example/check");
         expect(logPayload).not.toContain("monitor-token");
         expect(logPayload).not.toContain("private-monitor");
+    });
+
+    it("allows lifecycle persistence through a deletion check block", async () => {
+        const update = vi.fn().mockResolvedValue(undefined);
+        const dependencies = {
+            eventEmitter: { emitTyped: vi.fn().mockResolvedValue(undefined) },
+            monitorRepository: { update },
+            operationRegistry: { cancelOperations: vi.fn() },
+        } as unknown as ToggleMonitoringDependencies;
+        const releaseBlock = blockMonitorChecks(["monitor-1"]);
+
+        try {
+            await expect(
+                stopMonitoringOperation({
+                    dependencies,
+                    monitorId: "monitor-1",
+                    siteIdentifier: "site-1",
+                })
+            ).resolves.toBeTruthy();
+        } finally {
+            releaseBlock();
+        }
+
+        expect(update).toHaveBeenCalledWith("monitor-1", {
+            activeOperations: [],
+            monitoring: false,
+        });
+    });
+
+    it("rejects a queued start after deletion releases its block", async () => {
+        const findByIdentifier = vi.fn().mockResolvedValue(undefined);
+        const update = vi.fn().mockResolvedValue(undefined);
+        const dependencies = {
+            eventEmitter: { emitTyped: vi.fn().mockResolvedValue(undefined) },
+            monitorRepository: { findByIdentifier, update },
+            operationRegistry: { cancelOperations: vi.fn() },
+        } as unknown as ToggleMonitoringDependencies;
+        const releaseBlock = blockMonitorChecks(["monitor-1"]);
+
+        const start = startMonitoringOperation({
+            dependencies,
+            monitorId: "monitor-1",
+            siteIdentifier: "site-1",
+        });
+        await Promise.resolve();
+        expect(findByIdentifier).not.toHaveBeenCalled();
+
+        releaseBlock();
+        await expect(start).resolves.toBeFalsy();
+        expect(findByIdentifier).toHaveBeenCalledWith("monitor-1");
+        expect(update).not.toHaveBeenCalled();
     });
 });

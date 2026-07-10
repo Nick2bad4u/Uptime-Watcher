@@ -509,6 +509,8 @@ export class EnhancedMonitorChecker {
             ...(externalSignal && { externalSignal }),
             handleSuccessfulCheck: (siteArg, monitorArg, checkResult) =>
                 this.handleSuccessfulCheck(siteArg, monitorArg, checkResult),
+            isOperationValid: (operationId) =>
+                this.config.operationRegistry.validateOperation(operationId),
             logger,
             monitor,
             monitorId,

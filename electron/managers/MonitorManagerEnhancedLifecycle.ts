@@ -119,12 +119,27 @@ const toggleSingleMonitorEnhanced = async (args: {
         site,
     } = args;
 
-    const isCheckerResult =
-        kind === "start"
-            ? await services.checker.startMonitoring(identifier, monitorId)
-            : await services.checker.stopMonitoring(identifier, monitorId);
+    const wasScheduled =
+        kind === "stop"
+            ? config.monitorScheduler.stopMonitor(identifier, monitorId)
+            : false;
+    let isCheckerResult: boolean;
+    try {
+        isCheckerResult =
+            kind === "start"
+                ? await services.checker.startMonitoring(identifier, monitorId)
+                : await services.checker.stopMonitoring(identifier, monitorId);
+    } catch (error) {
+        if (wasScheduled) {
+            config.monitorScheduler.startMonitor(identifier, monitor);
+        }
+        throw error;
+    }
 
     if (!isCheckerResult) {
+        if (wasScheduled) {
+            config.monitorScheduler.startMonitor(identifier, monitor);
+        }
         return false;
     }
 
@@ -149,7 +164,7 @@ const toggleSingleMonitorEnhanced = async (args: {
 
     return kind === "start"
         ? config.monitorScheduler.startMonitor(identifier, monitor)
-        : config.monitorScheduler.stopMonitor(identifier, monitorId);
+        : true;
 };
 
 const getSiteOrWarn = (
@@ -400,6 +415,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     let skipped = 0;
 
     config.logger.info("Stopping all monitoring operations (enhanced system)");
+    config.monitorScheduler.stopAll();
 
     await runSequentially(sites, async (site) => {
         const monitors = getMonitorCandidates(site);
@@ -475,8 +491,6 @@ export async function stopAllMonitoringEnhancedFlow(params: {
             }
         });
     });
-
-    config.monitorScheduler.stopAll();
 
     const isPartialFailures = failed > 0 && succeeded > 0;
     const summary: MonitoringStopSummary = {

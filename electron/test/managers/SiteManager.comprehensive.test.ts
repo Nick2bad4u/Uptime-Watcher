@@ -180,6 +180,7 @@ const siteWriterMocks = vi.hoisted(() => {
         createSite: vi.fn(),
         updateSite: vi.fn(),
         deleteSite: vi.fn(),
+        deleteAllSites: vi.fn(),
         handleMonitorSchedulingChanges: vi.fn(),
         detectNewMonitors: vi.fn().mockReturnValue([]),
     };
@@ -234,6 +235,10 @@ describe("SiteManager - Comprehensive", () => {
         mockSiteWriterServiceInstance.createSite.mockResolvedValue(undefined);
         mockSiteWriterServiceInstance.updateSite.mockResolvedValue(undefined);
         mockSiteWriterServiceInstance.deleteSite.mockResolvedValue(undefined);
+        mockSiteWriterServiceInstance.deleteAllSites.mockResolvedValue({
+            deletedCount: 0,
+            deletedSites: [],
+        });
         mockSiteWriterServiceInstance.handleMonitorSchedulingChanges.mockResolvedValue(
             undefined
         );
@@ -1014,6 +1019,12 @@ describe("SiteManager - Comprehensive", () => {
             const isResult = await siteManager.removeSite("site-1");
 
             expect(isResult).toBeTruthy();
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledWith("site-1", "monitor-1");
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledBefore(mockSiteWriterServiceInstance.deleteSite);
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:removed",
                 expect.objectContaining({
@@ -1084,6 +1095,36 @@ describe("SiteManager - Comprehensive", () => {
             expect(isResult).toBeFalsy();
             // Should not emit events when deletion fails
             expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("deleteAllSites", () => {
+        beforeEach(() => {
+            siteManager = new SiteManager(mockDeps);
+        });
+
+        it("keeps monitor checks blocked through bulk deletion", async () => {
+            cacheStore.set(mockSite.identifier, mockSite);
+            mockSiteWriterServiceInstance.deleteAllSites.mockImplementation(
+                async (cache) => {
+                    cache.clear();
+                    return {
+                        deletedCount: 1,
+                        deletedSites: [mockSite],
+                    };
+                }
+            );
+
+            await expect(siteManager.deleteAllSites()).resolves.toBe(1);
+
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledWith("site-1", "monitor-1");
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledBefore(
+                mockSiteWriterServiceInstance.deleteAllSites
+            );
         });
     });
 

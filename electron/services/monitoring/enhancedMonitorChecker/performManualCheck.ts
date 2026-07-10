@@ -16,7 +16,7 @@ import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDepend
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 import { resolveMonitorBaseTimeoutMs } from "../shared/timeoutUtils";
-import { runExclusiveMonitorCheck } from "./performCorrelatedCheck";
+import { runExclusiveMonitorCheck } from "../MonitorExecutionFence";
 
 /**
  * Executes a manual monitor check.
@@ -39,8 +39,7 @@ export async function performManualCheckOperation(args: {
     readonly signal: AbortSignal | undefined;
     readonly site: Site;
 }): Promise<StatusUpdate | undefined> {
-    const { config, monitor, monitorId, performDirectCheck, signal, site } =
-        args;
+    const { config, monitorId, performDirectCheck, signal, site } = args;
 
     // Manual checks can race with scheduled correlated checks.
     // Cancel correlated operations to avoid overlapping writes.
@@ -49,16 +48,27 @@ export async function performManualCheckOperation(args: {
     return runExclusiveMonitorCheck({
         monitorId,
         operation: async () => {
+            const currentMonitor =
+                await config.monitorRepository.findByIdentifier(monitorId);
+            if (!currentMonitor) {
+                return undefined;
+            }
+
             // Clear persisted correlation state only after the cancelled check
             // has finished its own persistence and cleanup work.
             await config.monitorRepository.clearActiveOperations(monitorId);
 
             const timeoutSignal = createTimeoutSignal(
-                resolveMonitorBaseTimeoutMs(monitor.timeout),
+                resolveMonitorBaseTimeoutMs(currentMonitor.timeout),
                 signal
             );
 
-            return performDirectCheck(site, monitor, true, timeoutSignal);
+            return performDirectCheck(
+                site,
+                currentMonitor,
+                true,
+                timeoutSignal
+            );
         },
         skipIfBusy: false,
     });

@@ -91,7 +91,10 @@ import {
     type UpdateSitesCacheOptions,
 } from "./siteManager/updateSitesCache";
 import { validateSite as validateSiteHelper } from "./siteManager/validateSite";
-import { withRemovedMonitorsStopped } from "./siteManager/withRemovedMonitorsStopped";
+import {
+    withRemovedMonitorsStopped,
+    withSitesMonitorsStopped,
+} from "./siteManager/withRemovedMonitorsStopped";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
 
 const getSafeIdentifier = (identifier: string): string =>
@@ -451,11 +454,18 @@ export class SiteManager {
      */
     public async removeSite(identifier: string): Promise<boolean> {
         const siteBeforeRemoval = this.sitesCache.get(identifier);
-
-        const isRemoved = await this.siteWriterService.deleteSite(
-            this.sitesCache,
-            identifier
-        );
+        const deleteSite = async (): Promise<boolean> =>
+            this.siteWriterService.deleteSite(this.sitesCache, identifier);
+        const isRemoved =
+            siteBeforeRemoval && this.monitoringOperations
+                ? await withRemovedMonitorsStopped({
+                      identifier,
+                      monitoringConfig: this.createMonitoringConfig(),
+                      nextMonitors: [],
+                      operation: deleteSite,
+                      originalMonitors: siteBeforeRemoval.monitors,
+                  })
+                : await deleteSite();
 
         if (!isRemoved) {
             return false;
@@ -499,8 +509,17 @@ export class SiteManager {
      * @returns The number of deleted sites.
      */
     public async deleteAllSites(): Promise<number> {
+        const sitesBeforeRemoval = this.sitesCache.getAll();
+        const deleteSites = async () =>
+            this.siteWriterService.deleteAllSites(this.sitesCache);
         const { deletedCount, deletedSites } =
-            await this.siteWriterService.deleteAllSites(this.sitesCache);
+            sitesBeforeRemoval.length > 0 && this.monitoringOperations
+                ? await withSitesMonitorsStopped({
+                      monitoringConfig: this.createMonitoringConfig(),
+                      operation: deleteSites,
+                      sites: sitesBeforeRemoval,
+                  })
+                : await deleteSites();
 
         if (deletedCount === 0) {
             return 0;

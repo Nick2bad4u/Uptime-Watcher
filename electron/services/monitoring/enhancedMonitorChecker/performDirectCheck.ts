@@ -75,14 +75,21 @@ export async function performDirectCheck(args: {
             operationId: "direct-check",
         });
 
+        const currentMonitor = await monitorRepository.findByIdentifier(
+            monitor.id
+        );
+        if (!currentMonitor) {
+            return undefined;
+        }
+
         // For manual checks on paused monitors, preserve the paused status.
         const finalStatus =
-            isManualCheck && monitor.status === "paused"
+            isManualCheck && currentMonitor.status === "paused"
                 ? "paused"
                 : serviceResult.status;
 
         // Save history entry for direct checks too (always save actual result).
-        await saveHistoryEntry(monitor, checkResult);
+        await saveHistoryEntry(currentMonitor, checkResult);
 
         // Update monitor directly (bypass operation correlation for manual
         // checks). For manual checks on paused monitors, don't update the
@@ -93,15 +100,15 @@ export async function performDirectCheck(args: {
         };
 
         // Only update status if not a manual check on a paused monitor.
-        if (!isManualCheck || monitor.status !== "paused") {
+        if (!isManualCheck || currentMonitor.status !== "paused") {
             updateData.status = serviceResult.status;
         }
 
         const fallbackMonitor: Monitor = {
-            ...monitor,
+            ...currentMonitor,
             lastChecked: checkResult.timestamp,
             responseTime: serviceResult.responseTime,
-            status: updateData.status ?? monitor.status,
+            status: updateData.status ?? currentMonitor.status,
         };
 
         const statusUpdateBase: StatusUpdate = {
@@ -117,7 +124,7 @@ export async function performDirectCheck(args: {
             ),
             monitor: fallbackMonitor,
             monitorId: monitor.id,
-            previousStatus: monitor.status,
+            previousStatus: currentMonitor.status,
             responseTime: serviceResult.responseTime,
             site,
             siteIdentifier: site.identifier,
@@ -132,7 +139,7 @@ export async function performDirectCheck(args: {
         );
 
         if (!freshMonitorWithHistory) {
-            return statusUpdateBase;
+            return undefined;
         }
 
         const statusUpdate: StatusUpdate = {
@@ -157,11 +164,11 @@ export async function performDirectCheck(args: {
         // emit up/down events.
         if (
             didStatusChange &&
-            (!isManualCheck || monitor.status !== "paused")
+            (!isManualCheck || currentMonitor.status !== "paused")
         ) {
             await emitStatusChangeEvents(
                 site,
-                monitor,
+                currentMonitor,
                 freshMonitorWithHistory,
                 checkResult
             );

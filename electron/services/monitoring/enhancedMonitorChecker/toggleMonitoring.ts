@@ -19,6 +19,7 @@ import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 
 import { monitorLogger as logger } from "../../../utils/logger";
+import { runExclusiveMonitorCheck } from "../MonitorExecutionFence";
 
 type ToggleMonitoringDependencies = Pick<
     EnhancedMonitoringDependencies,
@@ -82,21 +83,40 @@ const runToggleMonitoringOperation = async (
     try {
         dependencies.operationRegistry.cancelOperations(monitorId);
 
-        await dependencies.monitorRepository.update(monitorId, {
-            activeOperations: [],
-            monitoring: config.monitoring,
+        const result = await runExclusiveMonitorCheck({
+            ignoreBlock: config.action === "stop",
+            monitorId,
+            operation: async () => {
+                if (config.action === "start") {
+                    const monitor =
+                        await dependencies.monitorRepository.findByIdentifier(
+                            monitorId
+                        );
+                    if (!monitor) {
+                        return false;
+                    }
+                }
+
+                await dependencies.monitorRepository.update(monitorId, {
+                    activeOperations: [],
+                    monitoring: config.monitoring,
+                });
+
+                logger.info(
+                    interpolateLogTemplate(config.logTemplate, {
+                        monitorId: safeMonitorId,
+                        siteIdentifier: safeSiteIdentifier,
+                    })
+                );
+
+                await emitMonitoringToggled(args, config.action);
+
+                return true;
+            },
+            skipIfBusy: false,
         });
 
-        logger.info(
-            interpolateLogTemplate(config.logTemplate, {
-                monitorId: safeMonitorId,
-                siteIdentifier: safeSiteIdentifier,
-            })
-        );
-
-        await emitMonitoringToggled(args, config.action);
-
-        return true;
+        return result ?? false;
     } catch (error) {
         logger.error(
             `Failed to ${config.failureVerb} monitoring for monitor ${safeMonitorId}`,

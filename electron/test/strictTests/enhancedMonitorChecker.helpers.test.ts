@@ -193,6 +193,7 @@ describe("enhancedMonitorChecker helper modules", () => {
 
             const monitorRepository = {
                 clearActiveOperations: vi.fn().mockResolvedValue(undefined),
+                findByIdentifier: vi.fn().mockResolvedValue(monitor),
             };
 
             const performDirectCheck = vi.fn().mockResolvedValue(undefined);
@@ -240,6 +241,7 @@ describe("enhancedMonitorChecker helper modules", () => {
 
             const monitorRepository = {
                 clearActiveOperations: vi.fn().mockResolvedValue(undefined),
+                findByIdentifier: vi.fn().mockResolvedValue(monitor),
             };
 
             const performDirectCheck = vi.fn().mockResolvedValue(undefined);
