@@ -699,7 +699,21 @@ export class WindowService {
         });
 
         const { session } = this.mainWindow.webContents;
-        this.sessionSecurity.configure(session, !isDev());
+        try {
+            this.sessionSecurity.configure(session, !isDev());
+        } catch (error: unknown) {
+            const failedWindow = this.mainWindow;
+            this.mainWindow = null;
+            try {
+                failedWindow.destroy();
+            } catch (cleanupError: unknown) {
+                logger.error(
+                    "[WindowService] Failed to destroy insecure window after security setup failure",
+                    ensureError(cleanupError)
+                );
+            }
+            throw error;
+        }
 
         // Install window event handlers (including navigation restrictions)
         // before loading any content.

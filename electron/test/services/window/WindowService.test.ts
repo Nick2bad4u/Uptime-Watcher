@@ -52,6 +52,7 @@ const electronFixtures = vi.hoisted(() => {
 
     const createMockBrowserWindow = () => ({
         close: vi.fn(),
+        destroy: vi.fn(),
         isDestroyed: vi.fn(() => false),
         loadFile: vi.fn().mockResolvedValue(undefined),
         loadURL: vi.fn().mockResolvedValue(undefined),
@@ -456,7 +457,7 @@ describe(WindowService, () => {
             ).toHaveLength(1);
         });
 
-        it("should log permission-handler setup failures", async ({
+        it("should destroy the window when permission-handler setup fails", async ({
             task,
             annotate,
         }) => {
@@ -470,7 +471,9 @@ describe(WindowService, () => {
                 }
             );
 
-            windowService.createMainWindow();
+            expect(() => windowService.createMainWindow()).toThrow(
+                "permission session unavailable"
+            );
 
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Failed to attach permission handlers",
@@ -478,6 +481,51 @@ describe(WindowService, () => {
                     message: "permission session unavailable",
                 })
             );
+            expect(getMockBrowserWindow().destroy).toHaveBeenCalledTimes(1);
+            expect(getMockBrowserWindow().loadFile).not.toHaveBeenCalled();
+            expect(getMockBrowserWindow().loadURL).not.toHaveBeenCalled();
+            expect(windowService.getMainWindow()).toBeNull();
+        });
+
+        it("should fail closed when permission-request setup fails", () => {
+            const window = getMockBrowserWindow();
+            vi.mocked(
+                window.webContents.session.setPermissionRequestHandler
+            ).mockImplementationOnce(() => {
+                throw new Error("permission request setup failed");
+            });
+
+            expect(() => windowService.createMainWindow()).toThrow(
+                "permission request setup failed"
+            );
+            expect(
+                window.webContents.session.setPermissionCheckHandler
+            ).toHaveBeenCalledTimes(1);
+            expect(window.destroy).toHaveBeenCalledTimes(1);
+            expect(window.loadFile).not.toHaveBeenCalled();
+            expect(window.loadURL).not.toHaveBeenCalled();
+            expect(windowService.getMainWindow()).toBeNull();
+        });
+
+        it("should preserve the security error when failed-window cleanup also fails", () => {
+            const window = getMockBrowserWindow();
+            vi.mocked(
+                window.webContents.session.setPermissionCheckHandler
+            ).mockImplementationOnce(() => {
+                throw new Error("permission setup failed");
+            });
+            vi.mocked(window.destroy).mockImplementationOnce(() => {
+                throw new Error("window cleanup failed");
+            });
+
+            expect(() => windowService.createMainWindow()).toThrow(
+                "permission setup failed"
+            );
+            expect(logger.error).toHaveBeenCalledWith(
+                "[WindowService] Failed to destroy insecure window after security setup failure",
+                expect.objectContaining({ message: "window cleanup failed" })
+            );
+            expect(windowService.getMainWindow()).toBeNull();
         });
 
         it("should setup window events", async ({ task, annotate }) => {
@@ -1522,7 +1570,7 @@ describe(WindowService, () => {
             });
         });
 
-        it("should warn when applying security middleware fails", async ({
+        it("should destroy the window when security middleware fails", async ({
             task,
             annotate,
         }) => {
@@ -1541,7 +1589,9 @@ describe(WindowService, () => {
                 throw new Error("session unavailable");
             });
 
-            windowService.createMainWindow();
+            expect(() => windowService.createMainWindow()).toThrow(
+                "session unavailable"
+            );
 
             expect(logger.warn).toHaveBeenCalledWith(
                 "[WindowService] Failed to attach security header middleware",
@@ -1549,16 +1599,10 @@ describe(WindowService, () => {
                     message: "session unavailable",
                 })
             );
-
-            const firstWindow = windowService.getMainWindow();
-            if (!firstWindow) {
-                throw new Error("Main window was not created");
-            }
-            const closedHandler = getRegisteredListener<() => void>(
-                vi.mocked(firstWindow.on).mock.calls,
-                "closed"
-            );
-            closedHandler();
+            expect(mockWindowRef.destroy).toHaveBeenCalledTimes(1);
+            expect(mockWindowRef.loadFile).not.toHaveBeenCalled();
+            expect(mockWindowRef.loadURL).not.toHaveBeenCalled();
+            expect(windowService.getMainWindow()).toBeNull();
 
             windowService.createMainWindow();
 

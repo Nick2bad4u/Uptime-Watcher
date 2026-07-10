@@ -92,10 +92,12 @@ export class WindowSessionSecurity {
                 );
             }
         } catch (error: unknown) {
+            const normalizedError = ensureError(error);
             this.logger.warn(
                 "[WindowService] Failed to attach permission handlers",
-                ensureError(error)
+                normalizedError
             );
+            throw normalizedError;
         }
     }
 
@@ -150,10 +152,12 @@ export class WindowSessionSecurity {
             session.webRequest.onHeadersReceived(onHeadersReceived);
             this.attachedProductionHeaderSessions.add(session);
         } catch (error: unknown) {
+            const normalizedError = ensureError(error);
             this.logger.warn(
                 "[WindowService] Failed to attach security header middleware",
-                ensureError(error)
+                normalizedError
             );
+            throw normalizedError;
         }
     }
 }
