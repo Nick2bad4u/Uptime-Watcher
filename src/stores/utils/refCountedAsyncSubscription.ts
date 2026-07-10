@@ -24,6 +24,9 @@ import { isDefined } from "ts-extras";
  * Options for {@link createRefCountedAsyncSubscription}.
  */
 export interface RefCountedAsyncSubscriptionOptions {
+    /** Maximum setup attempts while at least one subscriber remains. */
+    readonly maxSetupAttempts?: number;
+
     /**
      * Optional error handler invoked if the cleanup handler throws.
      */
@@ -44,6 +47,9 @@ export interface RefCountedAsyncSubscriptionOptions {
      * Optional diagnostic hook called when the first subscriber triggers setup.
      */
     readonly onStarted?: () => void;
+
+    /** Delay between setup attempts in milliseconds. */
+    readonly retryDelayMs?: number;
 
     /**
      * Starts the underlying subscription.
@@ -77,11 +83,30 @@ export interface RefCountedAsyncSubscription {
 export function createRefCountedAsyncSubscription(
     options: RefCountedAsyncSubscriptionOptions
 ): RefCountedAsyncSubscription {
-    const { onCleanupError, onReady, onSetupError, onStarted, start } = options;
+    const {
+        maxSetupAttempts = 1,
+        onCleanupError,
+        onReady,
+        onSetupError,
+        onStarted,
+        retryDelayMs = 0,
+        start,
+    } = options;
 
     let refCount = 0;
     let cleanup: (() => void) | undefined;
     let pending: Promise<void> | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let setupAttempts = 0;
+
+    const clearRetry = (): void => {
+        if (!isDefined(retryTimer)) {
+            return;
+        }
+
+        clearTimeout(retryTimer);
+        retryTimer = undefined;
+    };
 
     const safeCleanup = (): void => {
         if (!isDefined(cleanup)) {
@@ -99,13 +124,15 @@ export function createRefCountedAsyncSubscription(
     };
 
     const ensureStarted = (): void => {
-        if (isDefined(cleanup) || isDefined(pending)) {
+        if (isDefined(cleanup) || isDefined(pending) || isDefined(retryTimer)) {
             return;
         }
 
+        setupAttempts += 1;
         onStarted?.();
 
         pending = (async (): Promise<void> => {
+            let shouldRetry = false;
             try {
                 const cleanupCandidate = await start();
 
@@ -120,14 +147,25 @@ export function createRefCountedAsyncSubscription(
                 }
 
                 cleanup = cleanupCandidate;
+                setupAttempts = 0;
                 onReady?.();
             } catch (error: unknown) {
                 onSetupError?.(ensureError(error));
+                shouldRetry = refCount > 0 && setupAttempts < maxSetupAttempts;
             } finally {
                 pending = undefined;
 
                 if (refCount === 0) {
+                    setupAttempts = 0;
                     safeCleanup();
+                } else if (shouldRetry) {
+                    retryTimer = setTimeout(
+                        () => {
+                            retryTimer = undefined;
+                            ensureStarted();
+                        },
+                        Math.max(0, retryDelayMs)
+                    );
                 }
             }
         })();
@@ -150,6 +188,9 @@ export function createRefCountedAsyncSubscription(
             if (refCount > 0) {
                 return;
             }
+
+            clearRetry();
+            setupAttempts = 0;
 
             // If setup is still pending, the pending promise will observe
             // refCount===0 and cleanup immediately once ready.

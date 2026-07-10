@@ -128,6 +128,7 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
         (set, get) => {
             const updateStatusEventsSubscription =
                 createRefCountedAsyncSubscription({
+                    maxSetupAttempts: 3,
                     onCleanupError: (error) => {
                         logger.error(
                             "[UpdatesStore] Failed to cleanup update status subscription",
@@ -142,6 +143,7 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                         );
                         get().setUpdateError(resolved.message);
                     },
+                    retryDelayMs: 250,
                     start: () =>
                         EventsService.onUpdateStatus(
                             ({ error, status }: UpdateStatusEventData) => {

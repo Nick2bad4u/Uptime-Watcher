@@ -70,4 +70,65 @@ describe(createRefCountedAsyncSubscription, () => {
 
         expect(cleanup).toHaveBeenCalledTimes(1);
     });
+
+    it("retries a transient setup failure without another subscriber", async () => {
+        vi.useFakeTimers();
+        try {
+            const cleanup = vi.fn();
+            const onSetupError = vi.fn();
+            const start = vi
+                .fn<() => Promise<() => void>>()
+                .mockRejectedValueOnce(new Error("bridge unavailable"))
+                .mockResolvedValueOnce(cleanup);
+            const subscription = createRefCountedAsyncSubscription({
+                maxSetupAttempts: 3,
+                onSetupError,
+                retryDelayMs: 25,
+                start,
+            });
+
+            const unsubscribe = subscription.subscribe();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(start).toHaveBeenCalledTimes(1);
+            expect(onSetupError).toHaveBeenCalledTimes(1);
+
+            await vi.advanceTimersByTimeAsync(25);
+
+            expect(start).toHaveBeenCalledTimes(2);
+            expect(subscription.getRefCount()).toBe(1);
+
+            unsubscribe();
+            expect(cleanup).toHaveBeenCalledTimes(1);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("cancels a scheduled retry when the last subscriber leaves", async () => {
+        vi.useFakeTimers();
+        try {
+            const start = vi
+                .fn<() => Promise<() => void>>()
+                .mockRejectedValue(new Error("bridge unavailable"));
+            const subscription = createRefCountedAsyncSubscription({
+                maxSetupAttempts: 3,
+                retryDelayMs: 25,
+                start,
+            });
+
+            const unsubscribe = subscription.subscribe();
+            await Promise.resolve();
+            await Promise.resolve();
+            unsubscribe();
+
+            await vi.advanceTimersByTimeAsync(25);
+
+            expect(start).toHaveBeenCalledTimes(1);
+            expect(subscription.getRefCount()).toBe(0);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
 });

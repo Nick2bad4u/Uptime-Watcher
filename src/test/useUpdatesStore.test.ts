@@ -735,5 +735,33 @@ describe(useUpdatesStore, () => {
 
             expect(cleanup).toHaveBeenCalledTimes(1);
         });
+
+        it("automatically retries while the original subscriber remains", async () => {
+            vi.useFakeTimers();
+            try {
+                const cleanup = vi.fn();
+                const onUpdateStatusSpy = vi
+                    .spyOn(EventsService, "onUpdateStatus")
+                    .mockRejectedValueOnce(new Error("bridge unavailable"))
+                    .mockResolvedValueOnce(cleanup);
+
+                const unsubscribe = useUpdatesStore
+                    .getState()
+                    .subscribeToUpdateStatusEvents();
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(onUpdateStatusSpy).toHaveBeenCalledTimes(1);
+
+                await vi.advanceTimersByTimeAsync(250);
+
+                expect(onUpdateStatusSpy).toHaveBeenCalledTimes(2);
+
+                unsubscribe();
+                expect(cleanup).toHaveBeenCalledTimes(1);
+            } finally {
+                vi.useRealTimers();
+            }
+        });
     });
 });
