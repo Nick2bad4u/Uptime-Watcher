@@ -1,4 +1,5 @@
 import nick2bad4u from "eslint-config-nick2bad4u";
+import { resolve as resolveTypeScriptImport } from "eslint-import-resolver-typescript";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import tailwind from "eslint-plugin-tailwindcss";
 
@@ -15,6 +16,22 @@ const unavailableSharedRuleIds = new Set([
     "typefest/prefer-ts-extras-string-split",
     "zod/prefer-string-schema-with-trim",
 ]);
+
+const createScopedTypeScriptResolver = (project) => ({
+    interfaceVersion: 3,
+    name: "eslint-import-resolver-typescript",
+    resolve(source, file) {
+        return resolveTypeScriptImport(source, file, { project: [project] });
+    },
+});
+
+const createScopedImportSettings = (project) => ({
+    "import-x/resolver": {
+        node: true,
+        typescript: { project: [project] },
+    },
+    "import-x/resolver-next": [createScopedTypeScriptResolver(project)],
+});
 
 const sanitizeImportedConfig = (config) => {
     if (!config.rules) {
@@ -80,6 +97,20 @@ const config = [
     },
     ...sharedConfig,
     ...uptimeWatcherRepoConfigs,
+    {
+        files: ["src/**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}"],
+        name: "Uptime Watcher: renderer import resolution",
+        settings: createScopedImportSettings(
+            "config/testing/tsconfig.test.json"
+        ),
+    },
+    {
+        files: ["electron/**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}"],
+        name: "Uptime Watcher: Electron import resolution",
+        settings: createScopedImportSettings(
+            "config/linting/tsconfig.electron.eslint.json"
+        ),
+    },
     {
         files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,cts,mts}"],
         name: "Uptime Watcher: Tailwind plugin wiring",
@@ -452,6 +483,7 @@ const config = [
             "etc-misc/no-unnecessary-template-literal": "off",
             "etc-misc/no-unnecessary-initialization": "off",
             "etc-misc/throw-error": "off",
+            "import-x/extensions": "off",
             "import-x/no-unassigned-import": "off",
             "import-x/no-unresolved": "off",
             "array-callback-return": "off",
