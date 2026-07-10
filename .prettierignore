@@ -41,4 +41,3 @@ sonar-project.properties
 # covered by remark lint / remark
 .gitleaks.toml
 cliff.toml
-lychee.toml

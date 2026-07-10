@@ -34,7 +34,7 @@ This file applies to `.github/workflows/**`.
 - Use OIDC or provenance support where the target service supports it. Keep
   long-lived tokens narrowly scoped.
 - Keep release upload, package signing, Internet Archive upload, VirusTotal,
-  Codecov, Codacy, SonarCloud, and Pages deployment credentials isolated to the
+  Codecov, SonarCloud, and Pages deployment credentials isolated to the
   jobs that need them.
 - Do not widen `GITHUB_TOKEN` permissions to fix a failing step until the exact
   missing permission is identified.
