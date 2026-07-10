@@ -4,6 +4,7 @@
  */
 
 import type { AxiosInstance } from "axios";
+import type { Mock } from "vitest";
 
 import axios from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -30,50 +31,90 @@ vi.mock("node:https", () => ({
 
 describe("HTTP Client Utils", () => {
     const mockAxiosCreate = vi.mocked(axios.create);
-    const mockAxiosInstance = {
+
+    type InterceptorHandler = (value: unknown) => unknown;
+    type InterceptorUse = (
+        onFulfilled?: InterceptorHandler | null,
+        onRejected?: InterceptorHandler | null
+    ) => number;
+    interface MockAxiosInstance {
         interceptors: {
             request: {
-                use: vi.fn(),
+                use: Mock<InterceptorUse>;
+            };
+            response: {
+                use: Mock<InterceptorUse>;
+            };
+        };
+    }
+
+    const createMockAxiosInstance = (): MockAxiosInstance => ({
+        interceptors: {
+            request: {
+                use: vi.fn<InterceptorUse>(),
             },
             response: {
-                use: vi.fn(),
+                use: vi.fn<InterceptorUse>(),
             },
         },
-    } as unknown as AxiosInstance;
+    });
+
+    const asAxiosInstance = (instance: MockAxiosInstance): AxiosInstance =>
+        instance as unknown as AxiosInstance;
+
+    const getInterceptorHandlers = (use: Mock<InterceptorUse>) => {
+        const call = use.mock.calls[0];
+        if (!call) {
+            throw new Error("Expected an interceptor to be registered");
+        }
+
+        const [interceptor, errorHandler] = call;
+        if (
+            typeof interceptor !== "function" ||
+            typeof errorHandler !== "function"
+        ) {
+            throw new TypeError(
+                "Expected both interceptor handlers to be functions"
+            );
+        }
+
+        return { errorHandler, interceptor };
+    };
+
+    const getResponseTime = (value: unknown): unknown => {
+        if (typeof value !== "object" || value === null) {
+            throw new TypeError("Expected an interceptor response object");
+        }
+
+        return Reflect.get(value, "responseTime");
+    };
+
+    const mockAxiosInstance = createMockAxiosInstance();
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockAxiosCreate.mockReturnValue(mockAxiosInstance);
+        mockAxiosCreate.mockReturnValue(asAxiosInstance(mockAxiosInstance));
     });
 
-    const createMockAxiosInstance = (): AxiosInstance =>
-        ({
-            interceptors: {
-                request: {
-                    use: vi.fn(),
-                },
-                response: {
-                    use: vi.fn(),
-                },
-            },
-        }) as unknown as AxiosInstance;
-
     const setupClientAndGetInterceptors = (
-        instance: AxiosInstance = createMockAxiosInstance()
+        instance: MockAxiosInstance = createMockAxiosInstance()
     ) => {
-        mockAxiosCreate.mockReturnValueOnce(instance);
+        mockAxiosCreate.mockReturnValueOnce(asAxiosInstance(instance));
         createHttpClient({});
+
+        const requestHandlers = getInterceptorHandlers(
+            instance.interceptors.request.use
+        );
+        const responseHandlers = getInterceptorHandlers(
+            instance.interceptors.response.use
+        );
 
         return {
             instance,
-            requestErrorHandler: (instance.interceptors.request.use as any).mock
-                .calls[0][1],
-            requestInterceptor: (instance.interceptors.request.use as any).mock
-                .calls[0][0],
-            responseErrorHandler: (instance.interceptors.response.use as any)
-                .mock.calls[0][1],
-            responseInterceptor: (instance.interceptors.response.use as any)
-                .mock.calls[0][0],
+            requestErrorHandler: requestHandlers.errorHandler,
+            requestInterceptor: requestHandlers.interceptor,
+            responseErrorHandler: responseHandlers.errorHandler,
+            responseInterceptor: responseHandlers.interceptor,
         };
     };
     describe(createHttpClient, () => {
@@ -227,7 +268,9 @@ describe("HTTP Client Utils", () => {
             try {
                 vi.resetModules();
                 const freshAxios = vi.mocked((await import("axios")).default);
-                freshAxios.create.mockReturnValue(mockAxiosInstance);
+                freshAxios.create.mockReturnValue(
+                    asAxiosInstance(mockAxiosInstance)
+                );
 
                 const { createHttpClient: createFreshHttpClient } =
                     await import("../../../../services/monitoring/utils/httpClient");
@@ -343,7 +386,7 @@ describe("HTTP Client Utils", () => {
 
             // Act
             const { requestInterceptor } = setupClientAndGetInterceptors();
-            const config = {} as any;
+            const config = {};
             const result = requestInterceptor(config);
 
             // Assert
@@ -373,12 +416,12 @@ describe("HTTP Client Utils", () => {
                         startTime,
                     },
                 },
-            } as any;
+            };
 
             const result = responseInterceptor(response);
 
             // Assert
-            expect(result.responseTime).toBe(500); // 1500 - 1000
+            expect(getResponseTime(result)).toBe(500); // 1500 - 1000
         });
         it("should calculate response time when start time is zero", async ({
             task,
@@ -398,12 +441,12 @@ describe("HTTP Client Utils", () => {
                         startTime: 0,
                     },
                 },
-            } as any;
+            };
 
             const result = responseInterceptor(response);
 
             // Assert
-            expect(result.responseTime).toBe(250);
+            expect(getResponseTime(result)).toBe(250);
         });
         it("should not calculate response time if no start time", async ({
             task,
@@ -417,12 +460,12 @@ describe("HTTP Client Utils", () => {
             const { responseInterceptor } = setupClientAndGetInterceptors();
             const response = {
                 config: {},
-            } as any;
+            };
 
             const result = responseInterceptor(response);
 
             // Assert
-            expect(result.responseTime).toBeUndefined();
+            expect(getResponseTime(result)).toBeUndefined();
         });
         it("should handle request and response interceptor errors", async () => {
             // Act
@@ -456,13 +499,16 @@ describe("HTTP Client Utils", () => {
 
             // Act
             const { responseErrorHandler } = setupClientAndGetInterceptors();
-            const error = {
+            const error: {
+                config: { metadata: { startTime: number } };
+                responseTime?: number;
+            } = {
                 config: {
                     metadata: {
                         startTime,
                     },
                 },
-            } as any;
+            };
 
             // Test error handler modifies the error object with response time
             await expect(responseErrorHandler(error)).rejects.toThrow();

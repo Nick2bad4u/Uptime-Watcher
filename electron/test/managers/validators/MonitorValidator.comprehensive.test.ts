@@ -5,6 +5,7 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 
+import { isRecord } from "@shared/utils/typeHelpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
@@ -15,8 +16,13 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     isValidMonitorType: vi.fn((type: string) =>
         ["http", "port"].includes(type)
     ),
-    validateMonitorData: vi.fn((type: string, data: any) => {
-        if (type === "http" && data.url?.startsWith("https://")) {
+    validateMonitorData: vi.fn((type: string, data: unknown) => {
+        if (
+            type === "http" &&
+            isRecord(data) &&
+            typeof data["url"] === "string" &&
+            data["url"].startsWith("https://")
+        ) {
             return {
                 success: true,
                 errors: [],
@@ -25,7 +31,13 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
                 data,
             };
         }
-        if (type === "port" && data.host && typeof data.port === "number") {
+        if (
+            type === "port" &&
+            isRecord(data) &&
+            typeof data["host"] === "string" &&
+            data["host"].length > 0 &&
+            typeof data["port"] === "number"
+        ) {
             return {
                 success: true,
                 errors: [],
@@ -68,6 +80,14 @@ const createMockMonitor = (
         url: "https://example.com",
         ...overrides,
     };
+};
+
+const asMalformedMonitor = (candidate: unknown): Site["monitors"][0] => {
+    if (!isRecord(candidate)) {
+        throw new TypeError("Malformed monitor fixture must be an object");
+    }
+
+    return candidate as unknown as Site["monitors"][0];
 };
 
 describe("MonitorValidator - Comprehensive Coverage", () => {
@@ -207,7 +227,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 host: "example.com",
                 port: 8080,
             });
-            delete (monitor as any).url; // Remove URL for port monitor
+            delete monitor.url; // Remove URL for port monitor
 
             const result = validator.validateMonitorConfiguration(monitor);
 
@@ -224,11 +244,11 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitor = createMockMonitor({
-                id: "test-invalid",
-                type: "invalid" as any,
+            const monitor = asMalformedMonitor({
+                ...createMockMonitor({ id: "test-invalid" }),
+                type: "invalid",
             });
-            delete (monitor as any).url; // Remove URL for invalid monitor
+            delete monitor.url; // Remove URL for invalid monitor
 
             const result = validator.validateMonitorConfiguration(monitor);
 
@@ -385,10 +405,11 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const invalidMonitor = createMockMonitor({
-                type: "invalid-type" as any,
+            const invalidMonitor = asMalformedMonitor({
+                ...createMockMonitor(),
+                type: "invalid-type",
             });
-            delete (invalidMonitor as any).url; // Remove URL for invalid monitor
+            delete invalidMonitor.url; // Remove URL for invalid monitor
 
             const result =
                 validator.validateMonitorConfiguration(invalidMonitor);
@@ -405,10 +426,11 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const monitorWithBadData = createMockMonitor({
-                type: "invalid" as any,
+            const monitorWithBadData = asMalformedMonitor({
+                ...createMockMonitor(),
+                type: "invalid",
             });
-            delete (monitorWithBadData as any).url; // Remove URL for invalid monitor
+            delete monitorWithBadData.url; // Remove URL for invalid monitor
 
             const result =
                 validator.validateMonitorConfiguration(monitorWithBadData);
@@ -426,7 +448,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const emptyMonitor = {} as Site["monitors"][0];
+            const emptyMonitor = asMalformedMonitor({});
 
             const result = validator.validateMonitorConfiguration(emptyMonitor);
             expect(result.success).toBeFalsy();
@@ -442,7 +464,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const nullPropsMonitor = {
+            const nullPropsMonitor = asMalformedMonitor({
                 id: null,
                 type: undefined,
                 checkInterval: null,
@@ -452,7 +474,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                 status: null,
                 responseTime: undefined,
                 history: [],
-            } as any;
+            });
 
             const result =
                 validator.validateMonitorConfiguration(nullPropsMonitor);
@@ -507,7 +529,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
                     host,
                     port,
                 });
-                delete (monitor as any).url; // Remove URL for port monitor
+                delete monitor.url; // Remove URL for port monitor
 
                 const result = validator.validateMonitorConfiguration(monitor);
                 expect(result.success).toBeTruthy();
