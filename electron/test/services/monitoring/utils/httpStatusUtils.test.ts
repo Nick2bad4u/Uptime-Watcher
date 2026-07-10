@@ -15,6 +15,9 @@
 import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
 import { describe, expect, it } from "vitest";
 
+const determineUnknownStatus = (statusCode: unknown) =>
+    determineMonitorStatus(statusCode as number);
+
 describe("HTTP Status Utils", () => {
     describe(determineMonitorStatus, () => {
         it('should return "up" for 1xx informational responses', async ({
@@ -217,10 +220,10 @@ describe("HTTP Status Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             // TypeScript would catch this, but JavaScript might pass strings
-            expect(determineMonitorStatus("200" as any)).toBe("down");
-            expect(determineMonitorStatus("404" as any)).toBe("down");
-            expect(determineMonitorStatus("500" as any)).toBe("down");
-            expect(determineMonitorStatus("" as any)).toBe("down");
+            expect(determineUnknownStatus("200")).toBe("down");
+            expect(determineUnknownStatus("404")).toBe("down");
+            expect(determineUnknownStatus("500")).toBe("down");
+            expect(determineUnknownStatus("")).toBe("down");
         });
         it("should handle null and undefined inputs", async ({
             task,
@@ -231,8 +234,8 @@ describe("HTTP Status Utils", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(determineMonitorStatus(null as any)).toBe("down");
-            expect(determineMonitorStatus(undefined as any)).toBe("down");
+            expect(determineUnknownStatus(null)).toBe("down");
+            expect(determineUnknownStatus(undefined)).toBe("down");
         });
         it("should demonstrate monitoring logic reasoning", async ({
             task,
