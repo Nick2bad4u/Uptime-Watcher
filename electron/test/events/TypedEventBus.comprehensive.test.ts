@@ -63,12 +63,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
     let eventBus: TypedEventBus<TestEvents>;
     let mockMiddleware: EventMiddleware;
     let mockMiddleware2: EventMiddleware;
-    let mockListener: Mock<(data: any) => void>;
+    let mockListener: Mock<(data: unknown) => void>;
 
     beforeEach(() => {
         vi.clearAllMocks();
         eventBus = new TypedEventBus<TestEvents>("test-bus");
-        mockListener = vi.fn<(data: any) => void>();
+        mockListener = vi.fn<(data: unknown) => void>();
         mockMiddleware = vi.fn(async (_event, _data, next) => {
             await next();
         });
@@ -450,6 +450,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                     _meta: expect.any(Object),
                 })
             );
+            if (typeof receivedData !== "object" || receivedData === null) {
+                throw new TypeError("Expected an object event payload");
+            }
             expect(Object.hasOwn(receivedData, "_originalMeta")).toBeFalsy();
         });
         it("should not invoke accessor-backed object fields during clone fallback", async () => {
@@ -472,10 +475,16 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 get: getter,
             });
 
-            await eventBus.emitTyped("object-event", testData as any);
+            await eventBus.emitTyped(
+                "object-event",
+                testData as unknown as TestEvents["object-event"]
+            );
 
             expect(getter).not.toHaveBeenCalled();
             const receivedData = mockListener.mock.calls[0]?.[0];
+            if (typeof receivedData !== "object" || receivedData === null) {
+                throw new TypeError("Expected an object event payload");
+            }
             expect(Object.getPrototypeOf(receivedData)).toBe(prototype);
             expect(receivedData).toEqual(
                 expect.objectContaining({
@@ -501,6 +510,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBeTruthy();
+            if (!Array.isArray(receivedData)) {
+                throw new TypeError("Expected an array event payload");
+            }
             expect(receivedData).toEqual([
                 1,
                 2,
@@ -508,7 +520,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 4,
                 5,
             ]);
-            expect(receivedData._meta).toEqual(expect.any(Object));
+            expect(Reflect.get(receivedData, "_meta")).toEqual(
+                expect.any(Object)
+            );
 
             // Verify _meta is non-enumerable
             expect(
@@ -536,16 +550,24 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 writable: true,
             });
 
-            await eventBus.emitTyped("array-event", testArray as any);
+            await eventBus.emitTyped(
+                "array-event",
+                testArray as unknown as number[]
+            );
 
             expect(getter).not.toHaveBeenCalled();
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBeTruthy();
+            if (!Array.isArray(receivedData)) {
+                throw new TypeError("Expected an array event payload");
+            }
             expect(receivedData).toHaveLength(3);
             expect(receivedData[0]).toBe(callback);
             expect(Object.hasOwn(receivedData, "1")).toBeFalsy();
             expect(receivedData[2]).toBe(3);
-            expect(receivedData._meta).toEqual(expect.any(Object));
+            expect(Reflect.get(receivedData, "_meta")).toEqual(
+                expect.any(Object)
+            );
         });
         it("should handle complex objects correctly", async () => {
             eventBus.onTyped("complex-object", mockListener);
@@ -695,7 +717,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 maxMiddleware: 1,
             });
             // Manually set maxMiddleware to 0 to test the protection
-            (bus as any).maxMiddleware = 0;
+            Reflect.set(bus, "maxMiddleware", 0);
 
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.middlewareUtilization).toBe(0);
@@ -717,7 +739,11 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.registerMiddleware(mockMiddleware);
 
             // Manually insert null middleware to test the safety check
-            (eventBus as any).middlewares.push(undefined);
+            const middlewares: unknown = Reflect.get(eventBus, "middlewares");
+            if (!Array.isArray(middlewares)) {
+                throw new TypeError("Expected the event bus middleware list");
+            }
+            middlewares.push(undefined);
 
             eventBus.onTyped("string-event", mockListener);
 
@@ -745,6 +771,9 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(receivedData).toHaveLength(11);
+            if (!Array.isArray(receivedData)) {
+                throw new TypeError("Expected an array event payload");
+            }
             expect(receivedData[0]).toBe(1);
             expect(receivedData[1]).toBe(2);
             expect(receivedData[2]).toBe(3);
@@ -795,7 +824,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle null values correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
 
-            await eventBus.emitTyped("string-event", null as any);
+            await eventBus.emitTyped("string-event", null as unknown as string);
 
             expect(mockListener).toHaveBeenCalledWith({
                 value: null,
@@ -805,7 +834,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle undefined values correctly", async () => {
             eventBus.onTyped("string-event", mockListener);
 
-            await eventBus.emitTyped("string-event", undefined as any);
+            await eventBus.emitTyped(
+                "string-event",
+                undefined as unknown as string
+            );
 
             expect(mockListener).toHaveBeenCalledWith({
                 value: undefined,
@@ -854,8 +886,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBeTruthy();
+            if (!Array.isArray(receivedData)) {
+                throw new TypeError("Expected an array event payload");
+            }
             expect(receivedData).toHaveLength(0);
-            expect(receivedData._meta).toEqual(expect.any(Object));
+            expect(Reflect.get(receivedData, "_meta")).toEqual(
+                expect.any(Object)
+            );
         });
     });
     describe("Chaining Support", () => {
@@ -965,8 +1002,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const receivedData = mockListener.mock.calls[0]?.[0];
             expect(Array.isArray(receivedData)).toBeTruthy();
+            if (!Array.isArray(receivedData)) {
+                throw new TypeError("Expected an array event payload");
+            }
             expect(receivedData).toHaveLength(3);
-            expect(receivedData._meta).toEqual(expect.any(Object));
+            expect(Reflect.get(receivedData, "_meta")).toEqual(
+                expect.any(Object)
+            );
         });
         it("should handle middleware that throws non-Error objects", async () => {
             const badMiddleware: EventMiddleware = vi.fn(async () => {
@@ -985,12 +1027,14 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
         it("should handle complex nested circular references in objects", async () => {
             eventBus.onTyped("object-event", mockListener);
 
-            const circularObj: any = {
+            const circularObj: TestEvents["object-event"] & {
+                self?: unknown;
+            } = {
                 data: "test",
                 nested: { value: 123 },
             };
             circularObj.self = circularObj;
-            circularObj.nested.parent = circularObj;
+            Reflect.set(circularObj.nested, "parent", circularObj);
 
             await eventBus.emitTyped("object-event", circularObj);
 
@@ -1006,7 +1050,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const bigIntValue = 123_456_789_012_345_678_901_234_567_890n;
 
-            await eventBus.emitTyped("string-event", bigIntValue as any);
+            await eventBus.emitTyped(
+                "string-event",
+                bigIntValue as unknown as string
+            );
 
             expect(mockListener).toHaveBeenCalledWith({
                 value: bigIntValue,
@@ -1018,7 +1065,10 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const symbolValue = Symbol("test");
 
-            await eventBus.emitTyped("string-event", symbolValue as any);
+            await eventBus.emitTyped(
+                "string-event",
+                symbolValue as unknown as string
+            );
 
             expect(mockListener).toHaveBeenCalledWith({
                 value: symbolValue,
