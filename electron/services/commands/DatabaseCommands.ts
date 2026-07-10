@@ -24,7 +24,7 @@ import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
-import { arrayAt, arrayJoin, isDefined, isEmpty, setHas } from "ts-extras";
+import { arrayJoin, isDefined, isEmpty, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -218,14 +218,13 @@ abstract class DatabaseCommand<
  * execution and rollback.
  *
  * @remarks
- * Maintains a history of executed commands and provides automatic rollback on
- * failure. Supports full rollback of all executed commands in reverse order to
- * maintain transactional integrity.
+ * Retains only commands whose execution and immediate rollback both failed.
+ * Those commands can be retried in reverse order with {@link rollbackAll}.
  *
  * @public
  */
 export class DatabaseCommandExecutor {
-    /** Array of successfully executed commands for potential rollback operations */
+    /** Commands whose failed execution could not be rolled back immediately. */
     private readonly executedCommands: IDatabaseCommand<unknown>[] = [];
 
     /**
@@ -233,7 +232,8 @@ export class DatabaseCommandExecutor {
      *
      * @remarks
      * Validates the command before execution. If execution fails, attempts to
-     * rollback the command. Adds the command to the history if successful.
+     * rollback the command. Successful commands are released immediately;
+     * failed commands are retained only when their immediate rollback fails.
      *
      * @typeParam TResult - The result type returned by the command's execute
      *   method.
@@ -265,7 +265,10 @@ export class DatabaseCommandExecutor {
         this.executedCommands.push(command);
 
         try {
-            return await command.execute();
+            return await command.execute().then((result) => {
+                this.releaseCommand(command);
+                return result;
+            });
         } catch (error) {
             // Attempt rollback on failure
             try {
@@ -273,10 +276,7 @@ export class DatabaseCommandExecutor {
 
                 // Rollback succeeded, so we should not attempt to rollback the
                 // same command again via `rollbackAll()`.
-                const last = arrayAt(this.executedCommands, -1);
-                if (last === command) {
-                    this.executedCommands.pop();
-                }
+                this.releaseCommand(command);
             } catch (rollbackError) {
                 // Log rollback failure but don't mask original error.
                 // Intentionally keep the failed command in history so callers
@@ -295,11 +295,9 @@ export class DatabaseCommandExecutor {
      * Rolls back all executed commands in reverse order.
      *
      * @remarks
-     * Executes rollback operations for all previously executed commands in
-     * reverse order to maintain transactional integrity. Individual rollback
-     * failures are collected but do not prevent other rollbacks from executing.
-     * Uses array index access which is safe for typed arrays (hence the
-     * eslint-disable comment).
+     * Retries rollback for commands whose immediate rollback failed, in reverse
+     * order. Individual rollback failures are collected but do not prevent
+     * other rollbacks from executing.
      *
      * @returns Promise resolving when all rollbacks are complete.
      *
@@ -351,6 +349,13 @@ export class DatabaseCommandExecutor {
      */
     public clear(): void {
         this.executedCommands.length = 0;
+    }
+
+    private releaseCommand(command: IDatabaseCommand<unknown>): void {
+        const commandIndex = this.executedCommands.lastIndexOf(command);
+        if (commandIndex !== -1) {
+            this.executedCommands.splice(commandIndex, 1);
+        }
     }
 }
 
@@ -497,11 +502,12 @@ export class ExportDataCommand extends DatabaseCommand<string> {
  * Command for importing app data from JSON.
  *
  * @remarks
- * Encapsulates the logic for importing data, updating the cache, and emitting a
- * success event. Also emits a `cache:invalidated` event so renderer caches can
- * resynchronize with freshly imported data. Rollback restores the previous
- * cache state. Validation checks for non-empty JSON plus schema compliance via
- * the shared import/export Zod schemas.
+ * Encapsulates the logic for importing data, updating the cache, and emitting
+ * success events. The persistence transaction is the commit boundary:
+ * pre-commit failures may restore the previous cache, while post-commit cache
+ * and event synchronization failures are logged without reporting the durable
+ * import as failed. Validation checks for non-empty JSON plus schema compliance
+ * via the shared import/export Zod schemas.
  *
  * @public
  */
@@ -512,7 +518,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     /** JSON data string to be imported */
     private readonly data: string;
 
+    /** Whether the destructive import transaction has committed. */
+    private persistenceCommitted = false;
+
     public async execute(): Promise<boolean> {
+        this.persistenceCommitted = false;
+
         // Create backup of current sites
         this.backupSites = this.cache
             .getAll()
@@ -526,18 +537,15 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             await dataImportExportService.importDataFromJson(this.data);
 
         const canonicalSites = await this.validateImportedSites(sites);
+        const importedHistoryLimit = this.parseImportedHistoryLimit(settings);
         await dataImportExportService.persistImportedData(
             canonicalSites,
             settings
         );
+        this.persistenceCommitted = true;
 
-        await this.applyImportedHistoryLimit(settings);
-
-        // Reload sites from database
-        const siteRepositoryService =
-            this.serviceFactory.createSiteRepositoryService();
-        const reloadedSites =
-            await siteRepositoryService.getSitesFromDatabase();
+        await this.applyImportedHistoryLimit(importedHistoryLimit);
+        const reloadedSites = await this.refreshCacheAfterCommit();
 
         const previousSiteIdentifiers = new Set(
             this.backupSites.map((site) => site.identifier)
@@ -550,32 +558,43 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             }
         }
 
-        this.cache.replaceAll(
-            reloadedSites.map((site) => ({
-                data: structuredClone(site),
-                key: site.identifier,
-            }))
-        );
-
         if (newlyImportedSites.length > 0) {
             await mapWithConcurrency({
                 concurrency: IMPORT_SITE_EVENT_EMIT_CONCURRENCY,
                 items: newlyImportedSites,
                 task: async (site) => {
-                    await this.eventEmitter.emitTyped("internal:site:added", {
-                        identifier: site.identifier,
-                        operation: "added",
-                        site: structuredClone(site),
-                        source: SITE_ADDED_SOURCE.IMPORT,
-                        timestamp: Date.now(),
-                    });
+                    try {
+                        await this.eventEmitter.emitTyped(
+                            "internal:site:added",
+                            {
+                                identifier: site.identifier,
+                                operation: "added",
+                                site: structuredClone(site),
+                                source: SITE_ADDED_SOURCE.IMPORT,
+                                timestamp: Date.now(),
+                            }
+                        );
+                    } catch (error) {
+                        backendLogger.error(
+                            "[ImportDataCommand] Failed to publish imported site event after commit",
+                            ensureError(error),
+                            { identifier: site.identifier }
+                        );
+                    }
                 },
             });
         }
 
-        await this.emitSuccessEvent("internal:database:data-imported", {
-            operation: "data-imported",
-        });
+        try {
+            await this.emitSuccessEvent("internal:database:data-imported", {
+                operation: "data-imported",
+            });
+        } catch (error) {
+            backendLogger.error(
+                "[ImportDataCommand] Failed to publish import completion event after commit",
+                ensureError(error)
+            );
+        }
 
         // NOTE: We intentionally do NOT emit `sites:state-synchronized` here.
         // That responsibility belongs to SiteManager/UptimeOrchestrator so
@@ -589,6 +608,13 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     }
 
     public async rollback(): Promise<void> {
+        if (this.persistenceCommitted) {
+            backendLogger.warn(
+                "[ImportDataCommand] Skipping stale cache rollback after committed import"
+            );
+            return;
+        }
+
         // Restore cache from backup
         this.cache.clear();
         for (const site of this.backupSites) {
@@ -643,40 +669,74 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     }
 
     private async applyImportedHistoryLimit(
-        settings: Record<string, string>
+        importedHistoryLimit: number | undefined
     ): Promise<void> {
-        if (!this.updateHistoryLimit) {
+        if (!this.updateHistoryLimit || !isDefined(importedHistoryLimit)) {
             return;
         }
 
+        try {
+            await this.updateHistoryLimit(importedHistoryLimit);
+        } catch (error) {
+            backendLogger.error(
+                "[ImportDataCommand] Failed to synchronize imported history limit after commit",
+                ensureError(error),
+                {
+                    importedHistoryLimit,
+                }
+            );
+        }
+    }
+
+    private parseImportedHistoryLimit(
+        settings: Record<string, string>
+    ): number | undefined {
         const rawHistoryLimit = settings["historyLimit"];
         if (!isDefined(rawHistoryLimit)) {
-            return;
+            return undefined;
         }
 
         const parsedHistoryLimit = parseHistoryLimitSetting(rawHistoryLimit);
         if (!isDefined(parsedHistoryLimit)) {
             backendLogger.warn(
                 "[ImportDataCommand] Imported history limit is not a valid number",
-                {
-                    rawHistoryLimit,
-                }
+                { rawHistoryLimit }
             );
-            return;
         }
 
+        return parsedHistoryLimit;
+    }
+
+    private async refreshCacheAfterCommit(): Promise<Site[]> {
         try {
-            await this.updateHistoryLimit(parsedHistoryLimit);
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            backendLogger.error(
-                "[ImportDataCommand] Failed to apply imported history limit",
-                normalizedError,
-                {
-                    parsedHistoryLimit,
-                }
+            const siteRepositoryService =
+                this.serviceFactory.createSiteRepositoryService();
+            const reloadedSites =
+                await siteRepositoryService.getSitesFromDatabase();
+
+            this.cache.replaceAll(
+                reloadedSites.map((site) => ({
+                    data: structuredClone(site),
+                    key: site.identifier,
+                }))
             );
-            throw normalizedError;
+            return reloadedSites;
+        } catch (error) {
+            backendLogger.error(
+                "[ImportDataCommand] Failed to refresh site cache after committed import",
+                ensureError(error)
+            );
+
+            try {
+                this.cache.clear();
+            } catch (cacheError) {
+                backendLogger.error(
+                    "[ImportDataCommand] Failed to invalidate stale site cache after committed import",
+                    ensureError(cacheError)
+                );
+            }
+
+            return [];
         }
     }
 

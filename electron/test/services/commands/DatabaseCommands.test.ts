@@ -140,6 +140,21 @@ describe("DatabaseCommands", () => {
             expect(mockCommand.rollback).not.toHaveBeenCalled();
         });
 
+        it("should release successful commands instead of retaining them", async () => {
+            for (let index = 0; index < 100; index++) {
+                await executor.execute(mockCommand);
+            }
+
+            const executedCommands: unknown = Reflect.get(
+                executor,
+                "executedCommands"
+            );
+            expect(executedCommands).toEqual([]);
+
+            await executor.rollbackAll();
+            expect(mockCommand.rollback).not.toHaveBeenCalled();
+        });
+
         it("should reject invalid command before execution", async ({
             task,
             annotate,
@@ -225,24 +240,43 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
+            const rollbackOrder: string[] = [];
             const commands = [
-                { ...mockCommand, getDescription: () => "Command 1" },
-                { ...mockCommand, getDescription: () => "Command 2" },
-                { ...mockCommand, getDescription: () => "Command 3" },
-            ];
+                "Command 1",
+                "Command 2",
+                "Command 3",
+            ].map((description) => ({
+                ...mockCommand,
+                execute: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Execution failed")),
+                getDescription: () => description,
+                rollback: vi
+                    .fn()
+                    .mockRejectedValueOnce(new Error("Rollback failed"))
+                    .mockImplementationOnce(() => {
+                        rollbackOrder.push(description);
+                        return Promise.resolve();
+                    }),
+            }));
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
 
-            // Execute commands
             for (const command of commands) {
-                await executor.execute(command);
+                await expect(executor.execute(command)).rejects.toThrow(
+                    "Execution failed"
+                );
             }
 
-            // Rollback all
             await executor.rollbackAll();
 
-            // Check rollback was called in reverse order
-            expect(commands[2]?.rollback).toHaveBeenCalled();
-            expect(commands[1]?.rollback).toHaveBeenCalled();
-            expect(commands[0]?.rollback).toHaveBeenCalled();
+            expect(rollbackOrder).toEqual([
+                "Command 3",
+                "Command 2",
+                "Command 1",
+            ]);
+            loggerSpy.mockRestore();
         });
 
         it("should collect rollback errors and throw aggregate error", async ({
@@ -256,25 +290,37 @@ describe("DatabaseCommands", () => {
 
             const command1 = {
                 ...mockCommand,
+                execute: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Execution 1 failed")),
                 rollback: vi
                     .fn()
                     .mockRejectedValue(new Error("Rollback 1 failed")),
             };
             const command2 = {
                 ...mockCommand,
+                execute: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Execution 2 failed")),
                 rollback: vi
                     .fn()
                     .mockRejectedValue(new Error("Rollback 2 failed")),
             };
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
 
-            // Execute commands
-            await executor.execute(command1);
-            await executor.execute(command2);
+            await expect(executor.execute(command1)).rejects.toThrow(
+                "Execution 1 failed"
+            );
+            await expect(executor.execute(command2)).rejects.toThrow(
+                "Execution 2 failed"
+            );
 
-            // Rollback all should collect errors
             await expect(executor.rollbackAll()).rejects.toThrow(
                 "Rollback errors: Rollback 2 failed, Rollback 1 failed"
             );
+            loggerSpy.mockRestore();
         });
 
         it("should handle non-Error objects in rollback", async ({
@@ -288,14 +334,23 @@ describe("DatabaseCommands", () => {
 
             const command1 = {
                 ...mockCommand,
+                execute: vi
+                    .fn()
+                    .mockRejectedValue(new Error("Execution failed")),
                 rollback: vi.fn().mockRejectedValue("String error"),
             };
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
 
-            await executor.execute(command1);
+            await expect(executor.execute(command1)).rejects.toThrow(
+                "Execution failed"
+            );
 
             await expect(executor.rollbackAll()).rejects.toThrow(
                 "Rollback errors: String error"
             );
+            loggerSpy.mockRestore();
         });
 
         it("should clear command history", async ({ task, annotate }) => {
@@ -304,12 +359,25 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            await executor.execute(mockCommand);
+            mockCommand.execute = vi
+                .fn()
+                .mockRejectedValue(new Error("Execution failed"));
+            mockCommand.rollback = vi
+                .fn()
+                .mockRejectedValue(new Error("Rollback failed"));
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+
+            await expect(executor.execute(mockCommand)).rejects.toThrow(
+                "Execution failed"
+            );
             executor.clear();
 
             // After clear, rollbackAll should do nothing
             await executor.rollbackAll();
-            expect(mockCommand.rollback).not.toHaveBeenCalled();
+            expect(mockCommand.rollback).toHaveBeenCalledTimes(1);
+            loggerSpy.mockRestore();
         });
 
         it("should handle undefined commands in rollback gracefully", async ({
@@ -321,7 +389,19 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            await executor.execute(mockCommand);
+            mockCommand.execute = vi
+                .fn()
+                .mockRejectedValue(new Error("Execution failed"));
+            mockCommand.rollback = vi
+                .fn()
+                .mockRejectedValue(new Error("Rollback failed"));
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+
+            await expect(executor.execute(mockCommand)).rejects.toThrow(
+                "Execution failed"
+            );
 
             // Manually corrupt the command array to test robustness
             const executedCommands: unknown = Reflect.get(
@@ -335,6 +415,7 @@ describe("DatabaseCommands", () => {
 
             // Should not throw
             await expect(executor.rollbackAll()).resolves.toBeUndefined();
+            loggerSpy.mockRestore();
         });
     });
 
@@ -685,7 +766,7 @@ describe("DatabaseCommands", () => {
             expect(mockUpdateHistoryLimit).toHaveBeenCalledWith(2048);
         });
 
-        it("should fail import when imported history limit cannot be applied", async ({
+        it("should keep a committed import successful when runtime history-limit synchronization fails", async ({
             task,
             annotate,
         }) => {
@@ -700,17 +781,94 @@ describe("DatabaseCommands", () => {
                 settings: { historyLimit: "2048" },
             });
             mockUpdateHistoryLimit.mockRejectedValueOnce(updateError);
+            const rollbackSpy = vi.spyOn(command, "rollback");
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+            const executor = new DatabaseCommandExecutor();
 
-            await expect(command.execute()).rejects.toThrow(updateError);
+            await expect(executor.execute(command)).resolves.toBe(true);
 
             expect(mockUpdateHistoryLimit).toHaveBeenCalledWith(2048);
             expect(
                 mockSiteRepositoryService.getSitesFromDatabase
-            ).not.toHaveBeenCalled();
-            expect(mockEventBus.emitTyped).not.toHaveBeenCalledWith(
+            ).toHaveBeenCalledOnce();
+            expect(mockCache.replaceAll).toHaveBeenCalledOnce();
+            expect(rollbackSpy).not.toHaveBeenCalled();
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
-                expect.anything()
+                expect.objectContaining({ success: true })
             );
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[ImportDataCommand] Failed to synchronize imported history limit after commit",
+                updateError,
+                { importedHistoryLimit: 2048 }
+            );
+
+            loggerSpy.mockRestore();
+        });
+
+        it("should invalidate stale cache and report success when the post-commit reload fails", async () => {
+            const originalSite = createTestSite("original");
+            mockCache.set(originalSite.identifier, originalSite);
+            mockSiteRepositoryService.getSitesFromDatabase.mockRejectedValueOnce(
+                new Error("reload failed")
+            );
+            const rollbackSpy = vi.spyOn(command, "rollback");
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).resolves.toBe(true);
+
+            expect(
+                mockImportExportService.persistImportedData
+            ).toHaveBeenCalledOnce();
+            expect(mockCache.getAll()).toEqual([]);
+            expect(rollbackSpy).not.toHaveBeenCalled();
+            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+                "internal:database:data-imported",
+                expect.objectContaining({ success: true })
+            );
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[ImportDataCommand] Failed to refresh site cache after committed import",
+                expect.objectContaining({ message: "reload failed" })
+            );
+
+            loggerSpy.mockRestore();
+        });
+
+        it("should preserve the committed cache and result when event publication fails", async () => {
+            const eventError = new Error("event publication failed");
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock.mockRejectedValue(eventError);
+            const rollbackSpy = vi.spyOn(command, "rollback");
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).resolves.toBe(true);
+
+            expect(
+                mockImportExportService.persistImportedData
+            ).toHaveBeenCalledOnce();
+            expect(mockCache.getAll()).toEqual([
+                createTestSite("test1"),
+                createTestSite("test2"),
+            ]);
+            expect(rollbackSpy).not.toHaveBeenCalled();
+            expect(emitTypedMock).toHaveBeenCalledWith(
+                "internal:database:data-imported",
+                expect.objectContaining({ success: true })
+            );
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[ImportDataCommand] Failed to publish import completion event after commit",
+                eventError
+            );
+
+            loggerSpy.mockRestore();
         });
 
         it("should skip history limit propagation when value invalid", async ({
@@ -917,7 +1075,7 @@ describe("DatabaseCommands", () => {
             );
         });
 
-        it("should rollback cache to original state", async ({
+        it("should not restore stale cache after a committed import", async ({
             task,
             annotate,
         }) => {
@@ -930,30 +1088,36 @@ describe("DatabaseCommands", () => {
                 createTestSite("original1"),
                 createTestSite("original2"),
             ];
-            mockCache.getAll = vi.fn().mockReturnValue(originalSites);
+            for (const site of originalSites) {
+                mockCache.set(site.identifier, site);
+            }
 
-            // Execute first to populate backup
             await command.execute();
-
-            // Now test rollback
+            const warnSpy = vi
+                .spyOn(backendLogger, "warn")
+                .mockReturnValue(undefined);
             await command.rollback();
 
-            expect(mockCache.clear).toHaveBeenCalled();
-            expect(mockCache.set).toHaveBeenCalledWith(
-                "original1",
-                originalSites[0]
+            expect(mockCache.getAll()).toEqual([
+                createTestSite("test1"),
+                createTestSite("test2"),
+            ]);
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[ImportDataCommand] Skipping stale cache rollback after committed import"
             );
-            expect(mockCache.set).toHaveBeenCalledWith(
-                "original2",
-                originalSites[1]
-            );
+            warnSpy.mockRestore();
         });
 
-        it("should restore cloned original sites during rollback", async () => {
+        it("should restore cloned original sites when persistence fails before commit", async () => {
             const originalSite = createTestSite("original-clone");
-            mockCache.getAll = vi.fn().mockReturnValue([originalSite]);
+            mockCache.set(originalSite.identifier, originalSite);
+            mockImportExportService.persistImportedData.mockRejectedValueOnce(
+                new Error("persistence failed")
+            );
 
-            await command.execute();
+            await expect(command.execute()).rejects.toThrow(
+                "persistence failed"
+            );
             originalSite.name = "Mutated Original";
 
             await command.rollback();
