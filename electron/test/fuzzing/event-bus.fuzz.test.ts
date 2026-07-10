@@ -21,7 +21,9 @@ import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+    type EnhancedEventPayload,
     type EventPayloadValue,
+    type TypedEventListener,
     TypedEventBus,
 } from "../../events/TypedEventBus";
 
@@ -36,6 +38,30 @@ interface TestEvents extends Record<string, EventPayloadValue> {
     };
     "test:empty": Record<string, never>;
     "test:simple": { message: string };
+}
+
+interface CircularFixture {
+    circular?: CircularFixture;
+}
+
+type ComplexTestEvent = EnhancedEventPayload<TestEvents["test:complex"]>;
+type ManagedTestEventName =
+    | "test:complex"
+    | "test:empty"
+    | "test:simple";
+type ManagedTestListener = TypedEventListener<
+    TestEvents,
+    "test:complex" | "test:simple"
+>;
+type SimpleTestEvent = EnhancedEventPayload<TestEvents["test:simple"]>;
+
+function getFirstReceivedEvent<Event>(events: readonly Event[]): Event {
+    const event = events[0];
+    if (event === undefined) {
+        throw new Error("Expected the event listener to receive an event");
+    }
+
+    return event;
 }
 
 describe("TypedEventBus Fuzzing Tests", () => {
@@ -71,8 +97,8 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 { maxKeys: 20 }
                             ),
                             // Test circular references (should be handled safely)
-                            fc.constant({}).map((obj) => {
-                                (obj as any).circular = obj;
+                            fc.constant<CircularFixture>({}).map((obj) => {
+                                obj.circular = obj;
                                 return obj;
                             }),
                             // Test functions and symbols (should be serialized safely)
@@ -97,7 +123,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         ),
                     }),
                     async (eventData) => {
-                        const receivedEvents: any[] = [];
+                        const receivedEvents: ComplexTestEvent[] = [];
 
                         // Set up listener to capture events
                         eventBus.onTyped("test:complex", (data) => {
@@ -112,7 +138,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         // Verify event was received
                         expect(receivedEvents).toHaveLength(1);
 
-                        const received = receivedEvents[0];
+                        const received = getFirstReceivedEvent(receivedEvents);
 
                         // Verify metadata was added
                         expect(received).toHaveProperty("_meta");
@@ -155,7 +181,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         ),
                     }),
                     async (eventData) => {
-                        const receivedEvents: any[] = [];
+                        const receivedEvents: ComplexTestEvent[] = [];
 
                         eventBus.onTyped("test:complex", (data) => {
                             receivedEvents.push(data);
@@ -164,7 +190,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         await eventBus.emitTyped("test:complex", eventData);
 
                         expect(receivedEvents).toHaveLength(1);
-                        const received = receivedEvents[0];
+                        const received = getFirstReceivedEvent(receivedEvents);
 
                         // Should have new _meta, but preserve original as _originalMeta if it existed
                         expect(received).toHaveProperty("_meta");
@@ -286,7 +312,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             );
                         }
 
-                        const receivedEvents: any[] = [];
+                        const receivedEvents: SimpleTestEvent[] = [];
                         eventBus.onTyped("test:simple", (data) => {
                             receivedEvents.push(data);
                         });
@@ -402,7 +428,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                     }),
                     async (largeEventData) => {
                         const startTime = Date.now();
-                        const receivedEvents: any[] = [];
+                        const receivedEvents: ComplexTestEvent[] = [];
 
                         eventBus.onTyped("test:complex", (data) => {
                             receivedEvents.push(data);
@@ -425,9 +451,10 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         expect(receivedEvents).toHaveLength(1);
 
                         // Should preserve basic structure
-                        expect(receivedEvents[0]).toHaveProperty("id");
-                        expect(receivedEvents[0]).toHaveProperty("data");
-                        expect(receivedEvents[0]).toHaveProperty("_meta");
+                        const received = getFirstReceivedEvent(receivedEvents);
+                        expect(received).toHaveProperty("id");
+                        expect(received).toHaveProperty("data");
+                        expect(received).toHaveProperty("_meta");
 
                         // Clean up listeners after each iteration to prevent accumulation
                         eventBus.removeAllListeners();
@@ -459,12 +486,16 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         { minLength: 5, maxLength: 100 }
                     ),
                     async (actions) => {
-                        const listeners = new Map<string, Function[]>();
+                        const listeners = new Map<
+                            ManagedTestEventName,
+                            ManagedTestListener[]
+                        >();
 
                         for (const action of actions) {
                             switch (action.action) {
                                 case "add": {
-                                    const listener = vi.fn();
+                                    const listener =
+                                        vi.fn<ManagedTestListener>();
                                     if (action.eventType === "test:simple") {
                                         eventBus.onTyped(
                                             "test:simple",
@@ -492,19 +523,25 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                         listeners.get(action.eventType) ?? [];
                                     if (existing.length > 0) {
                                         const listener = existing[0];
+                                        if (listener === undefined) {
+                                            throw new Error(
+                                                "Expected a registered listener"
+                                            );
+                                        }
+
                                         if (
                                             action.eventType === "test:simple"
                                         ) {
                                             eventBus.offTyped(
                                                 "test:simple",
-                                                listener as any
+                                                listener
                                             );
                                         } else if (
                                             action.eventType === "test:complex"
                                         ) {
                                             eventBus.offTyped(
                                                 "test:complex",
-                                                listener as any
+                                                listener
                                             );
                                         }
                                         listeners.set(
