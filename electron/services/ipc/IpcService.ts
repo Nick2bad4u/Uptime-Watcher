@@ -65,6 +65,41 @@ export class IpcService {
 
         this.registeredIpcHandlers.clear();
 
+        this.clearScopedSubscriptions();
+
+        this.stateSyncStatusTracker.reset();
+        this.stateSyncListenerRegistered = false;
+    }
+
+    public setupHandlers(): void {
+        const previouslyRegisteredHandlers = new Set(
+            this.registeredIpcHandlers
+        );
+        const wasStateSyncListenerRegistered = this.stateSyncListenerRegistered;
+
+        try {
+            this.registerHandlerGroups();
+            this.ensureStateSyncListener();
+        } catch (error) {
+            for (const channel of this.registeredIpcHandlers) {
+                if (previouslyRegisteredHandlers.has(channel)) {
+                    continue;
+                }
+
+                ipcMain.removeHandler(channel);
+                this.registeredIpcHandlers.delete(channel);
+            }
+
+            if (!wasStateSyncListenerRegistered) {
+                this.clearScopedSubscriptions();
+                this.stateSyncListenerRegistered = false;
+            }
+
+            throw error;
+        }
+    }
+
+    private clearScopedSubscriptions(): void {
         this.scopedSubscriptions.clearAll({
             onError: (error) => {
                 logger.error(
@@ -74,12 +109,9 @@ export class IpcService {
             },
             suppressErrors: true,
         });
-
-        this.stateSyncStatusTracker.reset();
-        this.stateSyncListenerRegistered = false;
     }
 
-    public setupHandlers(): void {
+    private registerHandlerGroups(): void {
         registerCloudHandlers({
             cloudService: this.cloudService,
             registeredHandlers: this.registeredIpcHandlers,
@@ -132,8 +164,6 @@ export class IpcService {
             eventEmitter: this.uptimeOrchestrator,
             registeredHandlers: this.registeredIpcHandlers,
         });
-
-        this.ensureStateSyncListener();
     }
 
     private ensureStateSyncListener(): void {

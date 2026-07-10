@@ -258,6 +258,40 @@ describe(IpcService, () => {
             const handleCallCount = mockIpcMain.handle.mock.calls.length;
             expect(handleCallCount).toBeGreaterThan(20); // Ensure reasonable number of handlers
         });
+        it("should roll back a failed setup so registration can be retried", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            let registrationCount = 0;
+            mockIpcMain.handle.mockImplementation(() => {
+                registrationCount += 1;
+                if (registrationCount === 3) {
+                    throw new Error("registration failed");
+                }
+            });
+
+            expect(() => ipcService.setupHandlers()).toThrow(
+                "registration failed"
+            );
+
+            const installedBeforeFailure = mockIpcMain.handle.mock.calls
+                .slice(0, 2)
+                .map(([channel]) => channel);
+            expect(
+                mockIpcMain.removeHandler.mock.calls.map(([channel]) => channel)
+            ).toEqual(installedBeforeFailure);
+
+            mockIpcMain.handle.mockImplementation(() => undefined);
+            expect(() => ipcService.setupHandlers()).not.toThrow();
+
+            const retryRegistrationCount =
+                mockIpcMain.handle.mock.calls.length - registrationCount;
+            expect(retryRegistrationCount).toBeGreaterThan(20);
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledTimes(1);
+        });
         it("verifies diagnostics handler registration state", async ({
             task,
             annotate,
