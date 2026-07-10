@@ -157,7 +157,7 @@ const getWasmSourcePath = (): string => {
         "",
         "To fix this issue:",
         "  1. Run 'npm run copy-wasm' to copy from node_modules",
-        "  2. Or run 'npm run download:sqlite' to download it",
+        "  2. Or run 'npm run sqlite:download' to restore it",
         "  3. Or ensure the postinstall script completed successfully",
     ].join("\n");
 
