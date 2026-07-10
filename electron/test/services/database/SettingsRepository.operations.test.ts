@@ -3,7 +3,10 @@
  */
 
 import { fc } from "@fast-check/vitest";
+import type { Database, RunResult, Statement } from "node-sqlite3-wasm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { SettingsRepositoryDependencies } from "../../../services/database/SettingsRepository";
 
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => {
@@ -46,31 +49,59 @@ vi.mock("../../utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn((fn) => fn()),
 }));
 
+const createRunResult = (changes = 0): RunResult => ({
+    changes,
+    lastInsertRowid: 0,
+});
+
+const createMockStatement = () => ({
+    all: vi.fn<Statement["all"]>(() => []),
+    finalize: vi.fn<Statement["finalize"]>(),
+    get: vi.fn<Statement["get"]>(() => null),
+    run: vi.fn<Statement["run"]>(() => createRunResult()),
+});
+
+type MockStatement = ReturnType<typeof createMockStatement>;
+
+const createMockDatabase = (statement: MockStatement) => ({
+    all: vi.fn<Database["all"]>(() => []),
+    get: vi.fn<Database["get"]>(() => null),
+    prepare: vi.fn<Database["prepare"]>(
+        () => statement as unknown as Statement
+    ),
+    run: vi.fn<Database["run"]>(() => createRunResult()),
+});
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+const asDatabase = (database: MockDatabase): Database =>
+    database as unknown as Database;
+
+const createMockDatabaseService = (database: Database) => ({
+    executeTransaction: vi
+        .fn<
+            (callback: (transaction: Database) => unknown) => Promise<unknown>
+        >()
+        .mockImplementation(async (callback) => callback(database)),
+    getDatabase: vi.fn(() => database),
+});
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
+type RepositoryDatabaseService = MockDatabaseService &
+    SettingsRepositoryDependencies["databaseService"];
+
 describe("SettingsRepository operations", () => {
-    let mockDb: any;
-    let mockDatabaseService: any;
-    let mockStatement: any;
+    let mockDb: MockDatabase;
+    let mockDatabaseService: RepositoryDatabaseService;
+    let mockStatement: MockStatement;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockStatement = {
-            all: vi.fn(),
-            finalize: vi.fn(),
-            get: vi.fn(),
-            run: vi.fn(),
-        };
-        mockDb = {
-            all: vi.fn(() => []),
-            get: vi.fn(),
-            prepare: vi.fn(() => mockStatement),
-            run: vi.fn(),
-        };
-        mockDatabaseService = {
-            getDatabase: vi.fn(() => mockDb),
-            executeTransaction: vi.fn(async (callback: any) =>
-                callback(mockDb)
-            ),
-        };
+        mockStatement = createMockStatement();
+        mockDb = createMockDatabase(mockStatement);
+        mockDatabaseService = createMockDatabaseService(
+            asDatabase(mockDb)
+        ) as unknown as RepositoryDatabaseService;
     });
     it("should import the repository without errors", async ({
         task,
@@ -377,24 +408,21 @@ describe("SettingsRepository operations", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            const mockRun = vi.fn().mockReturnValue({
-                                changes: 1,
-                            });
-                            const mockGet = vi.fn().mockReturnValue({
+                            const transactionStatement = createMockStatement();
+                            transactionStatement.run.mockReturnValue(
+                                createRunResult(1)
+                            );
+                            transactionStatement.get.mockReturnValue({
                                 key: settingKey,
-                                value: JSON.stringify(settingValue),
                                 updatedAt: Date.now(),
+                                value: JSON.stringify(settingValue),
                             });
+                            const transactionDatabase =
+                                createMockDatabase(transactionStatement);
 
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) =>
-                                    callback({
-                                        prepare: vi.fn(() => ({
-                                            run: mockRun,
-                                            get: mockGet,
-                                            finalize: vi.fn(),
-                                        })),
-                                    })
+                                async (callback) =>
+                                    callback(asDatabase(transactionDatabase))
                             );
 
                             expect(repository).toBeDefined();
@@ -434,29 +462,27 @@ describe("SettingsRepository operations", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) =>
-                                    callback({
-                                        prepare: vi.fn(() => ({
-                                            run: vi.fn().mockReturnValue({
-                                                changes:
-                                                    Object.keys(settingsObject)
-                                                        .length,
-                                            }),
-                                            all: vi.fn().mockReturnValue(
-                                                Object.entries(
-                                                    settingsObject
-                                                ).map(([key, value]) => ({
-                                                    key,
-                                                    value: JSON.stringify(
-                                                        value
-                                                    ),
-                                                    updatedAt: Date.now(),
-                                                }))
-                                            ),
-                                            finalize: vi.fn(),
-                                        })),
+                            const transactionStatement = createMockStatement();
+                            transactionStatement.run.mockReturnValue(
+                                createRunResult(
+                                    Object.keys(settingsObject).length
+                                )
+                            );
+                            transactionStatement.all.mockReturnValue(
+                                Object.entries(settingsObject).map(
+                                    ([key, value]) => ({
+                                        key,
+                                        updatedAt: Date.now(),
+                                        value: JSON.stringify(value),
                                     })
+                                )
+                            );
+                            const transactionDatabase =
+                                createMockDatabase(transactionStatement);
+
+                            mockDatabaseService.executeTransaction.mockImplementation(
+                                async (callback) =>
+                                    callback(asDatabase(transactionDatabase))
                             );
 
                             expect(repository).toBeDefined();
@@ -519,22 +545,20 @@ describe("SettingsRepository operations", () => {
                             });
 
                             for (const key of settingKeys) {
-                                const mockGet = vi.fn().mockReturnValue({
+                                const lookupStatement = createMockStatement();
+                                lookupStatement.get.mockReturnValue({
                                     key,
-                                    value: JSON.stringify(`value-for-${key}`),
                                     updatedAt: Date.now(),
+                                    value: JSON.stringify(`value-for-${key}`),
                                 });
+                                lookupStatement.run.mockReturnValue(
+                                    createRunResult(1)
+                                );
+                                const lookupDatabase =
+                                    createMockDatabase(lookupStatement);
 
                                 mockDatabaseService.getDatabase.mockReturnValue(
-                                    {
-                                        prepare: vi.fn(() => ({
-                                            get: mockGet,
-                                            run: vi.fn().mockReturnValue({
-                                                changes: 1,
-                                            }),
-                                            finalize: vi.fn(),
-                                        })),
-                                    }
+                                    asDatabase(lookupDatabase)
                                 );
 
                                 expect(repository).toBeDefined();
@@ -578,23 +602,26 @@ describe("SettingsRepository operations", () => {
                                 databaseService: mockDatabaseService,
                             });
 
+                            const serializedValue: unknown =
+                                JSON.stringify(edgeValue);
+                            const transactionStatement = createMockStatement();
+                            transactionStatement.run.mockReturnValue(
+                                createRunResult(1)
+                            );
+                            transactionStatement.get.mockReturnValue({
+                                key: settingKey,
+                                updatedAt: Date.now(),
+                                value:
+                                    typeof serializedValue === "string"
+                                        ? serializedValue
+                                        : null,
+                            });
+                            const transactionDatabase =
+                                createMockDatabase(transactionStatement);
+
                             mockDatabaseService.executeTransaction.mockImplementation(
-                                async (callback: any) =>
-                                    callback({
-                                        prepare: vi.fn(() => ({
-                                            run: vi.fn().mockReturnValue({
-                                                changes: 1,
-                                            }),
-                                            get: vi.fn().mockReturnValue({
-                                                key: settingKey,
-                                                value: JSON.stringify(
-                                                    edgeValue
-                                                ),
-                                                updatedAt: Date.now(),
-                                            }),
-                                            finalize: vi.fn(),
-                                        })),
-                                    })
+                                async (callback) =>
+                                    callback(asDatabase(transactionDatabase))
                             );
 
                             expect(repository).toBeDefined();
@@ -639,10 +666,10 @@ describe("SettingsRepository operations", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            const dbError = new Error(
-                                `Mock ${errorType} error`
+                            const dbError = Object.assign(
+                                new Error(`Mock ${errorType} error`),
+                                { code: errorType }
                             );
-                            (dbError as any).code = errorType;
 
                             mockDatabaseService.executeTransaction.mockImplementation(
                                 async () => {
@@ -690,11 +717,15 @@ describe("SettingsRepository operations", () => {
                         ];
 
                         for (const methodName of expectedMethods) {
-                            if (methodName in repository) {
-                                expect(
-                                    typeof (repository as any)[methodName]
-                                ).toBe("function");
+                            if (!(methodName in repository)) {
+                                continue;
                             }
+
+                            const method: unknown = Reflect.get(
+                                repository,
+                                methodName
+                            );
+                            expect(typeof method).toBe("function");
                         }
 
                         if (mockSuccessfully) {

@@ -18,6 +18,11 @@ import type {
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
 import type { DatabaseCommandContext } from "../../../services/commands/databaseCommandContext";
 import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
+import type {
+    IDataBackupService,
+    IDataImportExportService,
+    ISiteRepositoryService,
+} from "../../../services/factories/DatabaseServiceFactory";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 import {
@@ -319,7 +324,14 @@ describe("DatabaseCommands", () => {
             await executor.execute(mockCommand);
 
             // Manually corrupt the command array to test robustness
-            (executor as any).executedCommands[0] = undefined;
+            const executedCommands: unknown = Reflect.get(
+                executor,
+                "executedCommands"
+            );
+            if (!Array.isArray(executedCommands)) {
+                throw new TypeError("Expected the executed command history");
+            }
+            executedCommands[0] = undefined;
 
             // Should not throw
             await expect(executor.rollbackAll()).resolves.toBeUndefined();
@@ -328,7 +340,11 @@ describe("DatabaseCommands", () => {
 
     describe(DownloadBackupCommand, () => {
         let command: DownloadBackupCommand;
-        let mockBackupService: any;
+        let mockBackupService: {
+            downloadDatabaseBackup: Mock<
+                IDataBackupService["downloadDatabaseBackup"]
+            >;
+        };
 
         const mockBackupMetadata = {
             createdAt: 1_700_000_200_000,
@@ -345,7 +361,7 @@ describe("DatabaseCommands", () => {
                 }),
             };
             mockServiceFactory.createBackupService.mockReturnValue(
-                mockBackupService
+                mockBackupService as unknown as IDataBackupService
             );
 
             command = new DownloadBackupCommand(
@@ -440,14 +456,16 @@ describe("DatabaseCommands", () => {
 
     describe(ExportDataCommand, () => {
         let command: ExportDataCommand;
-        let mockImportExportService: any;
+        let mockImportExportService: {
+            exportAllData: Mock<IDataImportExportService["exportAllData"]>;
+        };
 
         beforeEach(() => {
             mockImportExportService = {
                 exportAllData: vi.fn().mockResolvedValue('{"test": "data"}'),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
-                mockImportExportService
+                mockImportExportService as unknown as IDataImportExportService
             );
 
             command = new ExportDataCommand(
@@ -538,8 +556,19 @@ describe("DatabaseCommands", () => {
 
     describe(ImportDataCommand, () => {
         let command: ImportDataCommand;
-        let mockImportExportService: any;
-        let mockSiteRepositoryService: any;
+        let mockImportExportService: {
+            importDataFromJson: Mock<
+                IDataImportExportService["importDataFromJson"]
+            >;
+            persistImportedData: Mock<
+                IDataImportExportService["persistImportedData"]
+            >;
+        };
+        let mockSiteRepositoryService: {
+            getSitesFromDatabase: Mock<
+                ISiteRepositoryService["getSitesFromDatabase"]
+            >;
+        };
 
         beforeEach(() => {
             mockImportExportService = {
@@ -556,10 +585,10 @@ describe("DatabaseCommands", () => {
                 ]),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
-                mockImportExportService
+                mockImportExportService as unknown as IDataImportExportService
             );
             mockServiceFactory.createSiteRepositoryService.mockReturnValue(
-                mockSiteRepositoryService
+                mockSiteRepositoryService as unknown as ISiteRepositoryService
             );
 
             command = new ImportDataCommand({
@@ -1155,7 +1184,17 @@ describe("DatabaseCommands", () => {
             preRestoreFileName: string;
             restoredAt: number;
         };
-        let backupService: any;
+        let backupService: {
+            applyDatabaseBackupResult: Mock<
+                IDataBackupService["applyDatabaseBackupResult"]
+            >;
+            downloadDatabaseBackup: Mock<
+                IDataBackupService["downloadDatabaseBackup"]
+            >;
+            restoreDatabaseBackup: Mock<
+                IDataBackupService["restoreDatabaseBackup"]
+            >;
+        };
 
         beforeEach(() => {
             payload = {
@@ -1196,7 +1235,7 @@ describe("DatabaseCommands", () => {
                     .mockResolvedValue(restoreResult.metadata),
             };
             mockServiceFactory.createBackupService.mockReturnValue(
-                backupService as never
+                backupService as unknown as IDataBackupService
             );
             mockServiceFactory.createSiteRepositoryService.mockReturnValue({
                 getSitesFromDatabase: vi
@@ -1324,16 +1363,15 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            (mockEventBus.emitTyped as any).mockRejectedValue(
-                new Error("Event emission failed")
-            );
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock.mockRejectedValue(new Error("Event emission failed"));
 
             // Ensure the import/export service exists so execute() reaches event emission
             const mockImportExportService = {
                 exportAllData: vi.fn().mockResolvedValue("{}"),
             };
             mockServiceFactory.createImportExportService.mockReturnValue(
-                mockImportExportService as any
+                mockImportExportService as unknown as IDataImportExportService
             );
 
             const command = new ExportDataCommand(
