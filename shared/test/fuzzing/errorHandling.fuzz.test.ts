@@ -1,7 +1,7 @@
 /**
  * @module shared/test/fuzzing/errorHandling
  *
- * @file Fast-Check fuzzing tests for errorHandling targeting line 141
+ * @file Fast-Check fuzzing tests for shared error handling utilities
  */
 
 import { fc, test } from "@fast-check/vitest";
@@ -20,14 +20,13 @@ import { describe, expect, it, vi } from "vitest";
 const sanitizedErrorMessage = (message: string) =>
     expect.objectContaining({ message });
 const sharedLogMessage = (message: string) => `[SHARED] ${message}`;
+const asBackendContextForTesting = (
+    context: unknown
+): ErrorHandlingBackendContext => context as ErrorHandlingBackendContext;
 
-describe("ErrorHandling fuzzing - line 141", () => {
-    it("simple fuzz sanity check", () => {
-        expect(1 + 1).toBe(2);
-    });
-
-    describe("withErrorHandling fuzz - line 141 console.error fallback", () => {
-        it("should fuzz-trigger console.error when logger is invalid - line 141", async () => {
+describe("ErrorHandling fuzzing", () => {
+    describe("withErrorHandling console fallback", () => {
+        it("should use the console fallback when logger.error is not callable", async () => {
             const consoleErrorSpy = vi
                 .spyOn(console, "error")
                 .mockImplementation(() => {});
@@ -35,11 +34,10 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 .spyOn(console, "warn")
                 .mockImplementation(() => {});
 
-            // Backend context with invalid logger to trigger line 141
-            const context: ErrorHandlingBackendContext = {
-                logger: { error: "not a function" as any }, // Invalid logger that will fail runtime check
+            const context = asBackendContextForTesting({
+                logger: { error: "not a function" },
                 operationName: "test operation",
-            };
+            });
 
             const failingOperation = async () => {
                 throw new Error("Test error");
@@ -49,7 +47,6 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 withErrorHandling(failingOperation, context)
             ).rejects.toThrow("Test error");
 
-            // Verify line 141 was hit - console.error should be called
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 sharedLogMessage("Failed to test operation"),
                 sanitizedErrorMessage("Test error")
@@ -64,7 +61,6 @@ describe("ErrorHandling fuzzing - line 141", () => {
             consoleWarnSpy.mockRestore();
         });
 
-        // Fast-Check fuzzing tests for invalid logger scenarios
         test.prop([
             fc.oneof(
                 fc.constant(undefined),
@@ -82,7 +78,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
             fc.option(fc.string(), { nil: undefined }),
             fc.string(),
         ])(
-            "should fuzz-trigger console.error fallback with invalid logger - line 141",
+            "should use the console fallback for invalid logger values",
             async (invalidLogger, operationName, errorMessage) => {
                 const consoleErrorSpy = vi
                     .spyOn(console, "error")
@@ -91,11 +87,10 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     .spyOn(console, "warn")
                     .mockImplementation(() => {});
 
-                // Force type to pass TypeScript compilation but fail runtime check
-                const context: ErrorHandlingBackendContext = {
-                    logger: invalidLogger as any,
+                const context = asBackendContextForTesting({
+                    logger: invalidLogger,
                     ...(operationName !== undefined && { operationName }),
-                };
+                });
 
                 const failingOperation = async () => {
                     throw new Error(errorMessage);
@@ -105,7 +100,6 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     withErrorHandling(failingOperation, context)
                 ).rejects.toThrow(errorMessage);
 
-                // Verify line 141 was hit - console.error should be called instead of logger.error
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     sharedLogMessage(
                         operationName
@@ -125,7 +119,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
         );
 
         test.prop([fc.string().filter((s) => s.length > 0), fc.string()])(
-            "should fuzz-format console.error message correctly - line 141",
+            "should format fallback messages with an operation name",
             async (operationName, errorMessage) => {
                 const consoleErrorSpy = vi
                     .spyOn(console, "error")
@@ -134,11 +128,10 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     .spyOn(console, "warn")
                     .mockImplementation(() => {});
 
-                // Context with no logger property to trigger console.error
-                const context: ErrorHandlingBackendContext = {
-                    logger: {} as any, // Empty object fails the logger check
+                const context = asBackendContextForTesting({
+                    logger: {},
                     operationName,
-                };
+                });
 
                 const failingOperation = async () => {
                     throw new Error(errorMessage);
@@ -148,7 +141,6 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     withErrorHandling(failingOperation, context)
                 ).rejects.toThrow(errorMessage);
 
-                // Verify the specific message format for line 141
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     sharedLogMessage(`Failed to ${operationName}`),
                     sanitizedErrorMessage(errorMessage)
@@ -163,7 +155,7 @@ describe("ErrorHandling fuzzing - line 141", () => {
             }
         );
 
-        it("should fuzz-verify line 141 path with undefined operationName", async () => {
+        it("should use the default message without an operation name", async () => {
             const consoleErrorSpy = vi
                 .spyOn(console, "error")
                 .mockImplementation(() => {});
@@ -171,9 +163,9 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 .spyOn(console, "warn")
                 .mockImplementation(() => {});
 
-            const context: ErrorHandlingBackendContext = {
-                logger: { someOtherMethod: () => {} } as any, // Invalid logger without error method
-            };
+            const context = asBackendContextForTesting({
+                logger: { someOtherMethod: () => {} },
+            });
 
             const failingOperation = async () => {
                 throw new Error("Test error");
@@ -183,7 +175,6 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 withErrorHandling(failingOperation, context)
             ).rejects.toThrow("Test error");
 
-            // Verify line 141 console.error call with default message
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 sharedLogMessage("Async operation failed"),
                 sanitizedErrorMessage("Test error")
@@ -209,10 +200,10 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     .spyOn(console, "warn")
                     .mockImplementation(() => {});
 
-                const context: ErrorHandlingBackendContext = {
-                    logger: null as any, // Force console.error path
+                const context = asBackendContextForTesting({
+                    logger: null,
                     operationName: "fuzz test",
-                };
+                });
 
                 const failingOperation = async () => {
                     throw errorValue;
@@ -254,10 +245,10 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     .spyOn(console, "warn")
                     .mockImplementation(() => {});
 
-                const context: ErrorHandlingBackendContext = {
-                    logger: null as any, // Invalid logger to force console.error path
-                    operationName: invalidOperationName as any,
-                };
+                const context = asBackendContextForTesting({
+                    logger: null,
+                    operationName: invalidOperationName,
+                });
 
                 const failingOperation = async () => {
                     throw new Error(errorMessage);
