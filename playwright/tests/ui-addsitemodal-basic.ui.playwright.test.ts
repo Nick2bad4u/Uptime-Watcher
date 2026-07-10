@@ -137,7 +137,10 @@ test.describe(
                 await openAddSiteModal(page);
 
                 const monitorTypeSelect = page.getByLabel(/monitor type/i);
-                await expect.soft(monitorTypeSelect).toBeVisible();
+                await expect(monitorTypeSelect).toBeVisible();
+                await expect(monitorTypeSelect).toBeEnabled({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
 
                 const monitorTypeValues = await monitorTypeSelect.evaluate(
                     (element) =>
