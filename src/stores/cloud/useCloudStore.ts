@@ -94,6 +94,67 @@ export interface CloudStoreState {
 
 export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
     create<CloudStoreState>()((set, get) => {
+        let backupListRequestGeneration = 0;
+        let destructiveBackupOperationTail: null | Promise<void> = null;
+
+        const getProviderIdentity = (
+            status: CloudStatusSummary | null
+        ): null | string => {
+            if (status?.provider === null || status === null) {
+                return null;
+            }
+
+            const { provider, providerDetails } = status;
+            if (providerDetails?.kind === "filesystem") {
+                return `${provider}:${providerDetails.baseDirectory}`;
+            }
+
+            return `${provider}:${providerDetails?.accountLabel ?? ""}`;
+        };
+
+        const invalidateBackupListRequests = (): void => {
+            backupListRequestGeneration += 1;
+            set({ isListingBackups: false });
+        };
+
+        const setProviderStatus = (status: CloudStatusSummary): void => {
+            const providerChanged =
+                getProviderIdentity(get().status) !==
+                getProviderIdentity(status);
+
+            if (providerChanged) {
+                backupListRequestGeneration += 1;
+                set({ backups: [], isListingBackups: false, status });
+                return;
+            }
+
+            set({ status });
+        };
+
+        const runDestructiveBackupOperation = async (
+            operation: () => Promise<void>
+        ): Promise<void> => {
+            const precedingOperation = destructiveBackupOperationTail;
+            let releaseOperation: () => void = () => {};
+            const currentOperation = new Promise<void>((resolve) => {
+                releaseOperation = resolve;
+            });
+            destructiveBackupOperationTail = currentOperation;
+
+            if (precedingOperation) {
+                await precedingOperation;
+            }
+
+            try {
+                await operation();
+            } finally {
+                releaseOperation();
+                if (destructiveBackupOperationTail === currentOperation) {
+                    destructiveBackupOperationTail = null;
+                }
+            }
+        };
+
         const listBackupsWithFallback = async (): Promise<
             CloudBackupEntry[]
         > => {
@@ -118,7 +179,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                         async () => {
                             const status =
                                 await CloudService.clearEncryptionKey();
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler("cloud", "clearEncryptionKey")
                     );
@@ -130,6 +191,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             configureFilesystemProvider: async (args: {
                 baseDirectory: string;
             }): Promise<void> => {
+                invalidateBackupListRequests();
                 set({ isConfiguringFilesystemProvider: true });
 
                 try {
@@ -139,7 +201,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                                 await CloudService.configureFilesystemProvider(
                                     args
                                 );
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler(
                             "cloud",
@@ -151,6 +213,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                 }
             },
             connectDropbox: async (): Promise<void> => {
+                invalidateBackupListRequests();
                 set({ isConnectingDropbox: true });
                 const startedToastId = enqueueCloudOperationStartedToast({
                     message: "Waiting for authorization in your browser.",
@@ -161,7 +224,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     const nextStatus = await withErrorHandling(
                         async () => {
                             const status = await CloudService.connectDropbox();
-                            set({ status });
+                            setProviderStatus(status);
                             return status;
                         },
                         createStoreErrorHandler("cloud", "connectDropbox")
@@ -203,6 +266,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             },
 
             connectGoogleDrive: async (): Promise<void> => {
+                invalidateBackupListRequests();
                 set({ isConnectingGoogleDrive: true });
                 const startedToastId = enqueueCloudOperationStartedToast({
                     message: "Waiting for authorization in your browser.",
@@ -214,7 +278,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                         async () => {
                             const status =
                                 await CloudService.connectGoogleDrive();
-                            set({ status });
+                            setProviderStatus(status);
                             return status;
                         },
                         createStoreErrorHandler("cloud", "connectGoogleDrive")
@@ -259,24 +323,27 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             },
 
             deleteBackup: async (key: string): Promise<void> => {
-                set({ deletingBackupKey: key });
-                try {
-                    await withErrorHandling(
-                        async () => {
-                            const backups =
-                                await CloudService.deleteBackup(key);
-                            set({ backups });
-                        },
-                        createStoreErrorHandler("cloud", "deleteBackup")
-                    );
-                } finally {
-                    set({ deletingBackupKey: null });
-                }
+                await runDestructiveBackupOperation(async () => {
+                    set({ deletingBackupKey: key });
+                    try {
+                        await withErrorHandling(
+                            async () => {
+                                const backups =
+                                    await CloudService.deleteBackup(key);
+                                set({ backups });
+                            },
+                            createStoreErrorHandler("cloud", "deleteBackup")
+                        );
+                    } finally {
+                        set({ deletingBackupKey: null });
+                    }
+                });
             },
 
             deletingBackupKey: null,
 
             disconnect: async (): Promise<void> => {
+                invalidateBackupListRequests();
                 set({ isDisconnecting: true });
 
                 try {
@@ -314,18 +381,29 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             lastBackupMigrationResult: null,
             lastRemoteSyncResetResult: null,
             listBackups: async (): Promise<void> => {
+                const requestGeneration = ++backupListRequestGeneration;
+                const providerIdentity = getProviderIdentity(get().status);
                 set({ isListingBackups: true });
 
                 try {
                     await withErrorHandling(
                         async () => {
                             const backups = await CloudService.listBackups();
-                            set({ backups });
+                            if (
+                                requestGeneration ===
+                                    backupListRequestGeneration &&
+                                providerIdentity ===
+                                    getProviderIdentity(get().status)
+                            ) {
+                                set({ backups });
+                            }
                         },
                         createStoreErrorHandler("cloud", "listBackups")
                     );
                 } finally {
-                    set({ isListingBackups: false });
+                    if (requestGeneration === backupListRequestGeneration) {
+                        set({ isListingBackups: false });
+                    }
                 }
             },
 
@@ -442,7 +520,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                     await withErrorHandling(
                         async () => {
                             const status = await CloudService.getStatus();
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler("cloud", "getStatus")
                     );
@@ -464,7 +542,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                         async () => {
                             await CloudService.requestSyncNow();
                             const status = await CloudService.getStatus();
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler("cloud", "requestSyncNow")
                     );
@@ -562,57 +640,64 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
             },
 
             restoreBackup: async (key: string): Promise<void> => {
-                set({ restoringBackupKey: key });
-
-                try {
-                    const entryName =
-                        get().backups.find((backup) => backup.key === key)
-                            ?.fileName ?? key;
-
-                    const startedToastId = enqueueCloudOperationStartedToast({
-                        message: `Restoring ${entryName}`,
-                        title: "Restoring backup",
-                    });
-
+                await runDestructiveBackupOperation(async () => {
+                    set({ restoringBackupKey: key });
                     try {
-                        await withErrorHandling(
-                            async () => {
-                                await CloudService.restoreBackup(key);
+                        const entryName =
+                            get().backups.find((backup) => backup.key === key)
+                                ?.fileName ?? key;
 
-                                const [status, backups] = await Promise.all([
-                                    CloudService.getStatus(),
-                                    listBackupsWithFallback(),
-                                ]);
-                                set({ backups, status });
-                            },
-                            createStoreErrorHandler("cloud", "restoreBackup")
-                        );
+                        const startedToastId =
+                            enqueueCloudOperationStartedToast({
+                                message: `Restoring ${entryName}`,
+                                title: "Restoring backup",
+                            });
+
+                        try {
+                            await withErrorHandling(
+                                async () => {
+                                    await CloudService.restoreBackup(key);
+
+                                    const [status, backups] = await Promise.all(
+                                        [
+                                            CloudService.getStatus(),
+                                            listBackupsWithFallback(),
+                                        ]
+                                    );
+                                    set({ backups, status });
+                                },
+                                createStoreErrorHandler(
+                                    "cloud",
+                                    "restoreBackup"
+                                )
+                            );
+                        } finally {
+                            dismissToastSafely(startedToastId);
+                        }
+
+                        enqueueCloudToast({
+                            message: `Restored ${entryName}`,
+                            title: "Backup restored",
+                            variant: "success",
+                        });
+
+                        dispatchCloudSystemNotification({
+                            body: `Restored ${entryName}`,
+                            title: "Backup restored",
+                        });
+                    } catch (error) {
+                        const safeError = ensureError(error);
+                        enqueueCloudErrorToast("Backup restore failed", error);
+
+                        dispatchCloudSystemNotification({
+                            body: getCloudUserFacingErrorDetail(error),
+                            title: "Backup restore failed",
+                        });
+                        throw safeError;
                     } finally {
-                        dismissToastSafely(startedToastId);
+                        set({ restoringBackupKey: null });
                     }
-
-                    enqueueCloudToast({
-                        message: `Restored ${entryName}`,
-                        title: "Backup restored",
-                        variant: "success",
-                    });
-
-                    dispatchCloudSystemNotification({
-                        body: `Restored ${entryName}`,
-                        title: "Backup restored",
-                    });
-                } catch (error) {
-                    const safeError = ensureError(error);
-                    enqueueCloudErrorToast("Backup restore failed", error);
-
-                    dispatchCloudSystemNotification({
-                        body: getCloudUserFacingErrorDetail(error),
-                        title: "Backup restore failed",
-                    });
-                    throw safeError;
-                } finally {
-                    set({ restoringBackupKey: null });
-                }
+                });
             },
 
             restoringBackupKey: null,
@@ -629,7 +714,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                                 await CloudService.setEncryptionPassphrase(
                                     passphrase
                                 );
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler(
                             "cloud",
@@ -650,7 +735,7 @@ export const useCloudStore: UseBoundStore<StoreApi<CloudStoreState>> =
                             const status = await CloudService.enableSync({
                                 enabled,
                             });
-                            set({ status });
+                            setProviderStatus(status);
                         },
                         createStoreErrorHandler("cloud", "setSyncEnabled")
                     );

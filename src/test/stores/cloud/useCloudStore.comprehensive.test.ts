@@ -32,6 +32,7 @@ const cloudServiceMock = vi.hoisted(() => ({
             >(),
         connectDropbox: vi.fn<() => Promise<CloudStatusSummary>>(),
         connectGoogleDrive: vi.fn<() => Promise<CloudStatusSummary>>(),
+        deleteBackup: vi.fn<(key: string) => Promise<CloudBackupEntry[]>>(),
         disconnect: vi.fn<() => Promise<CloudStatusSummary>>(),
         enableSync:
             vi.fn<
@@ -84,6 +85,23 @@ function createDeferred<T>(): {
     return { promise, resolve, reject };
 }
 
+function createBackup(fileName: string): CloudBackupEntry {
+    return {
+        encrypted: false,
+        fileName,
+        key: `backups/${fileName}`,
+        metadata: {
+            appVersion: "test",
+            checksum: "x",
+            createdAt: 1,
+            originalPath: "x",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: 1,
+        },
+    };
+}
+
 describe(useCloudStore, () => {
     let initialSnapshot: CloudStoreState;
 
@@ -117,6 +135,7 @@ describe(useCloudStore, () => {
                 remoteSyncResetPreview: null,
                 lastBackupMigrationResult: null,
                 lastRemoteSyncResetResult: null,
+                deletingBackupKey: null,
                 restoringBackupKey: null,
                 isConfiguringFilesystemProvider: false,
                 isClearingEncryptionKey: false,
@@ -340,6 +359,127 @@ describe(useCloudStore, () => {
         expect(useCloudStore.getState().backups).toHaveLength(1);
     });
 
+    it("ignores a listBackups response invalidated by disconnect", async () => {
+        const deferred = createDeferred<CloudBackupEntry[]>();
+        cloudServiceMock.CloudService.listBackups.mockReturnValue(
+            deferred.promise
+        );
+        useCloudStore.setState({
+            status: {
+                ...baseStatus,
+                backupsEnabled: true,
+                configured: true,
+                connected: true,
+                provider: "dropbox",
+            },
+        });
+
+        const listPromise = useCloudStore.getState().listBackups();
+        await useCloudStore.getState().disconnect();
+
+        deferred.resolve([createBackup("stale.sqlite")]);
+        await listPromise;
+
+        expect(useCloudStore.getState().backups).toEqual([]);
+        expect(useCloudStore.getState().isListingBackups).toBeFalsy();
+    });
+
+    it("ignores a listBackups response from the previous provider", async () => {
+        const deferred = createDeferred<CloudBackupEntry[]>();
+        cloudServiceMock.CloudService.listBackups.mockReturnValue(
+            deferred.promise
+        );
+        useCloudStore.setState({
+            status: {
+                ...baseStatus,
+                backupsEnabled: true,
+                configured: true,
+                connected: true,
+                provider: "dropbox",
+            },
+        });
+
+        const listPromise = useCloudStore.getState().listBackups();
+        cloudServiceMock.CloudService.connectGoogleDrive.mockResolvedValue({
+            ...baseStatus,
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            provider: "google-drive",
+            providerDetails: {
+                kind: "google-drive",
+                accountLabel: "new@example.com",
+            },
+        });
+        await useCloudStore.getState().connectGoogleDrive();
+
+        deferred.resolve([createBackup("dropbox.sqlite")]);
+        await listPromise;
+
+        expect(useCloudStore.getState().status?.provider).toBe("google-drive");
+        expect(useCloudStore.getState().backups).toEqual([]);
+    });
+
+    it("invalidates a listBackups response when refreshStatus discovers a provider switch", async () => {
+        const deferred = createDeferred<CloudBackupEntry[]>();
+        cloudServiceMock.CloudService.listBackups.mockReturnValue(
+            deferred.promise
+        );
+        useCloudStore.setState({
+            status: {
+                ...baseStatus,
+                backupsEnabled: true,
+                configured: true,
+                connected: true,
+                provider: "dropbox",
+            },
+        });
+        cloudServiceMock.CloudService.getStatus.mockResolvedValue({
+            ...baseStatus,
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            provider: "google-drive",
+            providerDetails: {
+                kind: "google-drive",
+                accountLabel: "new@example.com",
+            },
+        });
+
+        const listPromise = useCloudStore.getState().listBackups();
+        await useCloudStore.getState().refreshStatus();
+
+        deferred.resolve([createBackup("dropbox.sqlite")]);
+        await listPromise;
+
+        expect(useCloudStore.getState().status?.provider).toBe("google-drive");
+        expect(useCloudStore.getState().backups).toEqual([]);
+        expect(useCloudStore.getState().isListingBackups).toBeFalsy();
+    });
+
+    it("keeps the latest listBackups request authoritative", async () => {
+        const first = createDeferred<CloudBackupEntry[]>();
+        const second = createDeferred<CloudBackupEntry[]>();
+        cloudServiceMock.CloudService.listBackups
+            .mockReturnValueOnce(first.promise)
+            .mockReturnValueOnce(second.promise);
+
+        const firstPromise = useCloudStore.getState().listBackups();
+        const secondPromise = useCloudStore.getState().listBackups();
+
+        first.resolve([]);
+        await firstPromise;
+        expect(useCloudStore.getState().isListingBackups).toBeTruthy();
+
+        second.resolve([createBackup("latest.sqlite")]);
+        await secondPromise;
+
+        expect(useCloudStore.getState().isListingBackups).toBeFalsy();
+        expect(arrayFirst(useCloudStore.getState().backups)?.fileName).toBe(
+            "latest.sqlite"
+        );
+    });
+
     it("requestSyncNow calls service and refreshes status", async () => {
         cloudServiceMock.CloudService.requestSyncNow.mockResolvedValue(
             undefined
@@ -449,6 +589,51 @@ describe(useCloudStore, () => {
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("success");
         expect(toast?.title).toBe("Backup restored");
+    });
+
+    it("serializes restore and delete operations without losing the active key", async () => {
+        const restoreDeferred = createDeferred<undefined>();
+        const deleteDeferred = createDeferred<CloudBackupEntry[]>();
+        cloudServiceMock.CloudService.restoreBackup.mockReturnValue(
+            restoreDeferred.promise
+        );
+        cloudServiceMock.CloudService.deleteBackup.mockReturnValue(
+            deleteDeferred.promise
+        );
+
+        const restorePromise = useCloudStore
+            .getState()
+            .restoreBackup("backups/restore.sqlite");
+        const deletePromise = useCloudStore
+            .getState()
+            .deleteBackup("backups/delete.sqlite");
+
+        expect(useCloudStore.getState().restoringBackupKey).toBe(
+            "backups/restore.sqlite"
+        );
+        expect(useCloudStore.getState().deletingBackupKey).toBeNull();
+        expect(
+            cloudServiceMock.CloudService.deleteBackup
+        ).not.toHaveBeenCalled();
+
+        restoreDeferred.resolve(undefined);
+        await restorePromise;
+        await vi.waitFor(() => {
+            expect(
+                cloudServiceMock.CloudService.deleteBackup
+            ).toHaveBeenCalledWith("backups/delete.sqlite");
+        });
+
+        expect(useCloudStore.getState().restoringBackupKey).toBeNull();
+        expect(useCloudStore.getState().deletingBackupKey).toBe(
+            "backups/delete.sqlite"
+        );
+
+        deleteDeferred.resolve([]);
+        await deletePromise;
+
+        expect(useCloudStore.getState().deletingBackupKey).toBeNull();
+        expect(useCloudStore.getState().restoringBackupKey).toBeNull();
     });
 
     it("setEncryptionPassphrase toggles busy flag and updates status", async () => {

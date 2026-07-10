@@ -49,6 +49,10 @@ export const RemoteBackupsPanel = ({
     const RefreshIcon = AppIcons.actions.refresh;
     const RestoreIcon = AppIcons.actions.download;
     const UploadIcon = AppIcons.actions.upload;
+    const isDestructiveOperationActive =
+        deletingBackupKey !== null || restoringBackupKey !== null;
+    const isBackupMutationActive =
+        isDestructiveOperationActive || isUploadingBackup;
 
     const deleteIcon = useMemo(
         () => <DeleteIcon aria-hidden size={buttonIconSize} />,
@@ -134,10 +138,7 @@ export const RemoteBackupsPanel = ({
 
                         <div className="flex flex-wrap gap-2">
                             <ThemedButton
-                                disabled={
-                                    !connected ||
-                                    restoringBackupKey === backup.key
-                                }
+                                disabled={!connected || isBackupMutationActive}
                                 icon={restoreIcon}
                                 loading={restoringBackupKey === backup.key}
                                 onClick={handleRestoreClick}
@@ -149,10 +150,7 @@ export const RemoteBackupsPanel = ({
                             </ThemedButton>
 
                             <ThemedButton
-                                disabled={
-                                    !connected ||
-                                    deletingBackupKey === backup.key
-                                }
+                                disabled={!connected || isBackupMutationActive}
                                 icon={deleteIcon}
                                 loading={deletingBackupKey === backup.key}
                                 onClick={handleDeleteClick}
@@ -183,7 +181,11 @@ export const RemoteBackupsPanel = ({
 
                 <div className="flex flex-wrap gap-2">
                     <ThemedButton
-                        disabled={!connected || isListingBackups}
+                        disabled={
+                            !connected ||
+                            isListingBackups ||
+                            isDestructiveOperationActive
+                        }
                         icon={refreshIcon}
                         loading={isListingBackups}
                         onClick={onListBackups}
@@ -194,7 +196,11 @@ export const RemoteBackupsPanel = ({
                     </ThemedButton>
 
                     <ThemedButton
-                        disabled={!connected || isUploadingBackup}
+                        disabled={
+                            !connected ||
+                            isUploadingBackup ||
+                            isDestructiveOperationActive
+                        }
                         icon={uploadIcon}
                         loading={isUploadingBackup}
                         onClick={onUploadLatestBackup}
