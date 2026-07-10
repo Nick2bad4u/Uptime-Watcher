@@ -7,6 +7,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useSyncExternalStore } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 import { objectAssign } from "ts-extras";
@@ -15,6 +16,7 @@ import type { Theme } from "../theme/types";
 
 import { App } from "../App";
 import { UI_DELAYS } from "../constants";
+import { NotificationPreferenceService } from "../services/NotificationPreferenceService";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { defaultSettings } from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
@@ -435,6 +437,68 @@ describe("App shell behavior", () => {
             await renderApp();
 
             expect(getMonitoredSitesCardValue()).toBe("2");
+        });
+    });
+
+    describe("Notification preferences", () => {
+        it("synchronizes when muted site identifiers change", async () => {
+            const settingsStoreListeners = new Set<() => void>();
+            const useSettingsStoreMock = (selector?: unknown): unknown =>
+                useSyncExternalStore(
+                    (listener) => {
+                        settingsStoreListeners.add(listener);
+                        return () => {
+                            settingsStoreListeners.delete(listener);
+                        };
+                    },
+                    () =>
+                        typeof selector === "function"
+                            ? (
+                                  selector as (
+                                      state: typeof defaultSettingsStore
+                                  ) => unknown
+                              )(defaultSettingsStore)
+                            : defaultSettingsStore
+                );
+            mockUseSettingsStore.mockImplementation(useSettingsStoreMock);
+
+            const updatePreferences = vi.mocked(
+                NotificationPreferenceService.updatePreferences
+            );
+            await renderApp();
+
+            await waitFor(() => {
+                expect(updatePreferences).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        mutedSiteNotificationIdentifiers: [],
+                    })
+                );
+            });
+            const initialCallCount = updatePreferences.mock.calls.length;
+
+            act(() => {
+                defaultSettingsStore.settings = {
+                    ...defaultSettingsStore.settings,
+                    mutedSiteNotificationIdentifiers: ["muted-site"],
+                };
+                for (const listener of settingsStoreListeners) {
+                    listener();
+                }
+            });
+
+            await waitFor(() => {
+                expect(updatePreferences.mock.calls.length).toBeGreaterThan(
+                    initialCallCount
+                );
+            });
+            expect(updatePreferences).toHaveBeenLastCalledWith({
+                mutedSiteNotificationIdentifiers: ["muted-site"],
+                systemNotificationsEnabled:
+                    defaultSettingsStore.settings.systemNotificationsEnabled,
+                systemNotificationsSoundEnabled:
+                    defaultSettingsStore.settings
+                        .systemNotificationsSoundEnabled,
+            });
         });
     });
 

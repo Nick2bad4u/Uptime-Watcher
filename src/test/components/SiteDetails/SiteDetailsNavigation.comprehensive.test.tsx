@@ -13,6 +13,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { arrayFirst, isEmpty } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -200,6 +201,25 @@ const renderSiteDetailsNavigation = (
     );
 };
 
+const renderKeyboardNavigation = () => {
+    const KeyboardNavigationHarness = () => {
+        const [activeSiteDetailsTab, setActiveSiteDetailsTab] =
+            React.useState<
+                SiteDetailsNavigationProperties["activeSiteDetailsTab"]
+            >("site-overview");
+
+        return (
+            <SiteDetailsNavigation
+                {...defaultProps}
+                activeSiteDetailsTab={activeSiteDetailsTab}
+                setActiveSiteDetailsTab={setActiveSiteDetailsTab}
+            />
+        );
+    };
+
+    return render(<KeyboardNavigationHarness />);
+};
+
 describe("SiteDetailsNavigation Navigation Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -303,6 +323,65 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             expect(
                 screen.getByText(/Website URL Analytics/v)
             ).toBeInTheDocument();
+        });
+    });
+
+    describe("Keyboard tab navigation", () => {
+        it("renders tabs in keyboard navigation order", () => {
+            renderSiteDetailsNavigation();
+
+            expect(
+                screen.getAllByRole("tab").map((tab) => tab.textContent?.trim())
+            ).toEqual([
+                "Site Overview",
+                "Monitor Overview",
+                "Website URL Analytics",
+                "History",
+                "Settings",
+            ]);
+        });
+
+        it("moves focus with Arrow keys in rendered order and wraps", async () => {
+            renderKeyboardNavigation();
+            const user = userEvent.setup();
+            const tabs = screen.getAllByRole("tab");
+            const [
+                siteOverview,
+                monitorOverview,
+                analytics,
+                history,
+                settings,
+            ] = tabs;
+
+            siteOverview?.focus();
+
+            await user.keyboard("{ArrowRight}");
+            expect(monitorOverview).toHaveFocus();
+            await user.keyboard("{ArrowRight}");
+            expect(analytics).toHaveFocus();
+            await user.keyboard("{ArrowRight}");
+            expect(history).toHaveFocus();
+            await user.keyboard("{ArrowRight}");
+            expect(settings).toHaveFocus();
+            await user.keyboard("{ArrowRight}");
+            expect(siteOverview).toHaveFocus();
+            await user.keyboard("{ArrowLeft}");
+            expect(settings).toHaveFocus();
+        });
+
+        it("moves focus to the first and last tabs with Home and End", async () => {
+            renderKeyboardNavigation();
+            const user = userEvent.setup();
+            const tabs = screen.getAllByRole("tab");
+            const siteOverview = tabs[0];
+            const settings = tabs.at(-1);
+
+            siteOverview?.focus();
+
+            await user.keyboard("{End}");
+            expect(settings).toHaveFocus();
+            await user.keyboard("{Home}");
+            expect(siteOverview).toHaveFocus();
         });
     });
 

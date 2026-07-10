@@ -138,6 +138,12 @@ export const App: NamedExoticComponent = memo(
                 []
             )
         );
+        const mutedSiteNotificationIdentifiers = useSettingsStore(
+            useCallback(
+                (state) => state.settings.mutedSiteNotificationIdentifiers,
+                []
+            )
+        );
 
         // UI store
         const {
@@ -353,6 +359,7 @@ export const App: NamedExoticComponent = memo(
         useEffect(
             function syncNotificationPreferencesEffect(): void {
                 logger.debug("[App:syncNotifEffect] triggered", {
+                    mutedSites: mutedSiteNotificationIdentifiers.length,
                     soundEnabled: isSystemNotificationsSoundEnabled,
                     systemEnabled: isSystemNotificationsEnabled,
                 });
@@ -365,7 +372,11 @@ export const App: NamedExoticComponent = memo(
                     },
                 });
             },
-            [isSystemNotificationsEnabled, isSystemNotificationsSoundEnabled]
+            [
+                isSystemNotificationsEnabled,
+                isSystemNotificationsSoundEnabled,
+                mutedSiteNotificationIdentifiers,
+            ]
         );
 
         // Update status events are subscribed during the initialization pipeline via the UpdatesStore to keep event ownership consistent.

@@ -233,11 +233,6 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
             );
         }, [handleStartMonitoring]);
 
-        const SiteOverviewIcon = AppIcons.ui.home;
-        const MonitorOverviewIcon = AppIcons.metrics.activity;
-        const AnalyticsIcon = AppIcons.ui.analytics;
-        const HistoryIcon = AppIcons.ui.history;
-        const SettingsIcon = AppIcons.settings.gear;
         const PauseIcon = AppIcons.actions.pause;
         const PlayIcon = AppIcons.actions.play;
 
@@ -253,27 +248,40 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         );
 
         const analyticsTabKey = `${selectedMonitorId}-analytics`;
-        const tabKeys = useMemo(
+        const tabDefinitions = useMemo(
             () =>
                 [
-                    analyticsTabKey,
-                    "history",
-                    "monitor-overview",
-                    "settings",
-                    "site-overview",
+                    {
+                        Icon: AppIcons.ui.home,
+                        key: "site-overview",
+                        label: "Site Overview",
+                        onSelect: handleSiteOverviewClick,
+                    },
+                    {
+                        Icon: AppIcons.metrics.activity,
+                        key: "monitor-overview",
+                        label: "Monitor Overview",
+                        onSelect: handleMonitorOverviewClick,
+                    },
+                    {
+                        Icon: AppIcons.ui.analytics,
+                        key: analyticsTabKey,
+                        label: `${monitorTypeLabel} Analytics`,
+                        onSelect: handleMonitorAnalyticsClick,
+                    },
+                    {
+                        Icon: AppIcons.ui.history,
+                        key: "history",
+                        label: "History",
+                        onSelect: handleHistoryClick,
+                    },
+                    {
+                        Icon: AppIcons.settings.gear,
+                        key: "settings",
+                        label: "Settings",
+                        onSelect: handleSettingsClick,
+                    },
                 ] as const,
-            [analyticsTabKey]
-        );
-
-        const tabActions = useMemo(
-            () =>
-                new Map<string, () => void>([
-                    ["history", handleHistoryClick],
-                    ["monitor-overview", handleMonitorOverviewClick],
-                    ["settings", handleSettingsClick],
-                    ["site-overview", handleSiteOverviewClick],
-                    [analyticsTabKey, handleMonitorAnalyticsClick],
-                ]),
             [
                 analyticsTabKey,
                 handleHistoryClick,
@@ -281,12 +289,15 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                 handleMonitorOverviewClick,
                 handleSettingsClick,
                 handleSiteOverviewClick,
+                monitorTypeLabel,
             ]
         );
 
         const handleTabKeyDown = useCallback(
             (event: ReactKeyboardEvent<HTMLButtonElement>): void => {
-                const currentIndex = tabKeys.indexOf(activeSiteDetailsTab);
+                const currentIndex = tabDefinitions.findIndex(
+                    ({ key }) => key === activeSiteDetailsTab
+                );
                 if (currentIndex === -1) {
                     return;
                 }
@@ -294,39 +305,30 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                 const nextIndex = resolveNextTabIndex({
                     currentIndex,
                     key: event.key,
-                    tabCount: tabKeys.length,
+                    tabCount: tabDefinitions.length,
                 });
 
                 if (nextIndex === null) {
                     return;
                 }
 
-                const nextKey = tabKeys[nextIndex];
-                if (!nextKey) {
-                    return;
-                }
-
-                const action = tabActions.get(nextKey);
-                if (!action) {
+                const nextTab = tabDefinitions[nextIndex];
+                if (!nextTab) {
                     return;
                 }
 
                 event.preventDefault();
-                action();
+                nextTab.onSelect();
 
                 queueMicrotask(() => {
                     document
                         .querySelector<HTMLElement>(
-                            `[id="${CSS.escape(resolveSiteDetailsTabId(nextKey))}"]`
+                            `#${CSS.escape(resolveSiteDetailsTabId(nextTab.key))}`
                         )
                         ?.focus();
                 });
             },
-            [
-                activeSiteDetailsTab,
-                tabActions,
-                tabKeys,
-            ]
+            [activeSiteDetailsTab, tabDefinitions]
         );
 
         return (
@@ -343,124 +345,34 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         className="site-details-navigation__tabs"
                         role="tablist"
                     >
-                        <ThemedButton
-                            aria-controls="site-details-tabpanel"
-                            aria-selected={
-                                activeSiteDetailsTab === "site-overview"
+                        {tabDefinitions.map(
+                            ({ Icon, key, label, onSelect }) => {
+                                const isActive = activeSiteDetailsTab === key;
+
+                                return (
+                                    <ThemedButton
+                                        aria-controls="site-details-tabpanel"
+                                        aria-selected={isActive}
+                                        className="flex items-center gap-2"
+                                        id={resolveSiteDetailsTabId(key)}
+                                        key={key}
+                                        onClick={onSelect}
+                                        onKeyDown={handleTabKeyDown}
+                                        role="tab"
+                                        size="sm"
+                                        tabIndex={isActive ? 0 : -1}
+                                        variant={
+                                            isActive
+                                                ? BUTTON_VARIANT_PRIMARY
+                                                : BUTTON_VARIANT_SECONDARY
+                                        }
+                                    >
+                                        <Icon size={16} />
+                                        <span>{label}</span>
+                                    </ThemedButton>
+                                );
                             }
-                            className="flex items-center gap-2"
-                            id={resolveSiteDetailsTabId("site-overview")}
-                            onClick={handleSiteOverviewClick}
-                            onKeyDown={handleTabKeyDown}
-                            role="tab"
-                            size="sm"
-                            tabIndex={
-                                activeSiteDetailsTab === "site-overview"
-                                    ? 0
-                                    : -1
-                            }
-                            variant={
-                                activeSiteDetailsTab === "site-overview"
-                                    ? BUTTON_VARIANT_PRIMARY
-                                    : BUTTON_VARIANT_SECONDARY
-                            }
-                        >
-                            <SiteOverviewIcon size={16} />
-                            <span>Site Overview</span>
-                        </ThemedButton>
-                        <ThemedButton
-                            aria-controls="site-details-tabpanel"
-                            aria-selected={
-                                activeSiteDetailsTab === "monitor-overview"
-                            }
-                            className="flex items-center gap-2"
-                            id={resolveSiteDetailsTabId("monitor-overview")}
-                            onClick={handleMonitorOverviewClick}
-                            onKeyDown={handleTabKeyDown}
-                            role="tab"
-                            size="sm"
-                            tabIndex={
-                                activeSiteDetailsTab === "monitor-overview"
-                                    ? 0
-                                    : -1
-                            }
-                            variant={
-                                activeSiteDetailsTab === "monitor-overview"
-                                    ? BUTTON_VARIANT_PRIMARY
-                                    : BUTTON_VARIANT_SECONDARY
-                            }
-                        >
-                            <MonitorOverviewIcon size={16} />
-                            <span>Monitor Overview</span>
-                        </ThemedButton>
-                        {/* Render analytics tab for selected monitor type only */}
-                        <ThemedButton
-                            aria-controls="site-details-tabpanel"
-                            aria-selected={
-                                activeSiteDetailsTab === analyticsTabKey
-                            }
-                            className="flex items-center gap-2"
-                            id={resolveSiteDetailsTabId(analyticsTabKey)}
-                            onClick={handleMonitorAnalyticsClick}
-                            onKeyDown={handleTabKeyDown}
-                            role="tab"
-                            size="sm"
-                            tabIndex={
-                                activeSiteDetailsTab === analyticsTabKey
-                                    ? 0
-                                    : -1
-                            }
-                            variant={
-                                activeSiteDetailsTab === analyticsTabKey
-                                    ? BUTTON_VARIANT_PRIMARY
-                                    : BUTTON_VARIANT_SECONDARY
-                            }
-                        >
-                            <AnalyticsIcon size={16} />
-                            <span>{`${monitorTypeLabel} Analytics`}</span>
-                        </ThemedButton>
-                        <ThemedButton
-                            aria-controls="site-details-tabpanel"
-                            aria-selected={activeSiteDetailsTab === "history"}
-                            className="flex items-center gap-2"
-                            id={resolveSiteDetailsTabId("history")}
-                            onClick={handleHistoryClick}
-                            onKeyDown={handleTabKeyDown}
-                            role="tab"
-                            size="sm"
-                            tabIndex={
-                                activeSiteDetailsTab === "history" ? 0 : -1
-                            }
-                            variant={
-                                activeSiteDetailsTab === "history"
-                                    ? BUTTON_VARIANT_PRIMARY
-                                    : BUTTON_VARIANT_SECONDARY
-                            }
-                        >
-                            <HistoryIcon size={16} />
-                            <span>History</span>
-                        </ThemedButton>
-                        <ThemedButton
-                            aria-controls="site-details-tabpanel"
-                            aria-selected={activeSiteDetailsTab === "settings"}
-                            className="flex items-center gap-2"
-                            id={resolveSiteDetailsTabId("settings")}
-                            onClick={handleSettingsClick}
-                            onKeyDown={handleTabKeyDown}
-                            role="tab"
-                            size="sm"
-                            tabIndex={
-                                activeSiteDetailsTab === "settings" ? 0 : -1
-                            }
-                            variant={
-                                activeSiteDetailsTab === "settings"
-                                    ? BUTTON_VARIANT_PRIMARY
-                                    : BUTTON_VARIANT_SECONDARY
-                            }
-                        >
-                            <SettingsIcon size={16} />
-                            <span>Settings</span>
-                        </ThemedButton>
+                        )}
                     </div>
 
                     {/* Monitor Selection and Site-level Controls (right) */}
