@@ -5,6 +5,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
+import type { NotificationService } from "../../../services/notifications/NotificationService";
+import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
+
 import { CloudService } from "../../../services/cloud/CloudService";
 import { IpcService } from "../../../services/ipc/IpcService";
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
@@ -146,6 +150,13 @@ const createTrustedIpcEvent = () => ({
     },
 });
 
+type RegistryMonitorConfig = ReturnType<
+    typeof mockGetAllMonitorTypeConfigs
+>[number];
+
+const asRegistryMonitorConfig = (value: unknown): RegistryMonitorConfig =>
+    value as RegistryMonitorConfig;
+
 // Set up mocks
 vi.mock("electron", () => ({
     ipcMain: mockIpcMain,
@@ -201,7 +212,8 @@ describe(IpcService, () => {
         };
 
         cloudService = new CloudService({
-            orchestrator: mockUptimeOrchestrator as any,
+            orchestrator:
+                mockUptimeOrchestrator as unknown as UptimeOrchestrator,
             settings: {
                 get: vi.fn(),
                 set: vi.fn(),
@@ -211,9 +223,9 @@ describe(IpcService, () => {
         });
 
         ipcService = new IpcService(
-            mockUptimeOrchestrator as any,
-            mockAutoUpdaterService as any,
-            mockNotificationService as any,
+            mockUptimeOrchestrator as unknown as UptimeOrchestrator,
+            mockAutoUpdaterService as unknown as AutoUpdaterService,
+            mockNotificationService as unknown as NotificationService,
             cloudService
         );
     });
@@ -492,7 +504,7 @@ describe(IpcService, () => {
         });
         it("should fail when monitor configs include unexpected properties", async () => {
             mockGetAllMonitorTypeConfigs.mockReturnValueOnce([
-                {
+                asRegistryMonitorConfig({
                     type: "http",
                     displayName: "HTTP Monitor",
                     description: "Monitor HTTP endpoints",
@@ -501,7 +513,7 @@ describe(IpcService, () => {
                     unexpectedProperty: "should be warned about",
                     serviceFactory: vi.fn(),
                     validationSchema: {},
-                } as any,
+                }),
             ]);
 
             ipcService.setupHandlers();
@@ -520,7 +532,7 @@ describe(IpcService, () => {
         });
         it("should not leak full monitor configs when sanitized configs fail validation", async () => {
             mockGetAllMonitorTypeConfigs.mockReturnValueOnce([
-                {
+                asRegistryMonitorConfig({
                     type: "http",
                     displayName: "HTTP Monitor with raw secret-marker",
                     description:
@@ -539,7 +551,7 @@ describe(IpcService, () => {
                     ],
                     serviceFactory: vi.fn(),
                     validationSchema: {},
-                } as any,
+                }),
             ]);
 
             ipcService.setupHandlers();
