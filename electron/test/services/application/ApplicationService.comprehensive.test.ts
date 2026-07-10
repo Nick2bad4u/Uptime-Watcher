@@ -609,6 +609,37 @@ describe(ApplicationService, () => {
             expect(mockWindowService.createMainWindow).not.toHaveBeenCalled();
         });
 
+        it("should share one cleanup sequence across concurrent callers", async () => {
+            let releaseScheduler!: () => void;
+            mockServiceContainer.shutdownCloudSyncScheduler.mockImplementation(
+                () =>
+                    new Promise<void>((resolve) => {
+                        releaseScheduler = resolve;
+                    })
+            );
+
+            const firstCleanup = applicationService.cleanup();
+            const secondCleanup = applicationService.cleanup();
+
+            await vi.waitFor(() => {
+                expect(
+                    mockServiceContainer.shutdownCloudSyncScheduler
+                ).toHaveBeenCalledOnce();
+            });
+            expect(mockIpcService.cleanup).not.toHaveBeenCalled();
+
+            releaseScheduler();
+            await expect(
+                Promise.all([firstCleanup, secondCleanup])
+            ).resolves.toEqual([undefined, undefined]);
+
+            expect(mockAutoUpdaterService.cleanup).toHaveBeenCalledOnce();
+            expect(mockIpcService.cleanup).toHaveBeenCalledOnce();
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledOnce();
+            expect(mockWindowService.closeMainWindow).toHaveBeenCalledOnce();
+            expect(mockDatabaseService.close).toHaveBeenCalledOnce();
+        });
+
         it("should cleanup all services successfully", async ({
             task,
             annotate,

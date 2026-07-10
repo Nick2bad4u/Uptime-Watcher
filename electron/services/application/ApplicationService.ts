@@ -83,6 +83,9 @@ import { ServiceContainer } from "../ServiceContainer";
  * @public
  */
 export class ApplicationService {
+    /** Shared cleanup task so startup rollback and app quit cannot overlap. */
+    private cleanupPromise: Promise<void> | undefined;
+
     /** Startup task shared with cleanup to prevent lifecycle overlap. */
     private initializationPromise: Promise<void> | undefined;
 
@@ -187,6 +190,11 @@ export class ApplicationService {
      * @public
      */
     public async cleanup(): Promise<void> {
+        this.cleanupPromise ??= this.performCleanup();
+        await this.cleanupPromise;
+    }
+
+    private async performCleanup(): Promise<void> {
         this.isShuttingDown = true;
         logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_START);
 
