@@ -3,10 +3,14 @@
  * management.
  */
 
+import type { UpdateStatusEventData } from "@shared/types/events";
+import type { Mock } from "vitest";
+
 import { autoUpdater } from "electron-updater";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
+import { logger as appLogger } from "../../../utils/logger";
 
 // Mock electron-updater
 vi.mock("electron-updater", () => ({
@@ -30,19 +34,16 @@ vi.mock("../../../utils/logger", () => {
     };
 });
 
+const logger = vi.mocked(appLogger);
+const mockAutoUpdater = vi.mocked(autoUpdater);
+
 describe(AutoUpdaterService, () => {
     let autoUpdaterService: AutoUpdaterService;
-    let mockAutoUpdater: any;
-    let statusCallback: any;
-    let logger: any;
+    let statusCallback: Mock<(statusData: UpdateStatusEventData) => void>;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         vi.clearAllMocks();
-
-        logger = (await import("../../../utils/logger")).logger;
-
-        mockAutoUpdater = autoUpdater;
-        statusCallback = vi.fn();
+        statusCallback = vi.fn<(statusData: UpdateStatusEventData) => void>();
 
         autoUpdaterService = new AutoUpdaterService();
     });
@@ -271,7 +272,7 @@ describe(AutoUpdaterService, () => {
             autoUpdaterService.setStatusCallback(statusCallback);
         });
         it("should call autoUpdater.checkForUpdatesAndNotify", async () => {
-            mockAutoUpdater.checkForUpdatesAndNotify.mockResolvedValue();
+            mockAutoUpdater.checkForUpdatesAndNotify.mockResolvedValue(null);
 
             await autoUpdaterService.checkForUpdates();
 
@@ -456,9 +457,18 @@ describe(AutoUpdaterService, () => {
     // Helper function to get event handler
     function getEventHandler(eventName: string): (...args: unknown[]) => void {
         const call = mockAutoUpdater.on.mock.calls.find(
-            (call: any[]) => call[0] === eventName
+            (candidate) => candidate[0] === eventName
         );
         expect(call).toBeDefined();
-        return call![1];
+        const handler = call?.[1];
+        if (typeof handler !== "function") {
+            throw new TypeError(
+                `No auto-updater handler registered for ${eventName}`
+            );
+        }
+
+        return (...args: unknown[]): void => {
+            Reflect.apply(handler, mockAutoUpdater, args);
+        };
     }
 });

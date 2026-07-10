@@ -7,6 +7,11 @@ import type { Monitor, Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { MonitorRepository } from "../../../services/database/MonitorRepository";
+import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
+import type { MonitorOperationRegistry } from "../../../services/monitoring/MonitorOperationRegistry";
+import type { OperationTimeoutManager } from "../../../services/monitoring/OperationTimeoutManager";
+
 import {
     MonitorStatusUpdateService,
     type StatusUpdateMonitorCheckResult,
@@ -85,12 +90,37 @@ function createTestResult(
     };
 }
 
+const createOperationRegistryMock = () => ({
+    completeOperation: vi.fn(),
+    validateOperation: vi.fn(),
+});
+
+const createMonitorRepositoryMock = () => ({
+    findByIdentifier: vi.fn(),
+    update: vi.fn(),
+});
+
+const createSitesCacheMock = () => ({
+    get: vi.fn(),
+    getAll: vi.fn(),
+    set: vi.fn(),
+});
+
+const createTimeoutManagerMock = () => ({
+    clearTimeout: vi.fn(),
+});
+
+type OperationRegistryMock = ReturnType<typeof createOperationRegistryMock>;
+type MonitorRepositoryMock = ReturnType<typeof createMonitorRepositoryMock>;
+type SitesCacheMock = ReturnType<typeof createSitesCacheMock>;
+type TimeoutManagerMock = ReturnType<typeof createTimeoutManagerMock>;
+
 describe(MonitorStatusUpdateService, () => {
     let service: MonitorStatusUpdateService;
-    let mockOperationRegistry: any;
-    let mockMonitorRepository: any;
-    let mockSitesCache: any;
-    let mockTimeoutManager: any;
+    let mockOperationRegistry: OperationRegistryMock;
+    let mockMonitorRepository: MonitorRepositoryMock;
+    let mockSitesCache: SitesCacheMock;
+    let mockTimeoutManager: TimeoutManagerMock;
     const rawMonitorId =
         "https://monitor.example/check?token=monitor-token#private-monitor";
     const rawSiteIdentifier =
@@ -101,31 +131,16 @@ describe(MonitorStatusUpdateService, () => {
         vi.clearAllMocks();
 
         // Create fresh mock objects for each test
-        mockOperationRegistry = {
-            validateOperation: vi.fn(),
-            completeOperation: vi.fn(),
-        };
-
-        mockMonitorRepository = {
-            findByIdentifier: vi.fn(),
-            update: vi.fn(),
-        };
-
-        mockSitesCache = {
-            getAll: vi.fn(),
-            set: vi.fn(),
-            get: vi.fn(),
-        };
-
-        mockTimeoutManager = {
-            clearTimeout: vi.fn(),
-        };
+        mockOperationRegistry = createOperationRegistryMock();
+        mockMonitorRepository = createMonitorRepositoryMock();
+        mockSitesCache = createSitesCacheMock();
+        mockTimeoutManager = createTimeoutManagerMock();
 
         service = new MonitorStatusUpdateService(
-            mockOperationRegistry,
-            mockMonitorRepository,
-            mockSitesCache,
-            mockTimeoutManager
+            mockOperationRegistry as unknown as MonitorOperationRegistry,
+            mockMonitorRepository as unknown as MonitorRepository,
+            mockSitesCache as unknown as StandardizedCache<Site>,
+            mockTimeoutManager as unknown as OperationTimeoutManager
         );
     });
 
