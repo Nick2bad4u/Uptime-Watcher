@@ -39,6 +39,12 @@ const createTestErrorStore = () => {
     // Get the current store state
     const store = useErrorStore.getState();
 
+    // Reset loading through the public actions so generated cases remain isolated.
+    for (const operation of objectKeys(store.operationLoading)) {
+        store.setOperationLoading(operation, false);
+    }
+    store.setLoading(false);
+
     // Clear all error states - clearAllErrors only clears error states, not loading states
     store.clearAllErrors();
 
@@ -563,11 +569,24 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     store.setOperationLoading(config.operation, config.loading);
                 }
 
+                const expectedOperationLoadings = new Map<string, boolean>();
+                for (const config of operationLoadings) {
+                    expectedOperationLoadings.set(
+                        config.operation,
+                        config.loading
+                    );
+                }
+                const expectedLoading =
+                    globalLoading ||
+                    [...expectedOperationLoadings.values()].includes(true);
+
                 // Verify state is set
                 expect(useErrorStore.getState().lastError).toBe(
                     expectedStoredError(globalError)
                 );
-                expect(useErrorStore.getState().isLoading).toBe(globalLoading);
+                expect(useErrorStore.getState().isLoading).toBe(
+                    expectedLoading
+                );
 
                 // Act
                 store.clearAllErrors();
