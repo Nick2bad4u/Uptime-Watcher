@@ -34,6 +34,7 @@ import {
     type Monitor,
     type MonitorStatus,
     type Site,
+    type StatusHistory,
     type StatusHistoryStatus,
 } from "@shared/types";
 import { render, screen } from "@testing-library/react";
@@ -114,7 +115,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
         filteredHistory,
         monitor,
     }: {
-        filteredHistory: any[];
+        filteredHistory: readonly StatusHistory[];
         monitor: Monitor | undefined;
     }) => (
         <div data-testid={`site-card-history-${monitor?.id || "no-monitor"}`}>
@@ -368,7 +369,7 @@ const edgeCaseSiteArbitrary = fc.record({
 /**
  * Helper function to render SiteCard component with mocks in a unique container
  */
-const renderSiteCard = (site: any) => {
+const renderSiteCard = (site: Site) => {
     mockSiteData = site;
     // Create a unique container for each test to avoid conflicts
     const uniqueId = `sitecard-test-${Date.now()}-${secureRandomFloat().toString(36).slice(2, 11)}`;
@@ -391,7 +392,7 @@ const renderSiteCard = (site: any) => {
 /**
  * Verify basic SiteCard structure is rendered correctly
  */
-const verifySiteCardStructure = (site: any) => {
+const verifySiteCardStructure = (site: Site) => {
     // Use consistent testId pattern matching the mocked ThemedBox implementation
     const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
     const themedBox = screen.getByTestId(testId);

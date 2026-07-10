@@ -166,7 +166,7 @@ describe("SiteCardHistory - Behavior Tests", () => {
 
             const monitor: Monitor = {
                 id: "mon1",
-                type: "unknown_type" as any,
+                type: "dns",
                 url: "https://example.com",
                 checkInterval: 60_000,
                 monitoring: true,
@@ -186,7 +186,7 @@ describe("SiteCardHistory - Behavior Tests", () => {
             );
 
             expect(screen.getByTestId("chart-title")).toHaveTextContent(
-                "unknown_type History"
+                "dns History"
             );
         });
     });
