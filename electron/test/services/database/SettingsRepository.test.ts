@@ -12,29 +12,52 @@
  * @tags ["database", "repository", "settings"]
  */
 
-import type { Database } from "node-sqlite3-wasm";
+import type {
+    Database,
+    QueryResult,
+    RunResult,
+    Statement,
+} from "node-sqlite3-wasm";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SettingsRepository } from "../../../services/database/SettingsRepository";
+import {
+    SettingsRepository,
+    type SettingsRepositoryDependencies,
+} from "../../../services/database/SettingsRepository";
 // Import the actual module to spy on it
 import * as operationalHooks from "../../../utils/operationalHooks";
 
-// Mock dependencies
-const mockDatabase = {
-    all: vi.fn(),
-    get: vi.fn(),
-    prepare: vi.fn().mockReturnValue({
-        run: vi.fn(),
-        finalize: vi.fn(),
-    }),
-    run: vi.fn(),
-} as unknown as Database;
+const createRunResult = (): RunResult => ({
+    changes: 0,
+    lastInsertRowid: 0,
+});
 
-const mockDatabaseService = {
-    executeTransaction: vi.fn(),
-    getDatabase: vi.fn().mockReturnValue(mockDatabase),
-};
+const createMockStatement = () => ({
+    finalize: vi.fn<Statement["finalize"]>(),
+    run: vi.fn<Statement["run"]>(createRunResult),
+});
+
+const createMockDatabase = () => ({
+    all: vi.fn<Database["all"]>(() => []),
+    get: vi.fn<Database["get"]>(() => null),
+    prepare: vi.fn(() => createMockStatement()),
+    run: vi.fn<Database["run"]>(createRunResult),
+});
+
+const createMockDatabaseService = (database: Database) => ({
+    executeTransaction:
+        vi.fn<
+            (operation: (transaction: Database) => unknown) => Promise<unknown>
+        >(),
+    getDatabase: vi.fn(() => database),
+});
+
+const mockDatabase = createMockDatabase();
+const database = mockDatabase as unknown as Database;
+const mockDatabaseService = createMockDatabaseService(database);
+const databaseService =
+    mockDatabaseService as unknown as SettingsRepositoryDependencies["databaseService"];
 
 describe(SettingsRepository, () => {
     let repository: SettingsRepository;
@@ -48,13 +71,13 @@ describe(SettingsRepository, () => {
         );
 
         // Reset database mock implementations
-        (mockDatabase.get as any).mockReturnValue(undefined);
-        (mockDatabase.all as any).mockReturnValue([]);
-        (mockDatabaseService.getDatabase as any).mockReturnValue(mockDatabase);
+        mockDatabase.get.mockReturnValue(null);
+        mockDatabase.all.mockReturnValue([]);
+        mockDatabaseService.getDatabase.mockReturnValue(database);
         mockDatabaseService.executeTransaction.mockResolvedValue(undefined);
 
         repository = new SettingsRepository({
-            databaseService: mockDatabaseService as any,
+            databaseService,
         });
     });
     describe("get", () => {
@@ -67,8 +90,8 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockSetting = { value: "test-value" };
-            (mockDatabase.get as any).mockReturnValue(mockSetting);
+            const mockSetting: QueryResult = { value: "test-value" };
+            mockDatabase.get.mockReturnValue(mockSetting);
 
             const result = await repository.get("test-key");
 
@@ -91,7 +114,7 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            (mockDatabase.get as any).mockReturnValue(undefined);
+            mockDatabase.get.mockReturnValue(null);
 
             const result = await repository.get("nonexistent-key");
 
@@ -104,7 +127,7 @@ describe(SettingsRepository, () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Database error");
-            (mockDatabase.get as any).mockImplementation(() => {
+            mockDatabase.get.mockImplementation(() => {
                 throw error;
             });
             await expect(repository.get("test-key")).rejects.toThrow(
@@ -122,11 +145,11 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockSettings = [
+            const mockSettings: QueryResult[] = [
                 { key: "setting1", value: "value1" },
                 { key: "setting2", value: "value2" },
             ];
-            (mockDatabase.all as any).mockReturnValue(mockSettings);
+            mockDatabase.all.mockReturnValue(mockSettings);
 
             const result = await repository.getAll();
 
@@ -148,7 +171,7 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            (mockDatabase.all as any).mockReturnValue([]);
+            mockDatabase.all.mockReturnValue([]);
 
             const result = await repository.getAll();
 
@@ -161,7 +184,7 @@ describe(SettingsRepository, () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Database error");
-            (mockDatabase.all as any).mockImplementation(() => {
+            mockDatabase.all.mockImplementation(() => {
                 throw error;
             });
             await expect(repository.getAll()).rejects.toThrow("Database error");
@@ -175,11 +198,11 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockSettings = [
+            const mockSettings: QueryResult[] = [
                 { key: "setting1", value: "value1" },
                 { key: "setting2", value: null },
             ];
-            (mockDatabase.all as any).mockReturnValue(mockSettings);
+            mockDatabase.all.mockReturnValue(mockSettings);
 
             const result = await repository.getAll();
 
@@ -262,7 +285,7 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                repository.setInternal(mockDatabase, "test-key", "test-value");
+                repository.setInternal(database, "test-key", "test-value");
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT OR REPLACE"),
@@ -275,7 +298,7 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                repository.setInternal(mockDatabase, "test-key", "");
+                repository.setInternal(database, "test-key", "");
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("INSERT OR REPLACE"),
@@ -290,7 +313,7 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Data Deletion", "type");
 
-                repository.deleteInternal(mockDatabase, "test-key");
+                repository.deleteInternal(database, "test-key");
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("DELETE"),
@@ -305,7 +328,7 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Data Deletion", "type");
 
-                repository.deleteAllInternal(mockDatabase);
+                repository.deleteAllInternal(database);
 
                 expect(mockDatabase.run).toHaveBeenCalledWith(
                     expect.stringContaining("DELETE")
@@ -322,13 +345,10 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const mockStatement = {
-                    run: vi.fn(),
-                    finalize: vi.fn(),
-                };
-                mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
+                const mockStatement = createMockStatement();
+                mockDatabase.prepare.mockReturnValue(mockStatement);
 
-                repository.bulkInsertInternal(mockDatabase, {
+                repository.bulkInsertInternal(database, {
                     setting1: "value1",
                     setting2: "value2",
                 });
@@ -355,13 +375,10 @@ describe(SettingsRepository, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const mockStatement = {
-                    run: vi.fn(),
-                    finalize: vi.fn(),
-                };
-                mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
+                const mockStatement = createMockStatement();
+                mockDatabase.prepare.mockReturnValue(mockStatement);
 
-                repository.bulkInsertInternal(mockDatabase, {});
+                repository.bulkInsertInternal(database, {});
 
                 expect(mockDatabase.prepare).not.toHaveBeenCalled();
                 expect(mockStatement.run).not.toHaveBeenCalled();
@@ -377,16 +394,14 @@ describe(SettingsRepository, () => {
                 await annotate("Type: Error Handling", "type");
 
                 const settings = { setting1: "value1" };
-                const mockStatement = {
-                    run: vi.fn().mockImplementation(() => {
-                        throw new Error("Statement error");
-                    }),
-                    finalize: vi.fn(),
-                };
-                mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
+                const mockStatement = createMockStatement();
+                mockStatement.run.mockImplementation(() => {
+                    throw new Error("Statement error");
+                });
+                mockDatabase.prepare.mockReturnValue(mockStatement);
 
                 expect(() => {
-                    repository.bulkInsertInternal(mockDatabase, settings);
+                    repository.bulkInsertInternal(database, settings);
                 }).toThrow("Statement error");
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });
@@ -400,7 +415,7 @@ describe(SettingsRepository, () => {
             await annotate("Type: Business Logic", "type");
 
             const longKey = "a".repeat(1000);
-            (mockDatabase.get as any).mockReturnValueOnce(undefined); // No row found
+            mockDatabase.get.mockReturnValueOnce(null); // No row found
 
             const result = await repository.get(longKey);
 
@@ -441,9 +456,12 @@ describe(SettingsRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            (mockDatabase.get as any).mockReturnValueOnce(undefined); // No row found
+            mockDatabase.get.mockReturnValueOnce(null); // No row found
 
-            const result = await repository.get(null as any);
+            const malformedKey: unknown = null;
+            const result = await repository.get(
+                malformedKey as Parameters<SettingsRepository["get"]>[0]
+            );
 
             expect(result).toBeUndefined();
             expect(mockDatabaseService.getDatabase).toHaveBeenCalled();

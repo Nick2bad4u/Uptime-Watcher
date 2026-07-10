@@ -1,6 +1,10 @@
 /**
- * DatabaseManager operation tests using focused mocks for command, history, and cache behavior.
+ * DatabaseManager operation tests using focused mocks for command, history, and
+ * cache behavior.
  */
+
+import type { Site } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
 
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
@@ -12,14 +16,93 @@ import {
     DatabaseManager,
     type DatabaseManagerDependencies,
 } from "../../managers/DatabaseManager";
+import type {
+    DatabaseCommandExecutor,
+    IDatabaseCommand,
+} from "../../services/commands/DatabaseCommands";
+import type { setHistoryLimit as setHistoryLimitContract } from "../../services/database/historyLimitManager";
+import type { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
 import {
     createMockConfigurationManager,
     createMockEventBus,
     createMockRepositories,
-    createMockSiteLoadingOrchestrator,
     createMockStandardizedCache,
     createTestSite,
 } from "../utils/enhanced-testUtilities";
+
+type CommandExecutorView = Pick<
+    DatabaseCommandExecutor,
+    | "clear"
+    | "execute"
+    | "rollbackAll"
+>;
+type SetHistoryLimitParams = Parameters<typeof setHistoryLimitContract>[0];
+type SiteLoadingOrchestratorView = Pick<
+    SiteLoadingOrchestrator,
+    "loadSitesFromDatabase"
+>;
+
+interface DatabaseManagerPrivateView {
+    commandExecutor: CommandExecutorView;
+    siteLoadingOrchestrator: SiteLoadingOrchestratorView;
+}
+
+function asDependency<TKey extends keyof DatabaseManagerDependencies>(
+    value: unknown
+): DatabaseManagerDependencies[TKey] {
+    return value as DatabaseManagerDependencies[TKey];
+}
+
+function createCommandExecutorFixture() {
+    const executeCommand = vi
+        .fn<(command: IDatabaseCommand<unknown>) => Promise<unknown>>()
+        .mockResolvedValue("mock-result");
+
+    const commandExecutor = {
+        clear: vi.fn(),
+        execute: <TResult>(
+            command: IDatabaseCommand<TResult>
+        ): Promise<TResult> => executeCommand(command) as Promise<TResult>,
+        rollbackAll: vi.fn().mockResolvedValue(undefined),
+    } satisfies CommandExecutorView;
+
+    return { commandExecutor, executeCommand };
+}
+
+function createSiteLoadingOrchestratorFixture() {
+    return {
+        loadSitesFromDatabase:
+            vi.fn<SiteLoadingOrchestrator["loadSitesFromDatabase"]>(),
+    } satisfies SiteLoadingOrchestratorView;
+}
+
+function mockLoadedSites(
+    orchestrator: ReturnType<typeof createSiteLoadingOrchestratorFixture>,
+    sites: Site[]
+): void {
+    orchestrator.loadSitesFromDatabase.mockImplementation(async (siteCache) => {
+        siteCache.replaceAll(
+            sites.map((site) => ({
+                data: site,
+                key: site.identifier,
+            }))
+        );
+
+        return {
+            message: `Successfully loaded ${sites.length} sites`,
+            sitesLoaded: sites.length,
+            success: true,
+        };
+    });
+}
+
+function setPrivateMember<TKey extends keyof DatabaseManagerPrivateView>(
+    manager: DatabaseManager,
+    key: TKey,
+    value: DatabaseManagerPrivateView[TKey]
+): void {
+    Reflect.set(manager, key, value);
+}
 
 // Mock external dependencies
 vi.mock("../../services/commands/DatabaseCommands", () => ({
@@ -48,20 +131,18 @@ vi.mock("../../services/database/serviceFactory", () => {
     });
 
     return {
-        createSiteCache: vi.fn(() => createMockStandardizedCache()),
+        createSiteCache: vi.fn(() => createMockStandardizedCache<Site>()),
         LoggerAdapter,
     };
 });
 
 vi.mock("../../services/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn(async (params: any) => {
-        if (params?.setHistoryLimit) {
-            const finalLimit = normalizeHistoryLimit(
-                params.limit,
-                params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
-            );
-            await params.setHistoryLimit(finalLimit);
-        }
+    setHistoryLimit: vi.fn(async (params: SetHistoryLimitParams) => {
+        const finalLimit = normalizeHistoryLimit(
+            params.limit,
+            params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+        );
+        await params.setHistoryLimit(finalLimit);
 
         return undefined;
     }),
@@ -71,13 +152,15 @@ vi.mock("../../services/database/historyLimitManager", () => ({
 describe("DatabaseManager operations", () => {
     let databaseManager: DatabaseManager;
     let eventEmitter: ReturnType<typeof createMockEventBus>;
-    let mockDependencies: DatabaseManagerDependencies;
+    let executeCommand: ReturnType<
+        typeof createCommandExecutorFixture
+    >["executeCommand"];
     let mockRepositories: ReturnType<typeof createMockRepositories>;
     let mockConfigurationManager: ReturnType<
         typeof createMockConfigurationManager
     >;
     let mockSiteLoadingOrchestrator: ReturnType<
-        typeof createMockSiteLoadingOrchestrator
+        typeof createSiteLoadingOrchestratorFixture
     >;
 
     beforeEach(async () => {
@@ -103,7 +186,22 @@ describe("DatabaseManager operations", () => {
         eventEmitter = createMockEventBus();
         mockRepositories = createMockRepositories();
         mockConfigurationManager = createMockConfigurationManager();
-        mockSiteLoadingOrchestrator = createMockSiteLoadingOrchestrator();
+        mockSiteLoadingOrchestrator = createSiteLoadingOrchestratorFixture();
+
+        const sqliteAdapter = {} as Database;
+        mockRepositories.database.getDatabase.mockReturnValue(sqliteAdapter);
+        mockRepositories.database.executeTransaction.mockImplementation(
+            async (...args: unknown[]) => {
+                const operation = args[0];
+                if (typeof operation !== "function") {
+                    throw new TypeError(
+                        "Expected a database transaction callback"
+                    );
+                }
+
+                return Reflect.apply(operation, undefined, [sqliteAdapter]);
+            }
+        );
 
         // Ensure getHistoryRetentionRules returns proper structure
         mockConfigurationManager.getHistoryRetentionRules.mockReturnValue({
@@ -113,65 +211,31 @@ describe("DatabaseManager operations", () => {
         });
         // Create test sites that the site loading orchestrator should return
         const testSites = [createTestSite("test1"), createTestSite("test2")];
-        mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
-            async (siteCache: any) => {
-                siteCache.replaceAll(
-                    testSites.map((site) => ({
-                        key: site.identifier,
-                        data: site,
-                    }))
-                );
+        mockLoadedSites(mockSiteLoadingOrchestrator, testSites);
 
-                return {
-                    success: true,
-                    sitesLoaded: testSites.length,
-                    message: `Successfully loaded ${testSites.length} sites`,
-                };
-            }
+        const dependencies = {
+            configurationManager: asDependency<"configurationManager">(
+                mockConfigurationManager
+            ),
+            eventEmitter: asDependency<"eventEmitter">(eventEmitter),
+            repositories: asDependency<"repositories">(mockRepositories),
+        } satisfies DatabaseManagerDependencies;
+
+        databaseManager = new DatabaseManager(dependencies);
+
+        setPrivateMember(
+            databaseManager,
+            "siteLoadingOrchestrator",
+            mockSiteLoadingOrchestrator
         );
 
-        mockDependencies = {
-            configurationManager:
-                mockConfigurationManager as unknown as DatabaseManagerDependencies["configurationManager"],
-            eventEmitter: eventEmitter as any,
-            repositories:
-                mockRepositories as unknown as DatabaseManagerDependencies["repositories"],
-        };
-
-        databaseManager = new DatabaseManager(mockDependencies);
-
-        // Mock the private siteLoadingOrchestrator
-        (databaseManager as any).siteLoadingOrchestrator =
-            mockSiteLoadingOrchestrator;
-
-        // Mock the private commandExecutor
-        const mockBackupMetadata = {
-            createdAt: 1_700_000_700_000,
-            originalPath: "/tmp/uptime-watcher.db",
-            sizeBytes: 1280,
-        };
-        const mockCommandExecutor = {
-            execute: vi.fn().mockImplementation(async (command: any) => {
-                // Return different values based on command type
-                if (command.constructor.name === "DownloadBackupCommand") {
-                    return {
-                        buffer: Buffer.from("test-backup-data"),
-                        fileName: "backup-test.db",
-                        metadata: { ...mockBackupMetadata },
-                    };
-                }
-                if (command.constructor.name === "ExportDataCommand") {
-                    return '{"test": "data"}';
-                }
-                if (command.constructor.name === "ImportDataCommand") {
-                    return true; // Success by default
-                }
-                return "mock-result";
-            }),
-            rollbackAll: vi.fn().mockResolvedValue(undefined),
-            clear: vi.fn(),
-        };
-        (databaseManager as any).commandExecutor = mockCommandExecutor;
+        const commandExecutorFixture = createCommandExecutorFixture();
+        executeCommand = commandExecutorFixture.executeCommand;
+        setPrivateMember(
+            databaseManager,
+            "commandExecutor",
+            commandExecutorFixture.commandExecutor
+        );
     });
 
     describe("History Limit Management", () => {
@@ -316,13 +380,12 @@ describe("DatabaseManager operations", () => {
                 "purpose"
             );
 
-            const mockExecutor = (databaseManager as any).commandExecutor;
-            vi.mocked(mockExecutor.execute).mockResolvedValue("exported-data");
+            executeCommand.mockResolvedValue("exported-data");
 
             const result = await databaseManager.exportData();
 
             expect(result).toBe("exported-data");
-            expect(mockExecutor.execute).toHaveBeenCalled();
+            expect(executeCommand).toHaveBeenCalled();
         });
 
         it("should call download backup command", async ({ annotate }) => {
@@ -346,7 +409,6 @@ describe("DatabaseManager operations", () => {
                 "purpose"
             );
 
-            const mockExecutor = (databaseManager as any).commandExecutor;
             const mockBackupData = {
                 buffer: Buffer.from("test-backup"),
                 fileName: "backup.db",
@@ -356,12 +418,12 @@ describe("DatabaseManager operations", () => {
                     sizeBytes: 1280,
                 },
             };
-            vi.mocked(mockExecutor.execute).mockResolvedValue(mockBackupData);
+            executeCommand.mockResolvedValue(mockBackupData);
 
             const result = await databaseManager.downloadBackup();
 
             expect(result).toEqual(mockBackupData);
-            expect(mockExecutor.execute).toHaveBeenCalled();
+            expect(executeCommand).toHaveBeenCalled();
         });
 
         it("should call import data command", async ({ annotate }) => {
@@ -385,14 +447,13 @@ describe("DatabaseManager operations", () => {
                 "purpose"
             );
 
-            const mockExecutor = (databaseManager as any).commandExecutor;
-            vi.mocked(mockExecutor.execute).mockResolvedValue(true);
+            executeCommand.mockResolvedValue(true);
 
             const isResult =
                 await databaseManager.importData('{"test": "data"}');
 
             expect(isResult).toBeTruthy();
-            expect(mockExecutor.execute).toHaveBeenCalled();
+            expect(executeCommand).toHaveBeenCalled();
         });
 
         it("should handle import data command failure", async ({
@@ -418,18 +479,12 @@ describe("DatabaseManager operations", () => {
                 "purpose"
             );
 
-            // Create a command executor mock that throws an error to simulate failure
-            const failureCommandExecutor = {
-                execute: vi.fn().mockRejectedValue(new Error("Import failed")),
-                rollbackAll: vi.fn().mockResolvedValue(undefined),
-                clear: vi.fn(),
-            };
-            (databaseManager as any).commandExecutor = failureCommandExecutor;
+            executeCommand.mockRejectedValue(new Error("Import failed"));
 
             const isResult = await databaseManager.importData("invalid-json");
 
             expect(isResult).toBeFalsy();
-            expect(failureCommandExecutor.execute).toHaveBeenCalled();
+            expect(executeCommand).toHaveBeenCalled();
         });
     });
 
@@ -481,28 +536,7 @@ describe("DatabaseManager operations", () => {
                 createTestSite("test2"),
             ];
 
-            // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
-                async (siteCache: any) => {
-                    siteCache.replaceAll(
-                        testSites.map((site) => ({
-                            key: site.identifier,
-                            data: site,
-                        }))
-                    );
-
-                    return {
-                        success: true,
-                        sites: testSites,
-                        errorCount: 0,
-                        metadata: {
-                            totalProcessed: 2,
-                            loadedFromCache: 0,
-                            loadedFromDatabase: 2,
-                        },
-                    };
-                }
-            );
+            mockLoadedSites(mockSiteLoadingOrchestrator, testSites);
 
             const result = await databaseManager.refreshSites();
 
@@ -652,28 +686,7 @@ describe("DatabaseManager operations", () => {
 
             const testSites = [createTestSite("test1")];
 
-            // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
-                async (siteCache: any) => {
-                    siteCache.replaceAll(
-                        testSites.map((site) => ({
-                            key: site.identifier,
-                            data: site,
-                        }))
-                    );
-
-                    return {
-                        success: true,
-                        sites: testSites,
-                        errorCount: 0,
-                        metadata: {
-                            totalProcessed: 1,
-                            loadedFromCache: 0,
-                            loadedFromDatabase: 1,
-                        },
-                    };
-                }
-            );
+            mockLoadedSites(mockSiteLoadingOrchestrator, testSites);
 
             await databaseManager.refreshSites();
 
@@ -713,28 +726,7 @@ describe("DatabaseManager operations", () => {
 
             const testSites = [createTestSite("test1")];
 
-            // The orchestrator should populate the cache when called
-            mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
-                async (siteCache: any) => {
-                    siteCache.replaceAll(
-                        testSites.map((site) => ({
-                            key: site.identifier,
-                            data: site,
-                        }))
-                    );
-
-                    return {
-                        success: true,
-                        sites: testSites,
-                        errorCount: 0,
-                        metadata: {
-                            totalProcessed: 1,
-                            loadedFromCache: 0,
-                            loadedFromDatabase: 1,
-                        },
-                    };
-                }
-            );
+            mockLoadedSites(mockSiteLoadingOrchestrator, testSites);
 
             // Perform multiple operations that should emit events
             await databaseManager.setHistoryLimit(999);
