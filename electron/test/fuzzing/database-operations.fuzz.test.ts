@@ -23,15 +23,9 @@ import {
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
 import fc from "fast-check";
-import {
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type MockedFunction,
-    vi,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { SiteRow } from "../../services/database/utils/mappers/siteMapper";
 
 import { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -85,45 +79,52 @@ interface PreparedStatementMock {
     readonly run: ReturnType<typeof vi.fn>;
 }
 
+const createMockDatabase = () => ({
+    all: vi.fn(),
+    get: vi.fn(),
+    prepare: vi.fn().mockReturnValue({
+        all: vi.fn(),
+        finalize: vi.fn(),
+        get: vi.fn(),
+        run: vi.fn(),
+    }),
+    run: vi.fn(),
+});
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+const createMockDatabaseService = (database: MockDatabase) => ({
+    executeTransaction: vi
+        .fn()
+        .mockImplementation(
+            async (callback: (transaction: MockDatabase) => unknown) =>
+                callback(database)
+        ),
+    getDatabase: vi.fn(() => database),
+});
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
+
 describe("Database Operations Fuzzing Tests", () => {
-    let mockDatabaseService: any;
-    let mockDb: {
-        all: MockedFunction<any>;
-        get: MockedFunction<any>;
-        prepare: MockedFunction<any>;
-        run: MockedFunction<any>;
-    };
+    let mockDatabaseService: MockDatabaseService;
+    let mockDb: MockDatabase;
     let siteRepository: SiteRepository;
     let monitorRepository: MonitorRepository;
     let historyRepository: HistoryRepository;
 
     beforeEach(() => {
-        mockDb = {
-            run: vi.fn(),
-            get: vi.fn(),
-            all: vi.fn(),
-            prepare: vi.fn().mockReturnValue({
-                run: vi.fn(),
-                get: vi.fn(),
-                all: vi.fn(),
-                finalize: vi.fn(),
-            }),
-        };
-
-        mockDatabaseService = {
-            executeTransaction: vi.fn(),
-            getDatabase: vi.fn().mockReturnValue(mockDb),
-        } as any;
+        mockDb = createMockDatabase();
+        mockDatabaseService = createMockDatabaseService(mockDb);
 
         vi.clearAllMocks();
         siteRepository = new SiteRepository({
-            databaseService: mockDatabaseService,
+            databaseService: mockDatabaseService as unknown as DatabaseService,
         });
         monitorRepository = new MonitorRepository({
-            databaseService: mockDatabaseService,
+            databaseService: mockDatabaseService as unknown as DatabaseService,
         });
         historyRepository = new HistoryRepository({
-            databaseService: mockDatabaseService,
+            databaseService: mockDatabaseService as unknown as DatabaseService,
         });
     });
 
@@ -163,10 +164,9 @@ describe("Database Operations Fuzzing Tests", () => {
                             { minLength: 0, maxLength: 5 }
                         ),
                     }),
-                    async (siteData: any) => {
-                        // Use any to avoid complex type issues
+                    async (siteData) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
                         mockDb.run.mockReturnValue({ lastInsertRowid: 1 });
 
@@ -190,7 +190,7 @@ describe("Database Operations Fuzzing Tests", () => {
                     ),
                     async (identifier: string) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
                         mockDb.get.mockReturnValue(null);
 
@@ -206,7 +206,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         if (mockDb.get.mock.calls.length > 0) {
                             const [sql] = mockDb.get.mock.calls[0] as [
                                 string,
-                                any[],
+                                unknown[],
                             ];
                             expect(sql).toContain("?"); // Parameterized query
                             expect(sql).not.toContain("DROP"); // No direct injection
@@ -221,7 +221,7 @@ describe("Database Operations Fuzzing Tests", () => {
             await fc.assert(
                 fc.asyncProperty(fc.string(), async (identifier: string) => {
                     mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
+                        async (callback) => callback(mockDb)
                     );
                     mockDb.run.mockReturnValue({ changes: 0 });
 
@@ -245,7 +245,7 @@ describe("Database Operations Fuzzing Tests", () => {
             await fc.assert(
                 fc.asyncProperty(fc.string(), async (identifier: string) => {
                     mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
+                        async (callback) => callback(mockDb)
                     );
                     mockDb.get.mockReturnValue(null);
 
@@ -275,7 +275,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         mockDb.prepare.mockReset();
 
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
 
                         mockDb.prepare.mockImplementation(() => {
@@ -367,16 +367,17 @@ describe("Database Operations Fuzzing Tests", () => {
                         .filter((value) => /\S/v.test(value)),
                     async (
                         monitorId: string,
-                        monitorData: any,
+                        monitorData,
                         siteIdentifier: string
                     ) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
                         // MonitorRepository uses INSERT ... RETURNING via db.get
                         // (insertWithReturning). Ensure the mock returns an id.
                         const normalizedMonitorData = {
                             ...monitorData,
+                            history: [],
                             id: monitorId,
                         };
 
@@ -404,7 +405,7 @@ describe("Database Operations Fuzzing Tests", () => {
                 fc.asyncProperty(fc.string(), async (monitorId: string) => {
                     mockDatabaseService.executeTransaction.mockClear();
                     mockDatabaseService.executeTransaction.mockImplementation(
-                        async (callback: any) => await callback(mockDb)
+                        async (callback) => callback(mockDb)
                     );
                     mockDb.get.mockReturnValue(null);
 
@@ -430,7 +431,7 @@ describe("Database Operations Fuzzing Tests", () => {
                     fc.string(),
                     async (siteIdentifier: string) => {
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
                         mockDb.all.mockReturnValue([]);
 
@@ -459,7 +460,7 @@ describe("Database Operations Fuzzing Tests", () => {
                     async (monitorId: string) => {
                         mockDatabaseService.executeTransaction.mockClear();
                         mockDatabaseService.executeTransaction.mockImplementation(
-                            async (callback: any) => await callback(mockDb)
+                            async (callback) => callback(mockDb)
                         );
                         mockDb.run.mockReturnValue({ changes: 0 });
 
@@ -500,7 +501,7 @@ describe("Database Operations Fuzzing Tests", () => {
             const testIdentifier = "test'; DROP TABLE sites; --";
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: any) => await callback(mockDb)
+                async (callback) => callback(mockDb)
             );
             mockDb.get.mockReturnValue(null);
 

@@ -12,14 +12,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Database } from "node-sqlite3-wasm";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import {
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type MockedFunction,
-    vi,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { MonitoringConfig } from "../../../services/database/interfaces";
@@ -55,16 +48,113 @@ const createCompleteMonitor = (
     ...overrides,
 });
 
+const createMockDatabase = () => ({
+    all: vi.fn(),
+    get: vi.fn(),
+    prepare: vi.fn(),
+    run: vi.fn(),
+});
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+const createMockDatabaseService = (database: Database) => ({
+    executeTransaction: vi
+        .fn()
+        .mockImplementation(
+            async (callback: (transaction: Database) => unknown) =>
+                callback(database)
+        ),
+    getDatabase: vi.fn(() => database),
+});
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
+
+const createMonitorAdapter = () =>
+    ({
+        clearActiveOperations: vi.fn(),
+        create: vi.fn().mockReturnValue("new-monitor-id"),
+        deleteAll: vi.fn(),
+        deleteById: vi.fn(),
+        deleteBySiteIdentifier: vi.fn(),
+        findBySiteIdentifier: vi.fn().mockReturnValue([
+            {
+                checkInterval: 30_000,
+                history: [],
+                id: "monitor-1",
+                lastChecked: undefined,
+                monitoring: false,
+                responseTime: 0,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
+                type: "http",
+                url: "https://example.com",
+            },
+        ]),
+        update: vi.fn(),
+    }) satisfies MonitorRepositoryTransactionAdapter;
+
+type MonitorAdapter = ReturnType<typeof createMonitorAdapter>;
+
+const createSiteAdapter = () =>
+    ({
+        bulkInsert: vi.fn(),
+        delete: vi.fn().mockReturnValue(true),
+        deleteAll: vi.fn(),
+        upsert: vi.fn(),
+    }) satisfies SiteRepositoryTransactionAdapter;
+
+type SiteAdapter = ReturnType<typeof createSiteAdapter>;
+
+const createSitesCacheMock = (site: Site) => ({
+    clear: vi.fn(),
+    delete: vi.fn().mockReturnValue(true),
+    get: vi.fn(),
+    getAll: vi.fn(() => [site]),
+    has: vi.fn(),
+    set: vi.fn(),
+});
+
+type SitesCacheMock = ReturnType<typeof createSitesCacheMock>;
+
+const createMonitoringConfigMock = () =>
+    ({
+        setHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        setupNewMonitors: vi.fn().mockResolvedValue(undefined),
+        startMonitoring: vi.fn().mockResolvedValue({
+            alreadyActive: false,
+            attempted: 1,
+            failed: 0,
+            isMonitoring: true,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 1,
+        } satisfies MonitoringStartSummary),
+        stopMonitoring: vi.fn().mockResolvedValue({
+            alreadyInactive: false,
+            attempted: 1,
+            failed: 0,
+            isMonitoring: false,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 1,
+        } satisfies MonitoringStopSummary),
+    }) satisfies MonitoringConfig;
+
+type MonitoringConfigMock = ReturnType<typeof createMonitoringConfigMock>;
+
 describe("SiteWriterService", () => {
     let siteWriterService: SiteWriterService;
-    let mockDatabaseService: DatabaseService;
+    let mockDatabaseService: DatabaseService & MockDatabaseService;
     let mockMonitorRepository: MonitorRepository;
     let mockSiteRepository: SiteRepository;
     let mockLogger: Logger;
-    let mockSitesCache: StandardizedCache<Site>;
-    let mockDb: Database;
-    let monitorAdapter: MonitorRepositoryTransactionAdapter;
-    let siteAdapter: SiteRepositoryTransactionAdapter;
+    let mockSitesCache: SitesCacheMock & StandardizedCache<Site>;
+    let mockDb: Database & MockDatabase;
+    let monitorAdapter: MonitorAdapter;
+    let siteAdapter: SiteAdapter;
 
     const mockSite: Site = {
         identifier: "test-site",
@@ -88,43 +178,15 @@ describe("SiteWriterService", () => {
 
     beforeEach(() => {
         // Mock database instance
-        mockDb = {
-            all: vi.fn(),
-            run: vi.fn(),
-            get: vi.fn(),
-            prepare: vi.fn(),
-        } as any;
+        mockDb = createMockDatabase() as unknown as Database & MockDatabase;
 
         // Mock DatabaseService
-        mockDatabaseService = {
-            executeTransaction: vi.fn(),
-            getDatabase: vi.fn().mockResolvedValue(mockDb),
-        } as any;
+        mockDatabaseService = createMockDatabaseService(
+            mockDb
+        ) as unknown as DatabaseService & MockDatabaseService;
 
         // Mock repositories with transaction adapters
-        monitorAdapter = {
-            clearActiveOperations: vi.fn(),
-            create: vi.fn().mockReturnValue("new-monitor-id"),
-            deleteAll: vi.fn(),
-            deleteById: vi.fn(),
-            deleteBySiteIdentifier: vi.fn(),
-            findBySiteIdentifier: vi.fn().mockReturnValue([
-                {
-                    id: "monitor-1",
-                    type: "http",
-                    url: "https://example.com",
-                    checkInterval: 30_000,
-                    timeout: 5000,
-                    retryAttempts: 3,
-                    monitoring: false,
-                    status: "pending",
-                    responseTime: 0,
-                    lastChecked: undefined,
-                    history: [],
-                },
-            ]),
-            update: vi.fn(),
-        } satisfies MonitorRepositoryTransactionAdapter;
+        monitorAdapter = createMonitorAdapter();
 
         mockMonitorRepository = {
             createTransactionAdapter: vi
@@ -132,12 +194,7 @@ describe("SiteWriterService", () => {
                 .mockImplementation(() => monitorAdapter),
         } as unknown as MonitorRepository;
 
-        siteAdapter = {
-            bulkInsert: vi.fn(),
-            delete: vi.fn().mockReturnValue(true),
-            deleteAll: vi.fn(),
-            upsert: vi.fn(),
-        } satisfies SiteRepositoryTransactionAdapter;
+        siteAdapter = createSiteAdapter();
 
         mockSiteRepository = {
             createTransactionAdapter: vi
@@ -154,14 +211,9 @@ describe("SiteWriterService", () => {
         };
 
         // Mock cache
-        mockSitesCache = {
-            get: vi.fn(),
-            set: vi.fn(),
-            delete: vi.fn().mockReturnValue(true),
-            has: vi.fn(),
-            getAll: vi.fn(() => [mockSite]),
-            clear: vi.fn(),
-        } as any;
+        mockSitesCache = createSitesCacheMock(
+            mockSite
+        ) as unknown as SitesCacheMock & StandardizedCache<Site>;
 
         // Create service instance
         siteWriterService = new SiteWriterService({
@@ -180,10 +232,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
@@ -193,9 +242,9 @@ describe("SiteWriterService", () => {
 
     describe("createSite", () => {
         beforeEach(() => {
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
+            );
         });
 
         it("should create a new site successfully", async ({
@@ -203,10 +252,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -222,10 +268,13 @@ describe("SiteWriterService", () => {
             expect(
                 mockMonitorRepository.createTransactionAdapter
             ).toHaveBeenCalledWith(mockDb);
-            const upsertMock = siteAdapter.upsert as MockedFunction<
-                SiteRepositoryTransactionAdapter["upsert"]
-            >;
-            const upsertCall = upsertMock.mock.calls[0]?.[0] as Site;
+            const upsertCall = siteAdapter.upsert.mock.calls[0]?.[0];
+            expect(upsertCall).toBeDefined();
+            if (!upsertCall) {
+                throw new TypeError(
+                    "Expected the site adapter to receive a site"
+                );
+            }
 
             expect(upsertCall.identifier).toBe(siteData.identifier);
             expect(upsertCall.monitors).toHaveLength(siteData.monitors.length);
@@ -253,10 +302,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -289,10 +335,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Normalization", "type");
 
@@ -334,10 +377,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -354,17 +394,12 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Transaction failed");
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockRejectedValue(error);
+            mockDatabaseService.executeTransaction.mockRejectedValue(error);
 
             await expect(
                 siteWriterService.createSite(mockSite)
@@ -374,9 +409,9 @@ describe("SiteWriterService", () => {
 
     describe("deleteSite", () => {
         beforeEach(() => {
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
+            );
         });
 
         it("should delete site successfully when found in cache", async ({
@@ -384,19 +419,14 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
             // Mock successful database deletion and cache presence
-            (siteAdapter.delete as MockedFunction<any>).mockReturnValue(true);
-            (mockSitesCache.has as MockedFunction<any>).mockReturnValue(true);
-            (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
-                true
-            );
+            siteAdapter.delete.mockReturnValue(true);
+            mockSitesCache.has.mockReturnValue(true);
+            mockSitesCache.delete.mockReturnValue(true);
 
             const isResult = await siteWriterService.deleteSite(
                 mockSitesCache,
@@ -434,18 +464,13 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
             // Mock database deletion failure (site not found in database)
-            (siteAdapter.delete as MockedFunction<any>).mockReturnValue(false);
-            (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
-                false
-            );
+            siteAdapter.delete.mockReturnValue(false);
+            mockSitesCache.delete.mockReturnValue(false);
 
             const isResult = await siteWriterService.deleteSite(
                 mockSitesCache,
@@ -478,17 +503,12 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Database deletion failed");
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockRejectedValue(error);
+            mockDatabaseService.executeTransaction.mockRejectedValue(error);
 
             await expect(
                 siteWriterService.deleteSite(mockSitesCache, "test-site")
@@ -498,9 +518,9 @@ describe("SiteWriterService", () => {
 
     describe("deleteAllSites", () => {
         beforeEach(() => {
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
+            );
         });
 
         it("should delete all sites and return snapshot", async ({
@@ -508,16 +528,11 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
-            (mockSitesCache.getAll as MockedFunction<any>).mockReturnValue([
-                mockSite,
-            ]);
+            mockSitesCache.getAll.mockReturnValue([mockSite]);
 
             const result =
                 await siteWriterService.deleteAllSites(mockSitesCache);
@@ -543,14 +558,11 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            (mockSitesCache.getAll as MockedFunction<any>).mockReturnValue([]);
+            mockSitesCache.getAll.mockReturnValue([]);
 
             const result =
                 await siteWriterService.deleteAllSites(mockSitesCache);
@@ -568,14 +580,12 @@ describe("SiteWriterService", () => {
 
     describe("updateSite", () => {
         beforeEach(() => {
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                mockSite
+            mockSitesCache.get.mockReturnValue(mockSite);
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
             );
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
             // Set up default DB mock that will be overridden by specific tests
-            (mockDb.all as MockedFunction<any>).mockReturnValue([
+            mockDb.all.mockReturnValue([
                 {
                     id: 1,
                     site_identifier: "test-site",
@@ -591,9 +601,7 @@ describe("SiteWriterService", () => {
             ]);
 
             // Set up default monitor repository response
-            (
-                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
-            ).mockReturnValue([
+            monitorAdapter.findBySiteIdentifier.mockReturnValue([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -612,10 +620,7 @@ describe("SiteWriterService", () => {
 
         it("should update site successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -640,10 +645,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Security", "type");
 
@@ -667,10 +669,13 @@ describe("SiteWriterService", () => {
                 updates
             );
 
-            const upsertMock = siteAdapter.upsert as MockedFunction<
-                SiteRepositoryTransactionAdapter["upsert"]
-            >;
-            const upsertedSite = upsertMock.mock.calls[0]?.[0] as Site;
+            const upsertedSite = siteAdapter.upsert.mock.calls[0]?.[0];
+            expect(upsertedSite).toBeDefined();
+            if (!upsertedSite) {
+                throw new TypeError(
+                    "Expected the site adapter to receive a site"
+                );
+            }
 
             expect(nameGetter).not.toHaveBeenCalled();
             expect(result.identifier).toBe("test-site");
@@ -686,10 +691,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Normalization", "type");
 
@@ -752,10 +754,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -794,10 +793,7 @@ describe("SiteWriterService", () => {
 
         it("should remove obsolete monitors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
@@ -820,16 +816,11 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                undefined
-            );
+            mockSitesCache.get.mockReturnValue(undefined);
 
             await expect(
                 siteWriterService.updateSite(mockSitesCache, "nonexistent", {})
@@ -841,10 +832,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -858,10 +846,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -880,33 +865,10 @@ describe("SiteWriterService", () => {
     });
 
     describe("handleMonitorIntervalChanges", () => {
-        let mockMonitoringConfig: MonitoringConfig;
+        let mockMonitoringConfig: MonitoringConfigMock;
 
         beforeEach(() => {
-            mockMonitoringConfig = {
-                setHistoryLimit: vi.fn().mockResolvedValue(undefined),
-                setupNewMonitors: vi.fn().mockResolvedValue(undefined),
-                startMonitoring: vi.fn().mockResolvedValue({
-                    attempted: 1,
-                    failed: 0,
-                    partialFailures: false,
-                    siteCount: 1,
-                    skipped: 0,
-                    succeeded: 1,
-                    isMonitoring: true,
-                    alreadyActive: false,
-                } satisfies MonitoringStartSummary),
-                stopMonitoring: vi.fn().mockResolvedValue({
-                    attempted: 1,
-                    failed: 0,
-                    partialFailures: false,
-                    siteCount: 1,
-                    skipped: 0,
-                    succeeded: 1,
-                    isMonitoring: false,
-                    alreadyInactive: false,
-                } satisfies MonitoringStopSummary),
-            };
+            mockMonitoringConfig = createMonitoringConfigMock();
         });
 
         it("should handle interval changes correctly", async ({
@@ -914,10 +876,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -970,10 +929,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1014,10 +970,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1045,17 +998,12 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Monitoring failed");
-            (
-                mockMonitoringConfig.stopMonitoring as MockedFunction<any>
-            ).mockRejectedValue(error);
+            mockMonitoringConfig.stopMonitoring.mockRejectedValue(error);
 
             const originalSite = {
                 ...mockSite,
@@ -1092,10 +1040,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1120,10 +1065,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1148,10 +1090,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1182,10 +1121,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1213,10 +1149,7 @@ describe("SiteWriterService", () => {
 
         it("should handle empty arrays", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1226,10 +1159,7 @@ describe("SiteWriterService", () => {
 
         it("should handle mixed scenarios", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1259,17 +1189,13 @@ describe("SiteWriterService", () => {
 
     describe("Private Methods Coverage", () => {
         beforeEach(() => {
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                mockSite
+            mockSitesCache.get.mockReturnValue(mockSite);
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
             );
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
 
             // Set up default monitor repository response for this describe block
-            (
-                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
-            ).mockReturnValue([
+            monitorAdapter.findBySiteIdentifier.mockReturnValue([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -1291,10 +1217,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -1328,10 +1251,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
@@ -1340,9 +1260,7 @@ describe("SiteWriterService", () => {
             const monitorWithoutId = createCompleteMonitor({ id: "" });
 
             // Configure monitor repository to return an existing monitor
-            (
-                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
-            ).mockReturnValueOnce([
+            monitorAdapter.findBySiteIdentifier.mockReturnValueOnce([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -1372,14 +1290,11 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            (mockDb.all as MockedFunction<any>).mockReturnValue([]); // No existing monitors
+            mockDb.all.mockReturnValue([]); // No existing monitors
 
             const orphanedMonitor = createCompleteMonitor({
                 id: "orphaned-id",
@@ -1416,10 +1331,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
@@ -1447,10 +1359,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1483,10 +1392,7 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
@@ -1518,24 +1424,17 @@ describe("SiteWriterService", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: SiteWriterService",
-                "component"
-            );
+            await annotate("Component: SiteWriterService", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            (mockSitesCache.get as MockedFunction<any>).mockReturnValue(
-                mockSite
+            mockSitesCache.get.mockReturnValue(mockSite);
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (callback) => callback(mockDb)
             );
-            (
-                mockDatabaseService.executeTransaction as MockedFunction<any>
-            ).mockImplementation(async (callback: any) => callback(mockDb));
 
             // Configure monitor repository to return two existing monitors
-            (
-                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
-            ).mockReturnValueOnce([
+            monitorAdapter.findBySiteIdentifier.mockReturnValueOnce([
                 {
                     id: "monitor-1",
                     type: "http",

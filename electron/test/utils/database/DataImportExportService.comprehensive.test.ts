@@ -15,24 +15,28 @@
 import type { Site } from "@shared/types";
 import type { ImportSite } from "@shared/validation/importExportSchemas";
 import type { Database } from "node-sqlite3-wasm";
+import type { JsonValue, Promisable } from "type-fest";
 
 import { MAX_IPC_JSON_IMPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type MockedFunction,
-    vi,
-} from "vitest";
+    safeJsonParse,
+    safeJsonStringifyWithFallback,
+    type SafeJsonResult,
+} from "@shared/utils/jsonSafety";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DataImportExportConfig } from "../../../services/database/DataImportExportService";
+import type { HistoryRepositoryTransactionAdapter } from "../../../services/database/HistoryRepository";
+import type { MonitorRepositoryTransactionAdapter } from "../../../services/database/MonitorRepository";
+import type { SettingsRepositoryTransactionAdapter } from "../../../services/database/SettingsRepository";
+import type { SiteRepositoryTransactionAdapter } from "../../../services/database/SiteRepository";
 
 import { DATABASE_GRAPH_READ_CONCURRENCY } from "../../../constants";
 import { DataImportExportService } from "../../../services/database/DataImportExportService";
 import { DataImportExportError } from "../../../services/database/interfaces";
+import { withDatabaseOperation } from "../../../utils/operationalHooks";
 
 // Mock all dependencies
 vi.mock("../../../../shared/utils/errorCatalog", () => ({
@@ -64,14 +68,219 @@ vi.mock("../../../utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn(),
 }));
 
+type Monitor = Site["monitors"][number];
+
+const safeJsonParseMock = vi.mocked(safeJsonParse);
+const safeJsonStringifyWithFallbackMock = vi.mocked(
+    safeJsonStringifyWithFallback
+);
+const getUtfByteLengthMock = vi.mocked(getUtfByteLength);
+const withDatabaseOperationMock = vi.mocked(withDatabaseOperation);
+
+const createMockDatabase = () =>
+    ({
+        close: vi.fn<Database["close"]>(),
+        exec: vi.fn<Database["exec"]>(),
+        prepare: vi.fn<Database["prepare"]>(),
+    }) satisfies Pick<
+        Database,
+        | "close"
+        | "exec"
+        | "prepare"
+    >;
+
+const createMockEventEmitter = () => ({
+    emitTyped: vi.fn<DataImportExportConfig["eventEmitter"]["emitTyped"]>(),
+});
+
+const createMockLogger = () =>
+    ({
+        debug: vi.fn<DataImportExportConfig["logger"]["debug"]>(),
+        error: vi.fn<DataImportExportConfig["logger"]["error"]>(),
+        info: vi.fn<DataImportExportConfig["logger"]["info"]>(),
+        warn: vi.fn<DataImportExportConfig["logger"]["warn"]>(),
+    }) satisfies DataImportExportConfig["logger"];
+
+const createMockRepositories = () => {
+    const historyAddEntryInternal = vi.fn(
+        (
+            _database: Database,
+            _monitorId: string,
+            _entry: Parameters<
+                HistoryRepositoryTransactionAdapter["addEntry"]
+            >[1],
+            _details?: string
+        ): void => undefined
+    );
+    const historyDeleteAllInternal = vi.fn(
+        (_database: Database): void => undefined
+    );
+    const monitorCreateInternal = vi.fn(
+        (
+            _database: Database,
+            _siteIdentifier: string,
+            _monitor: Monitor
+        ): string => "created-monitor-id"
+    );
+    const monitorDeleteAllInternal = vi.fn(
+        (_database: Database): void => undefined
+    );
+    const settingsBulkInsertInternal = vi.fn(
+        (_database: Database, _settings: Record<string, string>): void =>
+            undefined
+    );
+    const settingsDeleteAllInternal = vi.fn(
+        (_database: Database): void => undefined
+    );
+    const settingsDeleteInternal = vi.fn(
+        (_database: Database, _key: string): void => undefined
+    );
+    const siteBulkInsertInternal = vi.fn(
+        (
+            _database: Database,
+            _sites: Parameters<
+                SiteRepositoryTransactionAdapter["bulkInsert"]
+            >[0]
+        ): void => undefined
+    );
+    const siteDeleteAllInternal = vi.fn(
+        (_database: Database): void => undefined
+    );
+
+    return {
+        history: {
+            addEntryInternal: historyAddEntryInternal,
+            createTransactionAdapter: vi.fn(
+                (database: Database): HistoryRepositoryTransactionAdapter => ({
+                    addEntry: vi.fn((monitorId, entry, details) =>
+                        historyAddEntryInternal(
+                            database,
+                            monitorId,
+                            entry,
+                            details
+                        )
+                    ),
+                    deleteAll: vi.fn(() => historyDeleteAllInternal(database)),
+                    deleteByMonitorId: vi.fn(),
+                    getHistoryCount: vi.fn(() => 0),
+                    pruneAllHistory: vi.fn(),
+                })
+            ),
+            deleteAllInternal: historyDeleteAllInternal,
+            findByMonitorId: vi
+                .fn<
+                    DataImportExportConfig["repositories"]["history"]["findByMonitorId"]
+                >()
+                .mockResolvedValue([]),
+        },
+        monitor: {
+            bulkCreate: vi.fn().mockResolvedValue([]),
+            createInternal: monitorCreateInternal,
+            createTransactionAdapter: vi.fn(
+                (database: Database): MonitorRepositoryTransactionAdapter => ({
+                    clearActiveOperations: vi.fn(),
+                    create: vi.fn((siteIdentifier, monitor) =>
+                        monitorCreateInternal(database, siteIdentifier, monitor)
+                    ),
+                    deleteAll: vi.fn(() => monitorDeleteAllInternal(database)),
+                    deleteById: vi.fn(() => false),
+                    deleteBySiteIdentifier: vi.fn(),
+                    findBySiteIdentifier: vi.fn(() => []),
+                    update: vi.fn(),
+                })
+            ),
+            deleteAllInternal: monitorDeleteAllInternal,
+            findBySiteIdentifier: vi
+                .fn<
+                    DataImportExportConfig["repositories"]["monitor"]["findBySiteIdentifier"]
+                >()
+                .mockResolvedValue([]),
+        },
+        settings: {
+            bulkInsertInternal: settingsBulkInsertInternal,
+            createTransactionAdapter: vi.fn(
+                (database: Database): SettingsRepositoryTransactionAdapter => ({
+                    bulkInsert: vi.fn((settings) =>
+                        settingsBulkInsertInternal(database, settings)
+                    ),
+                    deleteAll: vi.fn(() => settingsDeleteAllInternal(database)),
+                    deleteByKey: vi.fn((key) =>
+                        settingsDeleteInternal(database, key)
+                    ),
+                    set: vi.fn(),
+                })
+            ),
+            deleteAllInternal: settingsDeleteAllInternal,
+            deleteInternal: settingsDeleteInternal,
+            getAll: vi
+                .fn<
+                    DataImportExportConfig["repositories"]["settings"]["getAll"]
+                >()
+                .mockResolvedValue({}),
+        },
+        site: {
+            bulkInsertInternal: siteBulkInsertInternal,
+            createTransactionAdapter: vi.fn(
+                (database: Database): SiteRepositoryTransactionAdapter => ({
+                    bulkInsert: vi.fn((sites) =>
+                        siteBulkInsertInternal(database, sites)
+                    ),
+                    delete: vi.fn(() => false),
+                    deleteAll: vi.fn(() => siteDeleteAllInternal(database)),
+                    upsert: vi.fn(),
+                })
+            ),
+            deleteAllInternal: siteDeleteAllInternal,
+            exportAllRows: vi
+                .fn<
+                    DataImportExportConfig["repositories"]["site"]["exportAllRows"]
+                >()
+                .mockResolvedValue([]),
+        },
+    };
+};
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+type MockEventEmitter = ReturnType<typeof createMockEventEmitter>;
+type MockLogger = ReturnType<typeof createMockLogger>;
+type MockRepositories = ReturnType<typeof createMockRepositories>;
+
+const createMockDatabaseService = (database: MockDatabase) => {
+    const productionDatabase = database as unknown as Database;
+    const executeTransaction = vi.fn(
+        async <T>(
+            operation: (database: Database) => Promise<T> | T
+        ): Promise<T> => operation(productionDatabase)
+    );
+
+    return {
+        executeTransaction,
+        getDatabase: vi.fn(() => productionDatabase),
+    };
+};
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
+
+const runDatabaseOperation: typeof withDatabaseOperation = async <T>(
+    operation: () => Promisable<T>
+): Promise<T> => {
+    const result = await operation();
+    return result;
+};
+
+const asUnvalidatedMonitors = (value: unknown): Site["monitors"] =>
+    value as Site["monitors"];
+
+const asUnvalidatedSettings = (value: unknown): Record<string, string> =>
+    value as Record<string, string>;
+
 describe("DataImportExportService - Comprehensive Coverage", () => {
     let service: DataImportExportService;
-    let mockConfig: DataImportExportConfig;
-    let mockDatabase: Database;
-    let mockEventEmitter: any;
-    let mockLogger: any;
-    let mockRepositories: any;
-    let mockDatabaseService: any;
+    let mockDatabase: MockDatabase;
+    let mockEventEmitter: MockEventEmitter;
+    let mockLogger: MockLogger;
+    let mockRepositories: MockRepositories;
+    let mockDatabaseService: MockDatabaseService;
 
     beforeEach(() => {
         // Reset all mocks
@@ -79,142 +288,25 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
         vi.mocked(getUtfByteLength).mockImplementation((value: string) =>
             Buffer.byteLength(value, "utf8")
         );
+        withDatabaseOperationMock.mockImplementation(runDatabaseOperation);
 
-        // Create comprehensive mocks
-        mockDatabase = {
-            exec: vi.fn(),
-            prepare: vi.fn(),
-            close: vi.fn(),
-        } as any;
+        mockDatabase = createMockDatabase();
+        mockEventEmitter = createMockEventEmitter();
+        mockEventEmitter.emitTyped.mockResolvedValue(undefined);
+        mockLogger = createMockLogger();
+        mockRepositories = createMockRepositories();
+        mockDatabaseService = createMockDatabaseService(mockDatabase);
 
-        mockEventEmitter = {
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-            on: vi.fn(),
-            off: vi.fn(),
-            emit: vi.fn(),
-        };
-
-        mockLogger = {
-            debug: vi.fn(),
-            info: vi.fn(),
-            warn: vi.fn(),
-            error: vi.fn(),
-        };
-
-        mockRepositories = {
-            history: {
-                deleteAllInternal: vi.fn(),
-                addEntryInternal: vi.fn(),
-                findByMonitorId: vi.fn().mockResolvedValue([]),
-            },
-            monitor: {
-                // Internal helpers used by the transaction adapter. These
-                // mirror the repository's internal API surface without
-                // requiring a real database.
-                createInternal: vi.fn().mockReturnValue("created-monitor-id"),
-                deleteAllInternal: vi.fn(),
-                // Previous bulkCreate is kept for compatibility with older
-                // tests but is no longer used by the service implementation.
-                bulkCreate: vi.fn().mockResolvedValue([]),
-                findBySiteIdentifier: vi.fn().mockResolvedValue([]),
-            },
-            settings: {
-                deleteAllInternal: vi.fn(),
-                deleteInternal: vi.fn(),
-                bulkInsertInternal: vi.fn(),
-                getAll: vi.fn().mockResolvedValue({}),
-            },
-            site: {
-                deleteAllInternal: vi.fn(),
-                bulkInsertInternal: vi.fn(),
-                exportAllRows: vi.fn().mockResolvedValue([]),
-            },
-        };
-
-        const attachTransactionAdapter = (
-            repository: Record<string, any>,
-            builders: Record<string, Function>
-        ) => {
-            repository["createTransactionAdapter"] = vi
-                .fn()
-                .mockImplementation((db: unknown) => {
-                    const adapter: Record<string, any> = {};
-
-                    for (const [key, factory] of Object.entries(builders)) {
-                        adapter[key] = vi.fn((...args: unknown[]) =>
-                            factory(db, ...args)
-                        );
-                    }
-
-                    return adapter;
-                });
-        };
-
-        attachTransactionAdapter(mockRepositories.site, {
-            bulkInsert: (db: unknown, rows: unknown) =>
-                mockRepositories.site.bulkInsertInternal(db, rows),
-            deleteAll: (db: unknown) =>
-                mockRepositories.site.deleteAllInternal(db),
-        });
-
-        attachTransactionAdapter(mockRepositories.monitor, {
-            deleteAll: (db: unknown) =>
-                mockRepositories.monitor.deleteAllInternal(db),
-            create: (
-                db: unknown,
-                siteIdentifier: string,
-                monitor: Site["monitors"][0]
-            ) =>
-                mockRepositories.monitor.createInternal(
-                    db,
-                    siteIdentifier,
-                    monitor
-                ),
-        });
-
-        attachTransactionAdapter(mockRepositories.history, {
-            deleteAll: (db: unknown) =>
-                mockRepositories.history.deleteAllInternal?.(db),
-            addEntry: (
-                db: unknown,
-                monitorId: unknown,
-                entry: unknown,
-                details: unknown
-            ) =>
-                mockRepositories.history.addEntryInternal(
-                    db,
-                    monitorId,
-                    entry,
-                    details
-                ),
-        });
-
-        attachTransactionAdapter(mockRepositories.settings, {
-            deleteAll: (db: unknown) =>
-                mockRepositories.settings.deleteAllInternal(db),
-            deleteByKey: (db: unknown, key: string) =>
-                mockRepositories.settings.deleteInternal(db, key),
-            bulkInsert: (db: unknown, values: unknown) =>
-                mockRepositories.settings.bulkInsertInternal(db, values),
-        });
-
-        mockDatabaseService = {
-            executeTransaction: vi
-                .fn()
-                .mockImplementation(
-                    async (callback: Function) => await callback(mockDatabase)
-                ),
-            getDatabase: vi.fn().mockReturnValue(mockDatabase),
-        };
-
-        mockConfig = {
+        const mockConfig = {
             databaseService: mockDatabaseService,
             eventEmitter: mockEventEmitter,
             logger: mockLogger,
             repositories: mockRepositories,
         };
 
-        service = new DataImportExportService(mockConfig);
+        service = new DataImportExportService(
+            mockConfig as unknown as DataImportExportConfig
+        );
     });
 
     describe("Constructor", () => {
@@ -242,8 +334,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockSites: Site[] = [
                 {
                     identifier: "test-site",
@@ -261,9 +351,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             mockRepositories.site.exportAllRows.mockResolvedValue(mockSites);
             mockRepositories.settings.getAll.mockResolvedValue(mockSettings);
-            (
-                safeJsonStringifyWithFallback as MockedFunction<any>
-            ).mockReturnValue('{"exported": true}');
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported": true}'
+            );
 
             const result = await service.exportAllData();
 
@@ -308,8 +398,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Performance", "type");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("../../../../shared/utils/jsonSafety");
             const siteRows = Array.from(
                 { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
                 (_, index) => ({
@@ -333,9 +421,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     return [];
                 }
             );
-            (
-                safeJsonStringifyWithFallback as MockedFunction<any>
-            ).mockReturnValue('{"exported": true}');
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported": true}'
+            );
 
             await service.exportAllData();
 
@@ -356,8 +444,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Performance", "type");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("../../../../shared/utils/jsonSafety");
             const monitors = Array.from(
                 { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
                 (_, index) => ({
@@ -397,9 +483,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     return [];
                 }
             );
-            (
-                safeJsonStringifyWithFallback as MockedFunction<any>
-            ).mockReturnValue('{"exported": true}');
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported": true}'
+            );
 
             await service.exportAllData();
 
@@ -418,12 +504,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate(`Testing: ${task.name}`, "security");
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Export", "category");
-
-            const { safeJsonStringifyWithFallback } =
-                await import("@shared/utils/jsonSafety");
-            const safeJsonStringifyWithFallbackMock = vi.mocked(
-                safeJsonStringifyWithFallback
-            );
 
             // Simulate a corrupted database or hostile import that inserted a
             // dangerous key into the settings table.
@@ -477,11 +557,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Export", "category");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("@shared/utils/jsonSafety");
-            const safeJsonStringifyWithFallbackMock = vi.mocked(
-                safeJsonStringifyWithFallback
-            );
             const bigintToStringSpy = vi
                 .spyOn(BigInt.prototype, "toString")
                 .mockImplementation(() => {
@@ -495,10 +570,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const symbolValue = Symbol("exported-setting");
 
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
-            mockRepositories.settings.getAll.mockResolvedValue({
-                numeric: 123n,
-                symbolic: symbolValue,
-            });
+            mockRepositories.settings.getAll.mockResolvedValue(
+                asUnvalidatedSettings({
+                    numeric: 123n,
+                    symbolic: symbolValue,
+                })
+            );
             safeJsonStringifyWithFallbackMock.mockReturnValue(
                 '{"exported":true}'
             );
@@ -537,11 +614,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Export", "category");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("@shared/utils/jsonSafety");
-            const safeJsonStringifyWithFallbackMock = vi.mocked(
-                safeJsonStringifyWithFallback
-            );
             const lastChecked = new Date("2026-07-08T12:34:56.789Z");
 
             mockRepositories.site.exportAllRows.mockResolvedValue([
@@ -591,16 +663,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Export", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("@shared/utils/jsonSafety");
-            const safeJsonStringifyWithFallbackMock = vi.mocked(
-                safeJsonStringifyWithFallback
-            );
-
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
-            mockRepositories.settings.getAll.mockResolvedValue({
-                theme: 123,
-            });
+            mockRepositories.settings.getAll.mockResolvedValue(
+                asUnvalidatedSettings({
+                    theme: 123,
+                })
+            );
 
             await expect(service.exportAllData()).rejects.toThrow(
                 "Export data payload did not match export schema after normalization."
@@ -712,8 +780,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Security", "type");
 
-            const { safeJsonStringifyWithFallback } =
-                await import("../../../../shared/utils/jsonSafety");
             const { getUtfByteLength } =
                 await import("../../../../shared/utils/utfByteLength");
             const { MAX_IPC_JSON_EXPORT_BYTES } =
@@ -721,13 +787,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             mockRepositories.site.exportAllRows.mockResolvedValue([]);
             mockRepositories.settings.getAll.mockResolvedValue({});
-            (
-                safeJsonStringifyWithFallback as MockedFunction<any>
-            ).mockReturnValue('{"exported":true}');
-
-            (getUtfByteLength as MockedFunction<any>).mockReturnValue(
-                MAX_IPC_JSON_EXPORT_BYTES + 1
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported":true}'
             );
+
+            getUtfByteLengthMock.mockReturnValue(MAX_IPC_JSON_EXPORT_BYTES + 1);
 
             const exportPromise = service.exportAllData();
             await expect(exportPromise).rejects.toThrow(DataImportExportError);
@@ -755,8 +819,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockJsonData = '{"sites": [], "settings": {}}';
             const mockParsedData = {
                 sites: [{ identifier: "test-site", name: "Test Site" }],
@@ -769,10 +831,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             };
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
                 data: mockParsedData,
-                error: null,
             });
 
             const result = await service.importDataFromJson(mockJsonData);
@@ -802,8 +863,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockJsonData = '{"sites": [], "settings": {}}';
             const mockParsedData = {
                 sites: [],
@@ -814,10 +873,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             };
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
                 data: mockParsedData,
-                error: null,
             });
 
             const result = await service.importDataFromJson(mockJsonData);
@@ -844,8 +902,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockJsonData = '{"sites": [], "settings": {}}';
             const mockParsedData = {
                 sites: [],
@@ -855,10 +911,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 },
             };
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
                 data: mockParsedData,
-                error: null,
             });
 
             const result = await service.importDataFromJson(mockJsonData);
@@ -884,8 +939,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockJsonData =
                 '{"sites":[{"identifier":"example.com","monitors":[]}]}';
             const mockParsedData = {
@@ -897,10 +950,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 ],
             };
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
                 data: mockParsedData,
-                error: null,
             });
 
             const result = await service.importDataFromJson(mockJsonData);
@@ -917,13 +969,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const invalidJsonData = "invalid json";
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: false,
-                data: null,
                 error: "Unexpected token in JSON",
             });
 
@@ -958,8 +1007,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Security", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const oversizedJsonData = "x".repeat(MAX_IPC_JSON_IMPORT_BYTES + 1);
 
             await expect(
@@ -985,13 +1032,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
-
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
-                data: null,
-                error: null,
             });
 
             await expect(service.importDataFromJson("{}")).rejects.toThrow(
@@ -1018,17 +1060,14 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
             const mockParsedData = {
                 sites: [{ identifier: "test-site" }],
                 // No settings property
             };
 
-            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+            safeJsonParseMock.mockReturnValue({
                 success: true,
                 data: mockParsedData,
-                error: null,
             });
 
             const result = await service.importDataFromJson("{}");
@@ -1048,10 +1087,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { safeJsonParse } =
-                await import("../../../../shared/utils/jsonSafety");
-
-            (safeJsonParse as MockedFunction<any>).mockImplementation(() => {
+            safeJsonParseMock.mockImplementation(() => {
                 throw "String error";
             });
 
@@ -1084,8 +1120,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "site1",
@@ -1100,10 +1134,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 historyLimit: "1000",
                 theme: "light",
             });
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, mockSettings);
 
@@ -1164,8 +1194,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const mockSettings = {
                 ["__proto__"]: "evil",
                 constructor: "unsafe-constructor",
@@ -1173,10 +1201,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 theme: "dark",
                 "cloud.dropbox.tokens": "ciphertext",
             };
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData([], mockSettings);
 
@@ -1196,16 +1220,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-
             mockRepositories.settings.getAll.mockResolvedValue({
                 historyLimit: "1000",
             });
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData([], {
                 historyLimit: "1e3",
@@ -1232,13 +1249,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
-
             await service.persistImportedData([], {
                 historyLimit: " 00500 ",
             });
@@ -1255,13 +1265,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate(`Testing: ${task.name}`, "security");
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
-
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData([], {
                 " cloud.dropbox.tokens ": "ciphertext",
@@ -1289,9 +1292,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-
             mockRepositories.settings.getAll.mockResolvedValue({
                 ["__proto__"]: "evil-existing",
                 "cloud.dropbox.tokens": "existing-token",
@@ -1301,10 +1301,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 prototype: "existing-prototype",
                 theme: "light",
             });
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData([], { theme: "dark" });
 
@@ -1344,8 +1340,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const rawIdentifier =
                 "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockSites: ImportSite[] = [
@@ -1387,16 +1381,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 { identifier: "site1" }, // No name
                 { identifier: "site2", name: "" }, // Empty name
             ];
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, {});
 
@@ -1417,8 +1405,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Sanitization", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const rawMonitorId =
                 "https://monitor.example/check?token=monitor-token#private-monitor";
             const rawSiteIdentifier =
@@ -1437,13 +1423,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const mockSites: ImportSite[] = [
                 {
                     identifier: rawSiteIdentifier,
-                    monitors: [lowIntervalMonitor as any],
+                    monitors: asUnvalidatedMonitors([lowIntervalMonitor]),
                 },
             ];
 
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
             await service.persistImportedData(mockSites, {});
 
             expect(
@@ -1492,13 +1475,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
-
             await service.persistImportedData([], {});
 
             expect(
@@ -1523,8 +1499,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const rawIdentifier =
                 "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockMonitors = [
@@ -1559,10 +1533,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ];
 
             mockRepositories.monitor.createInternal.mockReturnValueOnce("123");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, {});
 
@@ -1603,16 +1573,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 { identifier: "site1", name: "Site 1" }, // No monitors
                 { identifier: "site2", monitors: [] }, // Empty monitors
             ];
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, {});
 
@@ -1633,30 +1597,28 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const rawIdentifier =
                 "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockSites: ImportSite[] = [
                 {
                     identifier: rawIdentifier,
-                    monitors: [
+                    monitors: asUnvalidatedMonitors([
                         {
                             id: "mon1",
                             type: "http" as const,
                             url: "https://example.com",
-                        } as any,
-                    ],
+                        },
+                    ]),
                 },
                 {
                     identifier: "site2",
-                    monitors: [
+                    monitors: asUnvalidatedMonitors([
                         {
                             id: "mon2",
                             type: "ping" as const,
                             url: "https://test.com",
-                        } as any,
-                    ],
+                        },
+                    ]),
                 },
             ];
             const createError = new Error("Monitor creation failed");
@@ -1668,10 +1630,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
                     return "456";
                 }
-            );
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
             );
 
             await expect(
@@ -1705,8 +1663,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const originalMonitors = [
                 {
                     type: "http" as const,
@@ -1730,16 +1686,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
-                    monitors: originalMonitors as any,
+                    monitors: asUnvalidatedMonitors(originalMonitors),
                 },
             ];
 
             mockRepositories.monitor.createInternal.mockReturnValue(
                 "new-monitor-id"
-            );
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
             );
 
             await service.persistImportedData(mockSites, {});
@@ -1776,8 +1728,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const duplicateEndpointMonitors = [
                 {
                     type: "http" as const,
@@ -1806,17 +1756,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
-                    monitors: duplicateEndpointMonitors as any,
+                    monitors: asUnvalidatedMonitors(duplicateEndpointMonitors),
                 },
             ];
 
             mockRepositories.monitor.createInternal
                 .mockReturnValueOnce("first-monitor-id")
                 .mockReturnValueOnce("second-monitor-id");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, {});
 
@@ -1852,12 +1798,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const mockSites: ImportSite[] = [
                 {
                     identifier: "test-site",
-                    monitors: [
+                    monitors: asUnvalidatedMonitors([
                         {
                             type: "http" as const,
                             url: "https://example.com",
@@ -1869,17 +1813,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                                 },
                             ],
                         },
-                    ] as any,
+                    ]),
                 },
             ];
 
             // Simulate a repository bug returning a falsy ID so that the
             // history import path skips adding entries.
             mockRepositories.monitor.createInternal.mockReturnValueOnce("");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(mockSites, {});
 
@@ -1900,18 +1840,19 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { safeJsonParse } = await import("@shared/utils/jsonSafety");
-
             // The parse-time guard is passed to safeJsonParse.
             //
             // @remarks
-            // importDataFromJson intentionally accepts any JSON value at parse
+            // importDataFromJson accepts arbitrary JSON values at parse
             // time and then performs strict shape validation via the shared
             // Zod schemas.
-            (safeJsonParse as MockedFunction<any>).mockImplementation(
-                (_jsonData: any, guardFunction: any) => {
+            safeJsonParseMock.mockImplementation(
+                <T extends JsonValue>(
+                    _jsonData: string,
+                    guardFunction: (data: unknown) => data is T
+                ): SafeJsonResult<T> => {
                     // Test the type guard with valid data
-                    const validData = {
+                    const validData: unknown = {
                         sites: [{ identifier: "test" }],
                         settings: {},
                     };
@@ -1926,10 +1867,16 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     expect(guardFunction({})).toBeTruthy();
                     expect(guardFunction(undefined)).toBeFalsy();
 
+                    if (!guardFunction(validData)) {
+                        return {
+                            error: "Parse-time guard rejected valid JSON",
+                            success: false,
+                        };
+                    }
+
                     return {
                         success: true,
                         data: validData,
-                        error: null,
                     };
                 }
             );
@@ -1953,13 +1900,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const operationError = new Error("Database operation failed");
 
-            (withDatabaseOperation as MockedFunction<any>).mockRejectedValue(
-                operationError
-            );
+            withDatabaseOperationMock.mockRejectedValue(operationError);
 
             await expect(service.persistImportedData([], {})).rejects.toThrow(
                 operationError
@@ -1978,12 +1921,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const transactionError = new Error("Transaction failed");
             mockDatabaseService.executeTransaction.mockRejectedValue(
                 transactionError
-            );
-
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
             );
 
             await expect(service.persistImportedData([], {})).rejects.toThrow(
@@ -2005,12 +1942,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 throw deleteError;
             });
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
-
             await expect(service.persistImportedData([], {})).rejects.toThrow(
                 deleteError
             );
@@ -2027,8 +1958,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Import Operation", "type");
 
-            const { withDatabaseOperation } =
-                await import("../../../utils/operationalHooks");
             const complexSites: ImportSite[] = [
                 {
                     identifier: "complex-site",
@@ -2080,10 +2009,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             mockRepositories.monitor.createInternal
                 .mockReturnValueOnce("http-monitor-1")
                 .mockReturnValueOnce("port-monitor-1");
-
-            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
-                async (operation: any) => await operation()
-            );
 
             await service.persistImportedData(complexSites, complexSettings);
 
