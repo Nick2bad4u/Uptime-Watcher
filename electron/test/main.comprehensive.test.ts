@@ -17,6 +17,7 @@ import {
     describe,
     expect,
     it,
+    test,
     type MockInstance,
     vi,
 } from "vitest";
@@ -245,149 +246,105 @@ describe("main.ts - Electron Main Process", () => {
         vi.resetModules();
     });
     describe("Logging Configuration", () => {
-        it("should configure debug logging when --debug flag is present", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        test.for([
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--debug",
+                ],
+                consoleLevel: "debug",
+                expectInitializePreload: true,
+                fileLevel: "debug",
+                name: "should configure debug logging when --debug flag is present",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-production",
+                ],
+                consoleLevel: "info",
+                fileLevel: "warn",
+                name: "should configure production logging when --log-production flag is present",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-info",
+                ],
+                consoleLevel: "info",
+                fileLevel: "info",
+                name: "should configure info logging when --log-info flag is present",
+            },
+            {
+                argv: ["node", "main.js"],
+                consoleLevel: "debug",
+                fileLevel: "info",
+                isPackaged: false,
+                name: "should use default development logging when no flags are present",
+            },
+            {
+                argv: ["node", "main.js"],
+                consoleLevel: "info",
+                fileLevel: "warn",
+                isPackaged: true,
+                name: "should use default production logging when packaged",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-prod",
+                ],
+                consoleLevel: "info",
+                fileLevel: "warn",
+                name: "should handle --log-prod flag as alias for --log-production",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-debug",
+                ],
+                consoleLevel: "debug",
+                fileLevel: "debug",
+                name: "should handle --log-debug flag as alias for --debug",
+            },
+        ])(
+            "$name",
+            { timeout: 60_000 },
+            async (
+                {
+                    argv,
+                    consoleLevel,
+                    expectInitializePreload,
+                    fileLevel,
+                    isPackaged = false,
+                },
+                { task, annotate }
+            ) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: main", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
 
-            process.argv = [
-                "node",
-                "main.js",
-                "--debug",
-            ];
+                process.argv = argv;
+                Reflect.set(mockApp, "isPackaged", isPackaged);
 
-            // Reset the module cache and import main.ts with new argv
-            vi.resetModules();
-            await import("../main");
+                vi.resetModules();
+                await import("../main");
 
-            expect(mockLog.initialize).toHaveBeenCalledWith({ preload: true });
-            expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        }, 60_000);
-        it("should configure production logging when --log-production flag is present", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-production",
-            ];
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        }, 60_000);
-        it("should configure info logging when --log-info flag is present", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-info",
-            ];
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-        it("should use default development logging when no flags are present", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = ["node", "main.js"];
-            Reflect.set(mockApp, "isPackaged", false);
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
-        it("should use default production logging when packaged", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = ["node", "main.js"];
-            Reflect.set(mockApp, "isPackaged", true);
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-        it("should handle --log-prod flag as alias for --log-production", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-prod",
-            ];
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-        it("should handle --log-debug flag as alias for --debug", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-debug",
-            ];
-
-            vi.resetModules();
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
+                if (expectInitializePreload) {
+                    expect(mockLog.initialize).toHaveBeenCalledWith({
+                        preload: true,
+                    });
+                }
+                expect(mockLog.transports.file.level).toBe(fileLevel);
+                expect(mockLog.transports.console.level).toBe(consoleLevel);
+            }
+        );
     });
     describe("Main Class Initialization", () => {
         it("should create ApplicationService instance", async ({

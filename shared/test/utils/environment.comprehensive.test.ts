@@ -673,36 +673,25 @@ describe("Environment Detection Utilities", () => {
             expect(envModule.isDevelopment()).toBeTruthy();
         });
 
-        it("should return false when NODE_ENV is 'production'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "production" },
+        describe("non-development environments", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: environment", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
             });
 
-            expect(envModule.isDevelopment()).toBeFalsy();
-        });
+            it.each([
+                "production",
+                "test",
+                "Development",
+            ])("should return false when NODE_ENV is '%s'", (nodeEnv) => {
+                const envModule = applyMockProcessSnapshot({
+                    env: { NODE_ENV: nodeEnv },
+                });
 
-        it("should return false when NODE_ENV is 'test'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "test" },
+                expect(envModule.isDevelopment()).toBeFalsy();
             });
-
-            expect(envModule.isDevelopment()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -915,36 +904,25 @@ describe("Environment Detection Utilities", () => {
             expect(envModule.isProduction()).toBeTruthy();
         });
 
-        it("should return false when NODE_ENV is 'development'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "development" },
+        describe("non-production environments", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: environment", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
             });
 
-            expect(envModule.isProduction()).toBeFalsy();
-        });
+            it.each([
+                "development",
+                "test",
+                "Production",
+            ])("should return false when NODE_ENV is '%s'", (nodeEnv) => {
+                const envModule = applyMockProcessSnapshot({
+                    env: { NODE_ENV: nodeEnv },
+                });
 
-        it("should return false when NODE_ENV is 'test'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "test" },
+                expect(envModule.isProduction()).toBeFalsy();
             });
-
-            expect(envModule.isProduction()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({
@@ -1006,36 +984,25 @@ describe("Environment Detection Utilities", () => {
             expect(envModule.isTest()).toBeTruthy();
         });
 
-        it("should return false when NODE_ENV is 'development'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "development" },
+        describe("non-test environments", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: environment", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
             });
 
-            expect(envModule.isTest()).toBeFalsy();
-        });
+            it.each([
+                "development",
+                "production",
+                "Test",
+            ])("should return false when NODE_ENV is '%s'", (nodeEnv) => {
+                const envModule = applyMockProcessSnapshot({
+                    env: { NODE_ENV: nodeEnv },
+                });
 
-        it("should return false when NODE_ENV is 'production'", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: environment", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const envModule = applyMockProcessSnapshot({
-                env: { NODE_ENV: "production" },
+                expect(envModule.isTest()).toBeFalsy();
             });
-
-            expect(envModule.isTest()).toBeFalsy();
         });
 
         it("should return false when NODE_ENV is not set", async ({

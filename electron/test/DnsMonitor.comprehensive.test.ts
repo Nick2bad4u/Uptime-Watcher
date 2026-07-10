@@ -2,7 +2,7 @@ import type { Monitor } from "@shared/types";
 
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { resolve4 } from "node:dns/promises";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 
 // Import after mocking
 import { DnsMonitor } from "../services/monitoring/DnsMonitor";
@@ -147,160 +147,92 @@ describe(DnsMonitor, () => {
         expect(sleepUnrefMock).toHaveBeenNthCalledWith(1, 500, undefined);
     });
 
-    it("should check A record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
+    test.for([
+        {
+            expectedDetails: "A records",
+            expectResponseTimeNumber: true,
+            name: "should check A record successfully",
+            recordType: "A",
+        },
+        {
+            expectedDetails: "AAAA records",
+            name: "should check AAAA record successfully",
+            recordType: "AAAA",
+        },
+        {
+            expectedDetails: "CNAME record",
+            name: "should check CNAME record successfully",
+            recordType: "CNAME",
+        },
+        {
+            expectedDetails: "MX records",
+            name: "should check MX record successfully",
+            recordType: "MX",
+        },
+        {
+            expectedDetails: "TXT records",
+            name: "should check TXT record successfully",
+            recordType: "TXT",
+        },
+        {
+            expectedDetails: "NS records",
+            name: "should check NS record successfully",
+            recordType: "NS",
+        },
+        {
+            expectedDetails: "SRV records",
+            name: "should check SRV record successfully",
+            recordType: "SRV",
+        },
+        {
+            expectedDetails: "PTR records",
+            name: "should check PTR record successfully",
+            recordType: "PTR",
+        },
+        {
+            expectedDetails: "SOA:",
+            name: "should check SOA record successfully",
+            recordType: "SOA",
+        },
+        {
+            expectedDetails: "ANY records",
+            name: "should check ANY record successfully",
+            recordType: "ANY",
+        },
+        {
+            expectedDetails: "TLSA records",
+            name: "should check TLSA record successfully",
+            recordType: "TLSA",
+        },
+        {
+            expectedDetails: "CAA records",
+            name: "should check CAA record successfully",
+            recordType: "CAA",
+        },
+        {
+            expectedDetails: "NAPTR records",
+            name: "should check NAPTR record successfully",
+            recordType: "NAPTR",
+        },
+    ])(
+        "$name",
+        async (
+            { expectedDetails, expectResponseTimeNumber, recordType },
+            { task, annotate }
+        ) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DnsMonitor", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
 
-        const monitor = createTestMonitor({ recordType: "A" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(typeof result.responseTime).toBe("number");
-        expect(result.details).toContain("A records");
-    });
+            const monitor = createTestMonitor({ recordType });
+            const result = await dnsMonitor.check(monitor);
 
-    it("should check AAAA record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "AAAA" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("AAAA records");
-    });
-
-    it("should check CNAME record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "CNAME" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("CNAME record"); // Changed from 'CNAME records' to 'CNAME record'
-    });
-
-    it("should check MX record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "MX" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("MX records");
-    });
-
-    it("should check TXT record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "TXT" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("TXT records");
-    });
-
-    it("should check NS record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "NS" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("NS records");
-    });
-
-    it("should check SRV record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "SRV" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("SRV records");
-    });
-
-    it("should check PTR record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "PTR" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("PTR records");
-    });
-
-    it("should check SOA record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "SOA" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("SOA:"); // Changed from 'SOA record' to 'SOA:'
-    });
-
-    it("should check ANY record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "ANY" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("ANY records");
-    });
-
-    it("should check TLSA record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "TLSA" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("TLSA records");
-    });
-
-    it("should check CAA record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "CAA" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("CAA records");
-    });
-
-    it("should check NAPTR record successfully", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: DnsMonitor", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const monitor = createTestMonitor({ recordType: "NAPTR" });
-        const result = await dnsMonitor.check(monitor);
-        expect(result.status).toBe("up");
-        expect(result.details).toContain("NAPTR records");
-    });
+            expect(result.status).toBe("up");
+            if (expectResponseTimeNumber) {
+                expect(typeof result.responseTime).toBe("number");
+            }
+            expect(result.details).toContain(expectedDetails);
+        }
+    );
 });

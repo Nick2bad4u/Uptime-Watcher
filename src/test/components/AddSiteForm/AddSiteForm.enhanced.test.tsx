@@ -456,17 +456,17 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
     });
 
     describe("Basic Rendering and Structure", () => {
-        it("should render the form without errors", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
+        it.each([
+            {
+                description: "should render the form without errors",
+            },
+            {
+                description: "should render with proper form structure",
+            },
+            {
+                description: "should render with default configuration",
+            },
+        ])("$description", () => {
             const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
@@ -494,21 +494,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should render with proper form structure", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const { getForm } = renderAddSiteForm();
-            expect(getForm()).toBeInTheDocument();
-        });
-
         it("should render without errors when no props provided", ({
             task,
             annotate,
@@ -524,21 +509,6 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Type: Error Handling", "type");
 
             const { getForm } = renderAddSiteForm({});
-            expect(getForm()).toBeInTheDocument();
-        });
-
-        it("should render with default configuration", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AddSiteForm.enhanced", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const { getForm } = renderAddSiteForm();
             expect(getForm()).toBeInTheDocument();
         });
     });

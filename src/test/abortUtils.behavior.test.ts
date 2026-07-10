@@ -242,10 +242,17 @@ describe("abortUtils behavior", () => {
             vi.useFakeTimers();
         });
 
-        it("should resolve after specified delay", async () => {
-            const promise = sleep(1000);
+        it.each([
+            {
+                delay: 1000,
+                description: "should resolve after specified delay",
+            },
+            { delay: 500, description: "should work without signal parameter" },
+            { delay: 0, description: "should handle zero delay" },
+        ])("$description", async ({ delay }) => {
+            const promise = sleep(delay);
 
-            vi.advanceTimersByTime(1000);
+            vi.advanceTimersByTime(delay);
 
             await expect(promise).resolves.toBeUndefined();
         });
@@ -272,22 +279,6 @@ describe("abortUtils behavior", () => {
             controller.abort();
 
             await expect(promise).rejects.toThrow("Sleep was aborted");
-        });
-
-        it("should work without signal parameter", async () => {
-            const promise = sleep(500);
-
-            vi.advanceTimersByTime(500);
-
-            await expect(promise).resolves.toBeUndefined();
-        });
-
-        it("should handle zero delay", async () => {
-            const promise = sleep(0);
-
-            vi.advanceTimersByTime(0);
-
-            await expect(promise).resolves.toBeUndefined();
         });
     });
 

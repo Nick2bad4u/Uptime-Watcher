@@ -10,53 +10,35 @@
 import { describe, expect, it, vi } from "vitest";
 
 describe("IPC service helper initialization failures", () => {
-    it("surfaces CloudService helper initialization errors", async () => {
+    it.each([
+        {
+            description: "surfaces CloudService helper initialization errors",
+            errorMessage: "CloudService init failed",
+            loadService: () => import("../../services/CloudService"),
+        },
+        {
+            description: "surfaces DataService helper initialization errors",
+            errorMessage: "DataService init failed",
+            loadService: () => import("../../services/DataService"),
+        },
+        {
+            description:
+                "surfaces NotificationPreferenceService helper initialization errors",
+            errorMessage: "NotificationPreferenceService init failed",
+            loadService: () =>
+                import("../../services/NotificationPreferenceService"),
+        },
+    ])("$description", async ({ errorMessage, loadService }) => {
         vi.resetModules();
         const helpersModule =
             await import("../../services/utils/createIpcServiceHelpers");
         const getHelpersSpy = vi
             .spyOn(helpersModule, "getIpcServiceHelpers")
             .mockImplementation(() => {
-                throw new Error("CloudService init failed");
+                throw new Error(errorMessage);
             });
 
-        await expect(import("../../services/CloudService")).rejects.toThrow(
-            "CloudService init failed"
-        );
-
-        getHelpersSpy.mockRestore();
-    });
-
-    it("surfaces DataService helper initialization errors", async () => {
-        vi.resetModules();
-        const helpersModule =
-            await import("../../services/utils/createIpcServiceHelpers");
-        const getHelpersSpy = vi
-            .spyOn(helpersModule, "getIpcServiceHelpers")
-            .mockImplementation(() => {
-                throw new Error("DataService init failed");
-            });
-
-        await expect(import("../../services/DataService")).rejects.toThrow(
-            "DataService init failed"
-        );
-
-        getHelpersSpy.mockRestore();
-    });
-
-    it("surfaces NotificationPreferenceService helper initialization errors", async () => {
-        vi.resetModules();
-        const helpersModule =
-            await import("../../services/utils/createIpcServiceHelpers");
-        const getHelpersSpy = vi
-            .spyOn(helpersModule, "getIpcServiceHelpers")
-            .mockImplementation(() => {
-                throw new Error("NotificationPreferenceService init failed");
-            });
-
-        await expect(
-            import("../../services/NotificationPreferenceService")
-        ).rejects.toThrow("NotificationPreferenceService init failed");
+        await expect(loadService()).rejects.toThrow(errorMessage);
 
         getHelpersSpy.mockRestore();
     });

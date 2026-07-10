@@ -20,7 +20,7 @@ import {
     MONITOR_ID_MAX_LENGTH,
     MONITOR_ID_TOO_LONG_MESSAGE,
 } from "@shared/validation/monitorFieldConstants";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, test, vi } from "vitest";
 
 import { MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES } from "../services/ipc/diagnosticsLimits";
 // Import all exported validator groups (domain modules)
@@ -109,244 +109,223 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("addSite validator", () => {
-            it("should return null for valid single object parameter", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    assertArray: false,
+                    name: "should return null for valid single object parameter",
+                    params: [createValidSite()],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    assertArray: true,
+                    name: "should return error array for invalid parameter count",
+                    params: ["param1", "param2"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    assertArray: false,
+                    name: "should return error array for empty parameters",
+                    params: [],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    assertArray: false,
+                    name: "should return error array for invalid object parameter",
+                    params: [null],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async (
+                    { assertArray, params, succeeds, type },
+                    { task, annotate }
+                ) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const siteObject = createValidSite();
-                const result = SiteHandlerValidators.addSite([siteObject]);
+                    const result = SiteHandlerValidators.addSite(params);
 
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.addSite([
-                    "param1",
-                    "param2",
-                ]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-                expect(Array.isArray(result)).toBeTruthy();
-            });
-
-            it("should return error array for empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.addSite([]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid object parameter", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.addSite([null]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                    if (assertArray) {
+                        expect(Array.isArray(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("getSites validator", () => {
-            it("should return null for empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for empty parameters",
+                    params: [],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for non-empty parameters",
+                    params: ["unexpected"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = SiteHandlerValidators.getSites([]);
+                    const result = SiteHandlerValidators.getSites(params);
 
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for non-empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.getSites(["unexpected"]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("removeMonitor validator", () => {
-            it("should return null for valid two string parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid two string parameters",
+                    params: ["site-id", "monitor-id"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: ["only-one"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    name: "should return error array for invalid parameter types",
+                    params: [123, 456],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = SiteHandlerValidators.removeMonitor([
-                    "site-id",
-                    "monitor-id",
-                ]);
+                    const result = SiteHandlerValidators.removeMonitor(params);
 
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.removeMonitor([
-                    "only-one",
-                ]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter types", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.removeMonitor([123, 456]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("removeSite validator", () => {
-            it("should return null for valid single string parameter", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid single string parameter",
+                    params: ["site-identifier"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: [],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    name: "should return error array for invalid parameter type",
+                    params: [123],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = SiteHandlerValidators.removeSite([
-                    "site-identifier",
-                ]);
+                    const result = SiteHandlerValidators.removeSite(params);
 
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.removeSite([]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter type", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.removeSite([123]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("updateSite validator", () => {
-            it("should return null for valid string and object parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid string and object parameters",
+                    params: ["site-id", { name: "Updated Site" }],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: ["only-string"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    name: "should return error array for invalid parameter types",
+                    params: [123, "not-object"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const updates = { name: "Updated Site" };
-                const result = SiteHandlerValidators.updateSite([
-                    "site-id",
-                    updates,
-                ]);
+                    const result = SiteHandlerValidators.updateSite(params);
 
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.updateSite([
-                    "only-string",
-                ]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter types", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = SiteHandlerValidators.updateSite([
-                    123,
-                    "not-object",
-                ]);
-
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
     });
 
@@ -414,280 +393,276 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("checkSiteNow validator", () => {
-            it("should return null for valid site and monitor identifiers", async ({
-                task,
-                annotate,
-            }) => {
+            test.for([
+                {
+                    mode: "success",
+                    name: "should return null for valid site and monitor identifiers",
+                    params: ["site-id", "monitor-id"],
+                    type: "Business Logic",
+                },
+                {
+                    mode: "failure",
+                    name: "should return error array for invalid parameter count",
+                    params: ["only-site"],
+                    type: "Error Handling",
+                },
+                {
+                    mode: "message",
+                    name: "should reject monitor identifiers that exceed the shared limit",
+                    params: ["site-id", "m".repeat(MONITOR_ID_MAX_LENGTH + 1)],
+                    type: "Error Handling",
+                },
+            ])("$name", async ({ mode, params, type }, { task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+                await annotate(`Type: ${type}`, "type");
 
-                const result = MonitoringHandlerValidators.checkSiteNow([
-                    "site-id",
-                    "monitor-id",
-                ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = MonitoringHandlerValidators.checkSiteNow([
-                    "only-site",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should reject monitor identifiers that exceed the shared limit", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = MonitoringHandlerValidators.checkSiteNow([
-                    "site-id",
-                    "m".repeat(MONITOR_ID_MAX_LENGTH + 1),
-                ]);
-                expect(result).toContain(MONITOR_ID_TOO_LONG_MESSAGE);
+                const result = MonitoringHandlerValidators.checkSiteNow(params);
+                if (mode === "success") {
+                    expect(isValidationSuccess(result)).toBeTruthy();
+                } else if (mode === "failure") {
+                    expect(isValidationFailure(result)).toBeTruthy();
+                } else {
+                    expect(result).toContain(MONITOR_ID_TOO_LONG_MESSAGE);
+                }
             });
         });
 
         describe("startMonitoring validator", () => {
-            it("should return null for empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for empty parameters",
+                    params: [],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for non-empty parameters",
+                    params: ["unexpected"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = MonitoringHandlerValidators.startMonitoring([]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for non-empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = MonitoringHandlerValidators.startMonitoring([
-                    "unexpected",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.startMonitoring(params);
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("startMonitoringForSite validator", () => {
-            it("should return null for valid site identifier", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid site identifier",
+                    params: ["site-id"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: [],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    name: "should return error array when too many parameters are provided",
+                    params: ["site-id", "extra"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForSite([
-                        "site-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForSite([]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array when too many parameters are provided", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForSite([
-                        "site-id",
-                        "extra",
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.startMonitoringForSite(
+                            params
+                        );
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("startMonitoringForMonitor validator", () => {
-            it("should return null for valid site and monitor identifiers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid site and monitor identifiers",
+                    params: ["site-id", "monitor-id"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: ["only-site"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForMonitor([
-                        "site-id",
-                        "monitor-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForMonitor([
-                        "only-site",
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.startMonitoringForMonitor(
+                            params
+                        );
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("stopMonitoring validator", () => {
-            it("should return null for empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for empty parameters",
+                    params: [],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for non-empty parameters",
+                    params: ["unexpected"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = MonitoringHandlerValidators.stopMonitoring([]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for non-empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = MonitoringHandlerValidators.stopMonitoring([
-                    "unexpected",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.stopMonitoring(params);
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("stopMonitoringForSite validator", () => {
-            it("should return null for valid site identifier", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid site identifier",
+                    params: ["site-id"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: [],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+                {
+                    name: "should return error array when too many parameters are provided",
+                    params: ["site-id", "extra"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForSite([
-                        "site-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForSite([]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("should return error array when too many parameters are provided", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForSite([
-                        "site-id",
-                        "extra",
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.stopMonitoringForSite(
+                            params
+                        );
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
 
         describe("stopMonitoringForMonitor validator", () => {
-            it("should return null for valid site and monitor identifiers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    name: "should return null for valid site and monitor identifiers",
+                    params: ["site-id", "monitor-id"],
+                    succeeds: true,
+                    type: "Business Logic",
+                },
+                {
+                    name: "should return error array for invalid parameter count",
+                    params: ["only-site"],
+                    succeeds: false,
+                    type: "Error Handling",
+                },
+            ])(
+                "$name",
+                async ({ params, succeeds, type }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: validators.complete",
+                        "component"
+                    );
+                    await annotate("Category: Core", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForMonitor([
-                        "site-id",
-                        "monitor-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for invalid parameter count", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForMonitor([
-                        "only-site",
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
+                    const result =
+                        MonitoringHandlerValidators.stopMonitoringForMonitor(
+                            params
+                        );
+                    if (succeeds) {
+                        expect(isValidationSuccess(result)).toBeTruthy();
+                    } else {
+                        expect(isValidationFailure(result)).toBeTruthy();
+                    }
+                }
+            );
         });
     });
 

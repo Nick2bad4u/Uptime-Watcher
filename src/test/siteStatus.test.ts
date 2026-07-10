@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 
-import type { Site } from "@shared/types";
+import type { Site, SiteStatus } from "@shared/types";
 
 import {
     calculateSiteMonitoringStatus,
@@ -790,82 +790,44 @@ describe("siteStatus utilities - Uncovered Lines", () => {
     });
 
     describe(getSiteStatusVariant, () => {
-        it("should return success variant for up status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const variant = getSiteStatusVariant("up");
-            expect(variant).toBe("success");
-        });
-
-        it("should return error variant for down status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const variant = getSiteStatusVariant("down");
-            expect(variant).toBe("error");
-        });
-
-        it("should return info variant for pending status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const variant = getSiteStatusVariant("pending");
-            expect(variant).toBe("info");
-        });
-
-        it("should return warning variant for paused status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const variant = getSiteStatusVariant("paused");
-            expect(variant).toBe("warning");
-        });
-
-        it("should return warning variant for mixed status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const variant = getSiteStatusVariant("mixed");
-            expect(variant).toBe("warning");
-        });
-
-        it("should return error variant for unknown status", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: siteStatus", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const variant = getSiteStatusVariant("unknown");
-            expect(variant).toBe("error");
+        it.each([
+            {
+                description: "should return success variant for up status",
+                expected: "success",
+                status: "up",
+            },
+            {
+                description: "should return error variant for down status",
+                expected: "error",
+                status: "down",
+            },
+            {
+                description: "should return info variant for pending status",
+                expected: "info",
+                status: "pending",
+            },
+            {
+                description: "should return warning variant for paused status",
+                expected: "warning",
+                status: "paused",
+            },
+            {
+                description: "should return warning variant for mixed status",
+                expected: "warning",
+                status: "mixed",
+            },
+            {
+                description: "should return error variant for unknown status",
+                expected: "error",
+                status: "unknown",
+            },
+        ] satisfies ReadonlyArray<{
+            description: string;
+            expected: string;
+            status: SiteStatus;
+        }>)("$description", async ({ expected, status }) => {
+            const variant = getSiteStatusVariant(status);
+            expect(variant).toBe(expected);
         });
 
         it("should return error variant for unhandled status", async ({

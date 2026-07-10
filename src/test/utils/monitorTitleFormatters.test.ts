@@ -179,27 +179,44 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("port monitor type", () => {
-            it("should return formatted host:port suffix for port monitor with both host and port", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
+            it.each([
+                {
+                    description:
+                        "should return formatted host:port suffix for port monitor with both host and port",
+                    expected: " (database.example.com:5432)",
                     host: "database.example.com",
                     port: 5432,
+                },
+                {
+                    description:
+                        "should handle port monitor with IP address host",
+                    expected: " (192.168.1.100:3306)",
+                    host: "192.168.1.100",
+                    port: 3306,
+                },
+                {
+                    description: "should handle port monitor with localhost",
+                    expected: " (localhost:8080)",
+                    host: "localhost",
+                    port: 8080,
+                },
+                {
+                    description:
+                        "should handle port monitor with high port numbers",
+                    expected: " (service.example.com:65535)",
+                    host: "service.example.com",
+                    port: 65_535,
+                },
+            ] as const)("$description", async ({ expected, host, port }) => {
+                const monitor = createMockMonitor({
+                    host,
+                    port,
                     type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
 
-                expect(result).toBe(" (database.example.com:5432)");
+                expect(result).toBe(expected);
             });
 
             it("should return empty string for port monitor without host", async ({
@@ -338,75 +355,6 @@ describe("monitorTitleFormatters", () => {
                 const result = formatTitleSuffix(monitor);
 
                 expect(result).toBe("");
-            });
-
-            it("should handle port monitor with IP address host", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
-                    host: "192.168.1.100",
-                    port: 3306,
-                    type: "port",
-                });
-
-                const result = formatTitleSuffix(monitor);
-
-                expect(result).toBe(" (192.168.1.100:3306)");
-            });
-
-            it("should handle port monitor with localhost", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
-                    host: "localhost",
-                    port: 8080,
-                    type: "port",
-                });
-
-                const result = formatTitleSuffix(monitor);
-
-                expect(result).toBe(" (localhost:8080)");
-            });
-
-            it("should handle port monitor with high port numbers", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
-                    host: "service.example.com",
-                    port: 65_535,
-                    type: "port",
-                });
-
-                const result = formatTitleSuffix(monitor);
-
-                expect(result).toBe(" (service.example.com:65535)");
             });
         });
 
@@ -883,69 +831,27 @@ describe("monitorTitleFormatters", () => {
         });
 
         describe("unknown monitor types", () => {
-            it("should return empty string for unknown monitor type", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
+            it.each([
+                {
+                    description:
+                        "should return empty string for unknown monitor type",
+                    monitorType: "unknown",
+                },
+                {
+                    description:
+                        "should return empty string for custom monitor type without formatter",
+                    monitorType: "custom",
+                },
+                {
+                    description:
+                        "should return empty string for empty monitor type",
+                    monitorType: "",
+                },
+            ] as const)("$description", async ({ monitorType }) => {
                 const monitor = createMockMonitor({
                     url: "https://example.com",
                 });
-                // Manually set type to unknown to test edge case
-                (monitor as any).type = "unknown";
-
-                const result = formatTitleSuffix(monitor);
-
-                expect(result).toBe("");
-            });
-
-            it("should return empty string for custom monitor type without formatter", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
-                    url: "https://example.com",
-                });
-                // Manually set type to custom to test edge case
-                (monitor as any).type = "custom";
-
-                const result = formatTitleSuffix(monitor);
-
-                expect(result).toBe("");
-            });
-
-            it("should return empty string for empty monitor type", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: monitorTitleFormatters",
-                    "component"
-                );
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                const monitor = createMockMonitor({
-                    url: "https://example.com",
-                });
-                // Manually set type to empty string to test edge case
-                (monitor as any).type = "";
+                (monitor as any).type = monitorType;
 
                 const result = formatTitleSuffix(monitor);
 

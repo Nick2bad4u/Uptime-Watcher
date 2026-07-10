@@ -4,7 +4,7 @@
 
 import type { Site } from "@shared/types";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 
 import type {
     IMonitorService,
@@ -31,38 +31,27 @@ describe("MonitorFactory", () => {
     });
 
     describe("getMonitor", () => {
-        it("gets a ping monitor", async ({ task, annotate }) => {
+        test.for([
+            {
+                name: "gets a ping monitor",
+                type: "ping",
+            },
+            {
+                name: "gets an http monitor",
+                type: "http",
+            },
+            {
+                name: "gets a port monitor",
+                type: "port",
+            },
+        ] as const)("$name", async ({ type }, { task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Retrieval", "type");
 
             const { getMonitor } = await loadMonitorFactory();
-            const monitor = getMonitor("ping", mockMonitorConfig);
-            expect(monitor).toBeDefined();
-            expect(typeof monitor.check).toBe("function");
-        });
-
-        it("gets an http monitor", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Retrieval", "type");
-
-            const { getMonitor } = await loadMonitorFactory();
-            const monitor = getMonitor("http", mockMonitorConfig);
-            expect(monitor).toBeDefined();
-            expect(typeof monitor.check).toBe("function");
-        });
-
-        it("gets a port monitor", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Retrieval", "type");
-
-            const { getMonitor } = await loadMonitorFactory();
-            const monitor = getMonitor("port", mockMonitorConfig);
+            const monitor = getMonitor(type, mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });

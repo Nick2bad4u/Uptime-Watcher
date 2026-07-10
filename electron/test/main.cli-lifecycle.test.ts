@@ -2,7 +2,7 @@
  * Tests for main process command-line logging and startup lifecycle behavior.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
 
 // Shared mocks for main process startup branches.
 const mockLog = {
@@ -137,109 +137,71 @@ describe("main process CLI and lifecycle behavior", () => {
         vi.restoreAllMocks();
     });
     describe("Command Line Argument Processing", () => {
-        it("should handle --debug flag", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.cli-lifecycle", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        test.for([
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--debug",
+                ],
+                consoleLevel: "debug",
+                fileLevel: "debug",
+                name: "should handle --debug flag",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-debug",
+                ],
+                consoleLevel: "debug",
+                fileLevel: "debug",
+                name: "should handle --log-debug flag",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-production",
+                ],
+                consoleLevel: "info",
+                fileLevel: "warn",
+                name: "should handle --log-production flag",
+            },
+            {
+                argv: [
+                    "node",
+                    "main.js",
+                    "--log-info",
+                ],
+                consoleLevel: "info",
+                fileLevel: "info",
+                name: "should handle --log-info flag",
+            },
+        ])(
+            "$name",
+            { timeout: 60_000 },
+            async ({ argv, consoleLevel, fileLevel }, { task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: main.cli-lifecycle", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
 
-            vi.resetModules();
-            process.argv = [
-                "node",
-                "main.js",
-                "--debug",
-            ];
-            Object.defineProperty(process.versions, "electron", {
-                value: "1.0.0",
-                configurable: true,
-            });
-            mockApp.isPackaged = true; // Simulate production environment
-            mockIsDev.mockReturnValue(false);
+                vi.resetModules();
+                process.argv = argv;
+                Object.defineProperty(process.versions, "electron", {
+                    value: "1.0.0",
+                    configurable: true,
+                });
+                mockApp.isPackaged = true;
+                mockIsDev.mockReturnValue(false);
 
-            // Import the module to trigger the configuration logic
-            await import("../main");
+                await import("../main");
 
-            expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        }, 60_000);
-        it("should handle --log-debug flag", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.cli-lifecycle", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            vi.resetModules();
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-debug",
-            ];
-            Object.defineProperty(process.versions, "electron", {
-                value: "1.0.0",
-                configurable: true,
-            });
-            mockApp.isPackaged = true;
-            mockIsDev.mockReturnValue(false);
-
-            // Import the module to trigger the configuration logic
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("debug");
-            expect(mockLog.transports.console.level).toBe("debug");
-        });
-        it("should handle --log-production flag", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.cli-lifecycle", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            vi.resetModules();
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-production",
-            ];
-            Object.defineProperty(process.versions, "electron", {
-                value: "1.0.0",
-                configurable: true,
-            });
-            mockApp.isPackaged = true;
-            mockIsDev.mockReturnValue(false);
-
-            // Import the module to trigger the configuration logic
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("warn");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
-        it("should handle --log-info flag", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: main.cli-lifecycle", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            vi.resetModules();
-            process.argv = [
-                "node",
-                "main.js",
-                "--log-info",
-            ];
-            Object.defineProperty(process.versions, "electron", {
-                value: "1.0.0",
-                configurable: true,
-            });
-            mockApp.isPackaged = true;
-            mockIsDev.mockReturnValue(false);
-
-            // Import the module to trigger the configuration logic
-            await import("../main");
-
-            expect(mockLog.transports.file.level).toBe("info");
-            expect(mockLog.transports.console.level).toBe("info");
-        });
+                expect(mockLog.transports.file.level).toBe(fileLevel);
+                expect(mockLog.transports.console.level).toBe(consoleLevel);
+            }
+        );
         it("should handle unknown flags gracefully", async ({
             task,
             annotate,

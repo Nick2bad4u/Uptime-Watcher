@@ -278,18 +278,23 @@ describe("MonitoringService", () => {
     });
 
     describe("startMonitoringForMonitor", () => {
-        it("should start monitoring for a site and monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const siteIdentifier = "test-site-id";
-            const monitorId = "test-monitor-id";
-
+        it.each([
+            {
+                description: "should start monitoring for a site and monitor",
+                monitorId: "test-monitor-id",
+                siteIdentifier: "test-site-id",
+            },
+            {
+                description: "should handle special characters in IDs",
+                monitorId: "test-monitor-id!@#",
+                siteIdentifier: "test-site-id@#$%",
+            },
+            {
+                description: "should handle Unicode characters in IDs",
+                monitorId: "test-monitor-id-💻",
+                siteIdentifier: "test-site-id-🌟",
+            },
+        ])("$description", async ({ monitorId, siteIdentifier }) => {
             mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
@@ -370,58 +375,6 @@ describe("MonitoringService", () => {
                 mockElectronAPI.monitoring.startMonitoringForMonitor
             ).not.toHaveBeenCalled();
         });
-
-        it("should handle special characters in IDs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const siteIdentifier = "test-site-id@#$%";
-            const monitorId = "test-monitor-id!@#";
-
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
-
-            expect(
-                mockElectronAPI.monitoring.startMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
-        });
-
-        it("should handle Unicode characters in IDs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const siteIdentifier = "test-site-id-🌟";
-            const monitorId = "test-monitor-id-💻";
-
-            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
-
-            expect(
-                mockElectronAPI.monitoring.startMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
-        });
     });
 
     describe("startMonitoring", () => {
@@ -498,18 +451,23 @@ describe("MonitoringService", () => {
     });
 
     describe("stopMonitoringForMonitor", () => {
-        it("should stop monitoring for a site and monitor", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const siteIdentifier = "test-site-id";
-            const monitorId = "test-monitor-id";
-
+        it.each([
+            {
+                description: "should stop monitoring for a site and monitor",
+                monitorId: "test-monitor-id",
+                siteIdentifier: "test-site-id",
+            },
+            {
+                description: "should handle special characters in IDs",
+                monitorId: "test-monitor-id!@#",
+                siteIdentifier: "test-site-id@#$%",
+            },
+            {
+                description: "should handle Unicode characters in IDs",
+                monitorId: "test-monitor-id-💻",
+                siteIdentifier: "test-site-id-🌟",
+            },
+        ])("$description", async ({ monitorId, siteIdentifier }) => {
             mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
@@ -589,58 +547,6 @@ describe("MonitoringService", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).not.toHaveBeenCalled();
-        });
-
-        it("should handle special characters in IDs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const siteIdentifier = "test-site-id@#$%";
-            const monitorId = "test-monitor-id!@#";
-
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.stopMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
-
-            expect(
-                mockElectronAPI.monitoring.stopMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
-        });
-
-        it("should handle Unicode characters in IDs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitoringService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const siteIdentifier = "test-site-id-🌟";
-            const monitorId = "test-monitor-id-💻";
-
-            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
-                true
-            );
-
-            await MonitoringService.stopMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
-            );
-
-            expect(
-                mockElectronAPI.monitoring.stopMonitoringForMonitor
-            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 

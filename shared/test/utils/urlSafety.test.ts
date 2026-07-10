@@ -189,13 +189,6 @@ describe("urlSafety", () => {
             ).toBeTruthy();
         });
 
-        it("rejects uppercase mailto when email is invalid", () => {
-            const result = validateExternalOpenUrlCandidate(
-                "MAILTO:not-an-email"
-            );
-            expect(result.ok).toBeFalsy();
-        });
-
         it("rejects mailto URLs with query or hash parameters", () => {
             expect(
                 validateExternalOpenUrlCandidate(
@@ -227,31 +220,29 @@ describe("urlSafety", () => {
             ).toBeFalsy();
         });
 
-        it("rejects http(s) URLs containing credentials", () => {
-            const result = validateExternalOpenUrlCandidate(
-                "https://user:pass@example.com"
-            );
-            expect(result.ok).toBeFalsy();
-        });
-
-        it("rejects URLs containing CR/LF", () => {
-            const result = validateExternalOpenUrlCandidate(
-                "https://example.com\nInjected"
-            );
-            expect(result.ok).toBeFalsy();
-        });
-
-        it("rejects URLs containing ASCII control characters", () => {
-            const result = validateExternalOpenUrlCandidate(
-                "https://example.com/\0oops"
-            );
-            expect(result.ok).toBeFalsy();
-        });
-
-        it("rejects URLs ending with a bare scheme delimiter", () => {
-            const result = validateExternalOpenUrlCandidate(
-                "https://example.com://"
-            );
+        it.each([
+            {
+                description: "uppercase mailto when email is invalid",
+                url: "MAILTO:not-an-email",
+            },
+            {
+                description: "http(s) URLs containing credentials",
+                url: "https://user:pass@example.com",
+            },
+            {
+                description: "URLs containing CR/LF",
+                url: "https://example.com\nInjected",
+            },
+            {
+                description: "URLs containing ASCII control characters",
+                url: "https://example.com/\0oops",
+            },
+            {
+                description: "URLs ending with a bare scheme delimiter",
+                url: "https://example.com://",
+            },
+        ])("rejects $description", ({ url }) => {
+            const result = validateExternalOpenUrlCandidate(url);
             expect(result.ok).toBeFalsy();
         });
 

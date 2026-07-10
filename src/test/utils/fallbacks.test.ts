@@ -757,80 +757,44 @@ describe("fallback Utilities", () => {
         });
 
         describe("unknown monitor types with formatting", () => {
-            it("should generate title case for camelCase", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("apiEndpoint")).toBe(
-                    "API Endpoint Monitor"
-                );
-            });
-
-            it("should handle snake_case", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("ssl_certificate")).toBe(
-                    "Ssl Certificate Monitor"
-                );
-            });
-
-            it("should handle kebab-case", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("dns-lookup")).toBe(
-                    "DNS Lookup Monitor"
-                );
-            });
-
-            it("should handle mixed cases", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("customAPI_Monitor")).toBe(
-                    "Custom API Monitor Monitor"
-                );
-            });
-
-            it("should handle single words", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("ping")).toBe("Ping Monitor");
-            });
-
-            it("should handle uppercase", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("API")).toBe("API Monitor");
-            });
-
-            it("should handle lowercase", async ({ annotate, task }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(getMonitorTypeDisplayLabel("database")).toBe(
-                    "Database Monitor"
-                );
+            it.each([
+                {
+                    description: "should generate title case for camelCase",
+                    input: "apiEndpoint",
+                    expected: "API Endpoint Monitor",
+                },
+                {
+                    description: "should handle snake_case",
+                    input: "ssl_certificate",
+                    expected: "Ssl Certificate Monitor",
+                },
+                {
+                    description: "should handle kebab-case",
+                    input: "dns-lookup",
+                    expected: "DNS Lookup Monitor",
+                },
+                {
+                    description: "should handle mixed cases",
+                    input: "customAPI_Monitor",
+                    expected: "Custom API Monitor Monitor",
+                },
+                {
+                    description: "should handle single words",
+                    input: "ping",
+                    expected: "Ping Monitor",
+                },
+                {
+                    description: "should handle uppercase",
+                    input: "API",
+                    expected: "API Monitor",
+                },
+                {
+                    description: "should handle lowercase",
+                    input: "database",
+                    expected: "Database Monitor",
+                },
+            ] as const)("$description", async ({ expected, input }) => {
+                expect(getMonitorTypeDisplayLabel(input)).toBe(expected);
             });
         });
 

@@ -10,7 +10,7 @@ import {
     MONITORING_CHANNELS,
 } from "@shared/types/preload";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 
 import { isDev } from "../../../electronUtils";
 import {
@@ -106,360 +106,207 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
     describe("IpcValidators - Parameter Validation", () => {
         describe("optionalString validator", () => {
-            it("should return null for undefined values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    expected: null,
+                    name: "should return null for undefined values",
+                    type: "Business Logic",
+                    value: undefined,
+                },
+                {
+                    expected: null,
+                    name: "should return null for valid non-empty strings",
+                    type: "Business Logic",
+                    value: "valid string",
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for empty strings",
+                    type: "Error Handling",
+                    value: "",
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for whitespace-only strings",
+                    type: "Error Handling",
+                    value: " ".repeat(3),
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for non-string values",
+                    type: "Error Handling",
+                    value: 123,
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for null values",
+                    type: "Error Handling",
+                    value: null,
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for object values",
+                    type: "Error Handling",
+                    value: {},
+                },
+                {
+                    expected:
+                        "testParam must be a non-empty string when provided",
+                    name: "should return error for array values",
+                    type: "Error Handling",
+                    value: [],
+                },
+            ])(
+                "$name",
+                async ({ expected, type, value }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = IpcValidators.optionalString(
-                    undefined,
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return null for valid non-empty strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.optionalString(
-                    "valid string",
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return error for empty strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString("", "testParam");
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
-
-            it("should return error for whitespace-only strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString(
-                    " ".repeat(3),
-                    "testParam"
-                );
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
-
-            it("should return error for non-string values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString(123, "testParam");
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
-
-            it("should return error for null values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString(null, "testParam");
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
-
-            it("should return error for object values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString({}, "testParam");
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
-
-            it("should return error for array values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.optionalString([], "testParam");
-                expect(result).toBe(
-                    "testParam must be a non-empty string when provided"
-                );
-            });
+                    const result = IpcValidators.optionalString(
+                        value,
+                        "testParam"
+                    );
+                    expect(result).toBe(expected);
+                }
+            );
         });
 
         describe("requiredNumber validator", () => {
-            it("should return null for valid numbers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    expected: null,
+                    name: "should return null for valid numbers",
+                    type: "Business Logic",
+                    value: 42,
+                },
+                {
+                    expected: null,
+                    name: "should return null for zero",
+                    type: "Business Logic",
+                    value: 0,
+                },
+                {
+                    expected: null,
+                    name: "should return null for negative numbers",
+                    type: "Business Logic",
+                    value: -42,
+                },
+                {
+                    expected: null,
+                    name: "should return null for floating point numbers",
+                    type: "Business Logic",
+                    value: 3.14159,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for NaN values",
+                    type: "Error Handling",
+                    value: Number.NaN,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for positive infinity",
+                    type: "Error Handling",
+                    value: Number.POSITIVE_INFINITY,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for negative infinity",
+                    type: "Error Handling",
+                    value: Number.NEGATIVE_INFINITY,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for string values",
+                    type: "Error Handling",
+                    value: "123",
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for undefined values",
+                    type: "Error Handling",
+                    value: undefined,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for null values",
+                    type: "Error Handling",
+                    value: null,
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for object values",
+                    type: "Error Handling",
+                    value: {},
+                },
+                {
+                    expected: "testParam must be a valid number",
+                    name: "should return error for array values",
+                    type: "Error Handling",
+                    value: [],
+                },
+            ])(
+                "$name",
+                async ({ expected, type, value }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = IpcValidators.requiredNumber(42, "testParam");
-                expect(result).toBeNull();
-            });
-
-            it("should return null for zero", async ({ task, annotate }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredNumber(0, "testParam");
-                expect(result).toBeNull();
-            });
-
-            it("should return null for negative numbers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredNumber(-42, "testParam");
-                expect(result).toBeNull();
-            });
-
-            it("should return null for floating point numbers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredNumber(
-                    3.14159,
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return error for NaN values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber(NaN, "testParam");
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for positive infinity", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber(
-                    Infinity,
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for negative infinity", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber(
-                    -Infinity,
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for string values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber("123", "testParam");
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for undefined values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber(
-                    undefined,
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for null values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber(null, "testParam");
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for object values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber({}, "testParam");
-                expect(result).toBe("testParam must be a valid number");
-            });
-
-            it("should return error for array values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredNumber([], "testParam");
-                expect(result).toBe("testParam must be a valid number");
-            });
+                    const result = IpcValidators.requiredNumber(
+                        value,
+                        "testParam"
+                    );
+                    expect(result).toBe(expected);
+                }
+            );
         });
 
         describe("requiredUrl validator", () => {
-            it("should return null for valid http URL", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    expected: null,
+                    name: "should return null for valid http URL",
+                    type: "Business Logic",
+                    value: "https://example.com",
+                },
+                {
+                    expected: null,
+                    name: "should return null for valid https URL",
+                    type: "Business Logic",
+                    value: "http://localhost:3000/status",
+                },
+                {
+                    expected: "url must be a valid http(s) URL",
+                    name: "should report error for unsupported protocol",
+                    type: "Error Handling",
+                    value: "ftp://example.com",
+                },
+                {
+                    expected: "url must be a valid http(s) URL",
+                    name: "should report error for non-string input",
+                    type: "Error Handling",
+                    value: 123,
+                },
+            ])(
+                "$name",
+                async ({ expected, type, value }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = IpcValidators.requiredUrl(
-                    "https://example.com",
-                    "url"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return null for valid https URL", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredUrl(
-                    "http://localhost:3000/status",
-                    "url"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should report error for unsupported protocol", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredUrl(
-                    "ftp://example.com",
-                    "url"
-                );
-                expect(result).toBe("url must be a valid http(s) URL");
-            });
-
-            it("should report error for non-string input", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredUrl(123, "url");
-                expect(result).toBe("url must be a valid http(s) URL");
-            });
+                    const result = IpcValidators.requiredUrl(value, "url");
+                    expect(result).toBe(expected);
+                }
+            );
 
             it("should report error for URLs containing newlines", () => {
                 const result = IpcValidators.requiredUrl(
@@ -488,171 +335,102 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         });
 
         describe("requiredObject validator", () => {
-            it("should return null for valid objects", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredObject(
-                    { key: "value" },
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return null for empty objects", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredObject({}, "testParam");
-                expect(result).toBeNull();
-            });
-
-            it("should return null for null-prototype objects", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const value = Object.create(null) as Record<string, unknown>;
-                value["key"] = "value";
-
-                const result = IpcValidators.requiredObject(value, "testParam");
-
-                expect(result).toBeNull();
-            });
-
-            it("should return null for complex objects", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredObject(
-                    { nested: { key: "value" } },
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return error for null values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(null, "testParam");
-                expect(result).toBe("testParam must be a valid object");
-            });
-
-            it("should return error for array values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject([], "testParam");
-                expect(result).toBe("testParam must be a valid object");
-            });
-
-            it("should return error for array values with content", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(
-                    [
+            test.for([
+                {
+                    expected: null,
+                    name: "should return null for valid objects",
+                    type: "Business Logic",
+                    value: { key: "value" },
+                },
+                {
+                    expected: null,
+                    name: "should return null for empty objects",
+                    type: "Business Logic",
+                    value: {},
+                },
+                {
+                    expected: null,
+                    factory: () => {
+                        const value = Object.create(null) as Record<
+                            string,
+                            unknown
+                        >;
+                        value["key"] = "value";
+                        return value;
+                    },
+                    name: "should return null for null-prototype objects",
+                    type: "Business Logic",
+                },
+                {
+                    expected: null,
+                    name: "should return null for complex objects",
+                    type: "Business Logic",
+                    value: { nested: { key: "value" } },
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for null values",
+                    type: "Error Handling",
+                    value: null,
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for array values",
+                    type: "Error Handling",
+                    value: [],
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for array values with content",
+                    type: "Error Handling",
+                    value: [
                         1,
                         2,
                         3,
                     ],
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid object");
-            });
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for string values",
+                    type: "Error Handling",
+                    value: "string",
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for number values",
+                    type: "Error Handling",
+                    value: 123,
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for undefined values",
+                    type: "Error Handling",
+                    value: undefined,
+                },
+                {
+                    expected: "testParam must be a valid object",
+                    name: "should return error for boolean values",
+                    type: "Error Handling",
+                    value: true,
+                },
+            ])(
+                "$name",
+                async (
+                    { expected, factory, type, value },
+                    { task, annotate }
+                ) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-            it("should return error for string values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(
-                    "string",
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid object");
-            });
-
-            it("should return error for number values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(123, "testParam");
-                expect(result).toBe("testParam must be a valid object");
-            });
-
-            it("should return error for undefined values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(
-                    undefined,
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a valid object");
-            });
-
-            it("should return error for boolean values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredObject(true, "testParam");
-                expect(result).toBe("testParam must be a valid object");
-            });
+                    const result = IpcValidators.requiredObject(
+                        factory?.() ?? value,
+                        "testParam"
+                    );
+                    expect(result).toBe(expected);
+                }
+            );
 
             it("should return error for built-in object instances", async ({
                 task,
@@ -697,147 +475,82 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         });
 
         describe("requiredString validator", () => {
-            it("should return null for valid non-empty strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
+            test.for([
+                {
+                    expected: null,
+                    name: "should return null for valid non-empty strings",
+                    type: "Business Logic",
+                    value: "valid string",
+                },
+                {
+                    expected: null,
+                    name: "should return null for strings with special characters",
+                    type: "Business Logic",
+                    value: "test@example.com",
+                },
+                {
+                    expected: null,
+                    name: "should return null for numeric strings",
+                    type: "Business Logic",
+                    value: "123",
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for empty strings",
+                    type: "Error Handling",
+                    value: "",
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for whitespace-only strings",
+                    type: "Error Handling",
+                    value: " ".repeat(3),
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for undefined values",
+                    type: "Error Handling",
+                    value: undefined,
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for null values",
+                    type: "Error Handling",
+                    value: null,
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for number values",
+                    type: "Error Handling",
+                    value: 123,
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for object values",
+                    type: "Error Handling",
+                    value: {},
+                },
+                {
+                    expected: "testParam must be a non-empty string",
+                    name: "should return error for array values",
+                    type: "Error Handling",
+                    value: [],
+                },
+            ])(
+                "$name",
+                async ({ expected, type, value }, { task, annotate }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate(`Type: ${type}`, "type");
 
-                const result = IpcValidators.requiredString(
-                    "valid string",
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return null for strings with special characters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredString(
-                    "test@example.com",
-                    "testParam"
-                );
-                expect(result).toBeNull();
-            });
-
-            it("should return null for numeric strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = IpcValidators.requiredString("123", "testParam");
-                expect(result).toBeNull();
-            });
-
-            it("should return error for empty strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString("", "testParam");
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for whitespace-only strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString(
-                    " ".repeat(3),
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for undefined values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString(
-                    undefined,
-                    "testParam"
-                );
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for null values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString(null, "testParam");
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for number values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString(123, "testParam");
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for object values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString({}, "testParam");
-                expect(result).toBe("testParam must be a non-empty string");
-            });
-
-            it("should return error for array values", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = IpcValidators.requiredString([], "testParam");
-                expect(result).toBe("testParam must be a non-empty string");
-            });
+                    const result = IpcValidators.requiredString(
+                        value,
+                        "testParam"
+                    );
+                    expect(result).toBe(expected);
+                }
+            );
         });
     });
 
@@ -1708,64 +1421,46 @@ describe("IPC Utils - Comprehensive Coverage", () => {
         });
 
         describe(registerStandardizedIpcHandler, () => {
-            it("should register handler without validation", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Validation", "type");
+            test.for([
+                {
+                    channel: CHANNELS_FOR_TESTS.registration,
+                    handler: vi.fn().mockResolvedValue("test"),
+                    name: "should register handler without validation",
+                    validateParams: null,
+                },
+                {
+                    channel: CHANNELS_FOR_TESTS.validatedRegistration,
+                    handler: vi.fn().mockResolvedValue("validated test"),
+                    name: "should register handler with validation",
+                    validateParams: vi.fn().mockReturnValue(null),
+                },
+            ])(
+                "$name",
+                async (
+                    { channel, handler, validateParams },
+                    { task, annotate }
+                ) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate("Component: utils", "component");
+                    await annotate("Category: Service", "category");
+                    await annotate("Type: Validation", "type");
 
-                const mockHandler = vi.fn().mockResolvedValue("test");
-                const registeredHandlers = new Set<TestChannel>();
+                    const registeredHandlers = new Set<TestChannel>();
 
-                registerStandardizedIpcHandler(
-                    CHANNELS_FOR_TESTS.registration,
-                    mockHandler,
-                    null,
-                    registeredHandlers
-                );
+                    registerStandardizedIpcHandler(
+                        channel,
+                        handler,
+                        validateParams,
+                        registeredHandlers
+                    );
 
-                expect(ipcMain.handle).toHaveBeenCalledWith(
-                    CHANNELS_FOR_TESTS.registration,
-                    expect.any(Function)
-                );
-                expect(
-                    registeredHandlers.has(CHANNELS_FOR_TESTS.registration)
-                ).toBeTruthy();
-            });
-
-            it("should register handler with validation", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Validation", "type");
-
-                const mockHandler = vi.fn().mockResolvedValue("validated test");
-                const mockValidator = vi.fn().mockReturnValue(null);
-                const registeredHandlers = new Set<TestChannel>();
-
-                registerStandardizedIpcHandler(
-                    CHANNELS_FOR_TESTS.validatedRegistration,
-                    mockHandler,
-                    mockValidator,
-                    registeredHandlers
-                );
-
-                expect(ipcMain.handle).toHaveBeenCalledWith(
-                    CHANNELS_FOR_TESTS.validatedRegistration,
-                    expect.any(Function)
-                );
-                expect(
-                    registeredHandlers.has(
-                        CHANNELS_FOR_TESTS.validatedRegistration
-                    )
-                ).toBeTruthy();
-            });
+                    expect(ipcMain.handle).toHaveBeenCalledWith(
+                        channel,
+                        expect.any(Function)
+                    );
+                    expect(registeredHandlers.has(channel)).toBeTruthy();
+                }
+            );
 
             it("should execute registered handler without validation", async ({
                 task,
@@ -2094,10 +1789,20 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(result.data).toBe("validated execution");
             });
 
-            it("should reject extra args for validated handlers", async ({
-                task,
-                annotate,
-            }) => {
+            test.for([
+                {
+                    args: [
+                        "site-identifier",
+                        "monitor-id",
+                        "unexpected",
+                    ],
+                    name: "should reject extra args for validated handlers",
+                },
+                {
+                    args: [],
+                    name: "should reject missing args for validated handlers",
+                },
+            ])("$name", async ({ args }, { task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "regression");
                 await annotate("Component: utils", "component");
                 await annotate("Category: Service", "category");
@@ -2129,52 +1834,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const registeredFunction = handleCall![1];
                 const result = await registeredFunction(
                     createTrustedIpcEvent(),
-                    "site-identifier",
-                    "monitor-id",
-                    "unexpected"
-                );
-
-                expect(mockValidator).not.toHaveBeenCalled();
-                expect(handlerCallCount).toBe(0);
-                expect(result.success).toBeFalsy();
-                expect(result.error).toContain("expects exactly");
-            });
-
-            it("should reject missing args for validated handlers", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "regression");
-                await annotate("Component: utils", "component");
-                await annotate("Category: Service", "category");
-                await annotate("Type: Validation", "type");
-
-                let handlerCallCount = 0;
-                const handler = async (_value: string) => {
-                    handlerCallCount++;
-                    return "validated execution";
-                };
-                const mockValidator = vi.fn().mockReturnValue(null);
-                const registeredHandlers = new Set<TestChannel>();
-
-                registerStandardizedIpcHandler(
-                    CHANNELS_FOR_TESTS.validatedExecution,
-                    handler as never,
-                    mockValidator,
-                    registeredHandlers
-                );
-
-                const handleCall = vi
-                    .mocked(ipcMain.handle)
-                    .mock.calls.find(
-                        (call) =>
-                            call[0] === CHANNELS_FOR_TESTS.validatedExecution
-                    );
-                expect(handleCall).toBeDefined();
-
-                const registeredFunction = handleCall![1];
-                const result = await registeredFunction(
-                    createTrustedIpcEvent()
+                    ...args
                 );
 
                 expect(mockValidator).not.toHaveBeenCalled();

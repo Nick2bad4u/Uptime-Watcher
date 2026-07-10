@@ -14,7 +14,7 @@
 
 import { isDevelopment } from "@shared/utils/environment";
 import { app } from "electron";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
 
 // Import the module under test
 import { isDev } from "../electronUtils.js";
@@ -50,89 +50,58 @@ describe("ElectronUtils", () => {
     });
 
     describe(isDev, () => {
-        it("should return true when both isDevelopment is true and app is not packaged", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: electronUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
+        test.for([
+            {
+                expected: true,
+                isDevelopmentResult: true,
+                isPackaged: false,
+                name: "should return true when both isDevelopment is true and app is not packaged",
+            },
+            {
+                expected: false,
+                isDevelopmentResult: true,
+                isPackaged: true,
+                name: "should return false when isDevelopment is true but app is packaged",
+            },
+            {
+                expected: false,
+                isDevelopmentResult: false,
+                isPackaged: false,
+                name: "should return false when isDevelopment is false and app is not packaged",
+            },
+            {
+                expected: false,
+                isDevelopmentResult: false,
+                isPackaged: true,
+                name: "should return false when both isDevelopment is false and app is packaged",
+            },
+        ])(
+            "$name",
+            async (
+                { expected, isDevelopmentResult, isPackaged },
+                { task, annotate }
+            ) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: electronUtils", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
 
-            // Arrange
-            vi.mocked(isDevelopment).mockReturnValue(true);
-            setAppIsPackaged(false);
+                // Arrange
+                vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
+                setAppIsPackaged(isPackaged);
 
-            // Act
-            const isResult = isDev();
+                // Act
+                const isResult = isDev();
 
-            // Assert
-            expect(isResult).toBeTruthy();
-            expect(isDevelopment).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return false when isDevelopment is true but app is packaged", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: electronUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Arrange
-            vi.mocked(isDevelopment).mockReturnValue(true);
-            setAppIsPackaged(true);
-
-            // Act
-            const isResult = isDev();
-
-            // Assert
-            expect(isResult).toBeFalsy();
-            expect(isDevelopment).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return false when isDevelopment is false and app is not packaged", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: electronUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Arrange
-            vi.mocked(isDevelopment).mockReturnValue(false);
-            setAppIsPackaged(false);
-
-            // Act
-            const isResult = isDev();
-
-            // Assert
-            expect(isResult).toBeFalsy();
-            expect(isDevelopment).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return false when both isDevelopment is false and app is packaged", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: electronUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Arrange
-            vi.mocked(isDevelopment).mockReturnValue(false);
-            setAppIsPackaged(true);
-
-            // Act
-            const isResult = isDev();
-
-            // Assert
-            expect(isResult).toBeFalsy();
-            expect(isDevelopment).toHaveBeenCalledTimes(1);
-        });
+                // Assert
+                if (expected) {
+                    expect(isResult).toBeTruthy();
+                } else {
+                    expect(isResult).toBeFalsy();
+                }
+                expect(isDevelopment).toHaveBeenCalledTimes(1);
+            }
+        );
 
         it("should always call isDevelopment function", async ({
             task,

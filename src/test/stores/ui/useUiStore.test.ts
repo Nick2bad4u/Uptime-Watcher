@@ -1182,64 +1182,31 @@ describe(useUIStore, () => {
     });
 
     describe("Chart Time Range Management", () => {
-        it("should set chart time range to 1h", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUiStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
+        it.each([
+            {
+                description: "should set chart time range to 1h",
+                timeRange: "1h",
+            },
+            {
+                description: "should set chart time range to 24h",
+                timeRange: "24h",
+            },
+            {
+                description: "should set chart time range to 7d",
+                timeRange: "7d",
+            },
+            {
+                description: "should set chart time range to 30d",
+                timeRange: "30d",
+            },
+        ] as const)("$description", async ({ timeRange }) => {
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
-                result.current.setSiteDetailsChartTimeRange("1h");
+                result.current.setSiteDetailsChartTimeRange(timeRange);
             });
 
-            expect(result.current.siteDetailsChartTimeRange).toBe("1h");
-        });
-
-        it("should set chart time range to 24h", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUiStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useUIStore());
-
-            act(() => {
-                result.current.setSiteDetailsChartTimeRange("24h");
-            });
-
-            expect(result.current.siteDetailsChartTimeRange).toBe("24h");
-        });
-
-        it("should set chart time range to 7d", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUiStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useUIStore());
-
-            act(() => {
-                result.current.setSiteDetailsChartTimeRange("7d");
-            });
-
-            expect(result.current.siteDetailsChartTimeRange).toBe("7d");
-        });
-
-        it("should set chart time range to 30d", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useUiStore", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useUIStore());
-
-            act(() => {
-                result.current.setSiteDetailsChartTimeRange("30d");
-            });
-
-            expect(result.current.siteDetailsChartTimeRange).toBe("30d");
+            expect(result.current.siteDetailsChartTimeRange).toBe(timeRange);
         });
 
         it("should handle all valid time ranges", async ({

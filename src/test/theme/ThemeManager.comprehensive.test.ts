@@ -99,37 +99,17 @@ describe(ThemeManager, () => {
     });
 
     describe("getTheme", () => {
-        it("should return light theme", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const theme = themeManager.getTheme("light");
+        it.each([
+            { description: "should return light theme", themeName: "light" },
+            { description: "should return dark theme", themeName: "dark" },
+            {
+                description: "should return high contrast theme",
+                themeName: "high-contrast",
+            },
+        ] as const)("$description", async ({ themeName }) => {
+            const theme = themeManager.getTheme(themeName);
             expect(theme).toBeDefined();
-            expect(theme.name).toBe("light");
-        });
-
-        it("should return dark theme", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const theme = themeManager.getTheme("dark");
-            expect(theme).toBeDefined();
-            expect(theme.name).toBe("dark");
-        });
-
-        it("should return high contrast theme", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ThemeManager", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const theme = themeManager.getTheme("high-contrast");
-            expect(theme).toBeDefined();
-            expect(theme.name).toBe("high-contrast");
+            expect(theme.name).toBe(themeName);
         });
 
         it("should return existing theme for any valid name", async ({

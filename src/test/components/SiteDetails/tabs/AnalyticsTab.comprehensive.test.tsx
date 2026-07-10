@@ -719,68 +719,24 @@ describe(AnalyticsTab, () => {
     });
 
     describe("Response Time Color Coding", () => {
-        it("should use green color for excellent response times (≤100ms)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const props = createMockProps({
+        it.each([
+            {
                 avgResponseTime: 80,
-            });
-
-            render(<AnalyticsTab {...props} />);
-            // Component should render without errors for good response time
-            expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
-        });
-
-        it("should use yellow color for good response times (≤500ms)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const props = createMockProps({
+                description:
+                    "should use green color for excellent response times (≤100ms)",
+            },
+            {
                 avgResponseTime: 300,
-            });
-
-            render(<AnalyticsTab {...props} />);
-            expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
-        });
-
-        it("should use red color for poor response times (>500ms)", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: AnalyticsTab", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            const props = createMockProps({
+                description:
+                    "should use yellow color for good response times (≤500ms)",
+            },
+            {
                 avgResponseTime: 800,
-            });
+                description:
+                    "should use red color for poor response times (>500ms)",
+            },
+        ])("$description", ({ avgResponseTime }) => {
+            const props = createMockProps({ avgResponseTime });
 
             render(<AnalyticsTab {...props} />);
             expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();

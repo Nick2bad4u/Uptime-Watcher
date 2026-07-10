@@ -3,7 +3,7 @@
  * coverage for all validation functions
  */
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { ValidationResult } from "../../types/validation";
 
@@ -93,76 +93,43 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
         });
 
-        it("should reject retry attempts exceeding maximum", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas", "component");
-            await annotate("Category: Validation", "category");
-            await annotate("Type: Business Logic", "type");
+        describe("invalid base monitor boundaries", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: schemas", "component");
+                await annotate("Category: Validation", "category");
+                await annotate("Type: Business Logic", "type");
+            });
 
-            const invalidData = {
-                checkInterval: 30_000,
-                history: [],
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 11, // Above maximum 10
-                status: "up" as const,
-                timeout: 5000,
-                type: "http" as const,
-            };
+            it.each([
+                {
+                    description: "retry attempts exceeding maximum",
+                    overrides: { retryAttempts: 11 },
+                },
+                {
+                    description: "timeout below minimum",
+                    overrides: { timeout: 500 },
+                },
+                {
+                    description: "timeout exceeding maximum",
+                    overrides: { timeout: 300_001 },
+                },
+            ])("should reject $description", ({ overrides }) => {
+                const invalidData = {
+                    checkInterval: 30_000,
+                    history: [],
+                    id: "test",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 3,
+                    status: "up" as const,
+                    timeout: 5000,
+                    type: "http" as const,
+                    ...overrides,
+                };
 
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
-        });
-
-        it("should reject timeout below minimum", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas", "component");
-            await annotate("Category: Validation", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const invalidData = {
-                checkInterval: 30_000,
-                history: [],
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                status: "up" as const,
-                timeout: 500, // Below minimum 1000
-                type: "http" as const,
-            };
-
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
-        });
-
-        it("should reject timeout exceeding maximum", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: schemas", "component");
-            await annotate("Category: Validation", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const invalidData = {
-                checkInterval: 30_000,
-                history: [],
-                id: "test",
-                monitoring: true,
-                responseTime: 200,
-                retryAttempts: 3,
-                status: "up" as const,
-                timeout: 300_001, // Above maximum 300_000
-                type: "http" as const,
-            };
-
-            expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+                expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
+            });
         });
 
         it("should accept -1 as sentinel value for responseTime", async ({

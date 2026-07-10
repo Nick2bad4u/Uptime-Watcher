@@ -8,7 +8,7 @@
  * @file Tests for shared type validation functions
  */
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
     BASE_MONITOR_TYPES,
@@ -44,55 +44,23 @@ describe(isComputedSiteStatus, () => {
         expect(isComputedSiteStatus("unknown")).toBeTruthy();
     });
 
-    it("should return false for 'up' status", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
+    describe("invalid computed status values", () => {
+        beforeEach(async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+        });
 
-        expect(isComputedSiteStatus("up")).toBeFalsy();
-    });
-
-    it("should return false for 'down' status", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isComputedSiteStatus("down")).toBeFalsy();
-    });
-
-    it("should return false for 'pending' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isComputedSiteStatus("pending")).toBeFalsy();
-    });
-
-    it("should return false for 'paused' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isComputedSiteStatus("paused")).toBeFalsy();
-    });
-
-    it("should return false for empty string", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isComputedSiteStatus("")).toBeFalsy();
+        it.each([
+            { description: "'up' status", value: "up" },
+            { description: "'down' status", value: "down" },
+            { description: "'pending' status", value: "pending" },
+            { description: "'paused' status", value: "paused" },
+            { description: "empty string", value: "" },
+        ])("should return false for $description", ({ value }) => {
+            expect(isComputedSiteStatus(value)).toBeFalsy();
+        });
     });
 
     it("should return false for null", async ({ task, annotate }) => {
@@ -172,34 +140,21 @@ describe(isMonitorStatus, () => {
         });
     }
 
-    it("should return false for 'mixed' status", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
+    describe("invalid monitor status values", () => {
+        beforeEach(async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+        });
 
-        expect(isMonitorStatus("mixed")).toBeFalsy();
-    });
-
-    it("should return false for 'unknown' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isMonitorStatus("unknown")).toBeFalsy();
-    });
-
-    it("should return false for empty string", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: types", "component");
-        await annotate("Category: Shared", "category");
-        await annotate("Type: Business Logic", "type");
-
-        expect(isMonitorStatus("")).toBeFalsy();
+        it.each([
+            { description: "'mixed' status", value: "mixed" },
+            { description: "'unknown' status", value: "unknown" },
+            { description: "empty string", value: "" },
+        ])("should return false for $description", ({ value }) => {
+            expect(isMonitorStatus(value)).toBeFalsy();
+        });
     });
 
     it("should return false for null", async ({ task, annotate }) => {

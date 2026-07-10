@@ -7,7 +7,7 @@
  * cases.
  */
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import type { MonitorStatus, SiteForStatus, SiteStatus } from "../../types";
 
@@ -267,38 +267,46 @@ describe(getSiteDisplayStatus, () => {
         expect(result).toBe("unknown");
     });
 
-    it("should return 'paused' when no monitors are monitoring (stopped)", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Monitoring", "type");
+    describe("monitoring state combinations", () => {
+        beforeEach(async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: siteStatus", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+        });
 
-        const site = createTestSite([
-            { monitoring: false, status: "up" },
-            { monitoring: false, status: "down" },
-        ]);
-        const result = getSiteDisplayStatus(site);
-        expect(result).toBe("paused");
-    });
-
-    it("should return 'mixed' when monitoring is partial", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Monitoring", "type");
-
-        const site = createTestSite([
-            { monitoring: true, status: "up" },
-            { monitoring: false, status: "down" },
-        ]);
-        const result = getSiteDisplayStatus(site);
-        expect(result).toBe("mixed");
+        it.each([
+            {
+                description:
+                    "'paused' when no monitors are monitoring (stopped)",
+                monitors: [
+                    { monitoring: false, status: "up" as MonitorStatus },
+                    { monitoring: false, status: "down" as MonitorStatus },
+                ],
+                expected: "paused",
+            },
+            {
+                description: "'mixed' when monitoring is partial",
+                monitors: [
+                    { monitoring: true, status: "up" as MonitorStatus },
+                    { monitoring: false, status: "down" as MonitorStatus },
+                ],
+                expected: "mixed",
+            },
+            {
+                description:
+                    "'mixed' operational status when all monitors are running but have different statuses",
+                monitors: [
+                    { monitoring: true, status: "up" as MonitorStatus },
+                    { monitoring: true, status: "down" as MonitorStatus },
+                ],
+                expected: "mixed",
+            },
+        ])("should return $description", ({ monitors, expected }) => {
+            const site = createTestSite(monitors);
+            const result = getSiteDisplayStatus(site);
+            expect(result).toBe(expected);
+        });
     });
 
     it("should return operational status when all monitors are running", async ({
@@ -405,18 +413,44 @@ describe(getSiteStatusDescription, () => {
         expect(result).toBe("All 2 monitors are down");
     });
 
-    it("should describe single monitor down status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Monitoring", "type");
+    describe("single monitor descriptions", () => {
+        beforeEach(async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: siteStatus", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+        });
 
-        const site = createTestSite([{ monitoring: true, status: "down" }]);
-        const result = getSiteStatusDescription(site);
-        expect(result).toBe("All 1 monitors are down");
+        it.each([
+            {
+                description: "single monitor down status",
+                monitors: [
+                    { monitoring: true, status: "down" as MonitorStatus },
+                ],
+                expected: "All 1 monitors are down",
+            },
+            {
+                description: "unexpected status values using fallback",
+                monitors: [{ monitoring: true, status: "up" as MonitorStatus }],
+                expected: "All 1 monitors are up and running",
+            },
+            {
+                description: "single monitor up status",
+                monitors: [{ monitoring: true, status: "up" as MonitorStatus }],
+                expected: "All 1 monitors are up and running",
+            },
+            {
+                description: "single monitor pending status",
+                monitors: [
+                    { monitoring: true, status: "pending" as MonitorStatus },
+                ],
+                expected: "All 1 monitors are pending",
+            },
+        ])("should describe $description", ({ monitors, expected }) => {
+            const site = createTestSite(monitors);
+            const result = getSiteStatusDescription(site);
+            expect(result).toBe(expected);
+        });
     });
 
     it("should describe mixed status with monitoring count", async ({
@@ -532,82 +566,53 @@ describe(getSiteStatusDescription, () => {
 });
 
 describe(getSiteStatusVariant, () => {
-    it("should return 'error' for 'down' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Error Handling", "type");
+    describe("known status variants", () => {
+        beforeEach(async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: siteStatus", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+        });
 
-        const result = getSiteStatusVariant("down");
-        expect(result).toBe("error");
-    });
-
-    it("should return 'warning' for 'mixed' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const result = getSiteStatusVariant("mixed");
-        expect(result).toBe("warning");
-    });
-
-    it("should return 'warning' for 'paused' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const result = getSiteStatusVariant("paused");
-        expect(result).toBe("warning");
-    });
-
-    it("should return 'info' for 'pending' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const result = getSiteStatusVariant("pending");
-        expect(result).toBe("info");
-    });
-
-    it("should return 'error' for 'unknown' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Error Handling", "type");
-
-        const result = getSiteStatusVariant("unknown");
-        expect(result).toBe("error");
-    });
-
-    it("should return 'success' for 'up' status", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const result = getSiteStatusVariant("up");
-        expect(result).toBe("success");
+        it.each([
+            {
+                description: "'error' for 'down' status",
+                status: "down",
+                expected: "error",
+            },
+            {
+                description: "'warning' for 'mixed' status",
+                status: "mixed",
+                expected: "warning",
+            },
+            {
+                description: "'warning' for 'paused' status",
+                status: "paused",
+                expected: "warning",
+            },
+            {
+                description: "'info' for 'pending' status",
+                status: "pending",
+                expected: "info",
+            },
+            {
+                description: "'error' for 'unknown' status",
+                status: "unknown",
+                expected: "error",
+            },
+            {
+                description: "'success' for 'up' status",
+                status: "up",
+                expected: "success",
+            },
+        ] satisfies {
+            description: string;
+            status: SiteStatus;
+            expected: string;
+        }[])("should return $description", ({ status, expected }) => {
+            const result = getSiteStatusVariant(status);
+            expect(result).toBe(expected);
+        });
     });
 
     it("should return 'error' for unexpected status values", async ({

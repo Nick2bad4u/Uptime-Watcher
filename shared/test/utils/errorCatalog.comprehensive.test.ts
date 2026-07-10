@@ -1,7 +1,7 @@
 /**
  * Comprehensive tests for errorCatalog utilities
  */
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
     formatErrorMessage,
@@ -47,52 +47,41 @@ describe("errorCatalog utilities", () => {
             );
         });
 
-        it("should handle template without placeholders", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        describe("empty and placeholder-free inputs", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorCatalog", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
+            });
 
-            const template = "Generic error occurred";
-            const variables = {};
+            it.each([
+                {
+                    description: "template without placeholders",
+                    template: "Generic error occurred",
+                    variables: {},
+                    expected: "Generic error occurred",
+                },
+                {
+                    description: "empty template",
+                    template: "",
+                    variables: { key: "value" },
+                    expected: "",
+                },
+                {
+                    description: "empty variables object",
+                    template: "Error in {module}",
+                    variables: {},
+                    expected: "Error in {module}",
+                },
+            ])(
+                "should handle $description",
+                ({ template, variables, expected }) => {
+                    const result = formatErrorMessage(template, variables);
 
-            const result = formatErrorMessage(template, variables);
-
-            expect(result).toBe("Generic error occurred");
-        });
-
-        it("should handle empty template", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const template = "";
-            const variables = { key: "value" };
-
-            const result = formatErrorMessage(template, variables);
-
-            expect(result).toBe("");
-        });
-
-        it("should handle empty variables object", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const template = "Error in {module}";
-            const variables = {};
-
-            const result = formatErrorMessage(template, variables);
-
-            expect(result).toBe("Error in {module}");
+                    expect(result).toBe(expected);
+                }
+            );
         });
 
         it("should handle simple error messages without placeholders", async ({
@@ -381,41 +370,33 @@ describe("errorCatalog utilities", () => {
             expect(isResult).toBeFalsy();
         });
 
-        it("should handle case sensitivity", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+        describe("known message matching boundaries", () => {
+            beforeEach(async ({ task, annotate }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: errorCatalog", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
+            });
 
-            // Test that the function is case sensitive
-            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
-            expect(isKnownErrorMessage("SITE NOT FOUND")).toBeFalsy();
-            expect(isKnownErrorMessage("site not found")).toBeFalsy();
-        });
-
-        it("should handle whitespace sensitivity", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
-            expect(isKnownErrorMessage(" Site not found ")).toBeFalsy();
-            expect(isKnownErrorMessage("Site  not  found")).toBeFalsy();
-        });
-
-        it("should handle partial matches", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: errorCatalog", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(isKnownErrorMessage("Site not found")).toBeTruthy();
-            expect(isKnownErrorMessage("Site not")).toBeFalsy();
-            expect(isKnownErrorMessage("not found")).toBeFalsy();
+            it.each([
+                {
+                    description: "case sensitivity",
+                    invalidMessages: ["SITE NOT FOUND", "site not found"],
+                },
+                {
+                    description: "whitespace sensitivity",
+                    invalidMessages: [" Site not found ", "Site  not  found"],
+                },
+                {
+                    description: "partial matches",
+                    invalidMessages: ["Site not", "not found"],
+                },
+            ])("should handle $description", ({ invalidMessages }) => {
+                expect(isKnownErrorMessage("Site not found")).toBeTruthy();
+                for (const message of invalidMessages) {
+                    expect(isKnownErrorMessage(message)).toBeFalsy();
+                }
+            });
         });
 
         it("should work with all error categories", async ({

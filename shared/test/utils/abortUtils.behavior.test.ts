@@ -105,31 +105,25 @@ describe("abortUtils behavior", () => {
     });
 
     describe(isAbortError, () => {
-        test("should return true for Error with AbortError name", () => {
-            const error = new Error("Test error");
-            error.name = "AbortError";
-            expect(isAbortError(error)).toBeTruthy();
-        });
-
-        test("should return true for Error with TimeoutError name", () => {
-            const error = new Error("Test error");
-            error.name = "TimeoutError";
-            expect(isAbortError(error)).toBeTruthy();
-        });
-
-        test("should return true for Error with aborted message", () => {
-            const error = new Error("Operation was aborted");
-            expect(isAbortError(error)).toBeTruthy();
-        });
-
-        test("should return true for Error with cancelled message", () => {
-            const error = new Error("Request was cancelled");
-            expect(isAbortError(error)).toBeTruthy();
-        });
-
-        test("should return true for Error with canceled message", () => {
-            const error = new Error("Request was canceled");
-            expect(isAbortError(error)).toBeTruthy();
+        test.each([
+            {
+                description: "Error with aborted message",
+                createError: () => new Error("Operation was aborted"),
+            },
+            {
+                description: "Error with cancelled message",
+                createError: () => new Error("Request was cancelled"),
+            },
+            {
+                description: "Error with canceled message",
+                createError: () => new Error("Request was canceled"),
+            },
+            {
+                description: "Error with mixed case cancelled message",
+                createError: () => new Error("Request was CANCELLED by user"),
+            },
+        ])("should return true for $description", ({ createError }) => {
+            expect(isAbortError(createError())).toBeTruthy();
         });
 
         test("should return true for Error with ERR_CANCELED code", () => {
