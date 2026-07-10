@@ -99,6 +99,25 @@ export function createRefCountedAsyncSubscription(
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     let setupAttempts = 0;
 
+    const invokeHook = (hook: (() => void) | undefined): void => {
+        try {
+            hook?.();
+        } catch {
+            // Diagnostic hooks must not corrupt subscription lifecycle state.
+        }
+    };
+
+    const invokeErrorHook = (
+        hook: ((error: Error) => void) | undefined,
+        error: unknown
+    ): void => {
+        try {
+            hook?.(ensureError(error));
+        } catch {
+            // Error reporting hooks must not become unhandled failures.
+        }
+    };
+
     const clearRetry = (): void => {
         if (!isDefined(retryTimer)) {
             return;
@@ -119,7 +138,7 @@ export function createRefCountedAsyncSubscription(
         try {
             fn();
         } catch (error: unknown) {
-            onCleanupError?.(ensureError(error));
+            invokeErrorHook(onCleanupError, error);
         }
     };
 
@@ -129,7 +148,7 @@ export function createRefCountedAsyncSubscription(
         }
 
         setupAttempts += 1;
-        onStarted?.();
+        invokeHook(onStarted);
 
         pending = (async (): Promise<void> => {
             let shouldRetry = false;
@@ -141,16 +160,16 @@ export function createRefCountedAsyncSubscription(
                     try {
                         cleanupCandidate();
                     } catch (error: unknown) {
-                        onCleanupError?.(ensureError(error));
+                        invokeErrorHook(onCleanupError, error);
                     }
                     return;
                 }
 
                 cleanup = cleanupCandidate;
                 setupAttempts = 0;
-                onReady?.();
+                invokeHook(onReady);
             } catch (error: unknown) {
-                onSetupError?.(ensureError(error));
+                invokeErrorHook(onSetupError, error);
                 shouldRetry = refCount > 0 && setupAttempts < maxSetupAttempts;
             } finally {
                 pending = undefined;

@@ -131,4 +131,63 @@ describe(createRefCountedAsyncSubscription, () => {
             vi.useRealTimers();
         }
     });
+
+    it("isolates throwing lifecycle hooks from setup and cleanup", async () => {
+        const cleanup = vi.fn(() => {
+            throw new Error("cleanup hook failed");
+        });
+        const start = vi.fn(async () => cleanup);
+        const subscription = createRefCountedAsyncSubscription({
+            onCleanupError: () => {
+                throw new Error("cleanup reporting failed");
+            },
+            onReady: () => {
+                throw new Error("ready hook failed");
+            },
+            onStarted: () => {
+                throw new Error("started hook failed");
+            },
+            start,
+        });
+
+        const unsubscribe = subscription.subscribe();
+        await vi.waitFor(() => {
+            expect(start).toHaveBeenCalledTimes(1);
+        });
+
+        expect(subscription.getRefCount()).toBe(1);
+        expect(() => unsubscribe()).not.toThrow();
+        expect(cleanup).toHaveBeenCalledTimes(1);
+        expect(subscription.getRefCount()).toBe(0);
+    });
+
+    it("retries when the setup error hook throws", async () => {
+        vi.useFakeTimers();
+        try {
+            const cleanup = vi.fn();
+            const start = vi
+                .fn<() => Promise<() => void>>()
+                .mockRejectedValueOnce(new Error("setup failed"))
+                .mockResolvedValueOnce(cleanup);
+            const subscription = createRefCountedAsyncSubscription({
+                maxSetupAttempts: 2,
+                onSetupError: () => {
+                    throw new Error("setup reporting failed");
+                },
+                retryDelayMs: 10,
+                start,
+            });
+
+            const unsubscribe = subscription.subscribe();
+            await Promise.resolve();
+            await Promise.resolve();
+            await vi.advanceTimersByTimeAsync(10);
+
+            expect(start).toHaveBeenCalledTimes(2);
+            unsubscribe();
+            expect(cleanup).toHaveBeenCalledTimes(1);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
 });
