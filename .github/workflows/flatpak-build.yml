@@ -23,6 +23,7 @@ concurrency:
 jobs:
     build-flatpak:
         name: "Build Flatpak bundle"
+        if: "github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'"
         runs-on: "ubuntu-latest"
         timeout-minutes: 60
         permissions:
@@ -38,6 +39,8 @@ jobs:
 
             - name: "Checkout repository"
               uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
+              with:
+                  ref: "${{ github.event.workflow_run.head_sha || github.sha }}"
 
             - name: "Free disk space (Flatpak builds are huge)"
               run: |
@@ -84,7 +87,6 @@ jobs:
 
                   # Verify installations
                   flatpak list --user --runtime
-              continue-on-error: true
 
             - name: "Verify Flatpak components"
               run: |
@@ -98,7 +100,6 @@ jobs:
                   flatpak info --user org.electronjs.Electron2.BaseApp//24.08 || (echo "Electron BaseApp missing" && exit 1)
                   flatpak info --user org.freedesktop.Sdk.Extension.node24//24.08 || (echo "Node24 extension missing" && exit 1)
                   echo "All required components verified successfully"
-              continue-on-error: true
 
             # Removed duplicate SDK extension install step (handled above system-wide)
 
@@ -209,30 +210,25 @@ jobs:
                   ls -l
                   zip Uptime-Watcher.flatpak.zip Uptime-Watcher.flatpak
 
-            - name: "Get latest release tag"
+            - name: "Resolve target release tag"
               id: "get_release"
-              uses: "actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3" # v9.0.0
-              with:
-                  script: |
-                      const releases = await github.rest.repos.listReleases({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                      });
-                      if (releases.data.length === 0) {
-                        throw new Error('No releases found');
-                      }
-                      return releases.data[0].tag_name;
-                  result-encoding: "string"
+              env:
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+              run: |
+                  set -euo pipefail
+                  release_tag="v$(node -p "require('./package.json').version")"
+                  gh release view "$release_tag" --json tagName --jq '.tagName'
+                  echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
 
             - name: "Rename Flatpak and zip with version"
               run: |
                   cd .
-                  mv Uptime-Watcher.flatpak Uptime-Watcher-${{ steps.get_release.outputs.result }}.flatpak
-                  mv Uptime-Watcher.flatpak.zip Uptime-Watcher-${{ steps.get_release.outputs.result }}.flatpak.zip
+                  mv Uptime-Watcher.flatpak Uptime-Watcher-${{ steps.get_release.outputs.tag }}.flatpak
+                  mv Uptime-Watcher.flatpak.zip Uptime-Watcher-${{ steps.get_release.outputs.tag }}.flatpak.zip
 
             - name: "Upload .flatpak and .zip to latest release"
               env:
                   GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-                  RELEASE_TAG: "${{ steps.get_release.outputs.result }}"
+                  RELEASE_TAG: "${{ steps.get_release.outputs.tag }}"
               run: |
                   gh release upload "$RELEASE_TAG" "./Uptime-Watcher-${RELEASE_TAG}.flatpak" "./Uptime-Watcher-${RELEASE_TAG}.flatpak.zip" --clobber

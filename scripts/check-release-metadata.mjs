@@ -92,6 +92,8 @@ async function main() {
     const nodeVersion = (await readText(".node-version")).trim();
     const nvmrcVersion = (await readText(".nvmrc")).trim();
     const builderConfig = await readText("electron-builder.config.ts");
+    const electronConstants = await readText("electron/constants.ts");
+    const sonarProperties = await readText("sonar-project.properties");
     const buildWorkflow = await readText(".github/workflows/Build.yml");
     const codeqlWorkflow = await readText(".github/workflows/codeql.yml");
 
@@ -172,6 +174,18 @@ async function main() {
     );
     requireIncludes(
         errors,
+        "electron/constants.ts",
+        electronConstants,
+        `export const USER_AGENT = "Uptime-Watcher/${packageVersion}";`
+    );
+    requireIncludes(
+        errors,
+        "sonar-project.properties",
+        sonarProperties,
+        `sonar.projectVersion=${packageVersion}`
+    );
+    requireIncludes(
+        errors,
         "README.md",
         readme,
         `Electron-v${displayVersions.electron}-`
@@ -229,7 +243,7 @@ async function main() {
         errors,
         "README.md",
         readme,
-        `<em>Last updated: June 2026 • Version ${packageVersion}</em>`
+        `<em>Last updated: July 2026 • Version ${packageVersion}</em>`
     );
     requireIncludes(
         errors,
@@ -317,6 +331,18 @@ async function main() {
         ".github/workflows/Build.yml",
         buildWorkflow,
         "npm run release:check"
+    );
+    requireIncludes(
+        errors,
+        ".github/workflows/Build.yml",
+        buildWorkflow,
+        "--sbom-format cyclonedx"
+    );
+    requireIncludes(
+        errors,
+        ".github/workflows/Build.yml",
+        buildWorkflow,
+        "stagingPercentage: 100"
     );
     if (buildWorkflow.includes("npm version --no-git-tag-version")) {
         addError(

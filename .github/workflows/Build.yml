@@ -6,7 +6,7 @@ run-name: "Build and Release Electron App"
 
 concurrency:
     group: "build-${{ github.ref }}"
-    cancel-in-progress: true
+    cancel-in-progress: "${{ false }}"
 
 on:
     workflow_dispatch:
@@ -336,6 +336,31 @@ jobs:
                   APPLE_API_KEY: "${{ runner.os == 'macOS' && secrets.APPLE_API_KEY || '' }}"
                   APPLE_API_KEY_ID: "${{ runner.os == 'macOS' && secrets.APPLE_API_KEY_ID || '' }}"
                   APPLE_API_ISSUER: "${{ runner.os == 'macOS' && secrets.APPLE_API_ISSUER || '' }}"
+
+            - name: "Generate CycloneDX production SBOM"
+              if: "matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'"
+              shell: "bash"
+              run: |
+                  set -euo pipefail
+                  npm sbom \
+                    --package-lock-only \
+                    --omit dev \
+                    --sbom-format cyclonedx \
+                    --sbom-type application \
+                    > "release/Uptime-Watcher-sbom-${{ needs.bump-version.outputs.new_version }}.cdx.json"
+
+                  node -e '
+                    const fs = require("node:fs");
+                    const path = process.argv[1];
+                    const expectedVersion = process.argv[2];
+                    const sbom = JSON.parse(fs.readFileSync(path, "utf8"));
+                    if (sbom.bomFormat !== "CycloneDX") throw new Error("Unexpected SBOM format");
+                    if (sbom.metadata?.component?.version !== expectedVersion) {
+                      throw new Error(`SBOM version ${sbom.metadata?.component?.version} does not match ${expectedVersion}`);
+                    }
+                  ' \
+                    "release/Uptime-Watcher-sbom-${{ needs.bump-version.outputs.new_version }}.cdx.json" \
+                    "${{ needs.bump-version.outputs.new_version }}"
 
             - name: "Verify Windows release signatures"
               if: "runner.os == 'Windows'"
@@ -876,6 +901,20 @@ jobs:
                     echo "Updated $yml"
                   done
 
+            - name: "Configure stable updater rollout"
+              shell: "bash"
+              run: |
+                  set -euo pipefail
+                  find release-dist -type f -name 'latest*.yml' -print0 |
+                    while IFS= read -r -d '' metadata; do
+                      if grep -q '^stagingPercentage:' "$metadata"; then
+                        sed -i 's/^stagingPercentage:.*/stagingPercentage: 100/' "$metadata"
+                      else
+                        sed -i '/^version:/a stagingPercentage: 100' "$metadata"
+                      fi
+                      grep -q '^stagingPercentage: 100$' "$metadata"
+                    done
+
             - name: "Print artifact hash (debug, Windows)"
               id: "print_artifact_hash_debug_windows"
               if: "runner.os == 'Windows'"
@@ -1068,8 +1107,6 @@ jobs:
 
                       | Mac      | Builds       | Format           | Download Link |
                       |----------|--------------|------------------|---------------|
-                      | macOS    | x64          | DMG              | [Uptime-Watcher-dmg-x64-${{ needs.bump-version.outputs.new_version }}.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-dmg-x64-${{ needs.bump-version.outputs.new_version }}.dmg) |
-                      | macOS    | x64          | PKG              | [Uptime-Watcher-pkg-x64-${{ needs.bump-version.outputs.new_version }}.pkg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pkg-x64-${{ needs.bump-version.outputs.new_version }}.pkg) |
                       | macOS    | universal    | DMG              | [Uptime-Watcher-dmg-universal-${{ needs.bump-version.outputs.new_version }}.dmg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-dmg-universal-${{ needs.bump-version.outputs.new_version }}.dmg) |
                       | macOS    | universal    | PKG              | [Uptime-Watcher-pkg-universal-${{ needs.bump-version.outputs.new_version }}.pkg](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pkg-universal-${{ needs.bump-version.outputs.new_version }}.pkg) |
                       | macOS    | universal    | ZIP              | [Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.zip](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-darwin-universal-${{ needs.bump-version.outputs.new_version }}.zip) |
@@ -1086,7 +1123,7 @@ jobs:
                       | Linux    | x64          | RPM              | [Uptime-Watcher-rpm-x86_64-${{ needs.bump-version.outputs.new_version }}.rpm](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-rpm-x86_64-${{ needs.bump-version.outputs.new_version }}.rpm) |
                       | Linux    | x64          | PACMAN           | [Uptime-Watcher-pacman-x64-${{ needs.bump-version.outputs.new_version }}.pacman](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-pacman-x64-${{ needs.bump-version.outputs.new_version }}.pacman) |
                       | Linux    | x64          | SNAP             | [Uptime-Watcher-snap-amd64-${{ needs.bump-version.outputs.new_version }}.snap](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-snap-amd64-${{ needs.bump-version.outputs.new_version }}.snap) |
-                      | Linux    | x64          | APK (Alpine)     | [Uptime-Watcher-apk-x64-${{ needs.bump-version.outputs.new_version }}.apk](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-apk-x64-${{ needs.bump-version.outputs.new_version }}.apk) |
+                      | Linux    | x64          | APK (Alpine)     | [Uptime-Watcher-x64-${{ needs.bump-version.outputs.new_version }}.apk](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-x64-${{ needs.bump-version.outputs.new_version }}.apk) |
                       | Linux    | x64          | FreeBSD          | [Uptime-Watcher-freebsd-x64-${{ needs.bump-version.outputs.new_version }}.freebsd](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-freebsd-x64-${{ needs.bump-version.outputs.new_version }}.freebsd) |
                       | Linux    | x64          | Flatpak          | [Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak](https://github.com/${{ github.repository }}/releases/download/v${{ needs.bump-version.outputs.new_version }}/Uptime-Watcher-v${{ needs.bump-version.outputs.new_version }}.flatpak) |
 

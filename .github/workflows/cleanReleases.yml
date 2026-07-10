@@ -32,6 +32,7 @@ permissions:
 jobs:
     clean-releases:
         name: "Clean old releases"
+        if: "github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'"
         runs-on: "ubuntu-latest"
         timeout-minutes: 30
         permissions:
@@ -118,14 +119,14 @@ jobs:
 
                   for tag in $to_delete; do
                     echo "Deleting release $tag..."
-                    gh release delete "$tag" --yes || echo "Failed to delete release $tag (may not exist or already deleted)"
+                    gh release delete "$tag" --yes
                     if [ "$DELETE_TAGS" = "true" ]; then
                       if git tag | grep -qx "$tag"; then
                         echo "Deleting tag $tag locally..."
                         git tag -d "$tag" || true
                       fi
                       echo "Deleting tag $tag remotely..."
-                      git push origin ":refs/tags/$tag" || echo "Failed to delete remote tag $tag"
+                      git push origin ":refs/tags/$tag"
                     fi
                   done
 
@@ -143,11 +144,10 @@ jobs:
                       if ! echo "$release_tags" | grep -qxF "$tag_lc" && ! echo "$release_tags" | grep -qxF "$tag_nov"; then
                         echo "Deleting orphan tag $tag"
                         git tag -d "$tag" || true
-                        git push origin ":refs/tags/$tag" || echo "Failed to delete orphan remote tag $tag" || true
+                        git push origin ":refs/tags/$tag"
                       fi
                     done
                   fi
 
                   echo "Deletion complete."
                   exit 0
-              continue-on-error: true

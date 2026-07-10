@@ -29,6 +29,7 @@ defaults:
 jobs:
     virustotal:
         name: "Scan release assets with VirusTotal"
+        if: "github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'"
         runs-on: "ubuntu-latest"
         timeout-minutes: 30
         steps:
@@ -37,13 +38,20 @@ jobs:
               with:
                   egress-policy: "audit"
 
-            - name: "Download latest release assets"
-              uses: "robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f" # v1.13
+            - name: "Checkout released revision"
+              uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  latest: true
-                  fileName: "*"
-                  out-file-path: "release-dist"
-                  token: "${{ secrets.GITHUB_TOKEN }}"
+                  ref: "${{ github.event.workflow_run.head_sha || github.sha }}"
+
+            - name: "Download target release assets"
+              env:
+                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+              run: |
+                  set -euo pipefail
+                  release_tag="v$(node -p "require('./package.json').version")"
+                  mkdir -p release-dist
+                  gh release download "$release_tag" --dir release-dist
+
             - name: "VirusTotal Scan"
               uses: "crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2" # v5.0.0
               with:
@@ -51,4 +59,3 @@ jobs:
                   files: |
                       release-dist/*
                       release-dist/**/*
-              continue-on-error: true
