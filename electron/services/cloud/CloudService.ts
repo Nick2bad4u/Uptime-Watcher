@@ -118,34 +118,48 @@ export class CloudService {
     private googleDriveDepsPromise:
         Promise<GoogleDriveProviderDeps> | undefined;
 
+    /** Prevents cloud operations from interleaving persisted state changes. */
+    private operationQueue: Promise<void> = Promise.resolve();
+
     private async runCloudOperation<T>(
         operationName: string,
         operation: () => Promise<T>
     ): Promise<T> {
-        await clearLastError(this.settings);
+        const previous = this.operationQueue;
+        let release: () => void = () => undefined;
+        this.operationQueue = new Promise<void>((resolve) => {
+            release = resolve;
+        });
 
         try {
-            return await operation();
-        } catch (error: unknown) {
-            const resolved = ensureError(error);
-            await setLastError(this.settings, resolved.message);
+            await previous;
+            await clearLastError(this.settings);
 
-            const providerDetails = isCloudProviderOperationError(resolved)
-                ? {
-                      code: resolved.code,
-                      operation: resolved.operation,
-                      providerKind: resolved.providerKind,
-                      target: resolved.target,
-                  }
-                : undefined;
+            try {
+                return await operation();
+            } catch (error: unknown) {
+                const resolved = ensureError(error);
+                await setLastError(this.settings, resolved.message);
 
-            logger.warn("[CloudService] Operation failed", {
-                message: resolved.message,
-                name: resolved.name,
-                operationName,
-                ...(providerDetails && { providerDetails }),
-            });
-            throw resolved;
+                const providerDetails = isCloudProviderOperationError(resolved)
+                    ? {
+                          code: resolved.code,
+                          operation: resolved.operation,
+                          providerKind: resolved.providerKind,
+                          target: resolved.target,
+                      }
+                    : undefined;
+
+                logger.warn("[CloudService] Operation failed", {
+                    message: resolved.message,
+                    name: resolved.name,
+                    operationName,
+                    ...(providerDetails && { providerDetails }),
+                });
+                throw resolved;
+            }
+        } finally {
+            release();
         }
     }
 

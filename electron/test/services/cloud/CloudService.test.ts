@@ -3,7 +3,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
+import { SETTINGS_KEY_SYNC_ENABLED } from "../../../services/cloud/internal/cloudServiceSettings";
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
+
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise) => {
+        resolve = resolvePromise;
+    });
+
+    return { promise, resolve };
+}
 
 describe("CloudService", () => {
     let baseDirectory: string;
@@ -169,6 +184,50 @@ describe("CloudService", () => {
         await expect(cloudService.requestSyncNow()).rejects.toThrow(
             "Cloud sync is disabled"
         );
+    });
+
+    it("serializes cloud operations that mutate persisted state", async () => {
+        const firstWriteStarted = createDeferred<undefined>();
+        const releaseFirstWrite = createDeferred<undefined>();
+        const syncWrites: string[] = [];
+        const settings = new Map<string, string>();
+        const cloudService = new CloudService({
+            orchestrator: {
+                downloadBackup: vi.fn(),
+                restoreBackup: vi.fn(),
+            } as unknown as UptimeOrchestrator,
+            secretStore: new InMemorySecretStore(),
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    if (key === SETTINGS_KEY_SYNC_ENABLED) {
+                        syncWrites.push(value);
+                        if (value === "true") {
+                            firstWriteStarted.resolve(undefined);
+                            await releaseFirstWrite.promise;
+                        }
+                    }
+                    settings.set(key, value);
+                },
+            },
+            syncEngine: {
+                syncNow: vi.fn(),
+            },
+        });
+
+        const first = cloudService.enableSync({ enabled: true });
+        await firstWriteStarted.promise;
+        const second = cloudService.enableSync({ enabled: false });
+
+        await vi.waitFor(() => {
+            expect(syncWrites).toEqual(["true"]);
+        });
+
+        releaseFirstWrite.resolve(undefined);
+        await Promise.all([first, second]);
+
+        expect(syncWrites).toEqual(["true", "false"]);
+        expect(settings.get(SETTINGS_KEY_SYNC_ENABLED)).toBe("false");
     });
 
     it("rejects filesystem provider baseDirectory with leading/trailing whitespace", async () => {
