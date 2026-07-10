@@ -468,7 +468,7 @@ export class SiteWriterService {
      *
      * @returns Promise resolving to the updated site object
      *
-     * @throws SiteNotFoundError When the site is not found in cache
+     * @throws SiteNotFoundError When the site is not found in the database
      * @throws DatabaseError When database operations fail
      * @throws TransactionError When transaction rollback occurs
      */
@@ -478,44 +478,56 @@ export class SiteWriterService {
         updates: Partial<Site>
     ): Promise<Site> {
         const safeIdentifier = getSafeIdentifierForLogging(identifier);
+        if (!identifier) {
+            throw new SiteNotFoundError("Site identifier is required");
+        }
+
+        const sanitizedUpdates = safeObjectOmit(updates, ["identifier"]);
 
         return withDatabaseOperation(
             async () => {
-                // Validate input
-                const site = this.validateSiteExists(sitesCache, identifier);
-                const sanitizedUpdates = safeObjectOmit(updates, [
-                    "identifier",
-                ]);
-
-                // Create updated site object without updating cache yet
-                const normalizedMonitors = sanitizedUpdates.monitors
-                    ? this.normalizeMonitorsForPersistence(
-                          sanitizedUpdates.monitors,
-                          {
-                              existingMonitors: site.monitors,
-                              siteIdentifier: identifier,
-                          }
-                      )
-                    : site.monitors;
-
-                const updatedSite: Site = {
-                    ...site,
-                    ...sanitizedUpdates,
-                    monitors: normalizedMonitors,
-                };
-
-                // Use executeTransaction for atomic multi-step operation
-                await this.withSiteMonitorTransaction(
+                const updatedSite = await this.withSiteMonitorTransaction(
                     ({ monitorTx, siteTx }) => {
-                        siteTx.upsert(updatedSite);
+                        const siteRow = siteTx.findByIdentifier(identifier);
+                        if (!siteRow) {
+                            throw new SiteNotFoundError(identifier);
+                        }
+
+                        const existingMonitors =
+                            monitorTx.findBySiteIdentifier(identifier);
+                        const normalizedMonitors = sanitizedUpdates.monitors
+                            ? this.normalizeMonitorsForPersistence(
+                                  sanitizedUpdates.monitors,
+                                  {
+                                      existingMonitors,
+                                      siteIdentifier: identifier,
+                                  }
+                              )
+                            : existingMonitors;
+                        const site: Site = {
+                            identifier: siteRow.identifier,
+                            monitoring: siteRow.monitoring ?? true,
+                            monitors: existingMonitors,
+                            name: siteRow.name ?? DEFAULT_SITE_NAME,
+                        };
+                        const persistedSite: Site = {
+                            ...site,
+                            ...sanitizedUpdates,
+                            monitors: normalizedMonitors,
+                        };
+
+                        siteTx.upsert(persistedSite);
 
                         if (sanitizedUpdates.monitors) {
                             this.updateMonitorsPreservingHistory(
                                 monitorTx,
                                 identifier,
-                                normalizedMonitors
+                                normalizedMonitors,
+                                existingMonitors
                             );
                         }
+
+                        return persistedSite;
                     }
                 );
 
@@ -894,18 +906,16 @@ export class SiteWriterService {
      * @param monitorTx - Monitor repository transaction adapter
      * @param siteIdentifier - The site identifier to update monitors for
      * @param newMonitors - Array of new monitor configurations
+     * @param existingMonitors - Monitors read earlier in the active transaction
      *
      * @returns Promise that resolves when all monitor updates are complete
      */
     private updateMonitorsPreservingHistory(
         monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
-        newMonitors: Site["monitors"]
+        newMonitors: Site["monitors"],
+        existingMonitors: Site["monitors"]
     ): void {
-        // Fetch existing monitors using the transaction database instance
-        // This ensures consistent reads within the transaction boundary
-        const existingMonitors = monitorTx.findBySiteIdentifier(siteIdentifier);
-
         // Process each monitor: update existing or create new
         this.processMonitorUpdates(
             monitorTx,
@@ -921,24 +931,5 @@ export class SiteWriterService {
             newMonitors,
             existingMonitors
         );
-    }
-
-    /**
-     * Validate that a site exists in the cache.
-     */
-    private validateSiteExists(
-        sitesCache: StandardizedCache<Site>,
-        identifier: string
-    ): Site {
-        if (!identifier) {
-            throw new SiteNotFoundError("Site identifier is required");
-        }
-
-        const site = sitesCache.get(identifier);
-        if (!site) {
-            throw new SiteNotFoundError(identifier);
-        }
-
-        return site;
     }
 }

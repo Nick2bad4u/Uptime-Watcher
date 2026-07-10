@@ -114,6 +114,8 @@ export interface SiteRepositoryTransactionAdapter {
     deleteAll: () => void;
     /** Read all site rows within the active transaction. */
     findAll: () => SiteRow[];
+    /** Read one site row within the active transaction. */
+    findByIdentifier: (identifier: string) => SiteRow | undefined;
     /** Upsert a site record within the active transaction. */
     upsert: (site: Pick<SiteRow, SiteRowUpsertFields>) => void;
 }
@@ -148,7 +150,11 @@ const SITE_QUERIES = {
     SELECT_ALL: "SELECT identifier, name, monitoring FROM sites",
     SELECT_BY_ID:
         "SELECT identifier, name, monitoring FROM sites WHERE identifier = ?",
-    UPSERT: "INSERT OR REPLACE INTO sites (identifier, name, monitoring) VALUES (?, ?, ?)",
+    UPSERT: `INSERT INTO sites (identifier, name, monitoring)
+        VALUES (?, ?, ?)
+        ON CONFLICT(identifier) DO UPDATE SET
+            name = excluded.name,
+            monitoring = excluded.monitoring`,
 } as const;
 
 /**
@@ -368,7 +374,7 @@ export class SiteRepository {
      * @remarks
      * -
      *
-     * Uses `INSERT OR REPLACE` for atomic upsert.
+     * Uses an `ON CONFLICT` update so existing rows retain their identity.
      *
      * - Normalizes site data before persistence.
      *
@@ -484,6 +490,9 @@ export class SiteRepository {
         const findAll: SiteRepositoryTransactionAdapter["findAll"] = () =>
             this.fetchAllSitesInternal(db);
 
+        const findByIdentifier: SiteRepositoryTransactionAdapter["findByIdentifier"] =
+            (identifier) => this.findByIdentifierInternal(db, identifier);
+
         const upsert: SiteRepositoryTransactionAdapter["upsert"] = (site) => {
             this.upsertInternal(db, site);
         };
@@ -493,6 +502,7 @@ export class SiteRepository {
             delete: deleteSite,
             deleteAll,
             findAll,
+            findByIdentifier,
             upsert,
         } satisfies SiteRepositoryTransactionAdapter;
     }

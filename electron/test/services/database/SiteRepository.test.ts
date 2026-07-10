@@ -430,7 +430,7 @@ describe(SiteRepository, () => {
                         ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
                             expect.stringContaining(
-                                "INSERT OR REPLACE INTO sites"
+                                "ON CONFLICT(identifier) DO UPDATE"
                             ),
                             expect.arrayContaining([
                                 siteData.identifier,
@@ -475,7 +475,7 @@ describe(SiteRepository, () => {
                         ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
                             expect.stringContaining(
-                                "INSERT OR REPLACE INTO sites"
+                                "ON CONFLICT(identifier) DO UPDATE"
                             ),
                             expect.arrayContaining([
                                 updateData.identifier,

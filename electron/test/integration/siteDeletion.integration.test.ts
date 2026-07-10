@@ -99,6 +99,16 @@ const createRepositoryBundle = (
                         name: site.name,
                     }))
                 ),
+                findByIdentifier: vi.fn((identifier: string) => {
+                    const site = sites.get(identifier);
+                    return site
+                        ? {
+                              identifier: site.identifier,
+                              monitoring: site.monitoring,
+                              name: site.name,
+                          }
+                        : undefined;
+                }),
                 upsert: vi.fn(),
             } satisfies SiteRepositoryTransactionAdapter;
             siteAdapters.push(adapter);

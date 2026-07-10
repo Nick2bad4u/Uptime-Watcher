@@ -12,6 +12,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Database } from "node-sqlite3-wasm";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -26,7 +27,6 @@ import type {
 } from "../../../services/database/SiteRepository";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 import { SiteNotFoundError } from "../../../services/database/interfaces";
 import { SiteWriterService } from "../../../services/database/SiteWriterService";
 import { createMonitorSignature } from "../../../services/database/siteWriterService/monitorPersistenceUtils";
@@ -56,6 +56,23 @@ const createMockDatabase = () => ({
 });
 
 type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly reject: (reason?: unknown) => void;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let reject: Deferred<T>["reject"] = () => undefined;
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+        reject = rejectPromise;
+        resolve = resolvePromise;
+    });
+
+    return { promise, reject, resolve };
+}
 
 const createMockDatabaseService = (database: Database) => ({
     executeTransaction: vi
@@ -108,6 +125,11 @@ const createSiteAdapter = () =>
                 name: "Test Site",
             },
         ]),
+        findByIdentifier: vi.fn().mockReturnValue({
+            identifier: "test-site",
+            monitoring: false,
+            name: "Test Site",
+        }),
         upsert: vi.fn(),
     }) satisfies SiteRepositoryTransactionAdapter;
 
@@ -654,12 +676,86 @@ describe("SiteWriterService", () => {
                 updates
             );
 
-            expect(mockSitesCache.get).toHaveBeenCalledWith("test-site");
+            expect(mockSitesCache.get).not.toHaveBeenCalled();
             expect(mockSitesCache.set).toHaveBeenCalled();
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(siteAdapter.upsert).toHaveBeenCalled();
             expect(result.name).toBe("Updated Site Name");
             expect(result.monitoring).toBeTruthy();
+        });
+
+        it("should preserve disjoint concurrent updates", async () => {
+            let persistedSite = {
+                identifier: "test-site",
+                monitoring: false,
+                name: "Test Site",
+            };
+            siteAdapter.findByIdentifier.mockImplementation(() => ({
+                ...persistedSite,
+            }));
+            siteAdapter.upsert.mockImplementation((site) => {
+                persistedSite = {
+                    identifier: site.identifier,
+                    monitoring: site.monitoring ?? true,
+                    name: site.name ?? DEFAULT_SITE_NAME,
+                };
+            });
+            const pendingTransactions: {
+                callback: (database: Database) => unknown;
+                deferred: Deferred<unknown>;
+            }[] = [];
+            mockDatabaseService.executeTransaction.mockImplementation(
+                (callback) => {
+                    const deferred = createDeferred<unknown>();
+                    pendingTransactions.push({ callback, deferred });
+                    return deferred.promise;
+                }
+            );
+
+            const nameUpdate = siteWriterService.updateSite(
+                mockSitesCache,
+                "test-site",
+                { name: "Concurrent Name" }
+            );
+            const monitoringUpdate = siteWriterService.updateSite(
+                mockSitesCache,
+                "test-site",
+                { monitoring: true }
+            );
+
+            await vi.waitFor(() => {
+                expect(pendingTransactions).toHaveLength(2);
+            });
+
+            const firstTransaction = pendingTransactions[0];
+            const secondTransaction = pendingTransactions[1];
+            if (!firstTransaction || !secondTransaction) {
+                throw new Error("Expected two queued site transactions");
+            }
+
+            firstTransaction.deferred.resolve(
+                await firstTransaction.callback(mockDb)
+            );
+            secondTransaction.deferred.resolve(
+                await secondTransaction.callback(mockDb)
+            );
+
+            const [, monitoringResult] = await Promise.all([
+                nameUpdate,
+                monitoringUpdate,
+            ]);
+
+            expect(persistedSite).toEqual({
+                identifier: "test-site",
+                monitoring: true,
+                name: "Concurrent Name",
+            });
+            expect(monitoringResult).toEqual(
+                expect.objectContaining({
+                    monitoring: true,
+                    name: "Concurrent Name",
+                })
+            );
         });
 
         it("should ignore accessor-backed and identity update fields", async ({
@@ -739,7 +835,7 @@ describe("SiteWriterService", () => {
                 expect.objectContaining({
                     checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
                     retryAttempts: mockSite.monitors[0]!.retryAttempts,
-                    timeout: DEFAULT_REQUEST_TIMEOUT,
+                    timeout: 5000,
                 })
             );
 
@@ -833,7 +929,7 @@ describe("SiteWriterService", () => {
             expect(monitorAdapter.deleteById).toHaveBeenCalledWith("monitor-1");
         });
 
-        it("should throw SiteNotFoundError when site not in cache", async ({
+        it("should throw SiteNotFoundError when site is not persisted", async ({
             task,
             annotate,
         }) => {
@@ -842,7 +938,7 @@ describe("SiteWriterService", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockSitesCache.get.mockReturnValue(undefined);
+            siteAdapter.findByIdentifier.mockReturnValue(undefined);
 
             await expect(
                 siteWriterService.updateSite(mockSitesCache, "nonexistent", {})
@@ -880,9 +976,13 @@ describe("SiteWriterService", () => {
                 updates
             );
 
-            expect(mockDb.all).not.toHaveBeenCalled(); // Should not query monitors
+            expect(monitorAdapter.findBySiteIdentifier).toHaveBeenCalledWith(
+                "test-site"
+            );
             expect(result.name).toBe("Updated Name Only");
-            expect(result.monitors).toEqual(mockSite.monitors); // Should preserve original monitors
+            expect(result.monitors).toEqual(
+                monitorAdapter.findBySiteIdentifier.mock.results[0]?.value
+            );
         });
     });
 
@@ -1368,7 +1468,11 @@ describe("SiteWriterService", () => {
             expect(mockSitesCache.set).toHaveBeenCalledWith(
                 "test-site",
                 expect.objectContaining({
-                    ...mockSite,
+                    identifier: "test-site",
+                    monitoring: false,
+                    monitors: expect.arrayContaining([
+                        expect.objectContaining({ id: "monitor-1" }),
+                    ]),
                     name: "Updated Name",
                 })
             );

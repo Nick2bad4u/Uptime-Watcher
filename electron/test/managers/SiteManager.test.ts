@@ -71,6 +71,7 @@ describe(SiteManager, () => {
             delete: vi.fn().mockReturnValue(true),
             deleteAll: vi.fn(),
             findAll: vi.fn().mockReturnValue([]),
+            findByIdentifier: vi.fn(),
             upsert: vi.fn(),
         } satisfies SiteRepositoryTransactionAdapter;
 
