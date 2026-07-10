@@ -627,6 +627,9 @@ const mockElectronAPI: DeepMocked<ElectronAPI> = {
     },
 
     system: {
+        getUpdateStatus: vi.fn<ElectronAPI["system"]["getUpdateStatus"]>(
+            async () => ({ revision: 0, status: "idle" })
+        ),
         openExternal: vi.fn<ElectronAPI["system"]["openExternal"]>(
             async (url: string) => url.length > 0
         ),

@@ -31,6 +31,12 @@ export function registerSystemHandlers({
     const register = createStandardizedIpcRegistrar(registeredHandlers);
 
     register(
+        SYSTEM_CHANNELS.getUpdateStatus,
+        () => autoUpdaterService.getStatus(),
+        SystemHandlerValidators.getUpdateStatus
+    );
+
+    register(
         SYSTEM_CHANNELS.openExternal,
         async (
             url: IpcInvokeChannelParams<typeof SYSTEM_CHANNELS.openExternal>[0]

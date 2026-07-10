@@ -24,6 +24,33 @@ describe("systemApi", () => {
         vi.clearAllMocks();
     });
 
+    it("gets the latest updater status snapshot", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: { revision: 3, status: "available" },
+        });
+
+        await expect(systemApi.getUpdateStatus()).resolves.toEqual({
+            revision: 3,
+            status: "available",
+        });
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SYSTEM_CHANNELS.getUpdateStatus,
+            ipcContext
+        );
+    });
+
+    it("rejects malformed updater status snapshots", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: { revision: -1, status: "downloaded" },
+        });
+
+        await expect(systemApi.getUpdateStatus()).rejects.toThrow(
+            /failed validation/iv
+        );
+    });
+
     it("opens external links with strict typing", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,

@@ -29,7 +29,10 @@ import type {
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
-import type { CorrelationId } from "@shared/types/events";
+import type {
+    CorrelationId,
+    UpdateStatusEventData,
+} from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
     AppNotificationRequest,
@@ -348,6 +351,10 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: StateSyncStatusSummary;
     };
+    "get-update-status": {
+        params: readonly [];
+        result: UpdateStatusEventData;
+    };
     "import-data": {
         params: readonly [data: string];
         result: boolean;
@@ -521,6 +528,7 @@ export const IPC_INVOKE_CHANNEL_PARAM_COUNTS: Readonly<
     "get-monitor-types": 0,
     "get-sites": 0,
     "get-sync-status": 0,
+    "get-update-status": 0,
     "import-data": 1,
     "notify-app-event": 1,
     "open-external": 1,

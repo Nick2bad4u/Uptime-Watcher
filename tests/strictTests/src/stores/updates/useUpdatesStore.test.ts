@@ -9,6 +9,12 @@ import type { UpdateStatusEventData } from "@shared/types/events";
 type Cleanup = () => void;
 
 const quitAndInstallMock = vi.hoisted(() => vi.fn(async () => undefined));
+const getUpdateStatusMock = vi.hoisted(() =>
+    vi.fn(async (): Promise<UpdateStatusEventData> => ({
+        revision: 0,
+        status: "idle",
+    }))
+);
 const onUpdateStatusMock = vi.hoisted(() =>
     vi.fn<
         (listener: (status: UpdateStatusEventData) => void) => Promise<Cleanup>
@@ -21,6 +27,7 @@ const logStoreActionMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@app/services/SystemService", () => ({
     SystemService: {
+        getUpdateStatus: getUpdateStatusMock,
         quitAndInstall: quitAndInstallMock,
     },
 }));
@@ -48,6 +55,11 @@ vi.mock("@app/stores/utils", async (importOriginal) => {
 describe("useUpdatesStore (strict coverage)", () => {
     beforeEach(async () => {
         vi.resetModules();
+        getUpdateStatusMock.mockClear();
+        getUpdateStatusMock.mockResolvedValue({
+            revision: 0,
+            status: "idle",
+        });
         quitAndInstallMock.mockClear();
         onUpdateStatusMock.mockReset();
         loggerErrorMock.mockReset();
@@ -121,18 +133,19 @@ describe("useUpdatesStore (strict coverage)", () => {
             .getState()
             .subscribeToUpdateStatusEvents();
 
-        capturedListener?.({ status: "error", error: "download failed" });
+        capturedListener?.({
+            error: "download failed",
+            revision: 1,
+            status: "error",
+        });
         expect(useUpdatesStore.getState().updateStatus).toBe("error");
         expect(useUpdatesStore.getState().updateError).toBe("download failed");
 
         unsubscribe();
 
-        // Cleanup is executed via an async path (in case the subscription
-        // promise has not resolved yet). Yield to the microtask queue so the
-        // deferred cleanup runs before we assert.
-        await Promise.resolve();
-        await Promise.resolve();
-        expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        await vi.waitFor(() => {
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     it("does not double-call cleanup when disposed before subscription resolves", async () => {
@@ -155,11 +168,9 @@ describe("useUpdatesStore (strict coverage)", () => {
         unsubscribe();
 
         resolveCleanup?.(cleanupSpy);
-        await Promise.resolve();
-        await Promise.resolve();
-        await Promise.resolve();
-
-        expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        await vi.waitFor(() => {
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     it("logs cleanup errors and ignores repeated unsubscribe", async () => {
@@ -175,15 +186,19 @@ describe("useUpdatesStore (strict coverage)", () => {
         const unsubscribe = useUpdatesStore
             .getState()
             .subscribeToUpdateStatusEvents();
-        await Promise.resolve();
+        await vi.waitFor(() => {
+            expect(getUpdateStatusMock).toHaveBeenCalledTimes(1);
+        });
 
         unsubscribe();
         unsubscribe();
 
-        expect(cleanupSpy).toHaveBeenCalledTimes(1);
-        expect(loggerErrorMock).toHaveBeenCalledWith(
-            "[UpdatesStore] Failed to cleanup update status subscription",
-            expect.any(Error)
-        );
+        await vi.waitFor(() => {
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+            expect(loggerErrorMock).toHaveBeenCalledWith(
+                "[UpdatesStore] Failed to cleanup update status subscription",
+                expect.any(Error)
+            );
+        });
     });
 });

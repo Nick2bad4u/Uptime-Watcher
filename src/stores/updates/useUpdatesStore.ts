@@ -65,15 +65,40 @@ const normalizeUpdateError = (error: string | undefined): string | undefined =>
  */
 export const useUpdatesStore: UseBoundStore<StoreApi<UpdatesStore>> =
     create<UpdatesStore>()((set, get) => {
+        let latestMainProcessRevision = -1;
+
+        const reportCleanupError = (error: Error): void => {
+            logger.error(
+                "[UpdatesStore] Failed to cleanup update status subscription",
+                error
+            );
+        };
+
+        const applyMainProcessStatus = ({
+            error,
+            revision,
+            status,
+        }: UpdateStatusEventData): void => {
+            if (
+                revision !== undefined &&
+                revision < latestMainProcessRevision
+            ) {
+                return;
+            }
+
+            if (revision !== undefined) {
+                latestMainProcessRevision = revision;
+            }
+
+            const store = get();
+            store.applyUpdateStatus(status);
+            store.setUpdateError(error);
+        };
+
         const updateStatusEventsSubscription =
             createRefCountedAsyncSubscription({
                 maxSetupAttempts: 3,
-                onCleanupError: (error) => {
-                    logger.error(
-                        "[UpdatesStore] Failed to cleanup update status subscription",
-                        error
-                    );
-                },
+                onCleanupError: reportCleanupError,
                 onSetupError: (error) => {
                     const resolved = ensureError(error);
                     logger.error(
@@ -83,16 +108,26 @@ export const useUpdatesStore: UseBoundStore<StoreApi<UpdatesStore>> =
                     get().setUpdateError(resolved.message);
                 },
                 retryDelayMs: 250,
-                start: () =>
-                    EventsService.onUpdateStatus(
-                        ({ error, status }: UpdateStatusEventData) => {
-                            // Read the latest actions to avoid stale
-                            // closures if tests replace store methods.
-                            const store = get();
-                            store.applyUpdateStatus(status);
-                            store.setUpdateError(error);
+                start: async () => {
+                    const cleanup = await EventsService.onUpdateStatus(
+                        applyMainProcessStatus
+                    );
+
+                    try {
+                        applyMainProcessStatus(
+                            await SystemService.getUpdateStatus()
+                        );
+                    } catch (error) {
+                        try {
+                            cleanup();
+                        } catch (cleanupError) {
+                            reportCleanupError(ensureError(cleanupError));
                         }
-                    ),
+                        throw error;
+                    }
+
+                    return cleanup;
+                },
             });
 
         return {

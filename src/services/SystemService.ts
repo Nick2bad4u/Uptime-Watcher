@@ -18,6 +18,7 @@ import {
 } from "@shared/utils/urlSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import type { UpdateStatusEventData } from "@shared/types/events";
 
 import type { ElectronAPI } from "../types";
 
@@ -34,6 +35,7 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
                 {
                     domain: "system",
                     methods: [
+                        "getUpdateStatus",
                         "openExternal",
                         "quitAndInstall",
                         "writeClipboardText",
@@ -49,6 +51,7 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
 })();
 
 interface SystemServiceContract {
+    getUpdateStatus: () => Promise<UpdateStatusEventData>;
     initialize: () => Promise<void>;
     openExternal: (url: string) => Promise<boolean>;
     quitAndInstall: () => Promise<void>;
@@ -66,6 +69,13 @@ interface SystemServiceContract {
  * @public
  */
 export const SystemService: SystemServiceContract = {
+    /** Returns the latest updater status held by the main process. */
+    getUpdateStatus: wrap(
+        "getUpdateStatus",
+        async (api): Promise<UpdateStatusEventData> =>
+            api.system.getUpdateStatus()
+    ),
+
     /**
      * Ensures the electron API is available before making backend calls.
      *

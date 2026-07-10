@@ -15,8 +15,10 @@ import {
     type SystemDomainBridge,
 } from "@shared/types/preload";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeParseUpdateStatusEventData } from "@shared/validation/updateStatusSchemas";
 
 import {
+    createSafeParseAdapter,
     createValidatedInvoker,
     safeParseBooleanResult,
 } from "../core/bridgeFactory";
@@ -40,6 +42,16 @@ export type SystemApiInterface = SystemDomainBridge;
 function createSystemApi(): SystemApiInterface {
     try {
         return {
+            /** Returns the latest main-process updater status snapshot. */
+            getUpdateStatus: createValidatedInvoker(
+                SYSTEM_CHANNELS.getUpdateStatus,
+                createSafeParseAdapter(safeParseUpdateStatusEventData),
+                {
+                    domain: "systemApi",
+                    guardName: "updateStatusEventDataSchema",
+                }
+            ),
+
             /**
              * Opens an external URL in the default browser
              *
@@ -96,6 +108,9 @@ function createSystemApi(): SystemApiInterface {
 
 const createSystemApiFallback = (unavailableError: Error): SystemApiInterface =>
     ({
+        getUpdateStatus: (
+            ...args: Parameters<SystemApiInterface["getUpdateStatus"]>
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         openExternal: (
             ...args: Parameters<SystemApiInterface["openExternal"]>
         ) => rejectUnavailablePreloadCall(unavailableError, ...args),

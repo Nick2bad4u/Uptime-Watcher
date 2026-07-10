@@ -38,6 +38,7 @@ const mockLogger = vi.hoisted(() => ({
 
 const mockElectronAPI = vi.hoisted(() => ({
     system: {
+        getUpdateStatus: vi.fn(),
         openExternal: vi.fn(),
         quitAndInstall: vi.fn(),
         writeClipboardText: vi.fn(),
@@ -68,6 +69,10 @@ describe("SystemService", () => {
 
         // Reset mock implementations
         mockWaitForElectronBridge.mockResolvedValue(undefined);
+        mockElectronAPI.system.getUpdateStatus.mockResolvedValue({
+            revision: 0,
+            status: "idle",
+        });
         mockElectronAPI.system.openExternal.mockResolvedValue(true);
         mockElectronAPI.system.quitAndInstall.mockResolvedValue(true);
         mockElectronAPI.system.writeClipboardText.mockResolvedValue(true);
@@ -91,8 +96,26 @@ describe("SystemService", () => {
         it("should expose all required methods", () => {
             expect(SystemService).toBeDefined();
             expect(typeof SystemService.initialize).toBe("function");
+            expect(typeof SystemService.getUpdateStatus).toBe("function");
             expect(typeof SystemService.openExternal).toBe("function");
             expect(typeof SystemService.quitAndInstall).toBe("function");
+        });
+    });
+
+    describe("getUpdateStatus", () => {
+        it("should return the authoritative main-process status", async () => {
+            mockElectronAPI.system.getUpdateStatus.mockResolvedValue({
+                revision: 7,
+                status: "downloaded",
+            });
+
+            await expect(SystemService.getUpdateStatus()).resolves.toEqual({
+                revision: 7,
+                status: "downloaded",
+            });
+            expect(
+                mockElectronAPI.system.getUpdateStatus
+            ).toHaveBeenCalledTimes(1);
         });
     });
 

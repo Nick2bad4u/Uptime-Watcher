@@ -29,6 +29,11 @@ import { logger } from "../../utils/logger";
  * 4. Install updates when ready
  */
 export class AutoUpdaterService {
+    private currentStatus: UpdateStatusEventData = {
+        revision: 0,
+        status: UPDATE_STATUS.IDLE,
+    };
+
     private isInitialized = false;
 
     private isUpdateReadyToInstall = false;
@@ -240,6 +245,16 @@ export class AutoUpdaterService {
         autoUpdater.removeListener("error", this.handleError);
 
         this.isInitialized = false;
+        this.isUpdateReadyToInstall = false;
+        this.currentStatus = {
+            revision: (this.currentStatus.revision ?? 0) + 1,
+            status: UPDATE_STATUS.IDLE,
+        };
+    }
+
+    /** Returns the latest authoritative updater status snapshot. */
+    public getStatus(): UpdateStatusEventData {
+        return { ...this.currentStatus };
     }
 
     /**
@@ -363,12 +378,17 @@ export class AutoUpdaterService {
      * @internal
      */
     private notifyStatusChange(statusData: UpdateStatusEventData): void {
+        this.currentStatus = {
+            ...statusData,
+            revision: (this.currentStatus.revision ?? 0) + 1,
+        };
+
         if (!this.onStatusChange) {
             return;
         }
 
         try {
-            this.onStatusChange(statusData);
+            this.onStatusChange({ ...this.currentStatus });
         } catch (error) {
             logger.error(
                 "[AutoUpdaterService] Status callback threw",

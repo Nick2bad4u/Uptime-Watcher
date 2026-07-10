@@ -64,6 +64,7 @@ const {
 
     const mockAutoUpdaterService = {
         checkForUpdates: vi.fn(),
+        getStatus: vi.fn(() => ({ revision: 2, status: "available" })),
         quitAndInstall: vi.fn(),
     };
 
@@ -459,6 +460,7 @@ describe(IpcService, () => {
             const handleCalls = mockIpcMain.handle.mock.calls.map(
                 (call) => call[0]
             );
+            expect(handleCalls).toContain("get-update-status");
             expect(handleCalls).toContain("quit-and-install");
         });
         it("should setup state sync handlers", async ({ task, annotate }) => {
@@ -755,6 +757,23 @@ describe(IpcService, () => {
                     }),
                 });
             }
+        });
+        it("should return the latest update status", async () => {
+            const getUpdateStatusHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "get-update-status"
+            )?.[1];
+
+            expect(getUpdateStatusHandler).toBeDefined();
+            await expect(
+                getUpdateStatusHandler?.(createTrustedIpcEvent())
+            ).resolves.toEqual({
+                success: true,
+                data: { revision: 2, status: "available" },
+                metadata: expect.objectContaining({
+                    handler: "get-update-status",
+                }),
+            });
+            expect(mockAutoUpdaterService.getStatus).toHaveBeenCalledTimes(1);
         });
         it("should handle state:get-history-limit requests", async () => {
             // Set up the mock to return 500

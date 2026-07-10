@@ -75,7 +75,10 @@ describe(AutoUpdaterService, () => {
             const checkingHandler = getEventHandler("checking-for-update");
             checkingHandler();
 
-            expect(statusCallback).toHaveBeenCalledWith({ status: "checking" });
+            expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
+                status: "checking",
+            });
         });
         it("should allow changing the status callback", async ({
             task,
@@ -96,7 +99,10 @@ describe(AutoUpdaterService, () => {
             checkingHandler();
 
             expect(firstCallback).not.toHaveBeenCalled();
-            expect(secondCallback).toHaveBeenCalledWith({ status: "checking" });
+            expect(secondCallback).toHaveBeenCalledWith({
+                revision: 1,
+                status: "checking",
+            });
         });
     });
     describe("initialize", () => {
@@ -145,7 +151,10 @@ describe(AutoUpdaterService, () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 "[AutoUpdaterService] Checking for updates"
             );
-            expect(statusCallback).toHaveBeenCalledWith({ status: "checking" });
+            expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
+                status: "checking",
+            });
         });
         it("should handle update-available event", async ({
             task,
@@ -163,6 +172,7 @@ describe(AutoUpdaterService, () => {
                 updateInfo
             );
             expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
                 status: "available",
             });
         });
@@ -181,7 +191,10 @@ describe(AutoUpdaterService, () => {
                 "[AutoUpdaterService] No update available",
                 updateInfo
             );
-            expect(statusCallback).toHaveBeenCalledWith({ status: "idle" });
+            expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
+                status: "idle",
+            });
         });
         it("should handle download-progress event", async ({
             task,
@@ -204,6 +217,7 @@ describe(AutoUpdaterService, () => {
                 progressObj
             );
             expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
                 status: "downloading",
             });
         });
@@ -223,6 +237,7 @@ describe(AutoUpdaterService, () => {
                 updateInfo
             );
             expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
                 status: "downloaded",
             });
         });
@@ -242,8 +257,9 @@ describe(AutoUpdaterService, () => {
                 error
             );
             expect(statusCallback).toHaveBeenCalledWith({
-                status: "error",
                 error: "Update failed",
+                revision: 1,
+                status: "error",
             });
         });
         it("should handle error event with non-Error object", async ({
@@ -262,8 +278,9 @@ describe(AutoUpdaterService, () => {
                 error
             );
             expect(statusCallback).toHaveBeenCalledWith({
-                status: "error",
                 error: "String error",
+                revision: 1,
+                status: "error",
             });
         });
     });
@@ -289,8 +306,9 @@ describe(AutoUpdaterService, () => {
                 error
             );
             expect(statusCallback).toHaveBeenCalledWith({
-                status: "error",
                 error: "Network error",
+                revision: 1,
+                status: "error",
             });
         });
         it("should handle non-Error objects during update check", async () => {
@@ -300,8 +318,9 @@ describe(AutoUpdaterService, () => {
             await autoUpdaterService.checkForUpdates();
 
             expect(statusCallback).toHaveBeenCalledWith({
-                status: "error",
                 error: "String error",
+                revision: 1,
+                status: "error",
             });
         });
     });
@@ -380,6 +399,10 @@ describe(AutoUpdaterService, () => {
             expect(() => {
                 handler();
             }).not.toThrow();
+            expect(autoUpdaterService.getStatus()).toEqual({
+                revision: 2,
+                status: "checking",
+            });
         });
         it("should call callback when set", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -391,7 +414,10 @@ describe(AutoUpdaterService, () => {
             const handler = getEventHandler("checking-for-update");
             handler();
 
-            expect(statusCallback).toHaveBeenCalledWith({ status: "checking" });
+            expect(statusCallback).toHaveBeenCalledWith({
+                revision: 1,
+                status: "checking",
+            });
         });
     });
     describe("Integration scenarios", () => {
@@ -411,10 +437,12 @@ describe(AutoUpdaterService, () => {
 
             checkingHandler();
             expect(statusCallback).toHaveBeenLastCalledWith({
+                revision: 1,
                 status: "checking",
             });
             availableHandler({ version: "1.0.1" });
             expect(statusCallback).toHaveBeenLastCalledWith({
+                revision: 2,
                 status: "available",
             });
             progressHandler({
@@ -424,10 +452,12 @@ describe(AutoUpdaterService, () => {
                 transferred: 1024,
             });
             expect(statusCallback).toHaveBeenLastCalledWith({
+                revision: 3,
                 status: "downloading",
             });
             downloadedHandler({ version: "1.0.1" });
             expect(statusCallback).toHaveBeenLastCalledWith({
+                revision: 4,
                 status: "downloaded",
             });
             expect(statusCallback).toHaveBeenCalledTimes(4);
@@ -444,12 +474,14 @@ describe(AutoUpdaterService, () => {
 
             checkingHandler();
             expect(statusCallback).toHaveBeenLastCalledWith({
+                revision: 1,
                 status: "checking",
             });
             errorHandler(new Error("Download failed"));
             expect(statusCallback).toHaveBeenLastCalledWith({
-                status: "error",
                 error: "Download failed",
+                revision: 2,
+                status: "error",
             });
             expect(statusCallback).toHaveBeenCalledTimes(2);
         });

@@ -4,6 +4,7 @@
  */
 
 import type { UnknownRecord } from "type-fest";
+import type { UpdateStatusEventData } from "@shared/types/events";
 
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -11,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { UpdateStatus } from "../stores/types";
 
 import { EventsService } from "../services/EventsService";
+import { SystemService } from "../services/SystemService";
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 
 // Mock the logger (partial) so createPersistConfig remains available.
@@ -26,6 +28,10 @@ vi.mock("../stores/utils", async (importOriginal) => {
 const mockElectronAPIQuitAndInstall = vi.fn();
 
 const createSystemMock = () => ({
+    getUpdateStatus: vi.fn().mockResolvedValue({
+        revision: 0,
+        status: "idle",
+    }),
     openExternal: vi.fn(),
     quitAndInstall: mockElectronAPIQuitAndInstall,
     writeClipboardText: vi.fn().mockResolvedValue(true),
@@ -640,11 +646,9 @@ describe(useUpdatesStore, () => {
 
             unsubscribe2();
 
-            // Allow async subscription to settle.
-            await Promise.resolve();
-            await Promise.resolve();
-
-            expect(cleanup).toHaveBeenCalledTimes(1);
+            await vi.waitFor(() => {
+                expect(cleanup).toHaveBeenCalledTimes(1);
+            });
         });
 
         it("allows retry after an initial subscription failure", async ({
@@ -683,10 +687,78 @@ describe(useUpdatesStore, () => {
 
             unsubscribe2();
 
-            await Promise.resolve();
-            await Promise.resolve();
+            await vi.waitFor(() => {
+                expect(cleanup).toHaveBeenCalledTimes(1);
+            });
+        });
 
-            expect(cleanup).toHaveBeenCalledTimes(1);
+        it("recovers status emitted before the renderer subscribes", async () => {
+            const cleanup = vi.fn();
+            vi.spyOn(EventsService, "onUpdateStatus").mockResolvedValue(
+                cleanup
+            );
+            vi.spyOn(SystemService, "getUpdateStatus").mockResolvedValue({
+                revision: 4,
+                status: "downloaded",
+            });
+
+            const unsubscribe = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+
+            await vi.waitFor(() => {
+                expect(useUpdatesStore.getState().updateStatus).toBe(
+                    "downloaded"
+                );
+            });
+
+            unsubscribe();
+            await vi.waitFor(() => {
+                expect(cleanup).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        it("ignores a stale snapshot after a newer live event", async () => {
+            let eventCallback:
+                ((data: UpdateStatusEventData) => void) | undefined;
+            let resolveSnapshot: (
+                status: UpdateStatusEventData
+            ) => void = () => {};
+            const snapshot = new Promise<UpdateStatusEventData>((resolve) => {
+                resolveSnapshot = resolve;
+            });
+            const cleanup = vi.fn();
+
+            vi.spyOn(EventsService, "onUpdateStatus").mockImplementation(
+                async (callback) => {
+                    eventCallback = callback;
+                    return cleanup;
+                }
+            );
+            vi.spyOn(SystemService, "getUpdateStatus").mockReturnValue(
+                snapshot
+            );
+
+            const unsubscribe = useUpdatesStore
+                .getState()
+                .subscribeToUpdateStatusEvents();
+
+            await vi.waitFor(() => {
+                expect(eventCallback).toBeTypeOf("function");
+            });
+            eventCallback?.({ revision: 6, status: "downloaded" });
+            resolveSnapshot({ revision: 5, status: "idle" });
+
+            await vi.waitFor(() => {
+                expect(useUpdatesStore.getState().updateStatus).toBe(
+                    "downloaded"
+                );
+            });
+
+            unsubscribe();
+            await vi.waitFor(() => {
+                expect(cleanup).toHaveBeenCalledTimes(1);
+            });
         });
 
         it("automatically retries while the original subscriber remains", async () => {

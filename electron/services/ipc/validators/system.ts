@@ -17,6 +17,7 @@ import {
  * Interface for system handler validators.
  */
 interface SystemHandlerValidatorsInterface {
+    getUpdateStatus: IpcParameterValidator;
     openExternal: IpcParameterValidator;
     quitAndInstall: IpcParameterValidator;
     reportPreloadGuard: IpcParameterValidator;
@@ -25,6 +26,7 @@ interface SystemHandlerValidatorsInterface {
 }
 
 export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
+    getUpdateStatus: createNoParamsValidator(),
     openExternal: createSingleExternalOpenUrlValidator("url"),
     quitAndInstall: createNoParamsValidator(),
     reportPreloadGuard: createPreloadGuardReportValidator(),

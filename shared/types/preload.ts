@@ -384,12 +384,14 @@ export type StateSyncDomainBridge = DomainBridge<typeof STATE_SYNC_CHANNELS>;
  * @internal
  */
 interface SystemChannelMap {
+    readonly getUpdateStatus: "get-update-status";
     readonly openExternal: "open-external";
     readonly quitAndInstall: "quit-and-install";
     readonly writeClipboardText: "write-clipboard-text";
 }
 
 const SYSTEM_CHANNELS_DEFINITION: SystemChannelMap = {
+    getUpdateStatus: "get-update-status",
     openExternal: "open-external",
     quitAndInstall: "quit-and-install",
     writeClipboardText: "write-clipboard-text",

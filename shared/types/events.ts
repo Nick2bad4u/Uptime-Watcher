@@ -855,7 +855,9 @@ export interface UpdateStatusEventData {
     /**
      * Error message if status is 'error'.
      */
-    readonly error?: string;
+    readonly error?: string | undefined;
+    /** Monotonic main-process status revision used to reject stale snapshots. */
+    readonly revision?: number | undefined;
     /**
      * The current update status.
      *

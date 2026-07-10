@@ -36,10 +36,9 @@ import {
     CACHE_INVALIDATION_TYPE_VALUES,
     isStateSyncEventData,
     MONITORING_CONTROL_REASON_VALUES,
-    UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
-import { DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS } from "@shared/utils/userFacingErrors";
+import { safeParseUpdateStatusEventData } from "@shared/validation/updateStatusSchemas";
 import { isMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
@@ -107,8 +106,6 @@ const isMonitorCheckType = (
     value: unknown
 ): value is MonitorCheckCompletedEventData["checkType"] =>
     value === "manual" || value === "scheduled";
-
-const isUpdateStatus = createStringUnionGuard(UPDATE_STATUS_VALUES);
 
 const isCacheInvalidatedEventDataPayload = (
     payload: unknown
@@ -243,24 +240,8 @@ const isStateSyncEventDataPayload = (
 
 const isUpdateStatusEventDataPayload = (
     payload: unknown
-): payload is UpdateStatusEventData => {
-    if (!isUnknownRecord(payload)) {
-        return false;
-    }
-
-    const record = payload;
-    const { error, status } = record;
-
-    if (!isUpdateStatus(status)) {
-        return false;
-    }
-
-    return (
-        !isDefined(error) ||
-        (typeof error === "string" &&
-            error.length <= DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS)
-    );
-};
+): payload is UpdateStatusEventData =>
+    safeParseUpdateStatusEventData(payload).success;
 
 const mapUpdateStatusEventDataPayload = (
     payload: unknown
@@ -272,9 +253,15 @@ const mapUpdateStatusEventDataPayload = (
     return isDefined(payload.error)
         ? {
               error: payload.error,
+              ...(isDefined(payload.revision) && {
+                  revision: payload.revision,
+              }),
               status: payload.status,
           }
         : {
+              ...(isDefined(payload.revision) && {
+                  revision: payload.revision,
+              }),
               status: payload.status,
           };
 };

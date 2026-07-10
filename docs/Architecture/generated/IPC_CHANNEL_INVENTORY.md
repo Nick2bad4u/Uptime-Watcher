@@ -35,6 +35,7 @@
 | `get-monitor-types`                   | Handles `get-monitor-types` invocations.                   | `[]`                                           | `MonitorTypeConfig[]`                |
 | `get-sites`                           | Handles `get-sites` invocations.                           | `[]`                                           | `Site[]`                             |
 | `get-sync-status`                     | Handles `get-sync-status` invocations.                     | `[]`                                           | `StateSyncStatusSummary`             |
+| `get-update-status`                   | Handles `get-update-status` invocations.                   | `[]`                                           | `UpdateStatusEventData`              |
 | `import-data`                         | Handles `import-data` invocations.                         | `[data: string]`                               | `boolean`                            |
 | `notify-app-event`                    | Handles `notify-app-event` invocations.                    | `[request: AppNotificationRequest]`            | `undefined`                          |
 | `open-external`                       | Handles `open-external` invocations.                       | `[url: string]`                                | `boolean`                            |
