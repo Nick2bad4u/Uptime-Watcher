@@ -113,7 +113,7 @@ export interface ImportData {
     readonly exportedAt?: string | undefined;
     readonly settings?: Record<string, string> | undefined;
     readonly sites: ImportSite[];
-    readonly version?: string | undefined;
+    readonly version?: "1.0" | undefined;
 }
 
 const settingKeySchema = z.string().refine((key) => key.trim().length > 0, {
@@ -129,7 +129,7 @@ const importDataSchema: z.ZodType<ImportData> = z
         exportedAt: z.string().trim().optional(),
         settings: settingsSchema.optional(),
         sites: z.array(importSiteSchema),
-        version: z.string().trim().optional(),
+        version: z.string().trim().pipe(importExportVersionSchema).optional(),
     })
     .strict();
 

@@ -16,6 +16,38 @@ import {
 const paddedSettingKey = " custom.setting ";
 
 describe("importExportSchemas", () => {
+    it.each([
+        { label: "legacy payloads with no version", version: undefined },
+        { label: "current payloads", version: "1.0" },
+    ])("accepts $label", ({ version }) => {
+        const result = validateImportData({
+            sites: [{ identifier: "example.com" }],
+            ...(version && { version }),
+        });
+
+        expect(result.ok).toBeTruthy();
+    });
+
+    it.each([
+        "0.9",
+        "1.1",
+        "2.0",
+    ])("rejects unsupported explicit import version %s", (version) => {
+        const result = validateImportData({
+            sites: [{ identifier: "example.com" }],
+            version,
+        });
+
+        expect(result.ok).toBeFalsy();
+        if (result.ok) {
+            throw new Error("Expected unsupported import version to fail");
+        }
+
+        expect(result.error.issues).toEqual(
+            expect.arrayContaining([expect.stringContaining("version")])
+        );
+    });
+
     it("preserves import setting keys while trimming setting values", () => {
         const result = validateImportData({
             settings: {

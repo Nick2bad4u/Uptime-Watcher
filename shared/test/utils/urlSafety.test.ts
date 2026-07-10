@@ -37,6 +37,19 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("printer.local.")).toBeTruthy();
         });
 
+        it.each([
+            "home.arpa",
+            "HOME.ARPA",
+            "home.arpa.",
+            "router.home.arpa",
+            "ROUTER.HOME.ARPA.",
+        ])(
+            "treats special-use home.arpa hostname %s as private",
+            (hostname) => {
+                expect(isPrivateNetworkHostname(hostname)).toBeTruthy();
+            }
+        );
+
         it("treats single-label hostnames as private", () => {
             expect(isPrivateNetworkHostname("intranet")).toBeTruthy();
             expect(isPrivateNetworkHostname("NAS")).toBeTruthy();
@@ -446,6 +459,16 @@ describe("urlSafety", () => {
             expect(
                 tryGetSafeThirdPartyHttpUrl("https://[64:ff9b:1:c0a8:101::]")
             ).toBe(null);
+        });
+
+        it.each([
+            "https://home.arpa",
+            "https://HOME.ARPA",
+            "https://home.arpa.",
+            "https://router.home.arpa",
+            "https://ROUTER.HOME.ARPA./status",
+        ])("returns null for special-use home.arpa URL %s", (url) => {
+            expect(tryGetSafeThirdPartyHttpUrl(url)).toBeNull();
         });
 
         it("returns null for IPv4 special-use hostnames", () => {

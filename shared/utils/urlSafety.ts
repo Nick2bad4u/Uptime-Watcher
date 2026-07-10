@@ -941,6 +941,14 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
         return true;
     }
 
+    // RFC 8375 reserves `home.arpa` and its subdomains for home networks.
+    if (
+        withoutIpv6Brackets === "home.arpa" ||
+        withoutIpv6Brackets.endsWith(".home.arpa")
+    ) {
+        return true;
+    }
+
     // Single-label hostnames are overwhelmingly internal/intranet identifiers.
     // We treat them as private to avoid leaking local hostnames to third-party
     // services.
