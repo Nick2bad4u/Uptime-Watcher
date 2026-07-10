@@ -3,10 +3,19 @@
  * test serves as a template for proper mocking architecture
  */
 
+import type { Site } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
+
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
+import type {
+    DatabaseCommandExecutor,
+    IDatabaseCommand,
+} from "../../services/commands/DatabaseCommands";
+import type { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import {
@@ -15,10 +24,62 @@ import {
     ImportDataCommand,
 } from "../../services/commands/DatabaseCommands";
 
+type CommandExecutorFixture = Pick<
+    DatabaseCommandExecutor,
+    | "clear"
+    | "execute"
+    | "rollbackAll"
+>;
+type EventEmitterFixture = Pick<
+    DatabaseManagerDependencies["eventEmitter"],
+    | "addListener"
+    | "emit"
+    | "emitTyped"
+    | "removeListener"
+>;
+type SiteLoadingOrchestratorFixture = Pick<
+    SiteLoadingOrchestrator,
+    "loadSitesFromDatabase"
+>;
+
+interface DatabaseManagerPrivateView {
+    commandExecutor: CommandExecutorFixture;
+    siteLoadingOrchestrator: SiteLoadingOrchestratorFixture;
+}
+
+function asDependency<TKey extends keyof DatabaseManagerDependencies>(
+    value: unknown
+): DatabaseManagerDependencies[TKey] {
+    return value as DatabaseManagerDependencies[TKey];
+}
+
+function hasConstructorName(value: unknown, expectedName: string): boolean {
+    if (
+        typeof value !== "object" ||
+        value === null ||
+        !("constructor" in value)
+    ) {
+        return false;
+    }
+
+    const constructor: unknown = value.constructor;
+    return (
+        typeof constructor === "function" && constructor.name === expectedName
+    );
+}
+
+function setPrivateMember<TKey extends keyof DatabaseManagerPrivateView>(
+    manager: DatabaseManager,
+    key: TKey,
+    value: DatabaseManagerPrivateView[TKey]
+): boolean {
+    return Reflect.set(manager, key, value);
+}
+
 describe("DatabaseManager Foundation Tests", () => {
     let databaseManager: DatabaseManager;
     let mockDependencies: DatabaseManagerDependencies;
-    let mockEventEmitter: any;
+    let mockEventEmitter: EventEmitterFixture;
 
     const mockBackupMetadata = {
         createdAt: 1_700_000_600_000,
@@ -43,7 +104,7 @@ describe("DatabaseManager Foundation Tests", () => {
                 executeTransaction: vi.fn().mockResolvedValue(undefined),
                 getDatabase: vi.fn().mockReturnValue({}),
                 initialize: vi.fn().mockResolvedValue(undefined),
-                db: {} as any,
+                db: {} as Database,
             },
             history: {
                 getHistory: vi.fn().mockResolvedValue([]),
@@ -111,24 +172,27 @@ describe("DatabaseManager Foundation Tests", () => {
             getCacheStats: vi.fn().mockReturnValue({}),
             getFileWatcher: vi.fn().mockReturnValue({}),
             isWatchingEnabled: vi.fn().mockReturnValue(false),
-        } as any;
+        };
 
         mockDependencies = {
-            configurationManager: mockConfigurationManager,
-            eventEmitter: mockEventEmitter,
-            repositories: mockRepositories as any, // Type assertion for test mocks
+            configurationManager: asDependency<"configurationManager">(
+                mockConfigurationManager
+            ),
+            eventEmitter: asDependency<"eventEmitter">(mockEventEmitter),
+            repositories: asDependency<"repositories">(mockRepositories),
         };
 
         // Create DatabaseManager
         databaseManager = new DatabaseManager(mockDependencies);
 
         // Create smart command executor mock that recognizes command types
-        const smartCommandExecutor = {
-            execute: vi.fn().mockImplementation(async (command: any) => {
+        const executeCommand = vi
+            .fn<(command: unknown) => Promise<unknown>>()
+            .mockImplementation(async (command) => {
                 // Identify command type and return appropriate response
                 if (
                     command instanceof DownloadBackupCommand ||
-                    command.constructor.name === "DownloadBackupCommand"
+                    hasConstructorName(command, "DownloadBackupCommand")
                 ) {
                     const result = {
                         buffer: Buffer.from("backup-data"),
@@ -141,6 +205,8 @@ describe("DatabaseManager Foundation Tests", () => {
                         {
                             fileName: result.fileName,
                             operation: "backup-downloaded",
+                            success: true,
+                            timestamp: Date.now(),
                         }
                     );
                     return result;
@@ -148,7 +214,7 @@ describe("DatabaseManager Foundation Tests", () => {
 
                 if (
                     command instanceof ExportDataCommand ||
-                    command.constructor.name === "ExportDataCommand"
+                    hasConstructorName(command, "ExportDataCommand")
                 ) {
                     // Emit the expected event
                     await mockEventEmitter.emitTyped(
@@ -156,6 +222,8 @@ describe("DatabaseManager Foundation Tests", () => {
                         {
                             fileName: `export-${Date.now()}.json`,
                             operation: "data-exported",
+                            success: true,
+                            timestamp: Date.now(),
                         }
                     );
                     return '{"sites": [], "settings": []}';
@@ -163,13 +231,15 @@ describe("DatabaseManager Foundation Tests", () => {
 
                 if (
                     command instanceof ImportDataCommand ||
-                    command.constructor.name === "ImportDataCommand"
+                    hasConstructorName(command, "ImportDataCommand")
                 ) {
                     // Emit the expected event
                     await mockEventEmitter.emitTyped(
                         "internal:database:data-imported",
                         {
                             operation: "data-imported",
+                            success: true,
+                            timestamp: Date.now(),
                         }
                     );
                     return true;
@@ -177,14 +247,19 @@ describe("DatabaseManager Foundation Tests", () => {
 
                 // Default return for unknown commands
                 return undefined;
-            }),
+            });
+
+        const smartCommandExecutor = {
+            execute: <TResult>(
+                command: IDatabaseCommand<TResult>
+            ): Promise<TResult> => executeCommand(command) as Promise<TResult>,
             rollbackAll: vi.fn().mockResolvedValue(undefined),
-            clear: vi.fn().mockResolvedValue(undefined),
-        };
+            clear: vi.fn(),
+        } satisfies CommandExecutorFixture;
 
         // Replace the command executor after construction.
         expect(
-            Reflect.set(
+            setPrivateMember(
                 databaseManager,
                 "commandExecutor",
                 smartCommandExecutor
@@ -201,7 +276,7 @@ describe("DatabaseManager Foundation Tests", () => {
         };
 
         expect(
-            Reflect.set(
+            setPrivateMember(
                 databaseManager,
                 "siteLoadingOrchestrator",
                 mockSiteLoadingOrchestrator
@@ -216,7 +291,9 @@ describe("DatabaseManager Foundation Tests", () => {
             siteCache.get = vi.fn();
             siteCache.getAll = vi.fn(() => []);
             siteCache.replaceAll = vi.fn();
-            siteCache.entries = vi.fn(() => [][Symbol.iterator]()) as any;
+            siteCache.entries = vi.fn<StandardizedCache<Site>["entries"]>(() =>
+                new Map<string, Site>().entries()
+            );
         }
     });
 

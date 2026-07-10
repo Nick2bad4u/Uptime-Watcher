@@ -13,38 +13,62 @@
  */
 
 import { fc } from "@fast-check/vitest";
+import type { Database } from "node-sqlite3-wasm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SiteRepository } from "../../../services/database/SiteRepository";
+import {
+    SiteRepository,
+    type SiteRepositoryDependencies,
+} from "../../../services/database/SiteRepository";
+
+interface MockRunResult {
+    changes: number;
+    lastInsertRowid?: number;
+}
+
+const createMockStatement = () => ({
+    all: vi.fn<() => unknown[]>(() => []),
+    finalize: vi.fn(),
+    get: vi.fn<() => unknown>(() => undefined),
+    run: vi.fn<() => MockRunResult>(() => ({ changes: 1 })),
+});
+
+const createMockDatabase = () => ({
+    all: vi.fn<() => unknown[]>(() => []),
+    get: vi.fn<() => unknown>(() => undefined),
+    prepare: vi.fn(() => createMockStatement()),
+    run: vi.fn<() => MockRunResult>(() => ({ changes: 1 })),
+});
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+const asDatabase = (database: MockDatabase): Database =>
+    database as unknown as Database;
+
+const createMockDatabaseService = (database: Database) => ({
+    executeTransaction: vi
+        .fn<
+            (callback: (transaction: Database) => unknown) => Promise<unknown>
+        >()
+        .mockImplementation(async (callback) => callback(database)),
+    getDatabase: vi.fn(() => database),
+});
 
 describe(SiteRepository, () => {
     let repository: SiteRepository;
-    let mockDatabaseService: any;
-    let mockDatabase: any;
+    let mockDatabaseService: ReturnType<typeof createMockDatabaseService>;
+    let mockDatabase: MockDatabase;
 
     beforeEach(() => {
         // Create mock database with direct methods (like node-sqlite3-wasm)
-        mockDatabase = {
-            all: vi.fn().mockReturnValue([]),
-            get: vi.fn().mockReturnValue(undefined),
-            run: vi.fn().mockReturnValue({ changes: 1 }),
-            prepare: vi.fn().mockReturnValue({
-                all: vi.fn().mockReturnValue([]),
-                get: vi.fn().mockReturnValue(undefined),
-                run: vi.fn().mockReturnValue({ changes: 1 }),
-                finalize: vi.fn(),
-            }),
-        };
-
-        mockDatabaseService = {
-            getDatabase: vi.fn().mockReturnValue(mockDatabase),
-            executeTransaction: vi
-                .fn()
-                .mockImplementation(async (callback) => callback(mockDatabase)),
-        };
+        mockDatabase = createMockDatabase();
+        mockDatabaseService = createMockDatabaseService(
+            asDatabase(mockDatabase)
+        );
 
         repository = new SiteRepository({
-            databaseService: mockDatabaseService,
+            databaseService:
+                mockDatabaseService as unknown as SiteRepositoryDependencies["databaseService"],
         });
     });
     describe("findAll", () => {
@@ -59,7 +83,7 @@ describe(SiteRepository, () => {
                 { identifier: "site2", name: "Site 2", monitoring: 0 },
             ];
 
-            const mockDb = mockDatabaseService.getDatabase();
+            const mockDb = mockDatabase;
             mockDb.all.mockReturnValue(mockSites);
 
             const result = await repository.findAll();
@@ -77,7 +101,7 @@ describe(SiteRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockDb = mockDatabaseService.getDatabase();
+            const mockDb = mockDatabase;
             mockDb.all.mockImplementation(() => {
                 throw new Error("Database error");
             });
@@ -102,7 +126,7 @@ describe(SiteRepository, () => {
                 { identifier: "site2", name: "Site 2", monitoring: 0 },
             ];
 
-            const mockDb = mockDatabaseService.getDatabase();
+            const mockDb = mockDatabase;
             mockDb.all.mockReturnValueOnce(mockSites);
 
             const findAllResult = await repository.findAll();
@@ -171,7 +195,7 @@ describe(SiteRepository, () => {
             };
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                async (callback: any) => callback(mockDatabase)
+                async (callback) => callback(asDatabase(mockDatabase))
             );
 
             await repository.upsert(siteData);
@@ -218,12 +242,12 @@ describe(SiteRepository, () => {
                 finalize: vi.fn(),
             });
             mockDatabaseService.executeTransaction.mockImplementation(
-                (callback: any) => {
+                async (callback) => {
                     const mockDb = {
                         prepare: mockPrepare,
                         run: vi.fn().mockReturnValue({ changes: 0 }),
                     };
-                    return callback(mockDb);
+                    return callback(mockDb as unknown as Database);
                 }
             );
 
@@ -259,12 +283,12 @@ describe(SiteRepository, () => {
             const mockRun = vi.fn();
 
             mockDatabaseService.executeTransaction.mockImplementation(
-                (callback: any) => {
+                async (callback) => {
                     const mockDb = {
                         prepare: mockPrepare,
                         run: mockRun,
                     };
-                    return callback(mockDb);
+                    return callback(mockDb as unknown as Database);
                 }
             );
 
@@ -299,7 +323,7 @@ describe(SiteRepository, () => {
             mockDatabaseService.getDatabase.mockReturnValue({
                 prepare: mockPrepare,
                 get: mockGet,
-            });
+            } as unknown as Database);
             const isResult = await repository.exists("site1");
 
             expect(isResult).toBeTruthy();
@@ -321,7 +345,7 @@ describe(SiteRepository, () => {
             mockDatabaseService.getDatabase.mockReturnValue({
                 prepare: mockPrepare,
                 get: mockGet,
-            });
+            } as unknown as Database);
             const isResult = await repository.exists("nonexistent");
 
             expect(isResult).toBeFalsy();
@@ -344,9 +368,9 @@ describe(SiteRepository, () => {
                 finalize: vi.fn(),
             });
             mockDatabaseService.executeTransaction.mockImplementation(
-                (callback: any) => {
+                async (callback) => {
                     const mockDb = { prepare: mockPrepare };
-                    return callback(mockDb);
+                    return callback(mockDb as unknown as Database);
                 }
             );
 

@@ -17,12 +17,17 @@ import { constants as fsConstants } from "node:fs";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { Logger } from "@shared/utils/logger/interfaces";
+
+import type { UptimeEvents } from "../../../events/eventTypes";
 import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
 
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 
 // Import after mocks are set up
+import { TypedEventBus } from "../../../events/TypedEventBus";
 import { DataBackupService } from "../../../services/database/DataBackupService";
+import { DatabaseService } from "../../../services/database/DatabaseService";
 import { createConsistentSnapshot } from "../../../services/database/dataBackupService/snapshot";
 import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
@@ -120,30 +125,35 @@ vi.mock("node-sqlite3-wasm", () => ({
 }));
 
 // Test utilities and mocks
-const createMockEventEmitter = () => ({
-    emitTyped: vi.fn().mockResolvedValue(undefined),
-    on: vi.fn(),
-    off: vi.fn(),
-    once: vi.fn(),
-    emit: vi.fn(),
-    removeAllListeners: vi.fn(),
-    listenerCount: vi.fn(),
-    eventNames: vi.fn(),
-    getMaxListeners: vi.fn(),
-    setMaxListeners: vi.fn(),
-});
+const createMockEventEmitter = () => {
+    const emitTyped = vi
+        .fn<TypedEventBus<UptimeEvents>["emitTyped"]>()
+        .mockResolvedValue(undefined);
+    const eventEmitter = Object.assign(
+        new TypedEventBus<UptimeEvents>("data-backup-service-test"),
+        { emitTyped }
+    );
+
+    return { emitTyped, eventEmitter };
+};
 
 const createMockLogger = () => ({
-    debug: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+    debug: vi.fn<Logger["debug"]>(),
+    error: vi.fn<Logger["error"]>(),
+    info: vi.fn<Logger["info"]>(),
+    warn: vi.fn<Logger["warn"]>(),
 });
 
-const createMockDatabaseService = () => ({
-    close: vi.fn(),
-    initialize: vi.fn(),
-});
+const createMockDatabaseService = () => {
+    const close = vi.fn<DatabaseService["close"]>();
+    const initialize = vi.fn<DatabaseService["initialize"]>();
+    const service = Object.assign(DatabaseService.getInstance(), {
+        close,
+        initialize,
+    });
+
+    return { close, initialize, service };
+};
 
 const SQLITE_HEADER = Buffer.from("SQLite format 3\0", "ascii");
 
@@ -169,9 +179,9 @@ describe(DataBackupService, () => {
                 const localLogger = createMockLogger();
 
                 createConsistentSnapshot({
-                    databaseService: localDatabaseService as never,
+                    databaseService: localDatabaseService.service,
                     dbPath: "/tmp/mock-db.sqlite",
-                    logger: localLogger as never,
+                    logger: localLogger,
                     snapshotDir: "/tmp/backup\0dir",
                     snapshotFileName: "backup-snapshot.sqlite",
                 });
@@ -233,13 +243,15 @@ describe(DataBackupService, () => {
         });
 
         dataBackupService = new DataBackupService({
-            databaseService: mockDatabaseService as any,
-            eventEmitter: mockEventEmitter as any,
+            databaseService: mockDatabaseService.service,
+            eventEmitter: mockEventEmitter.eventEmitter,
             logger: mockLogger,
         });
     });
 
     afterEach(() => {
+        Reflect.deleteProperty(mockDatabaseService.service, "close");
+        Reflect.deleteProperty(mockDatabaseService.service, "initialize");
         vi.restoreAllMocks();
     });
 
@@ -254,8 +266,8 @@ describe(DataBackupService, () => {
             await annotate("Type: Constructor", "type");
 
             const service = new DataBackupService({
-                databaseService: mockDatabaseService as any,
-                eventEmitter: mockEventEmitter as any,
+                databaseService: mockDatabaseService.service,
+                eventEmitter: mockEventEmitter.eventEmitter,
                 logger: mockLogger,
             });
 
@@ -272,8 +284,8 @@ describe(DataBackupService, () => {
             await annotate("Type: Event Processing", "type");
 
             const service = new DataBackupService({
-                databaseService: mockDatabaseService as any,
-                eventEmitter: mockEventEmitter as any,
+                databaseService: mockDatabaseService.service,
+                eventEmitter: mockEventEmitter.eventEmitter,
                 logger: mockLogger,
             });
 
@@ -573,12 +585,14 @@ describe(DataBackupService, () => {
                 expect.fail("Should have thrown SiteLoadingError");
             } catch (error) {
                 expect(error).toBeInstanceOf(SiteLoadingError);
-                expect((error as SiteLoadingError).message).toBe(
+                if (!(error instanceof SiteLoadingError)) {
+                    throw error;
+                }
+
+                expect(error.message).toBe(
                     "Failed to load sites: Failed to download database backup: Original error"
                 );
-                expect((error as SiteLoadingError).stack).toContain(
-                    "Caused by:"
-                );
+                expect(error.stack).toContain("Caused by:");
             }
         });
 
@@ -616,7 +630,19 @@ describe(DataBackupService, () => {
                 })
             );
 
-            const emittedEvent = mockEventEmitter.emitTyped.mock.calls[0]![1];
+            const emittedEvent: unknown =
+                mockEventEmitter.emitTyped.mock.calls[0]?.[1];
+            if (
+                typeof emittedEvent !== "object" ||
+                emittedEvent === null ||
+                !("timestamp" in emittedEvent) ||
+                typeof emittedEvent.timestamp !== "number"
+            ) {
+                throw new TypeError(
+                    "Expected database:error payload with a numeric timestamp"
+                );
+            }
+
             expect(emittedEvent.timestamp).toBeGreaterThanOrEqual(beforeTime);
             expect(emittedEvent.timestamp).toBeLessThanOrEqual(afterTime);
         });
@@ -1406,25 +1432,34 @@ describe(DataBackupService, () => {
             await annotate("Type: Backup Operation", "type");
 
             // Arrange
-            let resolveBackup: (value: any) => void;
-            const backupPromise = new Promise((resolve) => {
-                resolveBackup = resolve;
-            });
-            vi.mocked(createDatabaseBackup).mockReturnValue(
-                backupPromise as any
+            let resolveBackup:
+                ((value: DatabaseBackupResult) => void) | undefined;
+            const backupPromise = new Promise<DatabaseBackupResult>(
+                (resolve) => {
+                    resolveBackup = resolve;
+                }
             );
+            vi.mocked(createDatabaseBackup).mockReturnValue(backupPromise);
 
             // Act
             const promise1 = dataBackupService.downloadDatabaseBackup();
             const promise2 = dataBackupService.downloadDatabaseBackup();
 
             // Complete both backups
-            resolveBackup!({
+            if (!resolveBackup) {
+                throw new Error("Backup promise resolver was not initialized");
+            }
+
+            resolveBackup({
                 buffer: Buffer.from("concurrent backup"),
                 fileName: "concurrent-backup.sqlite",
                 metadata: {
+                    appVersion: "0.0.0-test",
+                    checksum: "mock-checksum",
                     createdAt: Date.now(),
                     originalPath: "/test",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
                     sizeBytes: 17,
                 },
             });
