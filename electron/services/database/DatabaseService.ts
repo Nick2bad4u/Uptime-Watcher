@@ -13,6 +13,7 @@ import { withRetry } from "@shared/utils/retry";
 import { isSqliteLockedError } from "@shared/utils/sqliteErrors";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
+import { AsyncLocalStorage } from "node:async_hooks";
 import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
@@ -55,6 +56,11 @@ const TRANSACTION_RETRY_MAX_DELAY_MS = 750;
 
 type DatabaseTransactionOperation<T> = (db: Database) => Promise<T> | T;
 
+interface DatabaseTransactionContext {
+    active: boolean;
+    db: Database;
+}
+
 /**
  * @remarks
  * Provides a singleton interface for low-level database operations:
@@ -79,7 +85,7 @@ type DatabaseTransactionOperation<T> = (db: Database) => Promise<T> | T;
  * - Singleton pattern ensures single database connection
  * - Node-sqlite3-wasm operations are synchronous and thread-safe
  * - Multiple initialize() calls return same connection (idempotent)
- * - Concurrent access handled at app service layer
+ * - Independent top-level transactions are serialized on the shared connection
  *
  * @example
  *
@@ -100,6 +106,13 @@ export class DatabaseService {
 
     /** SQLite database connection instance */
     private db: Database | undefined;
+
+    /** Identifies calls that are genuinely nested in the active transaction. */
+    private readonly transactionContext =
+        new AsyncLocalStorage<DatabaseTransactionContext>();
+
+    /** Serializes independent top-level transactions on the shared connection. */
+    private transactionQueue: Promise<void> = Promise.resolve();
 
     /**
      * Gets the singleton database service instance.
@@ -127,9 +140,9 @@ export class DatabaseService {
      * **Transaction Behavior in node-sqlite3-wasm:**
      *
      * - All operations (BEGIN, COMMIT, ROLLBACK) are synchronous
-     * - No race conditions possible due to synchronous execution
+     * - Independent async transactions are queued to prevent interleaving
      * - Automatic rollback on operation failure ensures consistency
-     * - Nested transactions not supported (will throw error)
+     * - Re-entrant transactions use SQLite savepoints
      *
      * Automatically handles transaction lifecycle:
      *
@@ -157,136 +170,171 @@ export class DatabaseService {
     public async executeTransaction<T>(
         operation: DatabaseTransactionOperation<T>
     ): Promise<T> {
-        const db = this.getDatabase();
-
-        // Nested transaction scenario: use SAVEPOINT so callers still get an atomic boundary even when already inside a broader transaction.
-        //
-        // SQLite doesn't support nested BEGIN/COMMIT, but savepoints are the
-        // supported mechanism.
-        if (db.inTransaction) {
-            DatabaseService.savepointCounter += 1;
-            const savepointName = `uptime_watcher_sp_${DatabaseService.savepointCounter}`;
-
-            logger.warn(
-                "[DatabaseService] Nested transaction detected - using SAVEPOINT for isolation",
-                { savepointName }
-            );
-
-            db.run(`SAVEPOINT ${savepointName}`);
-
-            try {
-                return await Promise.resolve(operation(db)).then((result) => {
-                    db.run(`RELEASE ${savepointName}`);
-                    return result;
-                });
-            } catch (error) {
-                const normalizedError = ensureError(error);
-                const rollbackErrors: Error[] = [];
-                try {
-                    db.run(`ROLLBACK TO ${savepointName}`);
-                    db.run(`RELEASE ${savepointName}`);
-                } catch (rollbackError) {
-                    const normalizedRollbackError = ensureError(rollbackError);
-                    rollbackErrors.push(normalizedRollbackError);
-                    logger.error(
-                        "[DatabaseService] Failed to rollback savepoint",
-                        normalizedRollbackError
-                    );
-                }
-
-                if (rollbackErrors.length > 0) {
-                    throw new AggregateError(
-                        [normalizedError, ...rollbackErrors],
-                        "[DatabaseService] Nested transaction failed and savepoint rollback failed",
-                        { cause: error }
-                    );
-                }
-
-                throw normalizedError;
-            }
+        const activeContext = this.transactionContext.getStore();
+        if (activeContext?.active) {
+            return this.executeNestedTransaction(activeContext.db, operation);
         }
 
-        const executeSingleAttempt = async (): Promise<T> => {
-            try {
-                db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
-                logger.debug("[DatabaseService] Started new transaction");
+        return this.enqueueTopLevelTransaction(async () => {
+            const db = this.getDatabase();
+            const executeSingleAttempt = async (): Promise<T> => {
+                try {
+                    db.run(DATABASE_SERVICE_QUERIES.BEGIN_TRANSACTION);
+                    logger.debug("[DatabaseService] Started new transaction");
 
-                return await Promise.resolve(operation(db)).then((result) => {
+                    const context: DatabaseTransactionContext = {
+                        active: true,
+                        db,
+                    };
+                    let result: T;
+                    try {
+                        result = await this.transactionContext.run(
+                            context,
+                            () => Promise.resolve(operation(db))
+                        );
+                    } finally {
+                        context.active = false;
+                    }
+
                     db.run(DATABASE_SERVICE_QUERIES.COMMIT);
                     logger.debug(
                         "[DatabaseService] Successfully committed transaction"
                     );
                     return result;
-                });
-            } catch (error) {
-                const normalizedError = ensureError(error);
-                const rollbackErrors: Error[] = [];
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    const rollbackErrors: Error[] = [];
 
-                // Only attempt rollback if a transaction is actually active.
-                // This prevents "cannot rollback - no transaction is active" errors.
-                try {
-                    if (db.inTransaction) {
-                        db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
-                        logger.debug(
-                            "[DatabaseService] Successfully rolled back transaction"
-                        );
-                    } else {
-                        logger.debug(
-                            "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
+                    // Only attempt rollback if a transaction is actually active.
+                    // This prevents "cannot rollback - no transaction is active" errors.
+                    try {
+                        if (db.inTransaction) {
+                            db.run(DATABASE_SERVICE_QUERIES.ROLLBACK);
+                            logger.debug(
+                                "[DatabaseService] Successfully rolled back transaction"
+                            );
+                        } else {
+                            logger.debug(
+                                "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
+                            );
+                        }
+                    } catch (rollbackError) {
+                        const normalizedRollbackError =
+                            ensureError(rollbackError);
+                        rollbackErrors.push(normalizedRollbackError);
+                        logger.error(
+                            "[DatabaseService] Failed to rollback active transaction",
+                            normalizedRollbackError
                         );
                     }
-                } catch (rollbackError) {
-                    const normalizedRollbackError = ensureError(rollbackError);
-                    rollbackErrors.push(normalizedRollbackError);
-                    logger.error(
-                        "[DatabaseService] Failed to rollback active transaction",
-                        normalizedRollbackError
-                    );
+
+                    if (rollbackErrors.length > 0) {
+                        throw new AggregateError(
+                            [normalizedError, ...rollbackErrors],
+                            "[DatabaseService] Transaction failed and rollback failed",
+                            { cause: error }
+                        );
+                    }
+
+                    throw normalizedError;
                 }
+            };
 
-                if (rollbackErrors.length > 0) {
-                    throw new AggregateError(
-                        [normalizedError, ...rollbackErrors],
-                        "[DatabaseService] Transaction failed and rollback failed",
-                        { cause: error }
-                    );
-                }
+            return withRetry(executeSingleAttempt, {
+                delayMs: ({ attempt }) =>
+                    Math.min(
+                        TRANSACTION_RETRY_INITIAL_DELAY_MS * 2 ** (attempt - 1),
+                        TRANSACTION_RETRY_MAX_DELAY_MS
+                    ),
+                maxRetries: TRANSACTION_MAX_ATTEMPTS,
+                operationName: "database transaction",
+                onError: (error, attempt) => {
+                    const normalizedError = ensureError(error);
+                    const canRetry =
+                        attempt < TRANSACTION_MAX_ATTEMPTS &&
+                        isSqliteLockedError(normalizedError);
 
-                throw normalizedError;
-            }
-        };
-
-        return withRetry(executeSingleAttempt, {
-            delayMs: ({ attempt }) =>
-                Math.min(
-                    TRANSACTION_RETRY_INITIAL_DELAY_MS * 2 ** (attempt - 1),
-                    TRANSACTION_RETRY_MAX_DELAY_MS
-                ),
-            maxRetries: TRANSACTION_MAX_ATTEMPTS,
-            operationName: "database transaction",
-            onError: (error, attempt) => {
-                const normalizedError = ensureError(error);
-                const canRetry =
+                    if (canRetry) {
+                        logger.warn(
+                            `[DatabaseService] Transaction encountered SQLITE_BUSY/SQLITE_LOCKED; rolling back and retrying (attempt ${attempt}/${TRANSACTION_MAX_ATTEMPTS})`,
+                            normalizedError
+                        );
+                    } else {
+                        // Enhanced error logging to understand what's causing transaction failures
+                        logger.error(
+                            "[DatabaseService] Transaction operation failed",
+                            normalizedError
+                        );
+                    }
+                },
+                shouldRetry: (error, attempt) =>
                     attempt < TRANSACTION_MAX_ATTEMPTS &&
-                    isSqliteLockedError(normalizedError);
-
-                if (canRetry) {
-                    logger.warn(
-                        `[DatabaseService] Transaction encountered SQLITE_BUSY/SQLITE_LOCKED; rolling back and retrying (attempt ${attempt}/${TRANSACTION_MAX_ATTEMPTS})`,
-                        normalizedError
-                    );
-                } else {
-                    // Enhanced error logging to understand what's causing transaction failures
-                    logger.error(
-                        "[DatabaseService] Transaction operation failed",
-                        normalizedError
-                    );
-                }
-            },
-            shouldRetry: (error, attempt) =>
-                attempt < TRANSACTION_MAX_ATTEMPTS &&
-                isSqliteLockedError(ensureError(error)),
+                    isSqliteLockedError(ensureError(error)),
+            });
         });
+    }
+
+    private async enqueueTopLevelTransaction<T>(
+        operation: () => Promise<T>
+    ): Promise<T> {
+        const precedingTransaction = this.transactionQueue;
+        let releaseQueue: () => void = () => {};
+        this.transactionQueue = new Promise<void>((resolve) => {
+            releaseQueue = resolve;
+        });
+
+        await precedingTransaction;
+        try {
+            return await operation();
+        } finally {
+            releaseQueue();
+        }
+    }
+
+    private async executeNestedTransaction<T>(
+        db: Database,
+        operation: DatabaseTransactionOperation<T>
+    ): Promise<T> {
+        DatabaseService.savepointCounter += 1;
+        const savepointName = `uptime_watcher_sp_${DatabaseService.savepointCounter}`;
+
+        logger.warn(
+            "[DatabaseService] Nested transaction detected - using SAVEPOINT for isolation",
+            { savepointName }
+        );
+
+        db.run(`SAVEPOINT ${savepointName}`);
+
+        try {
+            return await Promise.resolve(operation(db)).then((result) => {
+                db.run(`RELEASE ${savepointName}`);
+                return result;
+            });
+        } catch (error) {
+            const normalizedError = ensureError(error);
+            const rollbackErrors: Error[] = [];
+            try {
+                db.run(`ROLLBACK TO ${savepointName}`);
+                db.run(`RELEASE ${savepointName}`);
+            } catch (rollbackError) {
+                const normalizedRollbackError = ensureError(rollbackError);
+                rollbackErrors.push(normalizedRollbackError);
+                logger.error(
+                    "[DatabaseService] Failed to rollback savepoint",
+                    normalizedRollbackError
+                );
+            }
+
+            if (rollbackErrors.length > 0) {
+                throw new AggregateError(
+                    [normalizedError, ...rollbackErrors],
+                    "[DatabaseService] Nested transaction failed and savepoint rollback failed",
+                    { cause: error }
+                );
+            }
+
+            throw normalizedError;
+        }
     }
 
     /**

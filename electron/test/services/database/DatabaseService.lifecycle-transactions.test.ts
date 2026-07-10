@@ -288,6 +288,217 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
         instance.close();
     });
 
+    it("should serialize concurrent top-level transactions", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        let isInTransaction = false;
+        const statements: string[] = [];
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
+        dbInstance!.run.mockImplementation((sql: string) => {
+            statements.push(sql);
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+            } else if (sql === "COMMIT" || sql === "ROLLBACK") {
+                isInTransaction = false;
+            }
+
+            return undefined;
+        });
+
+        let notifyFirstStarted!: () => void;
+        const firstStarted = new Promise<void>((resolve) => {
+            notifyFirstStarted = resolve;
+        });
+        let releaseFirst!: () => void;
+        const firstGate = new Promise<void>((resolve) => {
+            releaseFirst = resolve;
+        });
+        const executionOrder: string[] = [];
+
+        const firstTransaction = instance.executeTransaction(async () => {
+            executionOrder.push("first:start");
+            notifyFirstStarted();
+            await firstGate;
+            executionOrder.push("first:end");
+            return "first";
+        });
+
+        await firstStarted;
+
+        const secondOperation = vi.fn(async () => {
+            executionOrder.push("second:start");
+            return "second";
+        });
+        const secondTransaction = instance.executeTransaction(secondOperation);
+
+        await Promise.resolve();
+        expect(secondOperation).not.toHaveBeenCalled();
+        expect(statements).toEqual(["BEGIN TRANSACTION"]);
+
+        releaseFirst();
+
+        await expect(firstTransaction).resolves.toBe("first");
+        await expect(secondTransaction).resolves.toBe("second");
+        expect(executionOrder).toEqual([
+            "first:start",
+            "first:end",
+            "second:start",
+        ]);
+        expect(statements).toEqual([
+            "BEGIN TRANSACTION",
+            "COMMIT",
+            "BEGIN TRANSACTION",
+            "COMMIT",
+        ]);
+        expect(
+            statements.some((sql) => sql.startsWith("SAVEPOINT "))
+        ).toBeFalsy();
+
+        instance.close();
+    });
+
+    it("should continue queued transactions after a rollback", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        let isInTransaction = false;
+        const statements: string[] = [];
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
+        dbInstance!.run.mockImplementation((sql: string) => {
+            statements.push(sql);
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+            } else if (sql === "COMMIT" || sql === "ROLLBACK") {
+                isInTransaction = false;
+            }
+
+            return undefined;
+        });
+
+        let notifyFirstStarted!: () => void;
+        const firstStarted = new Promise<void>((resolve) => {
+            notifyFirstStarted = resolve;
+        });
+        let releaseFirst!: () => void;
+        const firstGate = new Promise<void>((resolve) => {
+            releaseFirst = resolve;
+        });
+
+        const firstTransaction = instance.executeTransaction(async () => {
+            notifyFirstStarted();
+            await firstGate;
+            throw new Error("first transaction failed");
+        });
+
+        await firstStarted;
+        const secondOperation = vi.fn(async () => "second");
+        const secondTransaction = instance.executeTransaction(secondOperation);
+
+        releaseFirst();
+
+        await expect(firstTransaction).rejects.toThrow(
+            "first transaction failed"
+        );
+        await expect(secondTransaction).resolves.toBe("second");
+        expect(secondOperation).toHaveBeenCalledTimes(1);
+        expect(statements).toEqual([
+            "BEGIN TRANSACTION",
+            "ROLLBACK",
+            "BEGIN TRANSACTION",
+            "COMMIT",
+        ]);
+
+        instance.close();
+    });
+
+    it("should use a savepoint for genuinely nested transactions", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        let isInTransaction = false;
+        const statements: string[] = [];
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
+        dbInstance!.run.mockImplementation((sql: string) => {
+            statements.push(sql);
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+            } else if (sql === "COMMIT" || sql === "ROLLBACK") {
+                isInTransaction = false;
+            }
+
+            return undefined;
+        });
+
+        await expect(
+            instance.executeTransaction(async () =>
+                instance.executeTransaction(async () => "nested result")
+            )
+        ).resolves.toBe("nested result");
+
+        expect(statements).toHaveLength(4);
+        expect(statements[0]).toBe("BEGIN TRANSACTION");
+        expect(statements[1]).toMatch(/^SAVEPOINT uptime_watcher_sp_\d+$/u);
+        expect(statements[2]).toMatch(/^RELEASE uptime_watcher_sp_\d+$/u);
+        expect(statements[3]).toBe("COMMIT");
+
+        instance.close();
+    });
+
     it("should retry top-level transactions when SQLite is busy", async ({
         task,
         annotate,
@@ -420,8 +631,22 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
         const operationError = new Error("nested operation failed");
         const rollbackError = new Error("savepoint rollback failed");
 
-        dbInstance!.inTransaction = true;
+        let isInTransaction = false;
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
         dbInstance!.run.mockImplementation((sql: string) => {
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+                return undefined;
+            }
+
+            if (sql === "ROLLBACK") {
+                isInTransaction = false;
+                return undefined;
+            }
+
             if (sql.startsWith("ROLLBACK TO ")) {
                 throw rollbackError;
             }
@@ -430,9 +655,11 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
         });
 
         await expect(
-            instance.executeTransaction(async () => {
-                throw operationError;
-            })
+            instance.executeTransaction(async () =>
+                instance.executeTransaction(async () => {
+                    throw operationError;
+                })
+            )
         ).rejects.toMatchObject({
             cause: operationError,
             errors: expect.arrayContaining([operationError, rollbackError]),
