@@ -7,7 +7,15 @@
  * @file Comprehensive tests for WindowService
  */
 
-import { BrowserWindow, shell } from "electron";
+import {
+    BrowserWindow,
+    shell,
+    type BrowserWindow as ElectronBrowserWindow,
+    type BrowserWindowConstructorOptions,
+    type Event,
+    type OnHeadersReceivedListenerDetails,
+    type WebPreferences,
+} from "electron";
 import { pathToFileURL } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,10 +27,27 @@ import { isDev } from "../../../electronUtils";
 import { WindowService } from "../../../services/window/WindowService";
 import { logger } from "../../../utils/logger";
 
-// Mock electron module first
-vi.mock("electron", () => {
-    // Create a single mock browser window that can be reused
-    const mockWindow = {
+const electronFixtures = vi.hoisted(() => {
+    const createMockSession = () => ({
+        setPermissionCheckHandler: vi.fn(),
+        setPermissionRequestHandler: vi.fn(),
+        webRequest: {
+            onHeadersReceived: vi.fn(),
+        },
+    });
+
+    const createMockWebContents = () => ({
+        isDestroyed: vi.fn(() => false),
+        on: vi.fn(),
+        once: vi.fn(),
+        openDevTools: vi.fn(),
+        removeListener: vi.fn(),
+        send: vi.fn(),
+        setWindowOpenHandler: vi.fn(),
+        session: createMockSession(),
+    });
+
+    const createMockBrowserWindow = () => ({
         close: vi.fn(),
         isDestroyed: vi.fn(() => false),
         loadFile: vi.fn().mockResolvedValue(undefined),
@@ -31,29 +56,34 @@ vi.mock("electron", () => {
         once: vi.fn(),
         removeListener: vi.fn(),
         show: vi.fn(),
-        webContents: {
-            isDestroyed: vi.fn(() => false),
-            on: vi.fn(),
-            once: vi.fn(),
-            openDevTools: vi.fn(),
-            removeListener: vi.fn(),
-            send: vi.fn(),
-            setWindowOpenHandler: vi.fn(),
-            session: {
-                setPermissionCheckHandler: vi.fn(),
-                setPermissionRequestHandler: vi.fn(),
-                webRequest: {
-                    onHeadersReceived: vi.fn(),
-                },
-            },
-        },
-    };
+        webContents: createMockWebContents(),
+    });
 
-    const MockBrowserWindow = vi.fn(function MockBrowserWindowMock() {
+    return {
+        createMockBrowserWindow,
+        mockWindow: createMockBrowserWindow(),
+    };
+});
+
+type MockBrowserWindowFixture = ReturnType<
+    typeof electronFixtures.createMockBrowserWindow
+>;
+
+// Mock electron module first
+vi.mock("electron", () => {
+    const { mockWindow } = electronFixtures;
+
+    const MockBrowserWindow = vi.fn(function MockBrowserWindowMock(
+        _options?: BrowserWindowConstructorOptions
+    ) {
         return mockWindow;
-    }) as any;
-    MockBrowserWindow.getAllWindows = vi.fn();
-    MockBrowserWindow.__mockWindow = mockWindow;
+    });
+    Reflect.set(
+        MockBrowserWindow,
+        "getAllWindows",
+        vi.fn<() => ElectronBrowserWindow[]>()
+    );
+    Reflect.set(MockBrowserWindow, "__mockWindow", mockWindow);
 
     return {
         BrowserWindow: MockBrowserWindow,
@@ -62,6 +92,83 @@ vi.mock("electron", () => {
         },
     };
 });
+
+const getMockBrowserWindow = (): MockBrowserWindowFixture => {
+    const fixture: unknown = Reflect.get(BrowserWindow, "__mockWindow");
+    if (fixture !== electronFixtures.mockWindow) {
+        throw new TypeError("BrowserWindow mock fixture is unavailable");
+    }
+
+    return electronFixtures.mockWindow;
+};
+
+const getRegisteredListener = <
+    TListener extends (...arguments_: never[]) => unknown,
+>(
+    mockCalls: unknown,
+    eventName: string
+): TListener => {
+    if (!Array.isArray(mockCalls)) {
+        throw new TypeError("Electron mock calls must be an array");
+    }
+
+    const matchingCall = mockCalls.find(
+        (call: unknown) =>
+            Array.isArray(call) &&
+            call[0] === eventName &&
+            typeof call[1] === "function"
+    );
+    if (!matchingCall) {
+        throw new Error(`No listener registered for ${eventName}`);
+    }
+
+    return matchingCall[1] as TListener;
+};
+
+const getReflectedMethod = <TArguments extends unknown[], TResult>(
+    target: object,
+    propertyKey: string
+): ((...arguments_: TArguments) => TResult) => {
+    const member: unknown = Reflect.get(target, propertyKey);
+    if (typeof member !== "function") {
+        throw new TypeError(`${propertyKey} is not a function`);
+    }
+
+    return member.bind(target) as (...arguments_: TArguments) => TResult;
+};
+
+const createElectronEvent = (): Event => ({
+    defaultPrevented: false,
+    preventDefault: vi.fn(),
+});
+
+const createHeadersReceivedDetails = (
+    overrides: Partial<OnHeadersReceivedListenerDetails> = {}
+): OnHeadersReceivedListenerDetails => ({
+    id: 1,
+    method: "GET",
+    referrer: "",
+    resourceType: "mainFrame",
+    statusCode: 200,
+    statusLine: "HTTP/1.1 200 OK",
+    timestamp: 0,
+    url: "file:///dist/index.html",
+    ...overrides,
+});
+
+const malformedElectronInput = <T>(value: unknown): T => value as T;
+
+type NavigationListener = (event: Event, url: string) => void;
+type WebviewAttachmentListener = (
+    event: Event,
+    webPreferences: WebPreferences,
+    params: Record<string, string>
+) => void;
+type DidFailLoadListener = (
+    event: Event,
+    errorCode: number,
+    errorDescription: string
+) => void;
 
 // Mock logger
 vi.mock("../../../utils/logger", () => {
@@ -121,9 +228,7 @@ describe(WindowService, () => {
         vi.mocked(isDev).mockReturnValue(false);
         vi.mocked(BrowserWindow.getAllWindows).mockReturnValue([]);
 
-        const mockWindowRef = (
-            BrowserWindow as unknown as { __mockWindow: any }
-        ).__mockWindow;
+        const mockWindowRef = getMockBrowserWindow();
         vi.mocked(mockWindowRef.isDestroyed).mockReturnValue(false);
         vi.mocked(mockWindowRef.webContents.isDestroyed).mockReturnValue(false);
         vi.mocked(mockWindowRef.removeListener).mockImplementation(() => {
@@ -447,20 +552,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willNavigateHandler = onCalls.find(
-                ([eventName]) => eventName === "will-navigate"
-            )?.[1];
+            const willNavigateHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-navigate"
+                );
 
             expect(willNavigateHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willNavigateHandler?.(event, "https://example.com");
 
@@ -487,20 +587,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willNavigateHandler = onCalls.find(
-                ([eventName]) => eventName === "will-navigate"
-            )?.[1];
+            const willNavigateHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-navigate"
+                );
 
             expect(willNavigateHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willNavigateHandler?.(event, "file:///etc/passwd");
 
@@ -528,20 +623,15 @@ describe(WindowService, () => {
                 .calls[0]?.[0];
             expect(loadedFilePath).toBeTypeOf("string");
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willNavigateHandler = onCalls.find(
-                ([eventName]) => eventName === "will-navigate"
-            )?.[1];
+            const willNavigateHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-navigate"
+                );
 
             expect(willNavigateHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willNavigateHandler?.(
                 event,
@@ -567,20 +657,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willNavigateHandler = onCalls.find(
-                ([eventName]) => eventName === "will-navigate"
-            )?.[1];
+            const willNavigateHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-navigate"
+                );
 
             expect(willNavigateHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willNavigateHandler?.(
                 event,
@@ -604,24 +689,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (
-                    event: any,
-                    webPreferences: any,
-                    params: Record<string, string>
-                ) => void,
-            ][];
-            const willAttachWebviewHandler = onCalls.find(
-                ([eventName]) => eventName === "will-attach-webview"
-            )?.[1];
+            const willAttachWebviewHandler =
+                getRegisteredListener<WebviewAttachmentListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-attach-webview"
+                );
 
             expect(willAttachWebviewHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willAttachWebviewHandler?.(
                 event,
@@ -659,20 +735,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willNavigateHandler = onCalls.find(
-                ([eventName]) => eventName === "will-navigate"
-            )?.[1];
+            const willNavigateHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-navigate"
+                );
 
             expect(willNavigateHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willNavigateHandler?.(
                 event,
@@ -698,20 +769,15 @@ describe(WindowService, () => {
 
             const window = windowService.createMainWindow();
 
-            const onCalls = vi.mocked(window.webContents.on).mock
-                .calls as unknown as [
-                string,
-                (event: any, url: string) => void,
-            ][];
-            const willRedirectHandler = onCalls.find(
-                ([eventName]) => eventName === "will-redirect"
-            )?.[1];
+            const willRedirectHandler =
+                getRegisteredListener<NavigationListener>(
+                    vi.mocked(window.webContents.on).mock.calls,
+                    "will-redirect"
+                );
 
             expect(willRedirectHandler).toBeTypeOf("function");
 
-            const event = {
-                preventDefault: vi.fn(),
-            };
+            const event = createElectronEvent();
 
             willRedirectHandler?.(event, "https://example.com/redirect");
 
@@ -731,10 +797,10 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockWindows = [vi.fn(), vi.fn()];
-            vi.mocked(BrowserWindow.getAllWindows).mockReturnValue(
-                mockWindows as unknown as BrowserWindow[]
-            );
+            const mockWindows: ElectronBrowserWindow[] = [
+                windowService.createMainWindow(),
+            ];
+            vi.mocked(BrowserWindow.getAllWindows).mockReturnValue(mockWindows);
 
             const windows = windowService.getAllWindows();
 
@@ -762,11 +828,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
-            const readyCallback = (
-                vi.mocked(window.once).mock.calls as any[]
-            ).find(
-                (call: any) => call[0] === "ready-to-show"
-            )?.[1] as () => void;
+            const readyCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.once).mock.calls,
+                "ready-to-show"
+            );
 
             expect(readyCallback).toBeDefined();
             readyCallback();
@@ -802,11 +867,10 @@ describe(WindowService, () => {
             process.env["HEADLESS"] = "true";
 
             const window = windowService.createMainWindow();
-            const readyCallback = (
-                vi.mocked(window.once).mock.calls as any[]
-            ).find(
-                (call: any) => call[0] === "ready-to-show"
-            )?.[1] as () => void;
+            const readyCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.once).mock.calls,
+                "ready-to-show"
+            );
 
             expect(readyCallback).toBeDefined();
             readyCallback();
@@ -832,9 +896,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
-            const domReadyCallback = (
-                vi.mocked(window.webContents.once).mock.calls as any[]
-            ).find((call: any) => call[0] === "dom-ready")?.[1] as () => void;
+            const domReadyCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.webContents.once).mock.calls,
+                "dom-ready"
+            );
 
             expect(domReadyCallback).toBeDefined();
             domReadyCallback();
@@ -856,11 +921,10 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
-            const finishLoadCallback = (
-                vi.mocked(window.webContents.once).mock.calls as any[]
-            ).find(
-                (call: any) => call[0] === "did-finish-load"
-            )?.[1] as () => void;
+            const finishLoadCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.webContents.once).mock.calls,
+                "did-finish-load"
+            );
 
             expect(finishLoadCallback).toBeDefined();
             finishLoadCallback();
@@ -879,16 +943,17 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             // Get the callback and call it
-            const failLoadCallback = (
-                vi.mocked(window.webContents.on).mock.calls as any[]
-            ).find((call: any) => call[0] === "did-fail-load")?.[1] as (
-                event: any,
-                errorCode: number,
-                errorDescription: string
-            ) => void;
+            const failLoadCallback = getRegisteredListener<DidFailLoadListener>(
+                vi.mocked(window.webContents.on).mock.calls,
+                "did-fail-load"
+            );
 
             expect(failLoadCallback).toBeDefined();
-            failLoadCallback(null, 404, "Not Found");
+            failLoadCallback(
+                malformedElectronInput<Event>(null),
+                404,
+                "Not Found"
+            );
 
             expect(logger.error).toHaveBeenCalledWith(
                 "[WindowService] Failed to load renderer: 404 - Not Found"
@@ -905,9 +970,10 @@ describe(WindowService, () => {
             expect(windowService.getMainWindow()).toBe(window);
 
             // Get the callback and call it
-            const closedCallback = (
-                vi.mocked(window.on).mock.calls as any[]
-            ).find((call: any) => call[0] === "closed")?.[1] as () => void;
+            const closedCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.on).mock.calls,
+                "closed"
+            );
 
             expect(closedCallback).toBeDefined();
             closedCallback();
@@ -955,7 +1021,7 @@ describe(WindowService, () => {
                 vi.mocked(window.loadFile).mockRejectedValue(error);
 
                 // Trigger the content loading
-                await (windowService as any).loadContent();
+                windowService.loadContent();
 
                 // Allow the asynchronous withErrorHandling call to complete
                 await new Promise((resolve) => setTimeout(resolve, 0));
@@ -975,9 +1041,7 @@ describe(WindowService, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const mockWindowRef = (
-                    BrowserWindow as unknown as { __mockWindow: any }
-                ).__mockWindow;
+                const mockWindowRef = getMockBrowserWindow();
 
                 const shutdownLoadError = new Error(
                     "ERR_FAILED (-2) loading 'file:///dist/index.html'"
@@ -1043,11 +1107,10 @@ describe(WindowService, () => {
                 const window = windowService.createMainWindow();
                 vi.mocked(window.isDestroyed).mockReturnValue(false);
 
-                await (
-                    windowService as unknown as {
-                        loadDevelopmentContent: () => Promise<void>;
-                    }
-                ).loadDevelopmentContent();
+                await getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "loadDevelopmentContent"
+                )();
 
                 expect(fetch).toHaveBeenCalledWith(
                     "http://localhost:5173",
@@ -1081,18 +1144,26 @@ describe(WindowService, () => {
 
                 // Mock waitForViteServer to fail immediately
                 const waitForViteServerSpy = vi
-                    .spyOn(testWindowService as any, "waitForViteServer")
+                    .fn<() => Promise<void>>()
                     .mockRejectedValue(
                         new Error(
                             "Vite dev server did not become available after 20 attempts"
                         )
                     );
+                Reflect.set(
+                    testWindowService,
+                    "waitForViteServer",
+                    waitForViteServerSpy
+                );
 
                 testWindowService.createMainWindow();
 
                 // Directly call loadDevelopmentContent to catch errors
                 await expect(
-                    (testWindowService as any).loadDevelopmentContent()
+                    getReflectedMethod<[], Promise<void>>(
+                        testWindowService,
+                        "loadDevelopmentContent"
+                    )()
                 ).rejects.toThrow();
 
                 expect(waitForViteServerSpy).toHaveBeenCalled();
@@ -1122,15 +1193,23 @@ describe(WindowService, () => {
 
                 // Mock waitForViteServer to succeed but then simulate window destruction check
                 const waitForViteServerSpy = vi
-                    .spyOn(testWindowService as any, "waitForViteServer")
+                    .fn<() => Promise<void>>()
                     .mockResolvedValue(undefined);
+                Reflect.set(
+                    testWindowService,
+                    "waitForViteServer",
+                    waitForViteServerSpy
+                );
 
                 // Simulate window being destroyed after server is ready but before load
                 vi.mocked(window.isDestroyed).mockReturnValue(true);
                 vi.clearAllMocks();
 
                 await expect(
-                    (testWindowService as any).loadDevelopmentContent()
+                    getReflectedMethod<[], Promise<void>>(
+                        testWindowService,
+                        "loadDevelopmentContent"
+                    )()
                 ).resolves.toBeUndefined();
 
                 expect(waitForViteServerSpy).toHaveBeenCalled();
@@ -1163,11 +1242,10 @@ describe(WindowService, () => {
                         throw new Error("DevTools blocked");
                     });
 
-                    await (
-                        windowService as unknown as {
-                            loadDevelopmentContent: () => Promise<void>;
-                        }
-                    ).loadDevelopmentContent();
+                    await getReflectedMethod<[], Promise<void>>(
+                        windowService,
+                        "loadDevelopmentContent"
+                    )();
 
                     await vi.runAllTimersAsync();
 
@@ -1198,11 +1276,10 @@ describe(WindowService, () => {
                     const window = windowService.createMainWindow();
                     vi.mocked(window.isDestroyed).mockReturnValue(false);
 
-                    await (
-                        windowService as unknown as {
-                            loadDevelopmentContent: () => Promise<void>;
-                        }
-                    ).loadDevelopmentContent();
+                    await getReflectedMethod<[], Promise<void>>(
+                        windowService,
+                        "loadDevelopmentContent"
+                    )();
 
                     vi.mocked(window.isDestroyed).mockReturnValue(true);
 
@@ -1230,9 +1307,7 @@ describe(WindowService, () => {
 
             vi.mocked(isDev).mockReturnValue(false);
 
-            const mockWindowRef = (
-                BrowserWindow as unknown as { __mockWindow: any }
-            ).__mockWindow;
+            const mockWindowRef = getMockBrowserWindow();
             const headerSpy = vi.mocked(
                 mockWindowRef.webContents.session.webRequest.onHeadersReceived
             );
@@ -1240,13 +1315,15 @@ describe(WindowService, () => {
             windowService.createMainWindow();
 
             expect(headerSpy).toHaveBeenCalledWith(expect.any(Function));
-            const [handler] = headerSpy.mock.calls[0];
+            const firstHeaderCall = headerSpy.mock.calls[0];
+            if (!firstHeaderCall) {
+                throw new Error("Security header handler was not registered");
+            }
+            const [handler] = firstHeaderCall;
             const callback = vi.fn();
 
             handler(
-                {
-                    responseHeaders: {},
-                } as any,
+                createHeadersReceivedDetails({ responseHeaders: {} }),
                 callback
             );
 
@@ -1276,9 +1353,7 @@ describe(WindowService, () => {
 
             vi.mocked(isDev).mockReturnValue(false);
 
-            const mockWindowRef = (
-                BrowserWindow as unknown as { __mockWindow: any }
-            ).__mockWindow;
+            const mockWindowRef = getMockBrowserWindow();
             const headerSpy = vi.mocked(
                 mockWindowRef.webContents.session.webRequest.onHeadersReceived
             );
@@ -1286,7 +1361,11 @@ describe(WindowService, () => {
             windowService.createMainWindow();
 
             expect(headerSpy).toHaveBeenCalledWith(expect.any(Function));
-            const [handler] = headerSpy.mock.calls[0];
+            const firstHeaderCall = headerSpy.mock.calls[0];
+            if (!firstHeaderCall) {
+                throw new Error("Security header handler was not registered");
+            }
+            const [handler] = firstHeaderCall;
             const callback = vi.fn();
 
             const originalHeaders = {
@@ -1294,10 +1373,10 @@ describe(WindowService, () => {
             };
 
             handler(
-                {
+                createHeadersReceivedDetails({
                     resourceType: "image",
                     responseHeaders: originalHeaders,
-                } as any,
+                }),
                 callback
             );
 
@@ -1318,9 +1397,7 @@ describe(WindowService, () => {
 
             vi.mocked(isDev).mockReturnValue(false);
 
-            const mockWindowRef = (
-                BrowserWindow as unknown as { __mockWindow: any }
-            ).__mockWindow;
+            const mockWindowRef = getMockBrowserWindow();
             const headerSpy = vi.mocked(
                 mockWindowRef.webContents.session.webRequest.onHeadersReceived
             );
@@ -1467,14 +1544,11 @@ describe(WindowService, () => {
             // Create service but don't call createMainWindow
             const service = new WindowService();
 
-            // Try to trigger loadContent without a window
-            // This is a private method, so we test it indirectly through createMainWindow
-            // but first nullify the window
+            // Nullify the private window reference to exercise the public guard.
             service.createMainWindow();
-            (service as any).mainWindow = null;
+            Reflect.set(service, "mainWindow", null);
 
-            // Call loadContent via reflection
-            (service as any).loadContent();
+            service.loadContent();
 
             expect(logger.error).toHaveBeenCalledWith(
                 "[WindowService] Cannot load content: main window not initialized"
@@ -1494,18 +1568,26 @@ describe(WindowService, () => {
 
             // Mock waitForViteServer to fail with timeout
             const waitForViteServerSpy = vi
-                .spyOn(testWindowService as any, "waitForViteServer")
+                .fn<() => Promise<void>>()
                 .mockRejectedValue(
                     new Error(
                         "Vite dev server did not become available after 20 attempts"
                     )
                 );
+            Reflect.set(
+                testWindowService,
+                "waitForViteServer",
+                waitForViteServerSpy
+            );
 
             testWindowService.createMainWindow();
 
             // Directly call loadDevelopmentContent to catch errors
             await expect(
-                (testWindowService as any).loadDevelopmentContent()
+                getReflectedMethod<[], Promise<void>>(
+                    testWindowService,
+                    "loadDevelopmentContent"
+                )()
             ).rejects.toThrow();
 
             expect(waitForViteServerSpy).toHaveBeenCalled();
@@ -1540,11 +1622,10 @@ describe(WindowService, () => {
             vi.mocked(logger.debug).mockClear();
 
             try {
-                await (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer();
+                await getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
 
                 expect(logger.debug).toHaveBeenCalledWith(
                     "[WindowService] Vite dev server is ready"
@@ -1574,11 +1655,10 @@ describe(WindowService, () => {
             setFetchForTesting(retryingFetch);
 
             try {
-                const waitPromise = (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer();
+                const waitPromise = getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
 
                 await waitPromise;
 
@@ -1608,11 +1688,10 @@ describe(WindowService, () => {
             setFetchForTesting(failingFetch);
 
             await expect(
-                (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer()
+                getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )()
             ).rejects.toThrow(
                 "Mocked fetch reported Vite server as unavailable"
             );
@@ -1642,11 +1721,10 @@ describe(WindowService, () => {
             setFetchForTesting(unavailableFetch);
 
             try {
-                const waitPromise = (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer();
+                const waitPromise = getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
 
                 for (let attempt = 0; attempt < 19; attempt++) {
                     await vi.advanceTimersToNextTimerAsync();
@@ -1689,11 +1767,10 @@ describe(WindowService, () => {
             setFetchForTesting(eventuallyAvailableFetch);
 
             try {
-                const waitPromise = (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer();
+                const waitPromise = getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
 
                 await vi.advanceTimersToNextTimerAsync();
                 await waitPromise;
@@ -1737,11 +1814,10 @@ describe(WindowService, () => {
             setFetchForTesting(abortingFetch);
 
             try {
-                const waitPromise = (
-                    windowService as unknown as {
-                        waitForViteServer: () => Promise<void>;
-                    }
-                ).waitForViteServer();
+                const waitPromise = getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
 
                 await vi.advanceTimersToNextTimerAsync();
                 await vi.advanceTimersToNextTimerAsync();
@@ -1778,15 +1854,14 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
 
             // Get the ready-to-show callback
-            const readyCallback = (
-                vi.mocked(window.once).mock.calls as any[]
-            ).find(
-                (call: any) => call[0] === "ready-to-show"
-            )?.[1] as () => void;
+            const readyCallback = getRegisteredListener<() => void>(
+                vi.mocked(window.once).mock.calls,
+                "ready-to-show"
+            );
 
             // Simulate window being destroyed before ready-to-show
             vi.mocked(window.isDestroyed).mockReturnValue(true);
-            (windowService as any).mainWindow = null;
+            Reflect.set(windowService, "mainWindow", null);
 
             // Should not crash when trying to show destroyed window
             expect(() => {
@@ -1800,11 +1875,10 @@ describe(WindowService, () => {
             try {
                 setProcessSnapshotOverrideForTesting(null);
                 expect(
-                    (
-                        windowService as unknown as {
-                            getEnvFlag: (name: string) => boolean;
-                        }
-                    ).getEnvFlag("SHOULD_NOT_EXIST")
+                    getReflectedMethod<[string], boolean>(
+                        windowService,
+                        "getEnvFlag"
+                    )("SHOULD_NOT_EXIST")
                 ).toBeFalsy();
             } finally {
                 resetProcessSnapshotOverrideForTesting();
@@ -1816,11 +1890,10 @@ describe(WindowService, () => {
             process.env["HEADLESS"] = "true";
 
             expect(
-                (
-                    windowService as unknown as {
-                        getEnvFlag: (name: string) => boolean;
-                    }
-                ).getEnvFlag("HEADLESS")
+                getReflectedMethod<[string], boolean>(
+                    windowService,
+                    "getEnvFlag"
+                )("HEADLESS")
             ).toBeTruthy();
 
             if (originalValue === undefined) {
