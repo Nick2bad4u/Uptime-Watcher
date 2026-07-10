@@ -94,6 +94,8 @@ export interface SettingsRepositoryTransactionAdapter {
     deleteAll: () => void;
     /** Delete a single setting by key. */
     deleteByKey: (key: string) => void;
+    /** Get all settings from the active transaction snapshot. */
+    getAll: () => Record<string, string>;
     /** Set a value for the provided key. */
     set: (key: string, value: string) => void;
 }
@@ -273,14 +275,10 @@ export class SettingsRepository {
      * @throws Error if the database operation fails.
      */
     public async getAll(): Promise<Record<string, string>> {
-        return withDatabaseOperation(() => {
-            const settingsRows = querySettingsRows(
-                this.getDb(),
-                SETTINGS_QUERIES.SELECT_ALL
-            );
-            const normalizedRows = rowsToSettings(settingsRows);
-            return Promise.resolve(settingsToRecord(normalizedRows));
-        }, "settings-get-all");
+        return withDatabaseOperation(
+            () => Promise.resolve(this.getAllInternal(this.getDb())),
+            "settings-get-all"
+        );
     }
 
     /**
@@ -352,6 +350,9 @@ export class SettingsRepository {
                 this.deleteInternal(db, key);
             };
 
+        const getAll: SettingsRepositoryTransactionAdapter["getAll"] = () =>
+            this.getAllInternal(db);
+
         const set: SettingsRepositoryTransactionAdapter["set"] = (
             key,
             value
@@ -363,8 +364,21 @@ export class SettingsRepository {
             bulkInsert,
             deleteAll,
             deleteByKey,
+            getAll,
             set,
         } satisfies SettingsRepositoryTransactionAdapter;
+    }
+
+    /**
+     * Reads all settings within an existing transaction context.
+     *
+     * @param db - The database connection bound to the active transaction.
+     *
+     * @returns All persisted settings as a key-value record.
+     */
+    public getAllInternal(db: Database): Record<string, string> {
+        const settingsRows = querySettingsRows(db, SETTINGS_QUERIES.SELECT_ALL);
+        return settingsToRecord(rowsToSettings(settingsRows));
     }
 
     /**

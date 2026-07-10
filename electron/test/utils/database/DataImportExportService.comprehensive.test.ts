@@ -135,6 +135,9 @@ const createMockRepositories = () => {
     const settingsDeleteInternal = vi.fn(
         (_database: Database, _key: string): void => undefined
     );
+    const settingsGetAllInternal = vi.fn(
+        (_database: Database): Record<string, string> => ({})
+    );
     const siteBulkInsertInternal = vi.fn(
         (
             _database: Database,
@@ -207,11 +210,13 @@ const createMockRepositories = () => {
                     deleteByKey: vi.fn((key) =>
                         settingsDeleteInternal(database, key)
                     ),
+                    getAll: vi.fn(() => settingsGetAllInternal(database)),
                     set: vi.fn(),
                 })
             ),
             deleteAllInternal: settingsDeleteAllInternal,
             deleteInternal: settingsDeleteInternal,
+            getAllInternal: settingsGetAllInternal,
             getAll: vi
                 .fn<
                     DataImportExportConfig["repositories"]["settings"]["getAll"]
@@ -1132,7 +1137,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 { identifier: "site2", name: "Site 2" }, // No monitors
             ];
             const mockSettings = { theme: "dark", historyLimit: "500" };
-            mockRepositories.settings.getAll.mockResolvedValue({
+            mockRepositories.settings.getAllInternal.mockReturnValue({
                 historyLimit: "1000",
                 theme: "light",
             });
@@ -1153,6 +1158,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalledWith(
                 expect.any(Function)
             );
+            expect(
+                mockRepositories.settings.getAllInternal
+            ).toHaveBeenCalledWith(mockDatabase);
             expect(
                 mockRepositories.site.deleteAllInternal
             ).toHaveBeenCalledWith(mockDatabase);
@@ -1222,7 +1230,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            mockRepositories.settings.getAll.mockResolvedValue({
+            mockRepositories.settings.getAllInternal.mockReturnValue({
                 historyLimit: "1000",
             });
 
@@ -1294,7 +1302,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             await annotate("Component: DataImportExportService", "component");
             await annotate("Category: Import Operation", "category");
 
-            mockRepositories.settings.getAll.mockResolvedValue({
+            mockRepositories.settings.getAllInternal.mockReturnValue({
                 ["__proto__"]: "evil-existing",
                 "cloud.dropbox.tokens": "existing-token",
                 "cloud.sync.deviceId": "existing-device",
@@ -1305,6 +1313,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             });
 
             await service.persistImportedData([], { theme: "dark" });
+
+            expect(mockRepositories.settings.getAll).not.toHaveBeenCalled();
 
             expect(
                 mockRepositories.settings.deleteAllInternal

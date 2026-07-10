@@ -187,6 +187,7 @@ const createMockConfig = () => ({
             bulkInsertInternal: vi.fn(),
             createTransactionAdapter: vi.fn(),
             deleteAllInternal: vi.fn(),
+            getAllInternal: vi.fn(() => ({})),
             getAll: vi.fn().mockResolvedValue({}),
         },
         site: {
@@ -241,6 +242,8 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                 mockConfig.repositories.settings.bulkInsertInternal(db, values),
             deleteAll: (db: unknown) =>
                 mockConfig.repositories.settings.deleteAllInternal(db),
+            getAll: (db: unknown) =>
+                mockConfig.repositories.settings.getAllInternal(db),
         });
 
         attachAdapter(mockConfig.repositories.monitor, {

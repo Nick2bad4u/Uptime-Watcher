@@ -298,6 +298,7 @@ const initializeTransactionAdapters = (): void => {
                 mockSettingsRepository.deleteAllInternal(database)
             ),
             deleteByKey: vi.fn(),
+            getAll: vi.fn(() => ({})),
             set: vi.fn((key: string, value: string) =>
                 mockSettingsRepository.setInternal(database, key, value)
             ),

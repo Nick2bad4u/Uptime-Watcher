@@ -177,6 +177,19 @@ describe(SettingsRepository, () => {
 
             expect(result).toEqual({});
         });
+        it("should read all settings from a transaction adapter", () => {
+            mockDatabase.all.mockReturnValue([{ key: "theme", value: "dark" }]);
+
+            const result = repository
+                .createTransactionAdapter(database)
+                .getAll();
+
+            expect(result).toEqual({ theme: "dark" });
+            expect(mockDatabase.all).toHaveBeenCalledWith(
+                expect.stringContaining("SELECT * FROM settings"),
+                undefined
+            );
+        });
         it("should handle database errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SettingsRepository", "component");
