@@ -7,7 +7,7 @@
  * cases.
  */
 
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, test } from "vitest";
 
 import type { MonitorStatus, SiteForStatus, SiteStatus } from "../../types";
 
@@ -506,48 +506,23 @@ describe(getSiteStatusDescription, () => {
         expect(result).toBe("All 3 monitors are pending");
     });
 
-    it("should describe up status correctly", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const site = createTestSite([
-            { monitoring: true, status: "up" },
-            { monitoring: true, status: "up" },
-        ]);
-        const result = getSiteStatusDescription(site);
-        expect(result).toBe("All 2 monitors are up and running");
-    });
-
-    it("should handle unexpected status values using fallback", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: siteStatus", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Business Logic", "type");
-
-        // This tests the getSiteDisplayStatus function's ability to handle edge cases
-        // The function will calculate status based on monitor states
-        const site = createTestSite([{ monitoring: true, status: "up" }]);
-        const result = getSiteStatusDescription(site);
-        expect(result).toBe("All 1 monitors are up and running");
-    });
-
-    it("should describe single monitor up status", async ({
-        task,
-        annotate,
-    }) => {
+    test.for([
+        { monitorCount: 2, name: "should describe up status correctly" },
+        { monitorCount: 1, name: "should describe single monitor up status" },
+    ])("$name", async ({ monitorCount }, { task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Monitoring", "type");
 
-        const site = createTestSite([{ monitoring: true, status: "up" }]);
+        const site = createTestSite(
+            Array.from({ length: monitorCount }, () => ({
+                monitoring: true,
+                status: "up" as const,
+            }))
+        );
         const result = getSiteStatusDescription(site);
-        expect(result).toBe("All 1 monitors are up and running");
+        expect(result).toBe(`All ${monitorCount} monitors are up and running`);
     });
 
     it("should describe single monitor pending status", async ({

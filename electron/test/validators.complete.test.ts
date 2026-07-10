@@ -820,90 +820,28 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects restore fileName with path separators", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const payload = {
-                    buffer: new ArrayBuffer(64),
+            test.for([
+                {
                     fileName: "../restore.sqlite",
-                };
-
-                const result = DataHandlerValidators.restoreSqliteBackup([
-                    payload,
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects restore fileName with a Windows drive prefix", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const payload = {
-                    buffer: new ArrayBuffer(64),
+                    name: "rejects restore fileName with path separators",
+                },
+                {
                     fileName: "C:restore.sqlite",
-                };
-
-                const result = DataHandlerValidators.restoreSqliteBackup([
-                    payload,
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects restore fileName with control characters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const payload = {
-                    buffer: new ArrayBuffer(64),
+                    name: "rejects restore fileName with a Windows drive prefix",
+                },
+                {
                     fileName: "restore\n.sqlite",
-                };
-
-                const result = DataHandlerValidators.restoreSqliteBackup([
-                    payload,
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects restore fileName with leading/trailing whitespace", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const payload = {
-                    buffer: new ArrayBuffer(64),
+                    name: "rejects restore fileName with control characters",
+                },
+                {
                     fileName: " restore.sqlite",
-                };
-
-                const result = DataHandlerValidators.restoreSqliteBackup([
-                    payload,
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects overly long restore fileName", async ({
-                task,
-                annotate,
-            }) => {
+                    name: "rejects restore fileName with leading/trailing whitespace",
+                },
+                {
+                    fileName: `${"a".repeat(600)}.sqlite`,
+                    name: "rejects overly long restore fileName",
+                },
+            ])("$name", async ({ fileName }, { task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -911,7 +849,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
                 const payload = {
                     buffer: new ArrayBuffer(64),
-                    fileName: `${"a".repeat(600)}.sqlite`,
+                    fileName,
                 };
 
                 const result = DataHandlerValidators.restoreSqliteBackup([
@@ -1027,10 +965,24 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects relative baseDirectory paths", async ({
-                task,
-                annotate,
-            }) => {
+            test.for([
+                {
+                    baseDirectory: "Backups",
+                    name: "rejects relative baseDirectory paths",
+                },
+                {
+                    baseDirectory: "C:/Backups\n",
+                    name: "rejects control characters in baseDirectory",
+                },
+                {
+                    baseDirectory: String.raw`\\?\C:\Backups`,
+                    name: "rejects Windows device namespace baseDirectory paths",
+                },
+                {
+                    baseDirectory: " C:/Backups",
+                    name: "rejects leading/trailing whitespace in baseDirectory",
+                },
+            ])("$name", async ({ baseDirectory }, { task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
@@ -1038,55 +990,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
                 const result =
                     CloudHandlerValidators.configureFilesystemProvider([
-                        { baseDirectory: "Backups" },
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects control characters in baseDirectory", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    CloudHandlerValidators.configureFilesystemProvider([
-                        { baseDirectory: "C:/Backups\n" },
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects Windows device namespace baseDirectory paths", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    CloudHandlerValidators.configureFilesystemProvider([
-                        { baseDirectory: String.raw`\\?\C:\Backups` },
-                    ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects leading/trailing whitespace in baseDirectory", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result =
-                    CloudHandlerValidators.configureFilesystemProvider([
-                        { baseDirectory: " C:/Backups" },
+                        { baseDirectory },
                     ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
@@ -1132,42 +1036,26 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
-            it("rejects path traversal segments", async ({
-                task,
-                annotate,
-            }) => {
+            test.for([
+                {
+                    key: "backups/../evil.sqlite",
+                    name: "rejects path traversal segments",
+                },
+                {
+                    key: "backups/backup.metadata.json",
+                    name: "rejects metadata keys",
+                },
+                {
+                    key: "backups/C:/evil.sqlite",
+                    name: "rejects provider/URL-like keys",
+                },
+            ])("$name", async ({ key }, { task, annotate }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: validators.complete", "component");
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = CloudHandlerValidators.deleteBackup([
-                    "backups/../evil.sqlite",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects metadata keys", async ({ task, annotate }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = CloudHandlerValidators.deleteBackup([
-                    "backups/backup.metadata.json",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-
-            it("rejects provider/URL-like keys", async ({ task, annotate }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = CloudHandlerValidators.deleteBackup([
-                    "backups/C:/evil.sqlite",
-                ]);
+                const result = CloudHandlerValidators.deleteBackup([key]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
