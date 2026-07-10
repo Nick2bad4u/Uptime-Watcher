@@ -711,7 +711,7 @@ class Main {
             logger.error("[Main] App quit cleanup failed", ensureError(error));
         } finally {
             clearTimeout(timeoutId);
-            app.exit(0);
+            app.exit(this.fatalShutdownStarted ? 1 : 0);
         }
     }
 

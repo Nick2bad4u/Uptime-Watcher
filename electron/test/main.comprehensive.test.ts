@@ -662,6 +662,48 @@ describe("main.ts - Electron Main Process", () => {
 
             expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
         });
+        it("should preserve a fatal exit code when normal and fatal shutdown overlap", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            let resolveCleanup!: () => void;
+            mockApplicationService.cleanup.mockImplementationOnce(
+                () =>
+                    new Promise<void>((resolve) => {
+                        resolveCleanup = resolve;
+                    })
+            );
+            const processOnSpy = vi.spyOn(process, "on");
+
+            await import("../main");
+
+            const unhandledRejectionHandler = processOnSpy.mock.calls.find(
+                (call) => call[0] === "unhandledRejection"
+            )?.[1];
+            const willQuitHandler = getRegisteredAppHandler("will-quit");
+
+            expect(unhandledRejectionHandler).toBeDefined();
+            willQuitHandler(createElectronEvent());
+            if (unhandledRejectionHandler) {
+                Reflect.apply(unhandledRejectionHandler, process, [
+                    new Error("fatal during cleanup"),
+                    Promise.resolve(),
+                ]);
+            }
+            resolveCleanup();
+
+            await vi.waitFor(() => {
+                expect(mockApp.exit).toHaveBeenCalledWith(1);
+            });
+
+            expect(mockApp.exit).not.toHaveBeenCalledWith(0);
+            expect(mockApplicationService.cleanup).toHaveBeenCalledTimes(1);
+        });
         it("should handle cleanup errors gracefully", async ({
             task,
             annotate,
