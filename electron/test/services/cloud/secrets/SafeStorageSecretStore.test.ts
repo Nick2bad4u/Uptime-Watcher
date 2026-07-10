@@ -325,6 +325,43 @@ describe(FallbackSecretStore, () => {
         );
     });
 
+    it("preserves a successful primary write when fallback maintenance fails", async () => {
+        const warnSpy = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => undefined);
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        await fallback.setSecret(
+            "cloud.dropbox.tokens",
+            "stale-token-json"
+        );
+        fallback.shouldFailDelete = true;
+        fallback.shouldFailSet = true;
+
+        await expect(
+            store.setSecret("cloud.dropbox.tokens", "new-token-json")
+        ).resolves.toBeUndefined();
+
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "new-token-json"
+        );
+        expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
+            "stale-token-json"
+        );
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            "new-token-json"
+        );
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[FallbackSecretStore] Failed to refresh fallback secret after primary write",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "set failed",
+            }
+        );
+    });
+
     it("reads fallback after primary write failure leaves stale primary data", async () => {
         const warnSpy = vi
             .spyOn(logger, "warn")

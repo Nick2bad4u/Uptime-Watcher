@@ -113,20 +113,6 @@ export class FallbackSecretStore implements SecretStore {
     public async setSecret(key: string, value: string): Promise<void> {
         try {
             await this.primary.setSecret(key, value);
-            this.fallbackPreferredKeys.delete(key);
-            try {
-                await this.fallback.deleteSecret(key);
-            } catch (error) {
-                logger.warn(
-                    "[FallbackSecretStore] Failed to clear fallback secret after primary write; refreshing fallback copy",
-                    {
-                        key,
-                        message: getUserFacingErrorDetail(error),
-                    }
-                );
-                await this.fallback.setSecret(key, value);
-            }
-            return;
         } catch (error) {
             logger.warn(
                 "[FallbackSecretStore] Primary secret write failed; using fallback",
@@ -150,9 +136,37 @@ export class FallbackSecretStore implements SecretStore {
                 // Keep preferring fallback for this key; primary may still
                 // contain a stale readable value from an earlier write.
             }
+
+            await this.fallback.setSecret(key, value);
+            return;
         }
 
-        await this.fallback.setSecret(key, value);
+        this.fallbackPreferredKeys.delete(key);
+        try {
+            await this.fallback.deleteSecret(key);
+        } catch (error) {
+            logger.warn(
+                "[FallbackSecretStore] Failed to clear fallback secret after primary write; refreshing fallback copy",
+                {
+                    key,
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
+
+            try {
+                await this.fallback.setSecret(key, value);
+            } catch (refreshError) {
+                // The primary write is authoritative. A fallback maintenance
+                // failure must not delete or invalidate that durable value.
+                logger.warn(
+                    "[FallbackSecretStore] Failed to refresh fallback secret after primary write",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(refreshError),
+                    }
+                );
+            }
+        }
     }
 }
 
