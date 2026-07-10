@@ -90,6 +90,38 @@ describe("providerConnectionState", () => {
         ).resolves.toBe("existing-google-secret");
     });
 
+    it("restores the provider discriminator after its supporting settings", async () => {
+        const values = new Map<string, string>();
+        const setOrder: string[] = [];
+        const settings = {
+            get: async (key: string): Promise<string | undefined> =>
+                values.get(key),
+            set: async (key: string, value: string): Promise<void> => {
+                setOrder.push(key);
+                values.set(key, value);
+            },
+        };
+        const secretStore = new InMemorySecretStore();
+
+        await restoreProviderConnectionState({
+            ctx: { secretStore, settings },
+            restoreGoogleDriveAccountLabel: true,
+            snapshot: {
+                previousFilesystemBaseDirectory: "/tmp/original",
+                previousGoogleDriveAccountLabel: "existing-label",
+                previousProvider: "filesystem",
+                previousStoredTokens: undefined,
+            },
+            tokenStorageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+        });
+
+        expect(setOrder).toEqual([
+            SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+            SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+            SETTINGS_KEY_PROVIDER,
+        ]);
+    });
+
     it("attempts every settings rollback when token restoration fails", async () => {
         const settings = createInMemoryCloudSettingsAdapter({
             [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "",

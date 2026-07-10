@@ -100,14 +100,16 @@ export async function restoreProviderConnectionState(args: {
 
     await attempt(async () => {
         await args.ctx.settings.set(
-            SETTINGS_KEY_PROVIDER,
-            args.snapshot.previousProvider
-        );
-    });
-    await attempt(async () => {
-        await args.ctx.settings.set(
             SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
             args.snapshot.previousFilesystemBaseDirectory
+        );
+    });
+    // Restore the provider discriminator last so concurrent status reads cannot
+    // observe a provider whose supporting settings are only partly restored.
+    await attempt(async () => {
+        await args.ctx.settings.set(
+            SETTINGS_KEY_PROVIDER,
+            args.snapshot.previousProvider
         );
     });
 
