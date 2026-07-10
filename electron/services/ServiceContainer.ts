@@ -620,22 +620,38 @@ export class ServiceContainer {
      * @returns An object mapping service names to their initialization status.
      */
     public getInitializationStatus(): Record<string, boolean> {
+        const status: Record<string, boolean> = {};
+        for (const [serviceName, serviceInstance] of objectEntries(
+            this.getServiceMap()
+        )) {
+            status[serviceName] = isDefined(serviceInstance);
+        }
+
+        return status;
+    }
+
+    /** Returns the single registry used by service lifecycle diagnostics. */
+    private getServiceMap(): UnknownRecord {
         return {
-            AutoUpdaterService: isDefined(this.autoUpdaterService),
-            CloudService: isDefined(this.cloudService),
-            ConfigurationManager: isDefined(this.configurationManager),
-            DatabaseManager: isDefined(this.databaseManager),
-            DatabaseService: isDefined(this.databaseService),
-            HistoryRepository: isDefined(this.historyRepository),
-            IpcService: isDefined(this.ipcService),
-            MonitorManager: isDefined(this.monitorManager),
-            MonitorRepository: isDefined(this.monitorRepository),
-            NotificationService: isDefined(this.notificationService),
-            SettingsRepository: isDefined(this.settingsRepository),
-            SiteManager: isDefined(this.siteManager),
-            SiteRepository: isDefined(this.siteRepository),
-            UptimeOrchestrator: isDefined(this.uptimeOrchestrator),
-            WindowService: isDefined(this.windowService),
+            AutoUpdaterService: this.autoUpdaterService,
+            CloudService: this.cloudService,
+            CloudSyncScheduler: this.cloudSyncScheduler,
+            ConfigurationManager: this.configurationManager,
+            DatabaseManager: this.databaseManager,
+            DatabaseService: this.databaseService,
+            HistoryRepository: this.historyRepository,
+            IpcService: this.ipcService,
+            MonitorManager: this.monitorManager,
+            MonitorOperationRegistry: this.monitorOperationRegistry,
+            MonitorRepository: this.monitorRepository,
+            NotificationService: this.notificationService,
+            RendererEventBridge: this.rendererEventBridge,
+            SettingsRepository: this.settingsRepository,
+            SiteManager: this.siteManager,
+            SiteRepository: this.siteRepository,
+            SyncEngine: this.syncEngine,
+            UptimeOrchestrator: this.uptimeOrchestrator,
+            WindowService: this.windowService,
         };
     }
 
@@ -643,33 +659,15 @@ export class ServiceContainer {
      * Gets all initialized services for shutdown and debugging.
      *
      * @remarks
-     * Dynamically discovers all initialized services by inspecting private
-     * fields. Only includes services that are actually initialized (not
-     * undefined).
+     * Reads the shared lifecycle diagnostics registry and includes only
+     * services that have actually been initialized.
      *
      * @returns Array of objects containing service names and their instances.
      */
     public getInitializedServices(): ServiceInfo[] {
         const services: ServiceInfo[] = [];
-        const serviceMap: UnknownRecord = {
-            AutoUpdaterService: this.autoUpdaterService,
-            CloudService: this.cloudService,
-            ConfigurationManager: this.configurationManager,
-            DatabaseManager: this.databaseManager,
-            DatabaseService: this.databaseService,
-            HistoryRepository: this.historyRepository,
-            IpcService: this.ipcService,
-            MonitorManager: this.monitorManager,
-            MonitorRepository: this.monitorRepository,
-            NotificationService: this.notificationService,
-            SettingsRepository: this.settingsRepository,
-            SiteManager: this.siteManager,
-            SiteRepository: this.siteRepository,
-            UptimeOrchestrator: this.uptimeOrchestrator,
-            WindowService: this.windowService,
-        };
         for (const [serviceName, serviceInstance] of objectEntries(
-            serviceMap
+            this.getServiceMap()
         )) {
             if (isDefined(serviceInstance)) {
                 services.push({ name: serviceName, service: serviceInstance });

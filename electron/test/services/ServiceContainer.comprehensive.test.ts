@@ -838,17 +838,21 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(status).toEqual({
                 AutoUpdaterService: false,
                 CloudService: false,
+                CloudSyncScheduler: false,
                 ConfigurationManager: false,
                 DatabaseManager: false,
                 DatabaseService: false,
                 HistoryRepository: false,
                 IpcService: false,
                 MonitorManager: false,
+                MonitorOperationRegistry: false,
                 MonitorRepository: false,
                 NotificationService: false,
+                RendererEventBridge: false,
                 SettingsRepository: false,
                 SiteManager: false,
                 SiteRepository: false,
+                SyncEngine: false,
                 UptimeOrchestrator: false,
                 WindowService: false,
             });
@@ -924,23 +928,50 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Initialization", "type");
 
-            // Initialize all services
+            // Initialize every public service; MonitorManager also creates the
+            // internal MonitorOperationRegistry.
             container.getAutoUpdaterService();
+            container.getCloudService();
+            container.getCloudSyncScheduler();
             container.getConfigurationManager();
             container.getDatabaseManager();
             container.getDatabaseService();
             container.getHistoryRepository();
+            container.getIpcService();
+            container.getMonitorManager();
             container.getMonitorRepository();
-            container.getSettingsRepository();
-            container.getSiteRepository();
-            container.getSiteManager();
             container.getNotificationService();
+            container.getRendererEventBridge();
+            container.getSettingsRepository();
+            container.getSiteManager();
+            container.getSiteRepository();
+            container.getSyncEngine();
             container.getUptimeOrchestrator();
             container.getWindowService();
 
             const services = container.getInitializedServices();
 
-            expect(services).toHaveLength(13); // All services except IpcService and MonitorManager
+            expect(services.map(({ name }) => name)).toEqual([
+                "AutoUpdaterService",
+                "CloudService",
+                "CloudSyncScheduler",
+                "ConfigurationManager",
+                "DatabaseManager",
+                "DatabaseService",
+                "HistoryRepository",
+                "IpcService",
+                "MonitorManager",
+                "MonitorOperationRegistry",
+                "MonitorRepository",
+                "NotificationService",
+                "RendererEventBridge",
+                "SettingsRepository",
+                "SiteManager",
+                "SiteRepository",
+                "SyncEngine",
+                "UptimeOrchestrator",
+                "WindowService",
+            ]);
             expect(services.every((s) => s.name && s.service)).toBeTruthy();
         });
     });

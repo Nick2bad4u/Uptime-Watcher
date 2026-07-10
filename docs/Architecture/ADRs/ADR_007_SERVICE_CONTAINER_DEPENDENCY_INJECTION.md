@@ -604,13 +604,10 @@ public getMyNewService(): MyNewService {
     return this.myNewService;
 }
 
-// 3. Add to getInitializationStatus()
-MyNewService: this.myNewService !== undefined,
-
-// 4. Add to getInitializedServices() serviceMap
+// 3. Add to the shared diagnostics registry
 MyNewService: this.myNewService,
 
-// 5. If service has initialize(), add to initialize() sequence
+// 4. If service has initialize(), add to initialize() sequence
 await this.tryInitializeService(this.getMyNewService(), "MyNewService");
 ```
 
@@ -712,6 +709,8 @@ All Electron main process services are managed through `ServiceContainer`:
 - ✅ `IpcService` - Renderer communication
 - ✅ `NotificationService`, `WindowService`, `AutoUpdaterService` - Feature services
 - ✅ `RendererEventBridge` - Event forwarding
+- ✅ `CloudService`, `CloudSyncScheduler`, `SyncEngine` - Cloud synchronization
+- ✅ `MonitorOperationRegistry` - Monitoring operation coordination
 
 ### Current Implementation Audit (2026-02-11)
 
