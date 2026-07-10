@@ -15,6 +15,8 @@ import {
     type MonitoringStopSummary,
     type Site,
 } from "@shared/types";
+import type { IpcResponse } from "@shared/types/ipc";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ipcMain } from "electron";
 import { createHash } from "node:crypto";
@@ -215,25 +217,25 @@ describe("IpcService - Comprehensive Coverage", () => {
         mockIpcEvent = {
             frameId: 1,
             processId: 1,
-            sender: {} as any,
+            sender: {} as unknown as IpcMainInvokeEvent["sender"],
             senderFrame: {
                 isDestroyed: () => false,
                 url: "http://localhost:5173",
-            } as any,
+            } as unknown as IpcMainInvokeEvent["senderFrame"],
         } as IpcMainInvokeEvent;
 
         mockMainEvent = {
             frameId: 1,
             processId: 1,
-            sender: {} as any,
+            sender: {} as unknown as IpcMainEvent["sender"],
             senderFrame: {
                 isDestroyed: () => false,
                 url: "http://localhost:5173",
-            } as any,
+            } as unknown as IpcMainEvent["senderFrame"],
             ports: [],
             reply: vi.fn(),
             returnValue: undefined,
-            type: "unknown" as any,
+            type: "frame",
             preventDefault: vi.fn(),
             defaultPrevented: false,
         };
@@ -542,7 +544,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent);
+            const result = (await handler(
+                mockIpcEvent
+            )) as unknown as IpcResponse<MonitorTypeConfig[]>;
 
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             expect(result).toEqual({
@@ -643,7 +647,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent);
+            const result = (await handler(
+                mockIpcEvent
+            )) as unknown as IpcResponse<MonitorTypeConfig[]>;
 
             expect(mockUptimeOrchestrator.startMonitoring).toHaveBeenCalled();
             expect(result).toEqual({
@@ -870,35 +876,40 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent);
+            const result = (await handler(
+                mockIpcEvent
+            )) as unknown as IpcResponse<MonitorTypeConfig[]>;
 
             expect(result.success).toBeTruthy();
             expect(Array.isArray(result.data)).toBeTruthy();
             expect(result.data).toHaveLength(BASE_MONITOR_TYPES.length);
 
             // Ensure representative monitor configurations exist
-            const monitorTypes = result.data.map((config: any) => config.type);
+            const monitorTypes = result.data?.map((config) => config.type);
             expect(monitorTypes).toEqual(
                 expect.arrayContaining([...BASE_MONITOR_TYPES])
             );
 
             // Check serialized config structure
-            const httpConfig = result.data.find(
-                (config: any) => config.type === "http"
+            const httpConfig = result.data?.find(
+                (config) => config.type === "http"
             );
             expect(httpConfig).toBeDefined();
+            if (!httpConfig) {
+                throw new TypeError("Expected the HTTP monitor configuration");
+            }
             expect(httpConfig.displayName).toBe("HTTP (Website/API)");
             expect(httpConfig.description).toBe(
                 "Monitors HTTP/HTTPS endpoints for availability and response time"
             );
             expect(httpConfig.version).toBe("1.0.0");
             expect(httpConfig.uiConfig).toBeDefined();
-            expect(httpConfig.uiConfig.supportsAdvancedAnalytics).toBeTruthy();
-            expect(httpConfig.uiConfig.supportsResponseTime).toBeTruthy();
+            expect(httpConfig.uiConfig?.supportsAdvancedAnalytics).toBeTruthy();
+            expect(httpConfig.uiConfig?.supportsResponseTime).toBeTruthy();
 
             // Check that non-serializable properties are excluded
-            expect(httpConfig.serviceFactory).toBeUndefined();
-            expect(httpConfig.validationSchema).toBeUndefined();
+            expect(httpConfig).not.toHaveProperty("serviceFactory");
+            expect(httpConfig).not.toHaveProperty("validationSchema");
         });
 
         it("should handle format-monitor-detail with known monitor type", async ({
@@ -1461,11 +1472,16 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent);
+            const result = (await handler(
+                mockIpcEvent
+            )) as unknown as IpcResponse<MonitorTypeConfig[]>;
 
-            const httpConfig = result.data.find(
-                (config: any) => config.type === "http"
+            const httpConfig = result.data?.find(
+                (config) => config.type === "http"
             );
+            if (!httpConfig) {
+                throw new TypeError("Expected the HTTP monitor configuration");
+            }
 
             expect(httpConfig.uiConfig).toEqual({
                 supportsAdvancedAnalytics: true,
@@ -1493,11 +1509,16 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent);
+            const result = (await handler(
+                mockIpcEvent
+            )) as unknown as IpcResponse<MonitorTypeConfig[]>;
 
-            const pingConfig = result.data.find(
-                (config: any) => config.type === "ping"
+            const pingConfig = result.data?.find(
+                (config) => config.type === "ping"
             );
+            if (!pingConfig) {
+                throw new TypeError("Expected the ping monitor configuration");
+            }
 
             expect(pingConfig.uiConfig).toEqual({
                 supportsAdvancedAnalytics: true,

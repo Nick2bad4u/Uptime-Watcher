@@ -12,6 +12,11 @@ import type {
     MonitoringStopSummary,
     Site,
 } from "@shared/types";
+import type { StateSyncEventData } from "@shared/types/events";
+import {
+    isMonitorTypeConfig,
+    type MonitorTypeConfig,
+} from "@shared/types/monitorTypes";
 
 import { ipcMain, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
 import { createHash } from "node:crypto";
@@ -35,6 +40,19 @@ const mockBackupMetadata = {
     schemaVersion: 1,
     sizeBytes: mockBackupBuffer.byteLength,
 };
+
+type StateSyncListener = (data: StateSyncEventData) => void;
+
+function getMonitorTypeConfigs(value: unknown): readonly MonitorTypeConfig[] {
+    if (
+        !Array.isArray(value) ||
+        value.some((config: unknown) => !isMonitorTypeConfig(config))
+    ) {
+        throw new TypeError("Expected serialized monitor type configurations");
+    }
+
+    return value;
+}
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -197,34 +215,37 @@ describe("IpcService - Comprehensive Coverage", () => {
     let stopSummary: MonitoringStopSummary;
     let stateSyncRevision = 0;
 
-    let stateSyncListener: ((data: any) => void) | undefined;
+    let stateSyncListener: StateSyncListener | undefined;
 
     beforeEach(() => {
         vi.clearAllMocks();
 
         // Create mock IPC events
         mockIpcEvent = {
+            defaultPrevented: false,
             frameId: 1,
+            preventDefault: vi.fn(),
             processId: 1,
-            sender: {} as any,
+            sender: {} as unknown as IpcMainInvokeEvent["sender"],
             senderFrame: {
                 isDestroyed: () => false,
                 url: "http://localhost:5173",
-            } as any,
-        } as IpcMainInvokeEvent;
+            } as unknown as IpcMainInvokeEvent["senderFrame"],
+            type: "frame",
+        };
 
         mockMainEvent = {
             frameId: 1,
             processId: 1,
-            sender: {} as any,
+            sender: {} as unknown as IpcMainEvent["sender"],
             senderFrame: {
                 isDestroyed: () => false,
                 url: "http://localhost:5173",
-            } as any,
+            } as unknown as IpcMainEvent["senderFrame"],
             ports: [],
             reply: vi.fn(),
             returnValue: undefined,
-            type: "unknown" as any,
+            type: "frame",
             preventDefault: vi.fn(),
             defaultPrevented: false,
         };
@@ -256,7 +277,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
         stateSyncRevision = 0;
         const offMock = vi.fn(
-            (eventName: string, handler: (data: any) => void) => {
+            (eventName: string, handler: StateSyncListener) => {
                 if (
                     eventName === "sites:state-synchronized" &&
                     handler === stateSyncListener
@@ -306,14 +327,12 @@ describe("IpcService - Comprehensive Coverage", () => {
                     };
                 }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
-            onTyped: vi.fn(
-                (eventName: string, handler: (data: any) => void) => {
-                    if (eventName === "sites:state-synchronized") {
-                        stateSyncListener = handler;
-                    }
-                    return undefined;
+            onTyped: vi.fn((eventName: string, handler: StateSyncListener) => {
+                if (eventName === "sites:state-synchronized") {
+                    stateSyncListener = handler;
                 }
-            ),
+                return undefined;
+            }),
             off: offMock,
             offTyped: offMock,
         } as unknown as UptimeOrchestrator;
@@ -882,26 +901,29 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
+            const monitorTypeConfigs = getMonitorTypeConfigs(result.data);
 
             expect(result.success).toBeTruthy();
-            expect(Array.isArray(result.data)).toBeTruthy();
-            expect(result.data).toHaveLength(2);
+            expect(Array.isArray(monitorTypeConfigs)).toBeTruthy();
+            expect(monitorTypeConfigs).toHaveLength(2);
 
             // Check serialized config structure
-            const httpConfig = result.data.find(
-                (config: any) => config.type === "http"
+            const httpConfig = monitorTypeConfigs.find(
+                (config) => config.type === "http"
             );
             expect(httpConfig).toBeDefined();
-            expect(httpConfig.displayName).toBe("HTTP Monitor");
-            expect(httpConfig.description).toBe("HTTP endpoint monitoring");
-            expect(httpConfig.version).toBe("1.0.0");
-            expect(httpConfig.uiConfig).toBeDefined();
-            expect(httpConfig.uiConfig.supportsAdvancedAnalytics).toBeTruthy();
-            expect(httpConfig.uiConfig.supportsResponseTime).toBeTruthy();
+            expect(httpConfig?.displayName).toBe("HTTP Monitor");
+            expect(httpConfig?.description).toBe("HTTP endpoint monitoring");
+            expect(httpConfig?.version).toBe("1.0.0");
+            expect(httpConfig?.uiConfig).toBeDefined();
+            expect(
+                httpConfig?.uiConfig?.supportsAdvancedAnalytics
+            ).toBeTruthy();
+            expect(httpConfig?.uiConfig?.supportsResponseTime).toBeTruthy();
 
             // Check that non-serializable properties are excluded
-            expect(httpConfig.serviceFactory).toBeUndefined();
-            expect(httpConfig.validationSchema).toBeUndefined();
+            expect(httpConfig).not.toHaveProperty("serviceFactory");
+            expect(httpConfig).not.toHaveProperty("validationSchema");
         });
 
         it("should handle format-monitor-detail with known monitor type", async ({
@@ -1568,12 +1590,13 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
+            const monitorTypeConfigs = getMonitorTypeConfigs(result.data);
 
-            const httpConfig = result.data.find(
-                (config: any) => config.type === "http"
+            const httpConfig = monitorTypeConfigs.find(
+                (config) => config.type === "http"
             );
 
-            expect(httpConfig.uiConfig).toEqual({
+            expect(httpConfig?.uiConfig).toEqual({
                 supportsAdvancedAnalytics: true,
                 supportsResponseTime: true,
                 detailFormats: { analyticsLabel: "HTTP Analytics" },
@@ -1599,12 +1622,13 @@ describe("IpcService - Comprehensive Coverage", () => {
                 .mock.calls.find((call) => call[0] === "get-monitor-types");
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
+            const monitorTypeConfigs = getMonitorTypeConfigs(result.data);
 
-            const pingConfig = result.data.find(
-                (config: any) => config.type === "ping"
+            const pingConfig = monitorTypeConfigs.find(
+                (config) => config.type === "ping"
             );
 
-            expect(pingConfig.uiConfig).toEqual({
+            expect(pingConfig?.uiConfig).toEqual({
                 supportsAdvancedAnalytics: false,
                 supportsResponseTime: true,
             });
