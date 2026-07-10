@@ -36,10 +36,12 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.constant({}),
                         fc.constant([])
                     ),
-                    (type: any) => {
+                    (type) => {
                         // Property: type validation should never throw
                         expect(() => {
-                            const isValidMonitorType = (t: any): boolean => {
+                            const isValidMonitorType = (
+                                t: unknown
+                            ): boolean => {
                                 if (typeof t !== "string") return false;
                                 return [
                                     "dns",
@@ -84,21 +86,33 @@ describe("Backend Validation Fuzzing Tests", () => {
                             fc.constant(undefined)
                         ),
                     }),
-                    (monitorData: any) => {
+                    (monitorData) => {
                         // Property: validation should never throw
                         expect(() => {
-                            const hasRequiredFields = (data: any): boolean =>
-                                data &&
-                                typeof data === "object" &&
-                                typeof data.id === "string" &&
-                                data.id.length > 0 &&
-                                typeof data.type === "string" &&
-                                [
-                                    "dns",
-                                    "http",
-                                    "ping",
-                                    "tcp",
-                                ].includes(data.type.toLowerCase());
+                            const hasRequiredFields = (
+                                data: unknown
+                            ): boolean => {
+                                if (
+                                    typeof data !== "object" ||
+                                    data === null ||
+                                    !("id" in data) ||
+                                    !("type" in data)
+                                ) {
+                                    return false;
+                                }
+
+                                return (
+                                    typeof data.id === "string" &&
+                                    data.id.length > 0 &&
+                                    typeof data.type === "string" &&
+                                    [
+                                        "dns",
+                                        "http",
+                                        "ping",
+                                        "tcp",
+                                    ].includes(data.type.toLowerCase())
+                                );
+                            };
 
                             const isResult = hasRequiredFields(monitorData);
                             expect(typeof isResult).toBe("boolean");
@@ -127,11 +141,11 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.constant(null),
                         fc.constant(undefined)
                     ),
-                    (url: any) => {
+                    (url) => {
                         // Property: URL sanitization should never throw
                         expect(() => {
                             const sanitizeUrl = (
-                                inputUrl: any
+                                inputUrl: unknown
                             ): null | string => {
                                 if (
                                     typeof inputUrl !== "string" ||
@@ -200,11 +214,11 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.constant(null),
                         fc.constant(undefined)
                     ),
-                    (host: any) => {
+                    (host) => {
                         // Property: host sanitization should never throw
                         expect(() => {
                             const sanitizeHost = (
-                                inputHost: any
+                                inputHost: unknown
                             ): null | string => {
                                 if (
                                     typeof inputHost !== "string" ||
@@ -282,10 +296,10 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.constant(""),
                         fc.constant("abc")
                     ),
-                    (value: any) => {
+                    (value) => {
                         // Test port validation
                         expect(() => {
-                            const isValidPort = (port: any): boolean => {
+                            const isValidPort = (port: unknown): boolean => {
                                 if (typeof port !== "number") return false;
                                 return (
                                     Number.isInteger(port) &&
@@ -300,7 +314,9 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                         // Test timeout validation
                         expect(() => {
-                            const isValidTimeout = (timeout: any): boolean => {
+                            const isValidTimeout = (
+                                timeout: unknown
+                            ): boolean => {
                                 if (typeof timeout !== "number") return false;
                                 return (
                                     Number.isFinite(timeout) &&
