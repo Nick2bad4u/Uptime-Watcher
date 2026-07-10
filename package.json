@@ -1051,7 +1051,7 @@
     "bundleDependencies": [
         "node-sqlite3-wasm"
     ],
-    "packageManager": "npm@11.13.0",
+    "packageManager": "npm@11.16.0",
     "engines": {
         "node": ">=24.8.0"
     },
