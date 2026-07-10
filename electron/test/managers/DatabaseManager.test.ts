@@ -5,12 +5,9 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
 
-import {
-    DEFAULT_HISTORY_LIMIT_RULES,
-    normalizeHistoryLimit,
-} from "@shared/constants/history";
-import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
+import { normalizeHistoryLimit } from "@shared/constants/history";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes.js";
@@ -21,10 +18,120 @@ import type { HistoryRepository } from "../../services/database/HistoryRepositor
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { setHistoryLimit as setHistoryLimitContract } from "../../services/database/historyLimitManager";
+import type {
+    DatabaseBackupMetadata,
+    DatabaseBackupResult,
+} from "../../services/database/utils/backup/databaseBackup";
+import type {
+    DatabaseCommandServiceFactory,
+    DatabaseServiceFactoryDependencies,
+    IDataBackupService,
+    IDataImportExportService,
+    ISiteRepositoryService,
+} from "../../services/factories/DatabaseServiceFactory";
 
+import { ConfigurationManager } from "../../managers/ConfigurationManager";
 import { DatabaseManager } from "../../managers/DatabaseManager";
 
-// Mock all dependencies
+type SetHistoryLimitArguments = Parameters<typeof setHistoryLimitContract>[0];
+
+interface BackupResultFixtureOptions {
+    buffer?: Buffer;
+    fileName?: string;
+    metadata?: Partial<DatabaseBackupMetadata>;
+}
+
+interface DatabaseManagerPrivateTestView {
+    loadSites: () => Promise<void>;
+}
+
+const createBackupResultFixture = (
+    options: BackupResultFixtureOptions = {}
+): DatabaseBackupResult => {
+    const buffer = options.buffer ?? Buffer.from("backup data");
+
+    return {
+        buffer,
+        fileName: options.fileName ?? "backup-test.db",
+        metadata: {
+            appVersion: "1.0.0-test",
+            checksum: "mock-checksum",
+            createdAt: 1_700_000_000_000,
+            originalPath: "/tmp/uptime-watcher.db",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: buffer.byteLength,
+            ...options.metadata,
+        },
+    };
+};
+
+const createBackupServiceFixture = (
+    overrides: Partial<IDataBackupService> = {}
+) =>
+    ({
+        applyDatabaseBackupResult:
+            vi.fn<IDataBackupService["applyDatabaseBackupResult"]>(),
+        downloadDatabaseBackup: vi
+            .fn<IDataBackupService["downloadDatabaseBackup"]>()
+            .mockResolvedValue(createBackupResultFixture()),
+        restoreDatabaseBackup:
+            vi.fn<IDataBackupService["restoreDatabaseBackup"]>(),
+        saveDatabaseBackupToPath:
+            vi.fn<IDataBackupService["saveDatabaseBackupToPath"]>(),
+        ...overrides,
+    }) satisfies IDataBackupService;
+
+const createImportExportServiceFixture = (
+    overrides: Partial<IDataImportExportService> = {}
+) =>
+    ({
+        exportAllData: vi
+            .fn<IDataImportExportService["exportAllData"]>()
+            .mockResolvedValue('{"sites": [], "settings": []}'),
+        importDataFromJson: vi
+            .fn<IDataImportExportService["importDataFromJson"]>()
+            .mockResolvedValue({ settings: {}, sites: [] }),
+        persistImportedData:
+            vi.fn<IDataImportExportService["persistImportedData"]>(),
+        ...overrides,
+    }) satisfies IDataImportExportService;
+
+const isDatabaseCommandServiceFactory = (
+    value: unknown
+): value is DatabaseCommandServiceFactory =>
+    typeof value === "object" &&
+    value !== null &&
+    typeof Reflect.get(value, "createBackupService") === "function" &&
+    typeof Reflect.get(value, "createImportExportService") === "function" &&
+    typeof Reflect.get(value, "createSiteRepositoryService") === "function";
+
+const getServiceFactory = (
+    databaseManager: DatabaseManager
+): DatabaseCommandServiceFactory => {
+    const serviceFactory: unknown = Reflect.get(
+        databaseManager,
+        "serviceFactory"
+    );
+    if (!isDatabaseCommandServiceFactory(serviceFactory)) {
+        throw new TypeError("DatabaseManager service factory is unavailable");
+    }
+
+    return serviceFactory;
+};
+
+const getPrivateTestView = (
+    databaseManager: DatabaseManager
+): DatabaseManagerPrivateTestView => {
+    const loadSites: unknown = Reflect.get(databaseManager, "loadSites");
+    if (typeof loadSites !== "function") {
+        throw new TypeError("DatabaseManager loadSites method is unavailable");
+    }
+
+    return databaseManager as unknown as DatabaseManagerPrivateTestView;
+};
+
 const mockEventEmitter = {
     emitTyped: vi.fn().mockResolvedValue(undefined),
     on: vi.fn(),
@@ -32,39 +139,53 @@ const mockEventEmitter = {
     removeAllListeners: vi.fn(),
 } as unknown as TypedEventBus<UptimeEvents>;
 
-const mockDatabaseService = {
-    initialize: vi.fn(() => Promise.resolve()),
+const sqliteDatabaseFixture = {} as unknown as Database;
+const databaseServiceAdapter = {
     close: vi.fn(),
-    getDatabase: vi.fn(),
-} as unknown as DatabaseService;
+    executeTransaction: async <T>(
+        operation: (database: Database) => Promise<T> | T
+    ): Promise<T> => operation(sqliteDatabaseFixture),
+    getDatabase: vi.fn(() => sqliteDatabaseFixture),
+    initialize: vi.fn(() => sqliteDatabaseFixture),
+} satisfies Pick<
+    DatabaseService,
+    | "close"
+    | "executeTransaction"
+    | "getDatabase"
+    | "initialize"
+>;
+const mockDatabaseService =
+    databaseServiceAdapter as unknown as DatabaseService;
 
-const mockHistoryRepository = {
-    findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
+const historyRepositoryAdapter = {
     deleteAll: vi.fn(() => Promise.resolve()),
-    deleteAllHistory: vi.fn(() => Promise.resolve()),
-} as unknown as HistoryRepository;
+} satisfies Pick<HistoryRepository, "deleteAll">;
+const mockHistoryRepository =
+    historyRepositoryAdapter as unknown as HistoryRepository;
 
-const mockMonitorRepository = {
+const monitorRepositoryAdapter = {
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
-    findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
-    getAllMonitorIds: vi.fn(() => Promise.resolve([])),
-} as unknown as MonitorRepository;
+} satisfies Pick<MonitorRepository, "findBySiteIdentifier">;
+const mockMonitorRepository =
+    monitorRepositoryAdapter as unknown as MonitorRepository;
 
-const mockSettingsRepository = {
-    findByKey: vi.fn(() => Promise.resolve(undefined)),
+const settingsRepositoryAdapter = {
     get: vi.fn(() => Promise.resolve(undefined)),
-    upsert: vi.fn(() => Promise.resolve()),
-    exportAllRows: vi.fn(() => Promise.resolve([])),
-} as unknown as SettingsRepository;
+} satisfies Pick<SettingsRepository, "get">;
+const mockSettingsRepository =
+    settingsRepositoryAdapter as unknown as SettingsRepository;
 
-const mockSiteRepository = {
+const siteRepositoryAdapter = {
     findAll: vi.fn(() => Promise.resolve([])),
-    findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
-    upsert: vi.fn(() => Promise.resolve()),
     deleteAll: vi.fn(() => Promise.resolve()),
     bulkInsert: vi.fn(() => Promise.resolve()),
-    exportAllRows: vi.fn(() => Promise.resolve([])),
-} as unknown as SiteRepository;
+} satisfies Pick<
+    SiteRepository,
+    | "bulkInsert"
+    | "deleteAll"
+    | "findAll"
+>;
+const mockSiteRepository = siteRepositoryAdapter as unknown as SiteRepository;
 
 // Mock external modules
 vi.mock("../../services/database/DataBackupService", () => ({
@@ -77,8 +198,8 @@ vi.mock("../../services/database/DataImportExportService", () => ({
 
 // Create mock instances that will be returned by constructors
 const mockSiteRepositoryService = {
-    loadSites: vi.fn(() => Promise.resolve([])),
-};
+    getSitesFromDatabase: vi.fn(() => Promise.resolve([])),
+} satisfies ISiteRepositoryService;
 
 const mockSiteLoadingOrchestrator = {
     loadSites: vi.fn(() => Promise.resolve()),
@@ -99,16 +220,9 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
 }));
 
 vi.mock("../../services/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn(async (args: any) => {
-        if (args && typeof args.setHistoryLimit === "function") {
-            const normalizedLimit = normalizeHistoryLimit(
-                args.limit,
-                args.rules ?? DEFAULT_HISTORY_LIMIT_RULES
-            );
-            await args.setHistoryLimit(normalizedLimit);
-        }
-
-        return undefined;
+    setHistoryLimit: vi.fn(async (args: SetHistoryLimitArguments) => {
+        const normalizedLimit = normalizeHistoryLimit(args.limit, args.rules);
+        await args.setHistoryLimit(normalizedLimit);
     }),
     getHistoryLimit: vi.fn(() => 500),
 }));
@@ -164,42 +278,18 @@ vi.mock("../../services/database/serviceFactory", () => ({
 // Mock DatabaseServiceFactory completely to return all needed services
 vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
     DatabaseServiceFactory: class {
-        public config: unknown;
-        public constructor(config: unknown) {
+        public config: DatabaseServiceFactoryDependencies;
+        public constructor(config: DatabaseServiceFactoryDependencies) {
             this.config = config;
         }
-        public createSiteRepositoryService() {
-            return {
-                getSitesFromDatabase: vi.fn().mockResolvedValue([]),
-                loadSitesIntoCache: vi.fn().mockResolvedValue(undefined),
-                applyHistoryLimitSetting: vi.fn().mockResolvedValue(undefined),
-            };
+        public createSiteRepositoryService(): ISiteRepositoryService {
+            return mockSiteRepositoryService;
         }
-        public createBackupService() {
-            return {
-                downloadDatabaseBackup: vi.fn().mockResolvedValue({
-                    buffer: Buffer.from("backup data"),
-                    fileName: "backup-test.db",
-                    metadata: {
-                        checksum: "mock-checksum",
-                        createdAt: 1_700_000_000_000,
-                        originalPath: "/tmp/uptime-watcher.db",
-                        schemaVersion: 1,
-                        sizeBytes: Buffer.from("backup data").byteLength,
-                    },
-                }),
-            };
+        public createBackupService(): IDataBackupService {
+            return createBackupServiceFixture();
         }
-        public createImportExportService() {
-            return {
-                exportAllData: vi
-                    .fn()
-                    .mockResolvedValue('{"sites": [], "settings": []}'),
-                importDataFromJson: vi
-                    .fn()
-                    .mockResolvedValue({ sites: [], settings: [] }),
-                persistImportedData: vi.fn().mockResolvedValue(undefined),
-            };
+        public createImportExportService(): IDataImportExportService {
+            return createImportExportServiceFixture();
         }
     },
 }));
@@ -220,13 +310,7 @@ describe(DatabaseManager, () => {
         );
 
         dependencies = {
-            configurationManager: {
-                getHistoryRetentionRules: vi.fn().mockReturnValue({
-                    defaultLimit: 500,
-                    maxLimit: Number.MAX_SAFE_INTEGER,
-                    minLimit: 25,
-                }),
-            } as any,
+            configurationManager: new ConfigurationManager(),
             eventEmitter: mockEventEmitter,
             repositories: {
                 database: mockDatabaseService,
@@ -287,48 +371,20 @@ describe(DatabaseManager, () => {
             await annotate("Type: Backup Operation", "type");
             await annotate("Operation: Download", "operation");
 
-            // Mock the LoggerAdapter
-            const mockLoggerAdapter = {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            };
-
-            // Mock the DataBackupService instance
             const mockBackupBuffer = Buffer.from("backup data");
-            const mockBackupMetadata = {
-                checksum: "mock-checksum",
-                createdAt: 1_700_000_400_000,
-                originalPath: "/tmp/uptime-watcher.db",
-                schemaVersion: 1,
-                sizeBytes: mockBackupBuffer.byteLength,
-            };
-            const mockDataBackupService = {
+            const mockBackupResult = createBackupResultFixture({
+                buffer: mockBackupBuffer,
+                metadata: { createdAt: 1_700_000_400_000 },
+            });
+            const mockDataBackupService = createBackupServiceFixture({
                 downloadDatabaseBackup: vi.fn(() =>
-                    Promise.resolve({
-                        buffer: mockBackupBuffer,
-                        fileName: "backup-test.db",
-                        metadata: { ...mockBackupMetadata },
-                    })
+                    Promise.resolve(mockBackupResult)
                 ),
-            };
-
-            // Get references to the mocked modules
-            const { LoggerAdapter } =
-                await import("../../services/database/serviceFactory");
-            const { DataBackupService } =
-                await import("../../services/database/DataBackupService");
-
-            // Setup mocks to return our mock instances
-            mockConstructableReturnValue(
-                vi.mocked(LoggerAdapter) as any,
-                mockLoggerAdapter as any
-            );
-            mockConstructableReturnValue(
-                vi.mocked(DataBackupService) as any,
-                mockDataBackupService as any
-            );
+            });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createBackupService"
+            ).mockReturnValue(mockDataBackupService);
 
             const result = await databaseManager.downloadBackup();
 
@@ -336,7 +392,7 @@ describe(DatabaseManager, () => {
                 buffer: expect.any(Buffer),
                 fileName: "backup-test.db",
                 metadata: expect.objectContaining({
-                    ...mockBackupMetadata,
+                    ...mockBackupResult.metadata,
                     createdAt: expect.any(Number),
                 }),
             });
@@ -352,15 +408,15 @@ describe(DatabaseManager, () => {
 
         it("should handle backup download errors", async () => {
             // Create a mock backup service that throws an error
-            const mockDataBackupService = {
+            const mockDataBackupService = createBackupServiceFixture({
                 downloadDatabaseBackup: vi.fn(() =>
                     Promise.reject(new Error("Backup failed"))
                 ),
-            };
+            });
 
             // Spy on the service factory's createBackupService method
             vi.spyOn(
-                (databaseManager as any).serviceFactory,
+                getServiceFactory(databaseManager),
                 "createBackupService"
             ).mockReturnValue(mockDataBackupService);
 
@@ -372,36 +428,16 @@ describe(DatabaseManager, () => {
 
     describe("Data Export Operations", () => {
         it("should export data successfully", async () => {
-            // Mock the LoggerAdapter
-            const mockLoggerAdapter = {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            };
-
-            // Mock the DataImportExportService instance
-            const mockDataImportExportService = {
-                exportAllData: vi.fn(() =>
-                    Promise.resolve('{"sites": [], "settings": []}')
-                ),
-            };
-
-            // Get references to the mocked modules
-            const { LoggerAdapter } =
-                await import("../../services/database/serviceFactory");
-            const { DataImportExportService } =
-                await import("../../services/database/DataImportExportService");
-
-            // Setup mocks to return our mock instances
-            mockConstructableReturnValue(
-                vi.mocked(LoggerAdapter) as any,
-                mockLoggerAdapter as any
-            );
-            mockConstructableReturnValue(
-                vi.mocked(DataImportExportService) as any,
-                mockDataImportExportService as any
-            );
+            const mockDataImportExportService =
+                createImportExportServiceFixture({
+                    exportAllData: vi.fn(() =>
+                        Promise.resolve('{"sites": [], "settings": []}')
+                    ),
+                });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createImportExportService"
+            ).mockReturnValue(mockDataImportExportService);
 
             const result = await databaseManager.exportData();
 
@@ -417,15 +453,16 @@ describe(DatabaseManager, () => {
 
         it("should handle export errors", async () => {
             // Create a mock import/export service that throws an error
-            const mockDataImportExportService = {
-                exportAllData: vi.fn(() =>
-                    Promise.reject(new Error("Export failed"))
-                ),
-            };
+            const mockDataImportExportService =
+                createImportExportServiceFixture({
+                    exportAllData: vi.fn(() =>
+                        Promise.reject(new Error("Export failed"))
+                    ),
+                });
 
             // Spy on the service factory's createImportExportService method
             vi.spyOn(
-                (databaseManager as any).serviceFactory,
+                getServiceFactory(databaseManager),
                 "createImportExportService"
             ).mockReturnValue(mockDataImportExportService);
 
@@ -437,110 +474,70 @@ describe(DatabaseManager, () => {
 
     describe("Data Import Operations", () => {
         it("should handle import errors", async () => {
-            // Mock the LoggerAdapter
-            const mockLoggerAdapter = {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            };
+            const mockDataImportExportService =
+                createImportExportServiceFixture({
+                    importDataFromJson: vi.fn(() =>
+                        Promise.reject(new Error("Import failed"))
+                    ),
+                });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createImportExportService"
+            ).mockReturnValue(mockDataImportExportService);
 
-            // Mock the DataImportExportService instance with error
-            const mockDataImportExportService = {
-                importDataFromJson: vi.fn(() =>
-                    Promise.reject(new Error("Import failed"))
-                ),
-                persistImportedData: vi.fn(() => Promise.resolve()),
-            };
-
-            // Mock the loadSites method to prevent it from affecting the test
-            const originalLoadSites = (databaseManager as any).loadSites;
-            (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
-
-            // Get references to the mocked modules
-            const { LoggerAdapter } =
-                await import("../../services/database/serviceFactory");
-            const { DataImportExportService } =
-                await import("../../services/database/DataImportExportService");
-
-            // Setup mocks to return our mock instances
-            mockConstructableReturnValue(
-                vi.mocked(LoggerAdapter) as any,
-                mockLoggerAdapter as any
-            );
-            mockConstructableReturnValue(
-                vi.mocked(DataImportExportService) as any,
-                mockDataImportExportService as any
-            );
+            const loadSitesSpy = vi
+                .spyOn(getPrivateTestView(databaseManager), "loadSites")
+                .mockResolvedValue(undefined);
 
             const testData = '{"invalid": "data"}';
-            const isResult = await databaseManager.importData(testData);
+            try {
+                const isResult = await databaseManager.importData(testData);
 
-            expect(isResult).toBeFalsy();
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:data-imported",
-                {
-                    operation: "data-imported",
-                    success: false,
-                    timestamp: expect.any(Number),
-                }
-            );
-
-            // Restore the original method
-            (databaseManager as any).loadSites = originalLoadSites;
+                expect(isResult).toBeFalsy();
+                expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                    "internal:database:data-imported",
+                    {
+                        operation: "data-imported",
+                        success: false,
+                        timestamp: expect.any(Number),
+                    }
+                );
+            } finally {
+                loadSitesSpy.mockRestore();
+            }
         });
 
         it("should return false for failed imports", async () => {
-            // Mock the LoggerAdapter
-            const mockLoggerAdapter = {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            };
+            const mockDataImportExportService =
+                createImportExportServiceFixture({
+                    importDataFromJson: vi.fn(() =>
+                        Promise.reject(new Error("Import failed"))
+                    ),
+                });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createImportExportService"
+            ).mockReturnValue(mockDataImportExportService);
 
-            // Mock the DataImportExportService instance with error
-            const mockDataImportExportService = {
-                importDataFromJson: vi.fn(() =>
-                    Promise.reject(new Error("Import failed"))
-                ),
-                persistImportedData: vi.fn(() => Promise.resolve()),
-            };
-
-            // Mock the loadSites method to prevent it from affecting the test
-            const originalLoadSites = (databaseManager as any).loadSites;
-            (databaseManager as any).loadSites = vi.fn(() => Promise.resolve());
-
-            // Get references to the mocked modules
-            const { LoggerAdapter } =
-                await import("../../services/database/serviceFactory");
-            const { DataImportExportService } =
-                await import("../../services/database/DataImportExportService");
-
-            // Setup mocks to return our mock instances
-            mockConstructableReturnValue(
-                vi.mocked(LoggerAdapter) as any,
-                mockLoggerAdapter as any
-            );
-            mockConstructableReturnValue(
-                vi.mocked(DataImportExportService) as any,
-                mockDataImportExportService as any
-            );
+            const loadSitesSpy = vi
+                .spyOn(getPrivateTestView(databaseManager), "loadSites")
+                .mockResolvedValue(undefined);
 
             const testData = '{"sites": []}';
-            const isResult = await databaseManager.importData(testData);
+            try {
+                const isResult = await databaseManager.importData(testData);
 
-            expect(isResult).toBeFalsy();
-            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
-                "internal:database:data-imported",
-                expect.objectContaining({
-                    operation: "data-imported",
-                    success: false,
-                })
-            );
-
-            // Restore the original method
-            (databaseManager as any).loadSites = originalLoadSites;
+                expect(isResult).toBeFalsy();
+                expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                    "internal:database:data-imported",
+                    expect.objectContaining({
+                        operation: "data-imported",
+                        success: false,
+                    })
+                );
+            } finally {
+                loadSitesSpy.mockRestore();
+            }
         });
     });
 
@@ -601,12 +598,9 @@ describe(DatabaseManager, () => {
     describe("Site Loading Operations", () => {
         it("should emit site loading events", async () => {
             const loadSitesSpy = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(getPrivateTestView(databaseManager), "loadSites")
                 .mockResolvedValue(undefined);
-            const eventEmitterSpy = vi.spyOn(
-                (databaseManager as any).eventEmitter,
-                "emitTyped"
-            );
+            const eventEmitterSpy = vi.spyOn(mockEventEmitter, "emitTyped");
 
             await databaseManager.refreshSites();
 
@@ -626,16 +620,14 @@ describe(DatabaseManager, () => {
 
     describe("Error Handling", () => {
         it("should handle withErrorHandling wrapper", async () => {
-            // Create a mock backup service that throws an error
-            const mockDataBackupService = {
+            const mockDataBackupService = createBackupServiceFixture({
                 downloadDatabaseBackup: vi.fn(() =>
                     Promise.reject(new Error("Service error"))
                 ),
-            };
+            });
 
-            // Spy on the service factory's createBackupService method
             vi.spyOn(
-                (databaseManager as any).serviceFactory,
+                getServiceFactory(databaseManager),
                 "createBackupService"
             ).mockReturnValue(mockDataBackupService);
 
@@ -656,19 +648,15 @@ describe(DatabaseManager, () => {
 
     describe("Event Emission", () => {
         it("should emit backup downloaded events with correct data", async () => {
-            // Set up the mock to return proper data
-            const { DataBackupService } =
-                await import("../../services/database/DataBackupService");
-            const mockBackupService = {
-                downloadDatabaseBackup: vi.fn().mockResolvedValue({
-                    buffer: Buffer.from("backup data"),
-                    fileName: "backup-test.db",
-                }),
-            };
-            mockConstructableReturnValue(
-                vi.mocked(DataBackupService) as any,
-                mockBackupService as any
-            );
+            const mockBackupService = createBackupServiceFixture({
+                downloadDatabaseBackup: vi
+                    .fn()
+                    .mockResolvedValue(createBackupResultFixture()),
+            });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createBackupService"
+            ).mockReturnValue(mockBackupService);
 
             await databaseManager.downloadBackup();
 
@@ -684,18 +672,15 @@ describe(DatabaseManager, () => {
         });
 
         it("should emit data exported events with correct data", async () => {
-            // Set up the mock to return proper data
-            const { DataImportExportService } =
-                await import("../../services/database/DataImportExportService");
-            const mockExportService = {
+            const mockExportService = createImportExportServiceFixture({
                 exportAllData: vi
                     .fn()
                     .mockResolvedValue('{"sites": [], "settings": []}'),
-            };
-            mockConstructableReturnValue(
-                vi.mocked(DataImportExportService) as any,
-                mockExportService as any
-            );
+            });
+            vi.spyOn(
+                getServiceFactory(databaseManager),
+                "createImportExportService"
+            ).mockReturnValue(mockExportService);
 
             await databaseManager.exportData();
 
@@ -735,14 +720,13 @@ describe(DatabaseManager, () => {
 
     describe("Edge Cases", () => {
         it("should handle empty export data", async () => {
-            // Create a mock import/export service that returns empty data
-            const mockDataImportExportService = {
-                exportAllData: vi.fn(() => Promise.resolve("{}")),
-            };
+            const mockDataImportExportService =
+                createImportExportServiceFixture({
+                    exportAllData: vi.fn(() => Promise.resolve("{}")),
+                });
 
-            // Spy on the service factory's createImportExportService method
             vi.spyOn(
-                (databaseManager as any).serviceFactory,
+                getServiceFactory(databaseManager),
                 "createImportExportService"
             ).mockReturnValue(mockDataImportExportService);
 
