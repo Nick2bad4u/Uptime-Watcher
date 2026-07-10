@@ -434,6 +434,45 @@ export class MonitorScheduler {
     }
 
     /**
+     * Stops scheduled jobs that are no longer enabled in an authoritative site
+     * snapshot.
+     *
+     * @returns The number of jobs removed from the scheduler.
+     */
+    public reconcileScheduledMonitors(sites: readonly Site[]): number {
+        const enabledMonitorIdsBySite = new Map<string, Set<string>>();
+
+        for (const site of sites) {
+            if (!site.monitoring) {
+                continue;
+            }
+
+            const enabledMonitorIds = new Set<string>();
+            for (const monitor of site.monitors) {
+                if (monitor.monitoring && monitor.id) {
+                    enabledMonitorIds.add(monitor.id);
+                }
+            }
+            enabledMonitorIdsBySite.set(site.identifier, enabledMonitorIds);
+        }
+
+        let stoppedCount = 0;
+        for (const job of this.jobs.values()) {
+            const isStillEnabled = enabledMonitorIdsBySite
+                .get(job.siteIdentifier)
+                ?.has(job.monitorId);
+            if (
+                !isStillEnabled &&
+                this.stopMonitor(job.siteIdentifier, job.monitorId)
+            ) {
+                stoppedCount += 1;
+            }
+        }
+
+        return stoppedCount;
+    }
+
+    /**
      * Returns a snapshot of the internal job map for diagnostics and tests.
      *
      * @remarks

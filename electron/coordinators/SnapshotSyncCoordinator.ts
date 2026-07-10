@@ -331,6 +331,8 @@ export class SnapshotSyncCoordinator {
     ): Promise<void> {
         const timestamp = Date.now();
 
+        this.monitorManager.reconcileScheduledMonitors(data.sites);
+
         await this.siteManager.updateSitesCache(
             data.sites,
             "UptimeOrchestrator.handleUpdateSitesCacheRequest",

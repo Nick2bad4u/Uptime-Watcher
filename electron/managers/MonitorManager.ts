@@ -603,6 +603,11 @@ export class MonitorManager {
         return this.monitorScheduler.getActiveCount();
     }
 
+    /** Stops scheduler jobs absent or disabled in an authoritative snapshot. */
+    public reconcileScheduledMonitors(sites: readonly Site[]): number {
+        return this.monitorScheduler.reconcileScheduledMonitors(sites);
+    }
+
     /**
      * Checks whether a specific monitor currently has a scheduled job.
      *

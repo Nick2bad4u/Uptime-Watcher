@@ -246,6 +246,46 @@ describe(MonitorScheduler, () => {
         expect(scheduler.isMonitoring("site-2", "monitor-2")).toBeTruthy();
     });
 
+    it("reconciles removed and disabled jobs against an authoritative snapshot", () => {
+        scheduler.startMonitor("site-keep", createMonitor({ id: "keep" }));
+        scheduler.startMonitor(
+            "site-keep",
+            createMonitor({ id: "disabled-monitor" })
+        );
+        scheduler.startMonitor(
+            "disabled-site",
+            createMonitor({ id: "disabled-site-monitor" })
+        );
+        scheduler.startMonitor(
+            "removed-site",
+            createMonitor({ id: "removed-monitor" })
+        );
+
+        const stoppedCount = scheduler.reconcileScheduledMonitors([
+            {
+                identifier: "site-keep",
+                monitoring: true,
+                monitors: [
+                    createMonitor({ id: "keep" }),
+                    createMonitor({
+                        id: "disabled-monitor",
+                        monitoring: false,
+                    }),
+                ],
+                name: "Kept site",
+            },
+            {
+                identifier: "disabled-site",
+                monitoring: false,
+                monitors: [createMonitor({ id: "disabled-site-monitor" })],
+                name: "Disabled site",
+            },
+        ]);
+
+        expect(stoppedCount).toBe(3);
+        expect(scheduler.getActiveMonitors()).toEqual(["site-keep|keep"]);
+    });
+
     it("keeps jobs distinct when identifiers contain key separators", () => {
         scheduler.startMonitor("site|prod", createMonitor({ id: "api" }));
         scheduler.startMonitor("site", createMonitor({ id: "prod|api" }));

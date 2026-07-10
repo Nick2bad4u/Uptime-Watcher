@@ -52,6 +52,7 @@ const mockDatabaseManager = {
 } as unknown as DatabaseManager;
 
 const mockMonitorManager = {
+    reconcileScheduledMonitors: vi.fn(() => 0),
     setupSiteForMonitoring: vi.fn(() => Promise.resolve()),
     checkSiteManually: vi.fn(() =>
         Promise.resolve({
@@ -1289,6 +1290,16 @@ describe(UptimeOrchestrator, () => {
             expect(
                 mockMonitorManager.setupSiteForMonitoring
             ).toHaveBeenCalledWith(sites[0]);
+            expect(
+                mockMonitorManager.reconcileScheduledMonitors
+            ).toHaveBeenCalledWith(sites);
+            expect(
+                vi.mocked(mockMonitorManager.reconcileScheduledMonitors).mock
+                    .invocationCallOrder[0]
+            ).toBeLessThan(
+                vi.mocked(mockSiteManager.updateSitesCache).mock
+                    .invocationCallOrder[0] ?? Number.POSITIVE_INFINITY
+            );
         });
 
         it("should handle internal database events with monitoring setup failures", async ({
