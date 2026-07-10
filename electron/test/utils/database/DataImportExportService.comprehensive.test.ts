@@ -396,6 +396,79 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(result).toBe('{"exported": true}');
         });
 
+        it("should read the complete export snapshot inside one transaction", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Export", "category");
+            await annotate("Type: Data Consistency", "type");
+
+            let transactionActive = false;
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (operation) => {
+                    transactionActive = true;
+                    try {
+                        return await operation(
+                            mockDatabaseService.getDatabase()
+                        );
+                    } finally {
+                        transactionActive = false;
+                    }
+                }
+            );
+            mockRepositories.site.exportAllRows.mockImplementation(async () => {
+                expect(transactionActive).toBeTruthy();
+                return [
+                    {
+                        identifier: "site-1",
+                        monitoring: true,
+                        name: "Site 1",
+                    },
+                ];
+            });
+            mockRepositories.monitor.findBySiteIdentifier.mockImplementation(
+                async () => {
+                    expect(transactionActive).toBeTruthy();
+                    return [
+                        {
+                            checkInterval: 60_000,
+                            history: [],
+                            id: "monitor-1",
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 3,
+                            status: "pending",
+                            timeout: 5000,
+                            type: "http",
+                            url: "https://example.com",
+                        },
+                    ];
+                }
+            );
+            mockRepositories.history.findByMonitorId.mockImplementation(
+                async () => {
+                    expect(transactionActive).toBeTruthy();
+                    return [];
+                }
+            );
+            mockRepositories.settings.getAll.mockImplementation(async () => {
+                expect(transactionActive).toBeTruthy();
+                return {};
+            });
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported":true}'
+            );
+
+            await service.exportAllData();
+
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
+            expect(transactionActive).toBeFalsy();
+        });
+
         it("should bound concurrent site graph reads during export", async ({
             task,
             annotate,

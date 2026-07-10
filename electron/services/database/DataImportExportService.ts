@@ -211,45 +211,55 @@ export class DataImportExportService {
      */
     public async exportAllData(): Promise<string> {
         try {
-            // Export full site shapes (sites + monitors + history) so imports
-            // can recreate a consistent domain graph.
-            const siteRows = await this.repositories.site.exportAllRows();
+            const { rawSettings, sites } =
+                await this.databaseService.executeTransaction(async () => {
+                    // Read the complete graph from one SQLite snapshot so a
+                    // concurrent mutation cannot produce a torn export.
+                    const siteRows =
+                        await this.repositories.site.exportAllRows();
 
-            const sites = await mapWithConcurrency({
-                concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
-                items: siteRows,
-                task: async (siteRow) => {
-                    const monitors =
-                        await this.repositories.monitor.findBySiteIdentifier(
-                            siteRow.identifier
-                        );
-
-                    const monitorsWithHistory = await mapWithConcurrency({
+                    const snapshotSites = await mapWithConcurrency({
                         concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
-                        items: monitors,
-                        task: async (monitor) => {
-                            if (!monitor.id) {
-                                return monitor;
-                            }
-
-                            const history =
-                                await this.repositories.history.findByMonitorId(
-                                    monitor.id
+                        items: siteRows,
+                        task: async (siteRow) => {
+                            const monitors =
+                                await this.repositories.monitor.findBySiteIdentifier(
+                                    siteRow.identifier
                                 );
 
-                            return { ...monitor, history };
+                            const monitorsWithHistory =
+                                await mapWithConcurrency({
+                                    concurrency:
+                                        DATABASE_GRAPH_READ_CONCURRENCY,
+                                    items: monitors,
+                                    task: async (monitor) => {
+                                        if (!monitor.id) {
+                                            return monitor;
+                                        }
+
+                                        const history =
+                                            await this.repositories.history.findByMonitorId(
+                                                monitor.id
+                                            );
+
+                                        return { ...monitor, history };
+                                    },
+                                });
+
+                            return {
+                                identifier: siteRow.identifier,
+                                monitoring: siteRow.monitoring ?? true,
+                                monitors: monitorsWithHistory,
+                                name: siteRow.name ?? DEFAULT_SITE_NAME,
+                            } satisfies Site;
                         },
                     });
 
                     return {
-                        identifier: siteRow.identifier,
-                        monitoring: siteRow.monitoring ?? true,
-                        monitors: monitorsWithHistory,
-                        name: siteRow.name ?? DEFAULT_SITE_NAME,
-                    } satisfies Site;
-                },
-            });
-            const rawSettings = await this.repositories.settings.getAll();
+                        rawSettings: await this.repositories.settings.getAll(),
+                        sites: snapshotSites,
+                    };
+                });
             const settings = this.stripCloudSettings(rawSettings, "export");
 
             const exportPayload: ExportData = {
