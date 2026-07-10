@@ -179,7 +179,7 @@ export async function uploadBackupWithMetadata(args: {
     await args.uploadObject({
         buffer: args.buffer,
         key: backupKey,
-        overwrite: true,
+        overwrite: false,
     });
 
     try {
@@ -189,7 +189,7 @@ export async function uploadBackupWithMetadata(args: {
                 "utf8"
             ),
             key: metadataKey,
-            overwrite: true,
+            overwrite: false,
         });
     } catch (error) {
         // Best-effort cleanup: a backup object without its metadata sidecar is

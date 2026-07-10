@@ -325,6 +325,64 @@ describe(uploadBackupWithMetadata, () => {
         );
     });
 
+    it("preserves an existing backup when an immutable key collides", async () => {
+        const backupKey = "backups/backup.sqlite";
+        const metadataKey = `${backupKey}.metadata.json`;
+        const originalBackup = Buffer.from("original-backup", "utf8");
+        const originalMetadata = Buffer.from("original-metadata", "utf8");
+        const objects = new Map<string, Buffer>([
+            [backupKey, originalBackup],
+            [metadataKey, originalMetadata],
+        ]);
+        const uploadObject = vi.fn(
+            async (args: {
+                buffer: Buffer;
+                key: string;
+                overwrite?: boolean;
+            }): Promise<void> => {
+                if (objects.has(args.key) && args.overwrite !== true) {
+                    throw new Error(`Object already exists: ${args.key}`);
+                }
+
+                objects.set(args.key, args.buffer);
+            }
+        );
+        const deleteObject = vi.fn(async (key: string): Promise<void> => {
+            objects.delete(key);
+        });
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("replacement", "utf8"),
+                deleteObject,
+                encrypted: false,
+                fileName: "backup.sqlite",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "replacement-checksum",
+                    createdAt: 2,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 11,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrow(`Object already exists: ${backupKey}`);
+
+        expect(uploadObject).toHaveBeenCalledOnce();
+        expect(uploadObject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                key: backupKey,
+                overwrite: false,
+            })
+        );
+        expect(deleteObject).not.toHaveBeenCalled();
+        expect(objects.get(backupKey)).toEqual(originalBackup);
+        expect(objects.get(metadataKey)).toEqual(originalMetadata);
+    });
+
     it("attempts to delete the backup when metadata upload fails", async () => {
         const uploadObject = vi
             .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()
