@@ -254,6 +254,54 @@ describe("FilesystemCloudStorageProvider", () => {
         expect(entries.map((entry) => entry.key)).toEqual(["sync/file.txt"]);
     });
 
+    it("refuses to list through an intermediate symlinked prefix", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const linkedDirectory = path.join(appRoot, "linked");
+        const outsideDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-list-outside-")
+        );
+        const outsideNestedDirectory = path.join(outsideDirectory, "nested");
+        const symlinkType = process.platform === "win32" ? "junction" : "dir";
+
+        await fs.mkdir(appRoot, { recursive: true });
+        await fs.mkdir(outsideNestedDirectory, { recursive: true });
+        await fs.writeFile(
+            path.join(outsideNestedDirectory, "outside.txt"),
+            "outside"
+        );
+
+        try {
+            await fs.symlink(outsideDirectory, linkedDirectory, symlinkType);
+        } catch (error: unknown) {
+            const code =
+                typeof error === "object" && error !== null && "code" in error
+                    ? String(error.code)
+                    : "";
+
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+
+            if (code === "EPERM" || code === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        try {
+            await expect(
+                provider.listObjects("linked/nested")
+            ).rejects.toMatchObject({
+                operation: "listObjects",
+                providerKind: "filesystem",
+                target: "linked/nested",
+            });
+        } finally {
+            await fs.rm(linkedDirectory, { force: true, recursive: true });
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("ignores filesystem entries that are not canonical cloud keys", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
 

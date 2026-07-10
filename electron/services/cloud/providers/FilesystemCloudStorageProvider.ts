@@ -296,6 +296,7 @@ export class FilesystemCloudStorageProvider
                     root,
                     normalizedPrefix
                 );
+            await this.assertNoSymlinkPathComponents(root, startDirectory);
             const startStat = await lstatIfExists(startDirectory);
 
             if (!startStat) {
