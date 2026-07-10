@@ -36,17 +36,14 @@
 import type { Event, HandlerDetails, WebPreferences } from "electron";
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
-import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { withRetry } from "@shared/utils/retry";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as electron from "electron";
-import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { arrayIncludes, objectHasOwn, setHas } from "ts-extras";
+import { arrayIncludes, setHas } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -60,6 +57,10 @@ import {
     applyProductionDocumentSecurityHeaders,
     getProductionCspHeaderValue,
 } from "./utils/productionSecurityHeaders";
+import {
+    VITE_DEV_SERVER_CONFIG,
+    waitForViteDevServer,
+} from "./ViteDevServerWaiter";
 
 const BrowserWindowCtor: typeof electron.BrowserWindow = electron.BrowserWindow;
 type BrowserWindowInstance = InstanceType<typeof BrowserWindowCtor>;
@@ -246,20 +247,6 @@ const getResolvedProductionDistDirectory = (): string => {
  * and disabled node integration.
  */
 export class WindowService {
-    /** Configuration constants for Vite server connection */
-    private static readonly VITE_SERVER_CONFIG = {
-        /** Base delay for exponential backoff in milliseconds */
-        BASE_DELAY: 500,
-        /** Fetch timeout for each connection attempt in milliseconds */
-        FETCH_TIMEOUT: 5000,
-        /** Maximum delay between retries in milliseconds */
-        MAX_DELAY: 10_000,
-        /** Maximum number of connection attempts */
-        MAX_RETRIES: 20,
-        /** URL for Vite development server */
-        SERVER_URL: "http://localhost:5173",
-    } as const;
-
     /** Reference to the main app window (null if not created) */
     private mainWindow: BrowserWindowInstance | null = null;
 
@@ -495,7 +482,7 @@ export class WindowService {
 
                 try {
                     await targetWindow.loadURL(
-                        WindowService.VITE_SERVER_CONFIG.SERVER_URL
+                        VITE_DEV_SERVER_CONFIG.SERVER_URL
                     );
                 } catch (error: unknown) {
                     if (this.isBenignWindowLoadFailure(error, targetWindow)) {
@@ -547,7 +534,7 @@ export class WindowService {
      * - First attempt: 500ms delay
      * - Subsequent attempts: exponentially increasing delay up to 10s max
      * - Each fetch has 5s timeout to prevent hanging
-     * - Total attempts: up to 20 retries
+     * - Total attempts: up to 20
      *
      * This approach provides fast response when server starts quickly while
      * being patient for slower startup scenarios.
@@ -557,114 +544,7 @@ export class WindowService {
      * @throws When server doesn't become available within timeout
      */
     private async waitForViteServer(): Promise<void> {
-        const isFetchMock =
-            typeof fetch === "function" && objectHasOwn(fetch, "mock");
-
-        if (isFetchMock) {
-            const controller = new AbortController();
-            const mockResponse = await fetch(
-                WindowService.VITE_SERVER_CONFIG.SERVER_URL,
-                { signal: controller.signal }
-            );
-
-            if (!mockResponse.ok) {
-                throw new Error(
-                    "Mocked fetch reported Vite server as unavailable"
-                );
-            }
-
-            logger.debug("[WindowService] Vite dev server ready (mocked)");
-            return;
-        }
-
-        const {
-            BASE_DELAY,
-            FETCH_TIMEOUT,
-            MAX_DELAY,
-            MAX_RETRIES,
-            SERVER_URL,
-        } = WindowService.VITE_SERVER_CONFIG;
-
-        class ViteDevServerNotReadyError extends Error {
-            public override readonly name = "ViteDevServerNotReadyError";
-        }
-
-        const JITTER_MS = 200;
-
-        try {
-            await withRetry(
-                async () => {
-                    // Create AbortController for fetch timeout
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => {
-                        controller.abort();
-                    }, FETCH_TIMEOUT);
-                    timeoutId.unref();
-
-                    try {
-                        const response = await fetch(SERVER_URL, {
-                            signal: controller.signal,
-                        });
-
-                        if (response.ok) {
-                            logger.debug(
-                                "[WindowService] Vite dev server is ready"
-                            );
-                            return;
-                        }
-
-                        // Preserve previous behavior: non-OK responses are
-                        // treated as "not ready" without log spam.
-                        throw new ViteDevServerNotReadyError(
-                            `Vite dev server returned ${response.status}`
-                        );
-                    } finally {
-                        clearTimeout(timeoutId);
-                    }
-                },
-                {
-                    delayMs: ({ attempt }) => {
-                        // Calculate exponential backoff delay with jitter.
-                        const exponentialDelay = Math.min(
-                            BASE_DELAY * 2 ** (attempt - 1),
-                            MAX_DELAY
-                        );
-
-                        // Use a cryptographically strong RNG to avoid
-                        // pseudo-random lints (and because it's essentially
-                        // free at this scale).
-                        const jitter = randomInt(0, JITTER_MS + 1);
-
-                        return exponentialDelay + jitter;
-                    },
-                    maxRetries: MAX_RETRIES,
-                    operationName: "wait for Vite dev server",
-                    onError: (error, attempt) => {
-                        const resolved = ensureError(error);
-                        // Log only significant errors or last attempt.
-                        if (
-                            attempt === MAX_RETRIES ||
-                            (resolved.name !== "AbortError" &&
-                                resolved.name !== "ViteDevServerNotReadyError")
-                        ) {
-                            logger.debug(
-                                `[WindowService] Vite server not ready (attempt ${attempt}/${MAX_RETRIES}): ${getUnknownErrorMessage(resolved)}`
-                            );
-                        }
-                    },
-                    onFailedAttempt: ({ attempt, delayMs }) => {
-                        logger.debug(
-                            `[WindowService] Waiting ${Math.round(delayMs)}ms before retry ${attempt + 1}/${MAX_RETRIES}`
-                        );
-                    },
-                }
-            );
-        } catch (error) {
-            throw new Error(
-                `Vite dev server did not become available after ${MAX_RETRIES} attempts`,
-                { cause: error }
-            );
-        }
+        await waitForViteDevServer({ logger });
     }
 
     /**
@@ -732,9 +612,8 @@ export class WindowService {
             }
 
             // In development, allow navigation within the Vite dev server origin.
-            const viteOrigin = new URL(
-                WindowService.VITE_SERVER_CONFIG.SERVER_URL
-            ).origin;
+            const viteOrigin = new URL(VITE_DEV_SERVER_CONFIG.SERVER_URL)
+                .origin;
 
             if (parsed.origin === viteOrigin) {
                 return true;

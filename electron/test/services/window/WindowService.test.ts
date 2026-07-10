@@ -1635,7 +1635,7 @@ describe(WindowService, () => {
             }
         });
 
-        it("should retry until the server responds successfully", async ({
+        it("should retry mocked fetch implementations until the server responds", async ({
             task,
             annotate,
         }) => {
@@ -1647,10 +1647,10 @@ describe(WindowService, () => {
             const originalFetch = fetch;
 
             let attempts = 0;
-            const retryingFetch: typeof fetch = async () => {
+            const retryingFetch = vi.fn<typeof fetch>(async () => {
                 attempts += 1;
                 return createFetchResponse(attempts > 1);
-            };
+            });
 
             setFetchForTesting(retryingFetch);
 
@@ -1663,40 +1663,13 @@ describe(WindowService, () => {
                 await waitPromise;
 
                 expect(attempts).toBe(2);
+                expect(retryingFetch).toHaveBeenCalledTimes(2);
                 expect(logger.debug).toHaveBeenCalledWith(
                     expect.stringMatching(/Waiting \d+ms before retry 2\/20/v)
                 );
             } finally {
                 setFetchForTesting(originalFetch);
             }
-        });
-
-        it("should surface errors when mocked fetch indicates server unavailability", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const originalFetch = fetch;
-            const failingFetch = vi.fn<typeof fetch>(async () =>
-                createFetchResponse(false)
-            );
-
-            setFetchForTesting(failingFetch);
-
-            await expect(
-                getReflectedMethod<[], Promise<void>>(
-                    windowService,
-                    "waitForViteServer"
-                )()
-            ).rejects.toThrow(
-                "Mocked fetch reported Vite server as unavailable"
-            );
-
-            setFetchForTesting(originalFetch);
         });
 
         it("should exhaust retries when the server never becomes available", async ({
@@ -1711,8 +1684,6 @@ describe(WindowService, () => {
             vi.useFakeTimers();
 
             const originalFetch = fetch;
-            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
-
             let attempts = 0;
             const unavailableFetch: typeof fetch = async () => {
                 attempts += 1;
@@ -1736,7 +1707,75 @@ describe(WindowService, () => {
                 expect(attempts).toBe(20);
             } finally {
                 setFetchForTesting(originalFetch);
-                randomSpy.mockRestore();
+                vi.useRealTimers();
+            }
+        });
+
+        it("should abort stalled fetch attempts before retrying", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Timeout Handling", "type");
+
+            vi.useFakeTimers();
+
+            const originalFetch = fetch;
+            const observedSignals: AbortSignal[] = [];
+            const stalledFetch = vi.fn<typeof fetch>(
+                async (_input, init) =>
+                    new Promise<Response>((_resolve, reject) => {
+                        const signal = init?.signal;
+                        if (!signal) {
+                            reject(new Error("Missing fetch abort signal"));
+                            return;
+                        }
+
+                        observedSignals.push(signal);
+                        signal.addEventListener(
+                            "abort",
+                            () => {
+                                const error = new Error("Vite fetch timed out");
+                                error.name = "AbortError";
+                                reject(error);
+                            },
+                            { once: true }
+                        );
+                    })
+            );
+            setFetchForTesting(stalledFetch);
+
+            try {
+                const waitPromise = getReflectedMethod<[], Promise<void>>(
+                    windowService,
+                    "waitForViteServer"
+                )();
+                const outcomePromise = waitPromise
+                    .then(() => ({ status: "resolved" as const }))
+                    .catch((error: unknown) => ({
+                        error,
+                        status: "rejected" as const,
+                    }));
+
+                await vi.runAllTimersAsync();
+                const outcome = await outcomePromise;
+
+                expect(outcome).toMatchObject({
+                    error: expect.objectContaining({
+                        message:
+                            "Vite dev server did not become available after 20 attempts",
+                    }),
+                    status: "rejected",
+                });
+                expect(stalledFetch).toHaveBeenCalledTimes(20);
+                expect(observedSignals).toHaveLength(20);
+                expect(observedSignals.every((signal) => signal.aborted)).toBe(
+                    true
+                );
+            } finally {
+                setFetchForTesting(originalFetch);
                 vi.useRealTimers();
             }
         });
@@ -1753,7 +1792,6 @@ describe(WindowService, () => {
             vi.useFakeTimers();
 
             const originalFetch = fetch;
-            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
             vi.mocked(logger.debug).mockClear();
 
             let attempts = 0;
@@ -1781,7 +1819,6 @@ describe(WindowService, () => {
                 );
             } finally {
                 setFetchForTesting(originalFetch);
-                randomSpy.mockRestore();
                 vi.useRealTimers();
             }
         });
@@ -1798,7 +1835,6 @@ describe(WindowService, () => {
             vi.useFakeTimers();
 
             const originalFetch = fetch;
-            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
             vi.mocked(logger.debug).mockClear();
 
             let attempts = 0;
@@ -1835,7 +1871,6 @@ describe(WindowService, () => {
                 expect(attempts).toBe(3);
             } finally {
                 setFetchForTesting(originalFetch);
-                randomSpy.mockRestore();
                 vi.useRealTimers();
             }
         });
