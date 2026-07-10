@@ -537,7 +537,7 @@ export class DataBackupService {
                 } catch (error) {
                     const normalizedError = ensureError(error);
                     const message =
-                        "Failed to restore database backup. Original database has been preserved.";
+                        "Failed to restore database backup. The service attempted to preserve the original database; review diagnostics before retrying.";
 
                     try {
                         await this.eventEmitter.emitTyped("database:error", {

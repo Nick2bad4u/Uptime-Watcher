@@ -1,6 +1,7 @@
 import {
     mkdtemp,
     mkdir,
+    readdir,
     readFile,
     rm,
     symlink,
@@ -260,6 +261,50 @@ describe(replaceDatabaseFile, () => {
         await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
         await expect(readFile(walPath, "utf8")).resolves.toBe("old-wal");
         await expect(readFile(shmPath, "utf8")).resolves.toBe("old-shm");
+    });
+
+    it("surfaces rollback failure when the previous database cannot be restored", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const databaseService = createDatabaseService();
+        const copyError = new Error("directory sync failed");
+
+        await writeFile(sourcePath, "new-db");
+        await writeFile(targetPath, "old-db");
+
+        vi.spyOn(fsSafeOps, "syncDirectorySafely").mockImplementationOnce(
+            async () => {
+                const rollbackFileName = (await readdir(tempDirectory)).find(
+                    (fileName) => fileName.includes(".rollback-")
+                );
+                if (!rollbackFileName) {
+                    throw new Error("Expected rollback database file");
+                }
+                await rm(path.join(tempDirectory, rollbackFileName), {
+                    force: true,
+                });
+                throw copyError;
+            }
+        );
+
+        try {
+            await replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            });
+            throw new Error("Expected database replacement to fail");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(AggregateError);
+            expect(error).toMatchObject({
+                errors: expect.arrayContaining([copyError, expect.any(Error)]),
+                message:
+                    "Failed to restore database file and preserve the previous database state",
+            });
+        }
+
+        await expect(readFile(targetPath, "utf8")).rejects.toThrow();
+        expect(databaseService.initialize).toHaveBeenCalledTimes(1);
     });
 
     it("refuses to replace an existing target directory", async () => {

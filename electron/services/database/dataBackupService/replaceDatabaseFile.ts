@@ -128,6 +128,7 @@ export async function replaceDatabaseFile(args: {
     let isTargetReplaced = false;
     let isWalRollbackCreated = false;
     let copyError: Error | undefined;
+    let copyRollbackError: Error | undefined;
 
     try {
         // Stage the incoming DB first to reduce the time window where
@@ -188,12 +189,12 @@ export async function replaceDatabaseFile(args: {
             isShmRollbackCreated = false;
             isJournalRollbackCreated = false;
         } catch (rollbackError: unknown) {
+            copyRollbackError = ensureError(rollbackError);
             logger?.warn(
                 "[DataBackupService] Failed to rollback database replacement after copy failure",
-                ensureError(rollbackError),
+                copyRollbackError,
                 { targetPath }
             );
-            // Best effort. We still surface the original copy error below.
         }
     }
 
@@ -201,6 +202,7 @@ export async function replaceDatabaseFile(args: {
         databaseService.initialize();
     } catch (error: unknown) {
         const initError = ensureError(error);
+        let initializationRollbackError: Error | undefined;
 
         // Attempt rollback if we replaced the file.
         if (isHadExistingTarget) {
@@ -227,12 +229,12 @@ export async function replaceDatabaseFile(args: {
                 isJournalRollbackCreated = false;
                 databaseService.initialize();
             } catch (rollbackError: unknown) {
+                initializationRollbackError = ensureError(rollbackError);
                 logger?.warn(
                     "[DataBackupService] Failed to rollback database replacement after reinitialize failure",
-                    ensureError(rollbackError),
+                    initializationRollbackError,
                     { targetPath }
                 );
-                // If rollback fails, we still surface the init error below.
             }
         } else if (isTargetReplaced) {
             try {
@@ -255,13 +257,29 @@ export async function replaceDatabaseFile(args: {
                 isJournalRollbackCreated = false;
                 databaseService.initialize();
             } catch (cleanupError: unknown) {
+                initializationRollbackError = ensureError(cleanupError);
                 logger?.warn(
                     "[DataBackupService] Failed to remove uninitialized database replacement",
-                    ensureError(cleanupError),
+                    initializationRollbackError,
                     { targetPath }
                 );
-                // If cleanup fails, we still surface the init error below.
             }
+        }
+
+        const rollbackErrors = [
+            copyRollbackError,
+            initializationRollbackError,
+        ].filter((rollbackError): rollbackError is Error =>
+            Boolean(rollbackError)
+        );
+        if (rollbackErrors.length > 0) {
+            throw new AggregateError(
+                [copyError, initError, ...rollbackErrors].filter(
+                    (failure): failure is Error => Boolean(failure)
+                ),
+                "Failed to restore database file and preserve the previous database state",
+                { cause: error }
+            );
         }
 
         if (copyError) {
@@ -283,6 +301,14 @@ export async function replaceDatabaseFile(args: {
     }
 
     if (copyError) {
+        if (copyRollbackError) {
+            throw new AggregateError(
+                [copyError, copyRollbackError],
+                "Failed to restore database file and preserve the previous database state",
+                { cause: copyError }
+            );
+        }
+
         throw copyError;
     }
 }
