@@ -462,8 +462,9 @@ export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetad
  * Command for exporting all app data to JSON.
  *
  * @remarks
- * Encapsulates the logic for exporting all data and emitting a success event.
- * Rollback and validation are no-ops.
+ * Encapsulates the logic for exporting all data and emitting a best-effort
+ * completion event after the export succeeds. Rollback and validation are
+ * no-ops.
  *
  * @public
  */
@@ -471,13 +472,21 @@ export class ExportDataCommand extends DatabaseCommand<string> {
     public async execute(): Promise<string> {
         const dataImportExportService =
             this.serviceFactory.createImportExportService();
+        const exportedData = await dataImportExportService.exportAllData();
 
-        await this.emitSuccessEvent("internal:database:data-exported", {
-            fileName: `export-${Date.now()}.json`,
-            operation: "data-exported",
-        });
+        try {
+            await this.emitSuccessEvent("internal:database:data-exported", {
+                fileName: `export-${Date.now()}.json`,
+                operation: "data-exported",
+            });
+        } catch (error: unknown) {
+            backendLogger.error(
+                "[ExportDataCommand] Failed to publish export completion event after commit",
+                ensureError(error)
+            );
+        }
 
-        return dataImportExportService.exportAllData();
+        return exportedData;
     }
 
     public async rollback(): Promise<void> {
@@ -887,12 +896,19 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
             }))
         );
 
-        await this.emitSuccessEvent("internal:database:backup-restored", {
-            fileName: this.payload.fileName ?? "uploaded-backup.sqlite",
-            operation: "backup-restored",
-            schemaVersion: metadata.schemaVersion,
-            sizeBytes: metadata.sizeBytes,
-        });
+        try {
+            await this.emitSuccessEvent("internal:database:backup-restored", {
+                fileName: this.payload.fileName ?? "uploaded-backup.sqlite",
+                operation: "backup-restored",
+                schemaVersion: metadata.schemaVersion,
+                sizeBytes: metadata.sizeBytes,
+            });
+        } catch (error: unknown) {
+            backendLogger.error(
+                "[RestoreBackupCommand] Failed to publish restore completion event after commit",
+                ensureError(error)
+            );
+        }
 
         return {
             metadata,

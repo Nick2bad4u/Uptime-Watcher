@@ -569,6 +569,12 @@ describe("DatabaseCommands", () => {
 
             expect(result).toBe('{"test": "data"}');
             expect(mockImportExportService.exportAllData).toHaveBeenCalled();
+            expect(
+                mockImportExportService.exportAllData.mock
+                    .invocationCallOrder[0]
+            ).toBeLessThan(
+                mockEventBus.emitTyped.mock.invocationCallOrder[0] ?? 0
+            );
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-exported",
                 expect.objectContaining({
@@ -595,6 +601,27 @@ describe("DatabaseCommands", () => {
             await expect(command.execute()).rejects.toThrow(
                 "Export service failed"
             );
+            expect(mockEventBus.emitTyped).not.toHaveBeenCalled();
+        });
+
+        it("should preserve an exported result when completion publication fails", async () => {
+            const eventError = new Error("Event emission failed");
+            mockEventBus.emitTyped.mockRejectedValue(eventError);
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+
+            await expect(command.execute()).resolves.toBe('{"test": "data"}');
+
+            expect(
+                mockImportExportService.exportAllData
+            ).toHaveBeenCalledOnce();
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[ExportDataCommand] Failed to publish export completion event after commit",
+                eventError
+            );
+
+            loggerSpy.mockRestore();
         });
 
         it("should validate successfully (no-op)", async ({
@@ -1453,6 +1480,34 @@ describe("DatabaseCommands", () => {
             ).toHaveBeenCalledWith(restoreResult.preRestoreBackup);
         });
 
+        it("preserves the committed restore when completion publication fails", async () => {
+            const eventError = new Error("restore publication failed");
+            mockEventBus.emitTyped.mockRejectedValueOnce(eventError);
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+            const rollbackSpy = vi.spyOn(command, "rollback");
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).resolves.toMatchObject({
+                metadata: restoreResult.metadata,
+                preRestoreFileName: restoreResult.preRestoreFileName,
+                restoredAt: restoreResult.restoredAt,
+            });
+
+            expect(mockCache.getAll()).toEqual([createTestSite("a")]);
+            expect(rollbackSpy).not.toHaveBeenCalled();
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).not.toHaveBeenCalled();
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[RestoreBackupCommand] Failed to publish restore completion event after commit",
+                eventError
+            );
+
+            loggerSpy.mockRestore();
+        });
+
         it("fails validation when payload buffer is empty", async () => {
             const invalidContext: DatabaseCommandContext & {
                 payload: DatabaseRestorePayload;
@@ -1518,38 +1573,6 @@ describe("DatabaseCommands", () => {
     });
 
     describe("Error handling and edge cases", () => {
-        it("should handle event emission failures gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: DatabaseCommands", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
-            emitTypedMock.mockRejectedValue(new Error("Event emission failed"));
-
-            // Ensure the import/export service exists so execute() reaches event emission
-            const mockImportExportService = {
-                exportAllData: vi.fn().mockResolvedValue("{}"),
-            };
-            mockServiceFactory.createImportExportService.mockReturnValue(
-                mockImportExportService as unknown as IDataImportExportService
-            );
-
-            const command = new ExportDataCommand(
-                mockServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache
-            );
-
-            // Should still throw the event emission error
-            await expect(command.execute()).rejects.toThrow(
-                "Event emission failed"
-            );
-        });
-
         it("should handle service factory returning null services", async ({
             task,
             annotate,

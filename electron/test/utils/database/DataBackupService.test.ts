@@ -1105,6 +1105,35 @@ describe(DataBackupService, () => {
             expect(summary.metadata.sizeBytes).toBe(buffer.length);
         });
 
+        it("keeps a committed restore when event publication fails", async () => {
+            const buffer = Buffer.concat([
+                Buffer.from("SQLite format 3\0", "ascii"),
+                Buffer.from("restored-db"),
+            ]);
+            const eventError = new Error("restore event failed");
+            mockEventEmitter.emitTyped.mockRejectedValueOnce(eventError);
+
+            await expect(
+                dataBackupService.restoreDatabaseBackup({
+                    buffer,
+                    fileName: "restore.sqlite",
+                })
+            ).resolves.toMatchObject({
+                metadata: { sizeBytes: buffer.length },
+            });
+
+            expect(mockDatabaseService.initialize).toHaveBeenCalled();
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataBackupService] Failed to publish database restore event after commit",
+                eventError,
+                { operation: "restore-backup" }
+            );
+            expect(mockEventEmitter.emitTyped).not.toHaveBeenCalledWith(
+                "database:error",
+                expect.any(Object)
+            );
+        });
+
         it("rejects structurally invalid SQLite payloads before snapshotting", async () => {
             const buffer = Buffer.concat([
                 Buffer.from("SQLite format 3\0", "ascii"),
