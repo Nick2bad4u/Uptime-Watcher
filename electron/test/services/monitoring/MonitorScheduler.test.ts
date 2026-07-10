@@ -12,6 +12,7 @@ import {
 } from "../../../services/monitoring/constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { logger } from "../../../utils/logger";
+import { createMonitorSchedulerEventRecorder } from "../../utils/monitorSchedulerEventRecorder";
 
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
@@ -71,7 +72,7 @@ describe(MonitorScheduler, () => {
     const FIXED_NOW = 1_700_000_000;
     let scheduler: MonitorScheduler;
     let mockCheckCallback: ReturnType<typeof createCheckCallbackMock>;
-    let eventEmitter: { emitTyped: ReturnType<typeof vi.fn> };
+    let eventRecorder: ReturnType<typeof createMonitorSchedulerEventRecorder>;
     let mathRandomSpy: ReturnType<typeof vi.spyOn>;
     let dateNowSpy: ReturnType<typeof vi.spyOn>;
 
@@ -79,10 +80,8 @@ describe(MonitorScheduler, () => {
         vi.useFakeTimers();
         mathRandomSpy = vi.spyOn(Math, "random").mockReturnValue(0.5);
         dateNowSpy = vi.spyOn(Date, "now").mockReturnValue(FIXED_NOW);
-        eventEmitter = {
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-        };
-        scheduler = new MonitorScheduler(logger, eventEmitter as any);
+        eventRecorder = createMonitorSchedulerEventRecorder();
+        scheduler = new MonitorScheduler(logger, eventRecorder.eventBus);
         mockCheckCallback =
             createCheckCallbackMock().mockResolvedValue(undefined);
         scheduler.setCheckCallback(mockCheckCallback);
@@ -125,7 +124,7 @@ describe(MonitorScheduler, () => {
             expect.any(AbortSignal)
         );
 
-        const scheduleEvent = eventEmitter.emitTyped.mock.calls.find(
+        const scheduleEvent = eventRecorder.calls.find(
             ([eventName]) => eventName === "monitor:schedule-updated"
         );
         const schedulePayload = scheduleEvent?.[1] as
@@ -207,11 +206,11 @@ describe(MonitorScheduler, () => {
             1
         );
 
-        eventEmitter.emitTyped.mockClear();
+        eventRecorder.clear();
         await scheduler.performImmediateCheck("site-1", "monitor-1");
         await flushAsync();
 
-        const manualEvent = eventEmitter.emitTyped.mock.calls.find(
+        const manualEvent = eventRecorder.calls.find(
             ([eventName]) => eventName === "monitor:manual-check-started"
         );
 
@@ -294,7 +293,7 @@ describe(MonitorScheduler, () => {
             .get(jobKey)?.correlationId;
         expect(initialCorrelationId).toEqual(expect.any(String));
 
-        eventEmitter.emitTyped.mockClear();
+        eventRecorder.clear();
         await scheduler.performImmediateCheck("site-1", "monitor-1");
         await flushAsync();
 
@@ -305,7 +304,7 @@ describe(MonitorScheduler, () => {
         expect(snapshotAfterQueue?.correlationId).toBe(initialCorrelationId);
         expect(queuedCorrelationId).toEqual(expect.any(String));
 
-        const manualCheckEvent = eventEmitter.emitTyped.mock.calls.find(
+        const manualCheckEvent = eventRecorder.calls.find(
             ([eventName]) => eventName === "monitor:manual-check-started"
         );
 
@@ -352,12 +351,12 @@ describe(MonitorScheduler, () => {
         scheduler.startMonitor("site-1", createMonitor());
         await flushAsync();
 
-        eventEmitter.emitTyped.mockClear();
+        eventRecorder.clear();
         await scheduler.performImmediateCheck("site-1", "monitor-1");
         await scheduler.performImmediateCheck("site-1", "monitor-1");
         await flushAsync();
 
-        const manualEvents = eventEmitter.emitTyped.mock.calls.filter(
+        const manualEvents = eventRecorder.calls.filter(
             ([eventName]) => eventName === "monitor:manual-check-started"
         );
         expect(manualEvents).toHaveLength(1);

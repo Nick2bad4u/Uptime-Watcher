@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { logger } from "../../../utils/logger";
+import { createMonitorSchedulerEventRecorder } from "../../utils/monitorSchedulerEventRecorder";
 
 vi.mock("node:crypto", () => ({
     // Choose the midpoint so MonitorScheduler's
@@ -53,11 +54,11 @@ const createMonitor = (
 
 describe("MonitorScheduler backoff regressions", () => {
     let scheduler: MonitorScheduler;
-    let eventEmitter: { emitTyped: ReturnType<typeof vi.fn> };
+    let eventRecorder: ReturnType<typeof createMonitorSchedulerEventRecorder>;
 
     beforeEach(() => {
-        eventEmitter = { emitTyped: vi.fn().mockResolvedValue(undefined) };
-        scheduler = new MonitorScheduler(logger, eventEmitter as any);
+        eventRecorder = createMonitorSchedulerEventRecorder();
+        scheduler = new MonitorScheduler(logger, eventRecorder.eventBus);
         scheduler.setCheckCallback(
             vi.fn(async () => {
                 throw new Error("fail");
@@ -84,7 +85,7 @@ describe("MonitorScheduler backoff regressions", () => {
         for (let attempt = 0; attempt < 20; attempt += 1) {
             await Promise.resolve();
 
-            scheduleEvent = eventEmitter.emitTyped.mock.calls.findLast(
+            scheduleEvent = eventRecorder.calls.findLast(
                 ([eventName]) => eventName === "monitor:schedule-updated"
             );
 

@@ -7,6 +7,7 @@ import { isDev } from "../../../electronUtils";
 import { MONITOR_TIMEOUT_BUFFER_MS } from "../../../services/monitoring/constants";
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { logger } from "../../../utils/logger";
+import { createMonitorSchedulerEventRecorder } from "../../utils/monitorSchedulerEventRecorder";
 
 vi.mock("node:crypto", () => ({
     randomInt: vi.fn().mockReturnValue(0),
@@ -69,7 +70,7 @@ const expectDelayWithinTolerance = (actual: number, expected: number): void => {
 describe("MonitorScheduler – comprehensive", () => {
     const FIXED_NOW = 2_000_000_000;
     let scheduler: MonitorScheduler;
-    let eventEmitter: { emitTyped: ReturnType<typeof vi.fn> };
+    let eventRecorder: ReturnType<typeof createMonitorSchedulerEventRecorder>;
     let mockCheckCallback: ReturnType<typeof createCheckCallbackMock>;
     let mathRandomSpy: ReturnType<typeof vi.spyOn>;
     let dateNowSpy: ReturnType<typeof vi.spyOn>;
@@ -78,8 +79,8 @@ describe("MonitorScheduler – comprehensive", () => {
         vi.useFakeTimers();
         mathRandomSpy = vi.spyOn(Math, "random").mockReturnValue(0.5);
         dateNowSpy = vi.spyOn(Date, "now").mockReturnValue(FIXED_NOW);
-        eventEmitter = { emitTyped: vi.fn().mockResolvedValue(undefined) };
-        scheduler = new MonitorScheduler(logger, eventEmitter as any);
+        eventRecorder = createMonitorSchedulerEventRecorder();
+        scheduler = new MonitorScheduler(logger, eventRecorder.eventBus);
         mockCheckCallback =
             createCheckCallbackMock().mockResolvedValue(undefined);
         scheduler.setCheckCallback(mockCheckCallback);
@@ -107,7 +108,7 @@ describe("MonitorScheduler – comprehensive", () => {
         );
         await flushAsync();
 
-        const backoffEvent = eventEmitter.emitTyped.mock.calls.find(
+        const backoffEvent = eventRecorder.calls.find(
             ([eventName]) => eventName === "monitor:backoff-applied"
         );
 
@@ -161,7 +162,7 @@ describe("MonitorScheduler – comprehensive", () => {
 
         for (const expectedDelay of expectedDelays) {
             await flushAsync();
-            const latestBackoff = eventEmitter.emitTyped.mock.calls.findLast(
+            const latestBackoff = eventRecorder.calls.findLast(
                 ([eventName]) => eventName === "monitor:backoff-applied"
             );
 
@@ -196,7 +197,7 @@ describe("MonitorScheduler – comprehensive", () => {
         await vi.advanceTimersByTimeAsync(guardDuration);
         await flushAsync();
 
-        const timeoutEvent = eventEmitter.emitTyped.mock.calls.find(
+        const timeoutEvent = eventRecorder.calls.find(
             ([eventName]) => eventName === "monitor:timeout"
         );
 

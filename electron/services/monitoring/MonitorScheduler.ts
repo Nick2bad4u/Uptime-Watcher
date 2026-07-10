@@ -20,7 +20,11 @@ import {
     resolveMonitorOperationTimeoutMs,
 } from "./shared/timeoutUtils";
 
-type MonitorSchedulerEventBus = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
+/** Event-emission contract required by {@link MonitorScheduler}. */
+export type MonitorSchedulerEventBus = Pick<
+    TypedEventBus<UptimeEvents>,
+    "emitTyped"
+>;
 
 const noopEventEmitter: MonitorSchedulerEventBus = {
     async emitTyped() {

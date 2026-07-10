@@ -8,6 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { TemplateVariables } from "@shared/utils/logTemplates";
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type {
     MonitorCheckOperation,
@@ -34,11 +35,11 @@ vi.mock("../../../utils/logger", () => {
 
 // Mock log templates
 vi.mock("@shared/utils/logTemplates", () => ({
-    interpolateLogTemplate: vi.fn((template: string, params: any) =>
-        template.replaceAll(
-            /\{(?<key>\w+)\}/gv,
-            (match, key) => params[key] || match
-        )
+    interpolateLogTemplate: vi.fn(
+        (template: string, params: TemplateVariables) =>
+            template.replaceAll(/\{(?<key>\w+)\}/gv, (match, key) =>
+                String(params[key] || match)
+            )
     ),
     LOG_TEMPLATES: {
         debug: {

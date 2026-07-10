@@ -6,7 +6,10 @@ import type { Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorCheckResult } from "../../../services/monitoring/types";
+import type {
+    MonitorCheckResult,
+    MonitorServiceConfig,
+} from "../../../services/monitoring/types";
 
 import { PortMonitor } from "../../../services/monitoring/PortMonitor";
 import {
@@ -267,7 +270,9 @@ describe("PortMonitor configuration and checks", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() => {
-                portMonitor.updateConfig({ timeout: "invalid" as any });
+                portMonitor.updateConfig({
+                    timeout: "invalid",
+                } as unknown as MonitorServiceConfig);
             }).toThrow();
         });
 

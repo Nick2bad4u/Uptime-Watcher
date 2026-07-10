@@ -3,6 +3,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { AxiosInstance } from "axios";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -58,7 +59,13 @@ vi.mock("@shared/utils/httpStatusUtils", () => ({
 
 describe("HttpMonitor active request counter", () => {
     let httpMonitor: HttpMonitor;
-    let mockAxiosInstance: any;
+    let mockAxiosInstance: {
+        get: ReturnType<typeof vi.fn>;
+        interceptors: {
+            request: { use: ReturnType<typeof vi.fn> };
+            response: { use: ReturnType<typeof vi.fn> };
+        };
+    };
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -75,7 +82,9 @@ describe("HttpMonitor active request counter", () => {
         const { createHttpClient } = vi.mocked(
             await import("../../../services/monitoring/utils/httpClient")
         );
-        createHttpClient.mockReturnValue(mockAxiosInstance);
+        createHttpClient.mockReturnValue(
+            mockAxiosInstance as unknown as AxiosInstance
+        );
 
         const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
             await import("../../../services/monitoring/shared/monitorServiceHelpers")
