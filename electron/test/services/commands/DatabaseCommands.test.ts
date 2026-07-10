@@ -565,6 +565,7 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Export Operation", "type");
 
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
             const result = await command.execute();
 
             expect(result).toBe('{"test": "data"}');
@@ -572,10 +573,8 @@ describe("DatabaseCommands", () => {
             expect(
                 mockImportExportService.exportAllData.mock
                     .invocationCallOrder[0]
-            ).toBeLessThan(
-                mockEventBus.emitTyped.mock.invocationCallOrder[0] ?? 0
-            );
-            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+            ).toBeLessThan(emitTypedMock.mock.invocationCallOrder[0] ?? 0);
+            expect(emitTypedMock).toHaveBeenCalledWith(
                 "internal:database:data-exported",
                 expect.objectContaining({
                     success: true,
@@ -606,7 +605,8 @@ describe("DatabaseCommands", () => {
 
         it("should preserve an exported result when completion publication fails", async () => {
             const eventError = new Error("Event emission failed");
-            mockEventBus.emitTyped.mockRejectedValue(eventError);
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock.mockRejectedValue(eventError);
             const loggerSpy = vi
                 .spyOn(backendLogger, "error")
                 .mockReturnValue(undefined);
@@ -1482,7 +1482,8 @@ describe("DatabaseCommands", () => {
 
         it("preserves the committed restore when completion publication fails", async () => {
             const eventError = new Error("restore publication failed");
-            mockEventBus.emitTyped.mockRejectedValueOnce(eventError);
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock.mockRejectedValueOnce(eventError);
             const loggerSpy = vi
                 .spyOn(backendLogger, "error")
                 .mockReturnValue(undefined);
