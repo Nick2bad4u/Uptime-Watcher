@@ -1,5 +1,6 @@
 /**
- * @file DatabaseManager edge-case tests for command, history, cache, and event behavior
+ * @file DatabaseManager edge-case tests for command, history, cache, and event
+ *   behavior
  */
 
 import type { Site } from "@shared/types";
@@ -8,23 +9,21 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
-import {
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type MockedFunction,
-    vi,
-} from "vitest";
+import { isRecord } from "@shared/utils/typeHelpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
+import type { DatabaseCommandExecutor } from "../../services/commands/DatabaseCommands";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { setHistoryLimit as setHistoryLimitContract } from "../../services/database/historyLimitManager";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
+import type { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
+import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 // Import after mocks so DatabaseManager uses mocked dependencies
@@ -32,6 +31,109 @@ import {
     DatabaseManager,
     type DatabaseManagerDependencies,
 } from "../../managers/DatabaseManager";
+
+type HistoryLimitUpdate = Pick<
+    Parameters<typeof setHistoryLimitContract>[0],
+    | "limit"
+    | "rules"
+    | "setHistoryLimit"
+>;
+
+interface DatabaseManagerTestView {
+    commandExecutor: Pick<DatabaseCommandExecutor, "execute">;
+    emitHistoryLimitUpdated: (limit: number) => Promise<void>;
+    emitSitesCacheUpdateRequested: () => Promise<void>;
+    historyLimit: number;
+    loadSites: () => Promise<void>;
+    siteCache: StandardizedCache<Site>;
+    siteLoadingOrchestrator: SiteLoadingOrchestrator;
+}
+
+function isHistoryLimitUpdate(value: unknown): value is HistoryLimitUpdate {
+    return (
+        isRecord(value) &&
+        typeof value["limit"] === "number" &&
+        isRecord(value["rules"]) &&
+        typeof value["rules"]["defaultLimit"] === "number" &&
+        typeof value["rules"]["maxLimit"] === "number" &&
+        typeof value["rules"]["minLimit"] === "number" &&
+        typeof value["setHistoryLimit"] === "function"
+    );
+}
+
+const getTestView = (manager: DatabaseManager): DatabaseManagerTestView =>
+    manager as unknown as DatabaseManagerTestView;
+
+const setHistoryLimitFromUnknown = (
+    manager: DatabaseManager,
+    value: unknown
+): Promise<void> => manager.setHistoryLimit(value as number);
+
+const createEventEmitterMock = () =>
+    ({
+        emitTyped: vi
+            .fn<TypedEventBus<UptimeEvents>["emitTyped"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<TypedEventBus<UptimeEvents>>;
+
+const createConfigurationManagerMock = () =>
+    ({
+        getHistoryRetentionRules: vi
+            .fn<ConfigurationManager["getHistoryRetentionRules"]>()
+            .mockReturnValue({
+                defaultLimit: DEFAULT_HISTORY_LIMIT,
+                maxLimit: 10_000,
+                minLimit: 25,
+            }),
+    }) satisfies Partial<ConfigurationManager>;
+
+const createDatabaseServiceMock = () =>
+    ({
+        close: vi.fn<DatabaseService["close"]>(),
+        getDatabase: vi.fn<DatabaseService["getDatabase"]>(),
+        initialize: vi.fn<DatabaseService["initialize"]>(),
+    }) satisfies Partial<DatabaseService>;
+
+const createHistoryRepositoryMock = () =>
+    ({
+        deleteAll: vi
+            .fn<HistoryRepository["deleteAll"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<HistoryRepository>;
+
+const createMonitorRepositoryMock = () =>
+    ({
+        findByIdentifier: vi
+            .fn<MonitorRepository["findByIdentifier"]>()
+            .mockResolvedValue(undefined),
+        findBySiteIdentifier: vi
+            .fn<MonitorRepository["findBySiteIdentifier"]>()
+            .mockResolvedValue([]),
+        getAllMonitorIds: vi
+            .fn<MonitorRepository["getAllMonitorIds"]>()
+            .mockResolvedValue([]),
+    }) satisfies Partial<MonitorRepository>;
+
+const createSettingsRepositoryMock = () =>
+    ({
+        get: vi.fn<SettingsRepository["get"]>().mockResolvedValue(undefined),
+        set: vi.fn<SettingsRepository["set"]>().mockResolvedValue(undefined),
+    }) satisfies Partial<SettingsRepository>;
+
+const createSiteRepositoryMock = () =>
+    ({
+        delete: vi.fn<SiteRepository["delete"]>().mockResolvedValue(false),
+        exportAllRows: vi
+            .fn<SiteRepository["exportAllRows"]>()
+            .mockResolvedValue([]),
+        findAll: vi.fn<SiteRepository["findAll"]>().mockResolvedValue([]),
+        findByIdentifier: vi
+            .fn<SiteRepository["findByIdentifier"]>()
+            .mockResolvedValue(undefined),
+    }) satisfies Partial<SiteRepository>;
+
+const createCommandExecutorMock = () =>
+    ({ execute: vi.fn() }) satisfies Partial<DatabaseCommandExecutor>;
 
 // Mock all external dependencies
 vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
@@ -98,9 +200,8 @@ vi.mock("../../services/database/serviceFactory", () => ({
         size: 0,
         entries: vi.fn().mockReturnValue([]),
         keys: vi.fn().mockReturnValue([]),
-        values: vi.fn().mockReturnValue([]),
         replaceAll: vi.fn(),
-    }),
+    } satisfies Partial<StandardizedCache<Site>>),
 }));
 
 vi.mock("../../services/database/SiteRepositoryService", () => ({
@@ -116,24 +217,18 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
                 sitesLoaded: 0,
                 message: "Success",
             }),
-            loadSitesFromRepository: vi.fn().mockResolvedValue([]),
-            addSiteToCache: vi.fn().mockResolvedValue(undefined),
-            updateSiteInCache: vi.fn().mockResolvedValue(undefined),
-            removeSiteFromCache: vi.fn().mockResolvedValue(undefined),
-        };
+        } satisfies Partial<SiteLoadingOrchestrator>;
     }),
 }));
 
 vi.mock("../../services/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn(async (args: any) => {
-        if (args && typeof args.setHistoryLimit === "function") {
-            const normalizedLimit = normalizeHistoryLimit(
-                args.limit,
-                args.rules ?? DEFAULT_HISTORY_LIMIT_RULES
-            );
-            await args.setHistoryLimit(normalizedLimit);
+    setHistoryLimit: vi.fn(async (args: unknown) => {
+        if (!isHistoryLimitUpdate(args)) {
+            throw new TypeError("Invalid history limit update contract");
         }
-        return undefined;
+
+        const normalizedLimit = normalizeHistoryLimit(args.limit, args.rules);
+        await args.setHistoryLimit(normalizedLimit);
     }),
 }));
 
@@ -169,130 +264,56 @@ vi.mock("../../shared/utils/errorHandling", () => {
 
 describe("DatabaseManager edge cases", () => {
     let databaseManager: DatabaseManager;
+    let databaseManagerTestView: DatabaseManagerTestView;
     let mockDependencies: DatabaseManagerDependencies;
-    let mockEventEmitter: TypedEventBus<UptimeEvents>;
-    let mockConfigurationManager: ConfigurationManager;
-    let mockDatabaseService: DatabaseService;
-    let mockHistoryRepository: HistoryRepository;
-    let mockMonitorRepository: MonitorRepository;
-    let mockSettingsRepository: SettingsRepository;
-    let mockSiteRepository: SiteRepository;
-    let mockCommandExecutor: any;
+    let mockEventEmitter: ReturnType<typeof createEventEmitterMock>;
+    let mockConfigurationManager: ReturnType<
+        typeof createConfigurationManagerMock
+    >;
+    let mockDatabaseService: ReturnType<typeof createDatabaseServiceMock>;
+    let mockHistoryRepository: ReturnType<typeof createHistoryRepositoryMock>;
+    let mockMonitorRepository: ReturnType<typeof createMonitorRepositoryMock>;
+    let mockSettingsRepository: ReturnType<typeof createSettingsRepositoryMock>;
+    let mockSiteRepository: ReturnType<typeof createSiteRepositoryMock>;
+    let mockCommandExecutor: ReturnType<typeof createCommandExecutorMock>;
 
     beforeEach(() => {
         // Clear all mocks
         vi.clearAllMocks();
 
-        // Create mock event emitter
-        mockEventEmitter = {
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-            on: vi.fn(),
-            off: vi.fn(),
-            removeAllListeners: vi.fn(),
-        } as unknown as TypedEventBus<UptimeEvents>;
-
-        // Create mock configuration manager
-        mockConfigurationManager = {
-            getHistoryRetentionRules: vi.fn().mockReturnValue({
-                defaultLimit: DEFAULT_HISTORY_LIMIT,
-                maxLimit: 10_000,
-                minLimit: 25,
-            }),
-        } as unknown as ConfigurationManager;
-
-        // Create mock database service
-        mockDatabaseService = {
-            initialize: vi.fn(),
-            close: vi.fn(),
-            getDatabase: vi.fn(),
-        } as unknown as DatabaseService;
-
-        // Create mock repositories
-        mockHistoryRepository = {
-            findBySiteIdentifier: vi.fn().mockResolvedValue([]),
-            deleteAll: vi.fn().mockResolvedValue(undefined),
-        } as unknown as HistoryRepository;
-
-        mockMonitorRepository = {
-            findBySiteIdentifier: vi.fn().mockResolvedValue([]),
-            findByIdentifier: vi.fn().mockResolvedValue(undefined),
-            getAllMonitorIds: vi.fn().mockResolvedValue([]),
-        } as unknown as MonitorRepository;
-
-        mockSettingsRepository = {
-            get: vi.fn().mockResolvedValue(undefined),
-            set: vi.fn().mockResolvedValue(undefined),
-            findByKey: vi.fn().mockResolvedValue(undefined),
-            upsert: vi.fn().mockResolvedValue(undefined),
-            exportAllRows: vi.fn().mockResolvedValue([]),
-        } as unknown as SettingsRepository;
-
-        mockSiteRepository = {
-            findAll: vi.fn().mockResolvedValue([]),
-            findByIdentifier: vi.fn().mockResolvedValue(undefined),
-            create: vi.fn().mockResolvedValue({ id: 1, identifier: "test" }),
-            update: vi.fn().mockResolvedValue(undefined),
-            delete: vi.fn().mockResolvedValue(undefined),
-            exportAllRows: vi.fn().mockResolvedValue([]),
-        } as unknown as SiteRepository;
-
-        // Create mock command executor
-        mockCommandExecutor = {
-            execute: vi.fn().mockResolvedValue({}),
-        };
+        mockEventEmitter = createEventEmitterMock();
+        mockConfigurationManager = createConfigurationManagerMock();
+        mockDatabaseService = createDatabaseServiceMock();
+        mockHistoryRepository = createHistoryRepositoryMock();
+        mockMonitorRepository = createMonitorRepositoryMock();
+        mockSettingsRepository = createSettingsRepositoryMock();
+        mockSiteRepository = createSiteRepositoryMock();
+        mockCommandExecutor = createCommandExecutorMock();
+        mockCommandExecutor.execute.mockResolvedValue({});
 
         // Create dependencies object
         mockDependencies = {
-            configurationManager: mockConfigurationManager,
-            eventEmitter: mockEventEmitter,
+            configurationManager:
+                mockConfigurationManager as unknown as ConfigurationManager,
+            eventEmitter:
+                mockEventEmitter as unknown as TypedEventBus<UptimeEvents>,
             repositories: {
-                database: mockDatabaseService,
-                history: mockHistoryRepository,
-                monitor: mockMonitorRepository,
-                settings: mockSettingsRepository,
-                site: mockSiteRepository,
+                database: mockDatabaseService as unknown as DatabaseService,
+                history: mockHistoryRepository as unknown as HistoryRepository,
+                monitor: mockMonitorRepository as unknown as MonitorRepository,
+                settings:
+                    mockSettingsRepository as unknown as SettingsRepository,
+                site: mockSiteRepository as unknown as SiteRepository,
             },
         };
 
         // Create DatabaseManager instance
         databaseManager = new DatabaseManager(mockDependencies);
-
-        // Replace the command executor with our mock
-        (databaseManager as any).commandExecutor = mockCommandExecutor;
-
-        // Ensure siteCache is properly mocked if it's undefined
-        if (!(databaseManager as any)["siteCache"]) {
-            (databaseManager as any)["siteCache"] = {
-                set: vi.fn(),
-                get: vi.fn(),
-                has: vi.fn(),
-                delete: vi.fn(),
-                clear: vi.fn(),
-                replaceAll: vi.fn(),
-                size: 0,
-                entries: vi.fn().mockReturnValue([]),
-                keys: vi.fn().mockReturnValue([]),
-                values: vi.fn().mockReturnValue([]),
-            };
-        }
-
-        // Ensure siteLoadingOrchestrator is properly mocked if methods are missing
-        if (
-            !(databaseManager as any).siteLoadingOrchestrator
-                ?.loadSitesFromDatabase
-        ) {
-            (databaseManager as any).siteLoadingOrchestrator = {
-                loadSitesFromDatabase: vi.fn().mockResolvedValue({
-                    success: true,
-                    sitesLoaded: 0,
-                    message: "Success",
-                }),
-                loadSitesFromRepository: vi.fn().mockResolvedValue([]),
-                addSiteToCache: vi.fn().mockResolvedValue(undefined),
-                updateSiteInCache: vi.fn().mockResolvedValue(undefined),
-                removeSiteFromCache: vi.fn().mockResolvedValue(undefined),
-            };
-        }
+        databaseManagerTestView = getTestView(databaseManager);
+        databaseManagerTestView.commandExecutor = mockCommandExecutor as Pick<
+            DatabaseCommandExecutor,
+            "execute"
+        >;
     });
 
     describe("Constructor", () => {
@@ -301,10 +322,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
@@ -314,14 +332,11 @@ describe("DatabaseManager edge cases", () => {
 
         it("should set default history limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Configuration", "type");
 
-            expect((databaseManager as any).historyLimit).toBe(
+            expect(databaseManagerTestView.historyLimit).toBe(
                 DEFAULT_HISTORY_LIMIT
             );
         });
@@ -333,16 +348,13 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
             // Arrange
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
 
             // Act
@@ -365,20 +377,17 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
             // Arrange
             const mockHistoryLimit = 750;
-            (
-                mockSettingsRepository.get as MockedFunction<any>
-            ).mockResolvedValue(String(mockHistoryLimit));
+            mockSettingsRepository.get.mockResolvedValue(
+                String(mockHistoryLimit)
+            );
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
 
             // Act
@@ -388,9 +397,7 @@ describe("DatabaseManager edge cases", () => {
             expect(mockSettingsRepository.get).toHaveBeenCalledWith(
                 "historyLimit"
             );
-            expect((databaseManager as any).historyLimit).toBe(
-                mockHistoryLimit
-            );
+            expect(databaseManagerTestView.historyLimit).toBe(mockHistoryLimit);
             expect(mockLoadSites).toHaveBeenCalled();
         });
 
@@ -399,26 +406,23 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
             // Arrange
-            (
-                mockSettingsRepository.get as MockedFunction<any>
-            ).mockRejectedValue(new Error("Settings error"));
+            mockSettingsRepository.get.mockRejectedValue(
+                new Error("Settings error")
+            );
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
 
             // Act
             await databaseManager.initialize();
 
             // Assert
-            expect((databaseManager as any).historyLimit).toBe(
+            expect(databaseManagerTestView.historyLimit).toBe(
                 DEFAULT_HISTORY_LIMIT
             );
             expect(mockLoadSites).toHaveBeenCalled();
@@ -429,20 +433,17 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
             // Arrange
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
-            (
-                mockEventEmitter.emitTyped as MockedFunction<any>
-            ).mockRejectedValue(new Error("Event error"));
+            mockEventEmitter.emitTyped.mockRejectedValue(
+                new Error("Event error")
+            );
 
             // Act & Assert - should not throw
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
@@ -456,10 +457,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Backup Operation", "type");
 
@@ -488,10 +486,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -512,10 +507,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Export Operation", "type");
 
@@ -536,10 +528,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -560,10 +549,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Import Operation", "type");
 
@@ -590,10 +576,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -622,10 +605,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -634,9 +614,9 @@ describe("DatabaseManager edge cases", () => {
             mockCommandExecutor.execute.mockRejectedValue(
                 new Error("Import failed")
             );
-            (
-                mockEventEmitter.emitTyped as MockedFunction<any>
-            ).mockRejectedValue(new Error("Event error"));
+            mockEventEmitter.emitTyped.mockRejectedValue(
+                new Error("Event error")
+            );
 
             // Act
             const isResult = await databaseManager.importData(importData);
@@ -654,10 +634,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Loading", "type");
 
@@ -677,20 +654,17 @@ describe("DatabaseManager edge cases", () => {
                 },
             ];
 
-            // Ensure siteCache is accessible and mock its methods
-            const { siteCache } = databaseManager as any;
-            if (!siteCache) {
-                throw new Error("siteCache is not initialized");
-            }
-
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
-            const entriesSpy = vi.spyOn(siteCache, "entries");
+            const entriesSpy = vi.spyOn(
+                databaseManagerTestView.siteCache,
+                "entries"
+            );
             entriesSpy.mockReturnValue(
                 new Map<string, Site>(
                     mockSites.map((s) => [s.identifier, s])
-                ).entries() as any
+                ).entries()
             );
 
             // Act
@@ -717,23 +691,18 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
             // Arrange
-            const { siteCache } = databaseManager as any;
-            if (!siteCache) {
-                throw new Error("siteCache is not initialized");
-            }
-
             const mockLoadSites = vi
-                .spyOn(databaseManager as any, "loadSites")
+                .spyOn(databaseManagerTestView, "loadSites")
                 .mockResolvedValue(undefined);
-            const entriesSpy = vi.spyOn(siteCache, "entries");
+            const entriesSpy = vi.spyOn(
+                databaseManagerTestView.siteCache,
+                "entries"
+            );
             entriesSpy.mockImplementation(() => {
                 throw new Error("Cache error");
             });
@@ -760,10 +729,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Configuration", "type");
 
@@ -777,27 +743,24 @@ describe("DatabaseManager edge cases", () => {
 
             // Assert
             expect(mockSetHistoryLimit).toHaveBeenCalled();
-            expect((databaseManager as any).historyLimit).toBe(newLimit);
+            expect(databaseManagerTestView.historyLimit).toBe(newLimit);
         });
 
         it("should reject non-number values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
             // Act & Assert
             await expect(
-                databaseManager.setHistoryLimit("invalid" as any)
+                setHistoryLimitFromUnknown(databaseManager, "invalid")
             ).rejects.toThrow(TypeError);
             await expect(
-                databaseManager.setHistoryLimit(null as any)
+                setHistoryLimitFromUnknown(databaseManager, null)
             ).rejects.toThrow(TypeError);
             await expect(
-                databaseManager.setHistoryLimit(undefined as any)
+                setHistoryLimitFromUnknown(databaseManager, undefined)
             ).rejects.toThrow(TypeError);
             await expect(databaseManager.setHistoryLimit(NaN)).rejects.toThrow(
                 TypeError
@@ -809,18 +772,15 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
             await databaseManager.setHistoryLimit(123.45);
-            expect((databaseManager as any).historyLimit).toBe(123);
+            expect(databaseManagerTestView.historyLimit).toBe(123);
 
             await databaseManager.setHistoryLimit(0.5);
-            expect((databaseManager as any).historyLimit).toBe(
+            expect(databaseManagerTestView.historyLimit).toBe(
                 DEFAULT_HISTORY_LIMIT_RULES.minLimit
             );
         });
@@ -830,26 +790,20 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
             await databaseManager.setHistoryLimit(-1);
-            expect((databaseManager as any).historyLimit).toBe(0);
+            expect(databaseManagerTestView.historyLimit).toBe(0);
 
             await databaseManager.setHistoryLimit(-100);
-            expect((databaseManager as any).historyLimit).toBe(0);
+            expect(databaseManagerTestView.historyLimit).toBe(0);
         });
 
         it("should reject infinite values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
@@ -867,18 +821,13 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Configuration", "type");
 
             // Arrange
             const maxLimit = 10_000;
-            (
-                mockConfigurationManager.getHistoryRetentionRules as MockedFunction<any>
-            ).mockReturnValue({
+            mockConfigurationManager.getHistoryRetentionRules.mockReturnValue({
                 maxLimit,
                 defaultLimit: DEFAULT_HISTORY_LIMIT,
                 minLimit: 25,
@@ -897,10 +846,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Configuration", "type");
 
@@ -925,16 +871,13 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Configuration", "type");
 
             // Arrange
             const testLimit = 750;
-            (databaseManager as any).historyLimit = testLimit;
+            databaseManagerTestView.historyLimit = testLimit;
 
             // Act
             const result = databaseManager.getHistoryLimit();
@@ -951,10 +894,7 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Data Update", "type");
 
@@ -962,7 +902,7 @@ describe("DatabaseManager edge cases", () => {
                 const limit = 500;
 
                 // Act
-                await (databaseManager as any).emitHistoryLimitUpdated(limit);
+                await databaseManagerTestView.emitHistoryLimitUpdated(limit);
 
                 // Assert
                 expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
@@ -979,22 +919,19 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Error Handling", "type");
 
                 // Arrange
                 const limit = 500;
-                (
-                    mockEventEmitter.emitTyped as MockedFunction<any>
-                ).mockRejectedValue(new Error("Event error"));
+                mockEventEmitter.emitTyped.mockRejectedValue(
+                    new Error("Event error")
+                );
 
                 // Act & Assert - should not throw
                 await expect(
-                    (databaseManager as any).emitHistoryLimitUpdated(limit)
+                    databaseManagerTestView.emitHistoryLimitUpdated(limit)
                 ).resolves.toBeUndefined();
             });
         });
@@ -1005,15 +942,12 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Data Update", "type");
 
                 // Arrange
-                const mockSites = [
+                const mockSites: Site[] = [
                     {
                         identifier: "site1",
                         name: "Site 1",
@@ -1021,13 +955,20 @@ describe("DatabaseManager edge cases", () => {
                         monitoring: false,
                     },
                 ];
-                const mockSiteCache = (databaseManager as any)["siteCache"];
-                mockSiteCache.entries.mockReturnValue(
-                    mockSites.map((site) => [site.identifier, site])
+                vi.spyOn(
+                    databaseManagerTestView.siteCache,
+                    "entries"
+                ).mockReturnValue(
+                    new Map(
+                        mockSites.map((site): [string, Site] => [
+                            site.identifier,
+                            site,
+                        ])
+                    ).entries()
                 );
 
                 // Act
-                await (databaseManager as any).emitSitesCacheUpdateRequested();
+                await databaseManagerTestView.emitSitesCacheUpdateRequested();
 
                 // Assert
                 expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
@@ -1044,21 +985,18 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Error Handling", "type");
 
                 // Arrange
-                (
-                    mockEventEmitter.emitTyped as MockedFunction<any>
-                ).mockRejectedValue(new Error("Event error"));
+                mockEventEmitter.emitTyped.mockRejectedValue(
+                    new Error("Event error")
+                );
 
                 // Act & Assert - should not throw
                 await expect(
-                    (databaseManager as any).emitSitesCacheUpdateRequested()
+                    databaseManagerTestView.emitSitesCacheUpdateRequested()
                 ).resolves.toBeUndefined();
             });
         });
@@ -1069,18 +1007,14 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Data Loading", "type");
 
                 // Arrange
-                const mockSiteLoadingOrchestrator = (databaseManager as any)
-                    .siteLoadingOrchestrator;
+                const { siteLoadingOrchestrator } = databaseManagerTestView;
                 vi.spyOn(
-                    mockSiteLoadingOrchestrator,
+                    siteLoadingOrchestrator,
                     "loadSitesFromDatabase"
                 ).mockResolvedValue({
                     success: true,
@@ -1089,11 +1023,11 @@ describe("DatabaseManager edge cases", () => {
                 });
 
                 // Act
-                await (databaseManager as any).loadSites();
+                await databaseManagerTestView.loadSites();
 
                 // Assert
                 expect(
-                    mockSiteLoadingOrchestrator.loadSitesFromDatabase
+                    siteLoadingOrchestrator.loadSitesFromDatabase
                 ).toHaveBeenCalled();
             });
 
@@ -1102,24 +1036,20 @@ describe("DatabaseManager edge cases", () => {
                 annotate,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
-                await annotate(
-                    "Component: DatabaseManager",
-                    "component"
-                );
+                await annotate("Component: DatabaseManager", "component");
                 await annotate("Category: Manager", "category");
                 await annotate("Type: Error Handling", "type");
 
                 // Arrange
-                const mockSiteLoadingOrchestrator = (databaseManager as any)
-                    .siteLoadingOrchestrator;
+                const { siteLoadingOrchestrator } = databaseManagerTestView;
                 vi.spyOn(
-                    mockSiteLoadingOrchestrator,
+                    siteLoadingOrchestrator,
                     "loadSitesFromDatabase"
                 ).mockRejectedValue(new Error("Loading error"));
 
                 // Act & Assert
                 await expect(
-                    (databaseManager as any).loadSites()
+                    databaseManagerTestView.loadSites()
                 ).rejects.toThrow("Loading error");
             });
         });
@@ -1131,10 +1061,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1155,10 +1082,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
@@ -1178,25 +1102,12 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
             // This tests constructor robustness with minimal dependencies
-            const minimalDeps: DatabaseManagerDependencies = {
-                configurationManager: mockConfigurationManager,
-                eventEmitter: mockEventEmitter,
-                repositories: {
-                    database: mockDatabaseService,
-                    history: mockHistoryRepository,
-                    monitor: mockMonitorRepository,
-                    settings: mockSettingsRepository,
-                    site: mockSiteRepository,
-                },
-            };
+            const minimalDeps = { ...mockDependencies };
 
             // Act & Assert - should not throw
             expect(() => new DatabaseManager(minimalDeps)).not.toThrow();
@@ -1209,10 +1120,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
@@ -1233,10 +1141,7 @@ describe("DatabaseManager edge cases", () => {
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: DatabaseManager",
-                "component"
-            );
+            await annotate("Component: DatabaseManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 

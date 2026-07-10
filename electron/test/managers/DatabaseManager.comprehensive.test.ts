@@ -4,38 +4,63 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockInstance,
+    vi,
+} from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes.js";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type {
     DatabaseManagerDependencies,
     DatabaseManager as DatabaseManagerType,
 } from "../../managers/DatabaseManager";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+import type {
+    HistoryRepository,
+    HistoryRepositoryTransactionAdapter,
+} from "../../services/database/HistoryRepository";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type {
+    SettingsRepository,
+    SettingsRepositoryTransactionAdapter,
+} from "../../services/database/SettingsRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
-import { DataImportExportService } from "../../services/database/DataImportExportService";
 // Import the mocked classes for use in tests
 import { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
 
 // Mock database commands FIRST using vi.hoisted
 const { DatabaseCommandExecutor } = vi.hoisted(() => {
     const mockExecutor = vi.fn(function DatabaseCommandExecutorMock() {
-        const executeMethod = vi.fn().mockImplementation((command) => {
+        const executeMethod = vi.fn().mockImplementation((command: unknown) => {
+            const constructor =
+                typeof command === "object" && command !== null
+                    ? Reflect.get(command, "constructor")
+                    : undefined;
+            const commandName =
+                typeof constructor === "function"
+                    ? constructor.name
+                    : undefined;
+
             // Return appropriate values based on command type
-            if (command && command.constructor.name === "ImportDataCommand") {
+            if (commandName === "ImportDataCommand") {
                 return Promise.resolve(true);
             }
-            if (
-                command &&
-                command.constructor.name === "DownloadBackupCommand"
-            ) {
+            if (commandName === "DownloadBackupCommand") {
                 return Promise.resolve("/path/to/backup.json");
             }
-            if (command && command.constructor.name === "ExportDataCommand") {
+            if (commandName === "ExportDataCommand") {
                 return Promise.resolve('{"sites": [], "settings": []}');
             }
             return Promise.resolve(undefined);
@@ -136,19 +161,6 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
     }),
 }));
 
-// Mock DataImportExportService
-vi.mock("../../services/database/DataImportExportService", () => ({
-    DataImportExportService: vi.fn(function DataImportExportServiceMock() {
-        return {
-            importDataFromJson: vi.fn(),
-            persistImportedData: vi.fn(),
-            exportDataToJson: vi.fn(),
-            downloadBackup: vi.fn(),
-            validateImportData: vi.fn(),
-        };
-    }),
-}));
-
 // Mock serviceFactory
 vi.mock("../../services/database/serviceFactory", () => ({
     createSiteCache: vi.fn(() => {
@@ -203,49 +215,63 @@ const mockEventEmitter = {
     removeAllListeners: vi.fn(),
 } as unknown as TypedEventBus<UptimeEvents>;
 
-const mockConfigurationManager = {
+const configurationManagerFixture = {
     getHistoryRetentionRules: vi.fn().mockReturnValue({
         defaultLimit: 500,
         maxLimit: 1000,
         minLimit: 25,
     }),
-} as any;
+};
+const mockConfigurationManager =
+    configurationManagerFixture as unknown as ConfigurationManager;
 
-const mockDatabaseService = {
+const sqliteDatabaseFixture = {} as unknown as Database;
+const databaseServiceFixture = {
     initialize: vi.fn(() => Promise.resolve()),
     close: vi.fn(),
-    getDatabase: vi.fn(),
-    executeTransaction: vi.fn((callback) => {
-        // Mock the callback execution
-        const mockDb = {};
-        return Promise.resolve(callback(mockDb));
-    }),
-} as any;
+    getDatabase: vi.fn(() => sqliteDatabaseFixture),
+    executeTransaction: vi.fn(
+        async <T>(
+            callback: (database: Database) => Promise<T> | T
+        ): Promise<T> => callback(sqliteDatabaseFixture)
+    ),
+};
+const mockDatabaseService =
+    databaseServiceFixture as unknown as DatabaseService;
 
-const mockHistoryRepository = {
+const historyRepositoryFixture = {
+    createTransactionAdapter: vi.fn(),
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
     deleteAll: vi.fn(() => Promise.resolve()),
     deleteOldHistoryEntriesBySiteId: vi.fn(() => Promise.resolve()),
     pruneAllHistoryInternal: vi.fn(),
     deleteAllInternal: vi.fn(),
-} as any;
+};
+const mockHistoryRepository =
+    historyRepositoryFixture as unknown as HistoryRepository;
 
-const mockMonitorRepository = {
+const monitorRepositoryFixture = {
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
     findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
     getAllMonitorIds: vi.fn(() => Promise.resolve([])),
     deleteAllInternal: vi.fn(),
-} as any;
+};
+const mockMonitorRepository =
+    monitorRepositoryFixture as unknown as MonitorRepository;
 
-const mockSettingsRepository = {
+const settingsRepositoryFixture = {
+    createTransactionAdapter: vi.fn(),
     findByKey: vi.fn(() => Promise.resolve(undefined)),
     get: vi.fn(() => Promise.resolve(undefined)),
     upsert: vi.fn(() => Promise.resolve()),
     setInternal: vi.fn(),
+    deleteAllInternal: vi.fn(),
     exportAllRows: vi.fn(() => Promise.resolve([])),
-} as any;
+};
+const mockSettingsRepository =
+    settingsRepositoryFixture as unknown as SettingsRepository;
 
-const mockSiteRepository = {
+const siteRepositoryFixture = {
     findAll: vi.fn(() => Promise.resolve([])),
     findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
     upsert: vi.fn(() => Promise.resolve()),
@@ -256,50 +282,47 @@ const mockSiteRepository = {
     exportAllRows: vi.fn(() => Promise.resolve([])),
     bulkInsertInternal: vi.fn(),
     deleteAllInternal: vi.fn(),
-} as any;
-
-const attachTransactionAdapter = (
-    repository: Record<string, any>,
-    builders: Record<string, Function>
-) => {
-    repository["createTransactionAdapter"] = vi
-        .fn()
-        .mockImplementation((db: unknown) => {
-            const adapter: Record<string, any> = {};
-            for (const [key, factory] of Object.entries(builders)) {
-                adapter[key] = vi.fn((...args: unknown[]) =>
-                    factory(db, ...args)
-                );
-            }
-            return adapter;
-        });
 };
+const mockSiteRepository = siteRepositoryFixture as unknown as SiteRepository;
 
 const initializeTransactionAdapters = (): void => {
-    attachTransactionAdapter(mockSettingsRepository, {
-        set: (db: unknown, key: unknown, value: unknown) =>
-            mockSettingsRepository.setInternal(db, key, value),
-    });
+    vi.mocked(mockSettingsRepository.setInternal).mockReset();
+    vi.mocked(mockHistoryRepository.pruneAllHistoryInternal).mockReset();
 
-    attachTransactionAdapter(mockHistoryRepository, {
-        pruneAllHistory: (db: unknown, limit: unknown) =>
-            mockHistoryRepository.pruneAllHistoryInternal(db, limit),
-        deleteAll: (db: unknown) => mockHistoryRepository.deleteAllInternal(db),
-    });
+    vi.mocked(
+        mockSettingsRepository.createTransactionAdapter
+    ).mockImplementation(
+        (database: Database): SettingsRepositoryTransactionAdapter => ({
+            bulkInsert: vi.fn(),
+            deleteAll: vi.fn(() =>
+                mockSettingsRepository.deleteAllInternal(database)
+            ),
+            deleteByKey: vi.fn(),
+            set: vi.fn((key: string, value: string) =>
+                mockSettingsRepository.setInternal(database, key, value)
+            ),
+        })
+    );
 
-    attachTransactionAdapter(mockMonitorRepository, {
-        deleteAll: (db: unknown) => mockMonitorRepository.deleteAllInternal(db),
-    });
-
-    attachTransactionAdapter(mockSiteRepository, {
-        bulkInsert: (db: unknown, rows: unknown) =>
-            mockSiteRepository.bulkInsertInternal(db, rows),
-        deleteAll: (db: unknown) => mockSiteRepository.deleteAllInternal(db),
-    });
+    vi.mocked(
+        mockHistoryRepository.createTransactionAdapter
+    ).mockImplementation(
+        (database: Database): HistoryRepositoryTransactionAdapter => ({
+            addEntry: vi.fn(),
+            deleteAll: vi.fn(() =>
+                mockHistoryRepository.deleteAllInternal(database)
+            ),
+            deleteByMonitorId: vi.fn(),
+            getHistoryCount: vi.fn(() => 0),
+            pruneAllHistory: vi.fn((limit: number) =>
+                mockHistoryRepository.pruneAllHistoryInternal(database, limit)
+            ),
+        })
+    );
 };
 
 // Helper function to create proper mocks
-const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
+const createSiteLoadingOrchestratorFixture = () => ({
     loadSitesFromDatabase: vi.fn().mockResolvedValue({
         success: true,
         sitesLoaded: 0,
@@ -308,6 +331,15 @@ const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
     siteRepositoryService: {
         getSitesFromDatabase: vi.fn().mockResolvedValue([]),
     },
+});
+type SiteLoadingOrchestratorFixture = ReturnType<
+    typeof createSiteLoadingOrchestratorFixture
+>;
+
+const createSiteLoadingOrchestratorMock = (
+    overrides: Partial<SiteLoadingOrchestratorFixture> = {}
+): SiteLoadingOrchestratorFixture => ({
+    ...createSiteLoadingOrchestratorFixture(),
     ...overrides,
 });
 
@@ -319,27 +351,34 @@ const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
  * which is not constructable and breaks `new SiteLoadingOrchestrator(...)`.
  */
 const setSiteLoadingOrchestratorMock = (
-    orchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>
+    orchestrator: SiteLoadingOrchestratorFixture
 ): void => {
+    type SiteLoadingOrchestratorConstructorMock = MockInstance<
+        (
+            ...args: ConstructorParameters<typeof SiteLoadingOrchestrator>
+        ) => SiteLoadingOrchestrator
+    >;
+
     mockConstructableReturnValue(
-        SiteLoadingOrchestrator as any,
-        orchestrator as any
+        vi.mocked(
+            SiteLoadingOrchestrator
+        ) as unknown as SiteLoadingOrchestratorConstructorMock,
+        orchestrator as unknown as SiteLoadingOrchestrator
     );
 };
 
-const createDataImportExportServiceMock = (overrides = {}) => ({
-    importDataFromJson: vi.fn(),
-    persistImportedData: vi.fn(),
-    exportDataToJson: vi.fn(),
-    downloadBackup: vi.fn(),
-    validateImportData: vi.fn(),
-    ...overrides,
-});
+const setPrivateCollaborator = (
+    databaseManager: DatabaseManagerType,
+    property: "commandExecutor" | "siteLoadingOrchestrator",
+    value: unknown
+): void => {
+    expect(Reflect.set(databaseManager, property, value)).toBeTruthy();
+};
 
 describe("DatabaseManager - Comprehensive Error Coverage", () => {
     let databaseManager: DatabaseManagerType;
     let mockDeps: DatabaseManagerDependencies;
-    let mockOrchestrator: ReturnType<typeof createSiteLoadingOrchestratorMock>;
+    let mockOrchestrator: SiteLoadingOrchestratorFixture;
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -550,8 +589,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }),
             });
 
-            // Direct property assignment since vi.mock doesn't intercept constructor calls
-            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             // Should throw when loadSitesFromDatabase fails
             await expect(databaseManager.initialize()).rejects.toThrow(
@@ -577,7 +619,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }),
             });
 
-            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             let thrownError: unknown;
             try {
@@ -623,7 +669,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Direct property assignment since vi.mock doesn't intercept constructor calls
-            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             await databaseManager.initialize();
             expect(mockOrchestrator.loadSitesFromDatabase).toHaveBeenCalled();
@@ -745,8 +795,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
             setSiteLoadingOrchestratorMock(mockOrchestrator);
 
-            (databaseManager as any).siteLoadingOrchestrator =
-                mockOrchestrator as any;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             // Mock event emission to fail
             vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
@@ -775,26 +828,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Reset and configure the DataImportExportService mock
-            // Mock import service to fail
-            const mockImportService = createDataImportExportServiceMock({
-                importDataFromJson: vi
-                    .fn()
-                    .mockRejectedValue(new Error("Import failed")),
-            });
-            vi.mocked(DataImportExportService).mockImplementation(
-                function DataImportExportServiceCtorMock() {
-                    return mockImportService as any;
-                }
-            );
-
             const mockExecute = vi
                 .fn()
                 .mockRejectedValue(new Error("Import failed"));
-            (databaseManager as any).commandExecutor = {
+            setPrivateCollaborator(databaseManager, "commandExecutor", {
+                clear: vi.fn(),
                 execute: mockExecute,
                 rollbackAll: vi.fn(),
-            };
+            });
 
             // Mock first event emission to succeed, second to fail
             vi.mocked(mockEventEmitter.emitTyped)
@@ -814,25 +855,13 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Import Operation", "type");
 
-            // Reset and configure the DataImportExportService mock
-            const mockImportService = createDataImportExportServiceMock({
-                importDataFromJson: vi
-                    .fn()
-                    .mockResolvedValue({ sites: [], settings: [] }),
-                persistImportedData: vi.fn().mockResolvedValue(undefined),
-            });
-            vi.mocked(DataImportExportService).mockImplementation(
-                function DataImportExportServiceCtorMock() {
-                    return mockImportService as any;
-                }
-            );
-
             // Mock the command executor to succeed for ImportDataCommand
             const mockExecute = vi.fn().mockResolvedValue(true);
-            (databaseManager as any).commandExecutor = {
+            setPrivateCollaborator(databaseManager, "commandExecutor", {
+                clear: vi.fn(),
                 execute: mockExecute,
                 rollbackAll: vi.fn(),
-            };
+            });
 
             const isResult = await databaseManager.importData(
                 '{"sites": [{"identifier": "site1"}], "settings": []}'
@@ -888,27 +917,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await databaseManager.initialize();
 
             // Mock the repository methods that are actually called by the utility
-            const mockSetInternal = vi.fn().mockImplementation(() => {
-                throw new Error("Failed to set limit");
-            });
-
-            // Use direct property assignment for repositories
-            (databaseManager as any).dependencies.repositories.settings = {
-                ...mockSettingsRepository,
-                setInternal: mockSetInternal,
-            };
-
-            mockSettingsRepository.setInternal = mockSetInternal;
-            attachTransactionAdapter(mockSettingsRepository, {
-                set: (db: unknown, key: unknown, value: unknown) =>
-                    mockSetInternal(db, key, value),
-            });
-
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
+            vi.mocked(mockSettingsRepository.setInternal).mockImplementation(
+                () => {
+                    throw new Error("Failed to set limit");
                 }
             );
 
@@ -975,8 +986,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
             setSiteLoadingOrchestratorMock(mockOrchestrator);
 
-            (databaseManager as any).siteLoadingOrchestrator =
-                mockOrchestrator as any;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
                 async (eventName, _payload) => {
@@ -1082,7 +1096,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Direct property assignment since vi.mock doesn't intercept constructor calls
-            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             // Should propagate the error
             await expect(databaseManager.initialize()).rejects.toThrow(
@@ -1112,10 +1130,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 },
             };
             const mockExecute = vi.fn().mockResolvedValue(mockBackupResult);
-            (databaseManager as any).commandExecutor = {
+            setPrivateCollaborator(databaseManager, "commandExecutor", {
+                clear: vi.fn(),
                 execute: mockExecute,
                 rollbackAll: vi.fn().mockResolvedValue(undefined),
-            };
+            });
 
             const result = await databaseManager.downloadBackup();
 
@@ -1136,21 +1155,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             const mockExecute = vi
                 .fn()
                 .mockRejectedValue(new Error("File system error"));
-            (databaseManager as any).commandExecutor = {
+            setPrivateCollaborator(databaseManager, "commandExecutor", {
+                clear: vi.fn(),
                 execute: mockExecute,
                 rollbackAll: vi.fn().mockResolvedValue(undefined),
-            };
-
-            const mockImportService = createDataImportExportServiceMock({
-                downloadBackup: vi
-                    .fn()
-                    .mockRejectedValue(new Error("File system error")),
             });
-            vi.mocked(DataImportExportService).mockImplementation(
-                function DataImportExportServiceCtorMock() {
-                    return mockImportService as any;
-                }
-            );
 
             await expect(databaseManager.downloadBackup()).rejects.toThrow(
                 "File system error"
@@ -1177,69 +1186,16 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Mock the repository methods that are actually called by the utility
-            const mockSetInternal = vi.fn();
-            const mockPruneAllHistoryInternal = vi.fn();
+            const mockSetInternal = vi.fn<SettingsRepository["setInternal"]>();
+            const mockPruneAllHistoryInternal =
+                vi.fn<HistoryRepository["pruneAllHistoryInternal"]>();
 
-            // Use direct property assignment for repositories
-            (databaseManager as any).dependencies.repositories.settings = {
-                ...mockSettingsRepository,
-                setInternal: mockSetInternal,
-            };
-            (databaseManager as any).dependencies.repositories.history = {
-                ...mockHistoryRepository,
-                pruneAllHistoryInternal: mockPruneAllHistoryInternal,
-            };
-
-            mockSettingsRepository.setInternal = mockSetInternal;
-            attachTransactionAdapter(mockSettingsRepository, {
-                set: (db: unknown, key: unknown, value: unknown) =>
-                    mockSetInternal(db, key, value),
-            });
-
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
-                }
+            vi.mocked(mockSettingsRepository.setInternal).mockImplementation(
+                mockSetInternal
             );
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.history,
-                {
-                    pruneAllHistory: (db: unknown, limit: unknown) =>
-                        mockPruneAllHistoryInternal(db, limit),
-                }
-            );
-
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
-                }
-            );
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.history,
-                {
-                    pruneAllHistory: (db: unknown, limit: unknown) =>
-                        mockPruneAllHistoryInternal(db, limit),
-                }
-            );
-
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
-                }
-            );
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.history,
-                {
-                    pruneAllHistory: (db: unknown, limit: unknown) =>
-                        mockPruneAllHistoryInternal(db, limit),
-                }
-            );
+            vi.mocked(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).mockImplementation(mockPruneAllHistoryInternal);
 
             await databaseManager.setHistoryLimit(300);
 
@@ -1296,34 +1252,16 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Mock the repository methods that are actually called by the utility
-            const mockSetInternal = vi.fn();
-            const mockPruneAllHistoryInternal = vi.fn();
+            const mockSetInternal = vi.fn<SettingsRepository["setInternal"]>();
+            const mockPruneAllHistoryInternal =
+                vi.fn<HistoryRepository["pruneAllHistoryInternal"]>();
 
-            // Use direct property assignment for repositories
-            (databaseManager as any).dependencies.repositories.settings = {
-                ...mockSettingsRepository,
-                setInternal: mockSetInternal,
-            };
-            (databaseManager as any).dependencies.repositories.history = {
-                ...mockHistoryRepository,
-                pruneAllHistoryInternal: mockPruneAllHistoryInternal,
-            };
-
-            mockSettingsRepository.setInternal = mockSetInternal;
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
-                }
+            vi.mocked(mockSettingsRepository.setInternal).mockImplementation(
+                mockSetInternal
             );
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.history,
-                {
-                    pruneAllHistory: (db: unknown, limit: unknown) =>
-                        mockPruneAllHistoryInternal(db, limit),
-                }
-            );
+            vi.mocked(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).mockImplementation(mockPruneAllHistoryInternal);
 
             await databaseManager.setHistoryLimit(10);
 
@@ -1361,21 +1299,9 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Mock the repository methods that are actually called by the utility
-            const mockSetInternal = vi.fn().mockImplementation(() => {
-                throw new Error("Database write error");
-            });
-
-            // Use direct property assignment for repositories
-            (databaseManager as any).dependencies.repositories.settings = {
-                ...mockSettingsRepository,
-                setInternal: mockSetInternal,
-            };
-
-            attachTransactionAdapter(
-                (databaseManager as any).dependencies.repositories.settings,
-                {
-                    set: (db: unknown, key: unknown, value: unknown) =>
-                        mockSetInternal(db, key, value),
+            vi.mocked(mockSettingsRepository.setInternal).mockImplementation(
+                () => {
+                    throw new Error("Database write error");
                 }
             );
 
@@ -1438,8 +1364,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             vi.clearAllMocks();
 
             const mockOrchestrator = createSiteLoadingOrchestratorMock();
-            // Direct property assignment since vi.mock doesn't intercept constructor calls
-            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+            setPrivateCollaborator(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockOrchestrator
+            );
 
             // First initialization
             await databaseManager.initialize();
@@ -1462,9 +1391,13 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(
-                mockConfigurationManager.getHistoryRetentionRules
-            ).mockReturnValue(undefined as any);
+            expect(
+                Reflect.set(
+                    mockConfigurationManager,
+                    "getHistoryRetentionRules",
+                    vi.fn(() => undefined)
+                )
+            ).toBeTruthy();
 
             await expect(databaseManager.setHistoryLimit(300)).rejects.toThrow(
                 "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
@@ -1490,18 +1423,16 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             });
 
             // Mock the repository methods that are actually called by the utility
-            const mockSetInternal = vi.fn();
-            const mockPruneAllHistoryInternal = vi.fn();
+            const mockSetInternal = vi.fn<SettingsRepository["setInternal"]>();
+            const mockPruneAllHistoryInternal =
+                vi.fn<HistoryRepository["pruneAllHistoryInternal"]>();
 
-            // Use direct property assignment for repositories
-            (databaseManager as any).dependencies.repositories.settings = {
-                ...mockSettingsRepository,
-                setInternal: mockSetInternal,
-            };
-            (databaseManager as any).dependencies.repositories.history = {
-                ...mockHistoryRepository,
-                pruneAllHistoryInternal: mockPruneAllHistoryInternal,
-            };
+            vi.mocked(mockSettingsRepository.setInternal).mockImplementation(
+                mockSetInternal
+            );
+            vi.mocked(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).mockImplementation(mockPruneAllHistoryInternal);
 
             // Test concurrent setHistoryLimit calls
             const promises = [
@@ -1516,27 +1447,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 undefined,
             ]);
 
-            const settingsAdapterMock = vi.mocked(
-                (databaseManager as any).dependencies.repositories.settings
-                    .createTransactionAdapter
-            );
-
-            let totalSetInvocations = 0;
-            for (const invocation of settingsAdapterMock.mock.results) {
-                if (invocation.type !== "return") {
-                    continue;
-                }
-
-                const adapter = invocation.value as {
-                    set?: ReturnType<typeof vi.fn>;
-                };
-
-                if (adapter?.set) {
-                    totalSetInvocations += adapter.set.mock.calls.length;
-                }
-            }
-
-            expect(totalSetInvocations).toBe(3);
+            expect(mockSetInternal).toHaveBeenCalledTimes(3);
         });
     });
 });
