@@ -14,6 +14,8 @@
  * @public
  */
 
+import { isObject } from "@shared/utils/typeGuards";
+
 import { describe, expect, it } from "vitest";
 
 import type { IpcResponse } from "../../../services/ipc/types";
@@ -23,40 +25,59 @@ describe("IPC Standardization Concepts", () => {
      * Helper function to validate IpcResponse format
      */
     function validateIpcResponse<T>(
-        response: any
+        response: unknown
     ): asserts response is IpcResponse<T> {
         expect(response).toBeTypeOf("object");
-        expect(response).toHaveProperty("success");
-        expect(typeof response.success).toBe("boolean");
+        if (!isObject(response)) {
+            throw new TypeError("IPC response must be an object");
+        }
 
-        if (response.success) {
+        expect(response).toHaveProperty("success");
+        expect(typeof response["success"]).toBe("boolean");
+        if (typeof response["success"] !== "boolean") {
+            throw new TypeError("IPC response success must be a boolean");
+        }
+
+        if (response["success"]) {
             // Success responses may have data, metadata, warnings
-            if (response.data !== undefined) {
-                expect(response.data).toBeDefined();
+            if (response["data"] !== undefined) {
+                expect(response["data"]).toBeDefined();
             }
         } else {
             // Error responses must have error message
             expect(response).toHaveProperty("error");
-            expect(typeof response.error).toBe("string");
-            expect(response.error.length).toBeGreaterThan(0);
+            expect(typeof response["error"]).toBe("string");
+            if (typeof response["error"] !== "string") {
+                throw new TypeError("IPC response error must be a string");
+            }
+            expect(response["error"]).not.toHaveLength(0);
         }
 
         // Optional metadata should contain handler name and duration if present
-        if (response.metadata) {
-            expect(response.metadata).toBeTypeOf("object");
-            if (response.metadata.handler) {
-                expect(typeof response.metadata.handler).toBe("string");
+        const metadata = response["metadata"];
+        if (metadata !== undefined) {
+            expect(metadata).toBeTypeOf("object");
+            if (!isObject(metadata)) {
+                throw new TypeError("IPC response metadata must be an object");
             }
-            if (response.metadata.duration) {
-                expect(typeof response.metadata.duration).toBe("number");
-                expect(response.metadata.duration).toBeGreaterThanOrEqual(0);
+
+            if (metadata["handler"] !== undefined) {
+                expect(typeof metadata["handler"]).toBe("string");
+            }
+            if (metadata["duration"] !== undefined) {
+                expect(typeof metadata["duration"]).toBe("number");
+                expect(metadata["duration"]).toBeGreaterThanOrEqual(0);
             }
         }
 
         // Optional warnings should be string array
-        if (response.warnings) {
-            expect(Array.isArray(response.warnings)).toBeTruthy();
-            response.warnings.forEach((warning: any) => {
+        const warnings = response["warnings"];
+        if (warnings !== undefined) {
+            expect(Array.isArray(warnings)).toBeTruthy();
+            if (!Array.isArray(warnings)) {
+                throw new TypeError("IPC response warnings must be an array");
+            }
+            warnings.forEach((warning: unknown) => {
                 expect(typeof warning).toBe("string");
             });
         }
@@ -65,8 +86,8 @@ describe("IPC Standardization Concepts", () => {
     /**
      * Mock standardized IPC handler wrapper
      */
-    function createMockStandardizedHandler<T>(
-        handler: (...args: any[]) => Promise<T>,
+    function createMockStandardizedHandler<TArgs extends unknown[], T>(
+        handler: (...args: TArgs) => Promise<T>,
         validator?: (params: unknown[]) => null | string[]
     ) {
         return async (...args: unknown[]): Promise<IpcResponse<T>> => {
@@ -90,7 +111,7 @@ describe("IPC Standardization Concepts", () => {
                 }
 
                 // Execute handler
-                const result = await handler(...args);
+                const result = await handler(...(args as TArgs));
 
                 return {
                     success: true,

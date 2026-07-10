@@ -22,7 +22,10 @@ import type { Monitor, Site, StatusHistory } from "@shared/types";
 import fc from "fast-check";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { DataImportExportService } from "../../services/database/DataImportExportService";
+import {
+    DataImportExportService,
+    type DataImportExportConfig,
+} from "../../services/database/DataImportExportService";
 
 type BaseGeneratedMonitor = Pick<
     Monitor,
@@ -119,12 +122,18 @@ const validExportMonitorArbitrary: fc.Arbitrary<Monitor> = fc.oneof(
             safeHostArbitrary,
             fc.integer({ max: 65_535, min: 1 })
         )
-        .map(([base, host, port]) => ({
-            ...base,
-            host,
-            port,
-            type: "port" as const,
-        })),
+        .map(
+            ([
+                base,
+                host,
+                port,
+            ]) => ({
+                ...base,
+                host,
+                port,
+                type: "port" as const,
+            })
+        ),
     fc
         .tuple(baseGeneratedMonitorArbitrary, safeHostArbitrary)
         .map(([base, host]) => ({
@@ -142,70 +151,83 @@ const validExportSiteArbitrary: fc.Arbitrary<Site> = fc.record({
     name: safeNameArbitrary,
 });
 
+const createMockConfig = () => ({
+    databaseService: {
+        executeTransaction: vi
+            .fn()
+            .mockImplementation(
+                async (
+                    callback: (database: Record<string, never>) => unknown
+                ) => callback({})
+            ),
+    },
+    eventEmitter: {
+        emitTyped: vi.fn().mockResolvedValue(undefined),
+    },
+    logger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
+    repositories: {
+        history: {
+            addEntryInternal: vi.fn(),
+            createTransactionAdapter: vi.fn(),
+            deleteAllInternal: vi.fn(),
+            findByMonitorId: vi.fn().mockResolvedValue([]),
+        },
+        monitor: {
+            bulkCreate: vi.fn().mockResolvedValue([]),
+            createTransactionAdapter: vi.fn(),
+            deleteAllInternal: vi.fn(),
+            findBySiteIdentifier: vi.fn().mockResolvedValue([]),
+        },
+        settings: {
+            bulkInsertInternal: vi.fn(),
+            createTransactionAdapter: vi.fn(),
+            deleteAllInternal: vi.fn(),
+            getAll: vi.fn().mockResolvedValue({}),
+        },
+        site: {
+            bulkInsertInternal: vi.fn(),
+            createTransactionAdapter: vi.fn(),
+            deleteAllInternal: vi.fn(),
+            exportAllRows: vi.fn().mockResolvedValue([]),
+            findAll: vi.fn().mockResolvedValue([]),
+            findByIdentifier: vi.fn().mockResolvedValue(undefined),
+        },
+    },
+});
+
+type MockConfig = ReturnType<typeof createMockConfig>;
+type AdapterBuilder = (...args: never[]) => unknown;
+
+const attachAdapter = <
+    TRepository extends { createTransactionAdapter: ReturnType<typeof vi.fn> },
+>(
+    repository: TRepository,
+    builders: Record<string, AdapterBuilder>
+): void => {
+    repository.createTransactionAdapter.mockImplementation(
+        (database: unknown) =>
+            Object.fromEntries(
+                Object.entries(builders).map(([key, factory]) => [
+                    key,
+                    vi.fn((...args: unknown[]) =>
+                        Reflect.apply(factory, undefined, [database, ...args])
+                    ),
+                ])
+            )
+    );
+};
+
 describe("Data Import/Export Service Fuzzing Tests", () => {
     let service: DataImportExportService;
-    let mockConfig: any;
+    let mockConfig: MockConfig;
 
     beforeEach(() => {
-        mockConfig = {
-            databaseService: {
-                executeTransaction: vi
-                    .fn()
-                    .mockImplementation(
-                        async (callback: any) => await callback({})
-                    ),
-            },
-            eventEmitter: {
-                emitTyped: vi.fn().mockResolvedValue(undefined),
-            },
-            logger: {
-                debug: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
-                error: vi.fn(),
-            },
-            repositories: {
-                site: {
-                    exportAllRows: vi.fn().mockResolvedValue([]),
-                    findAll: vi.fn().mockResolvedValue([]),
-                    findByIdentifier: vi.fn().mockResolvedValue(undefined),
-                    bulkInsertInternal: vi.fn(),
-                    deleteAllInternal: vi.fn(),
-                },
-                settings: {
-                    getAll: vi.fn().mockResolvedValue({}),
-                    bulkInsertInternal: vi.fn(),
-                    deleteAllInternal: vi.fn(),
-                },
-                monitor: {
-                    bulkCreate: vi.fn().mockResolvedValue([]),
-                    findBySiteIdentifier: vi.fn().mockResolvedValue([]),
-                    deleteAllInternal: vi.fn(),
-                },
-                history: {
-                    deleteAllInternal: vi.fn(),
-                    findByMonitorId: vi.fn().mockResolvedValue([]),
-                    addEntryInternal: vi.fn(),
-                },
-            },
-        };
-
-        const attachAdapter = (
-            repository: Record<string, any>,
-            builders: Record<string, Function>
-        ) => {
-            repository["createTransactionAdapter"] = vi
-                .fn()
-                .mockImplementation((db: unknown) => {
-                    const adapter: Record<string, any> = {};
-                    for (const [key, factory] of Object.entries(builders)) {
-                        adapter[key] = vi.fn((...args: unknown[]) =>
-                            factory(db, ...args)
-                        );
-                    }
-                    return adapter;
-                });
-        };
+        mockConfig = createMockConfig();
 
         attachAdapter(mockConfig.repositories.site, {
             bulkInsert: (db: unknown, rows: unknown) =>
@@ -243,7 +265,9 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                 ),
         });
 
-        service = new DataImportExportService(mockConfig);
+        service = new DataImportExportService(
+            mockConfig as unknown as DataImportExportConfig
+        );
         vi.clearAllMocks();
     });
 
@@ -310,7 +334,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
                                                 "dns",
                                                 "invalid",
                                                 "",
-                                                null as any
+                                                null
                                             ),
                                             url: fc.option(
                                                 fc.string({
