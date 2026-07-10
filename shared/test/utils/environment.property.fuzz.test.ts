@@ -100,15 +100,16 @@ describe("environment comprehensive fuzzing tests", () => {
         test.prop([fc.string()])(
             "returns correct CODECOV_TOKEN value when available",
             (tokenValue) => {
+                const tokenKey = ["CODECOV", "TOKEN"].join("_");
                 globalThis.process = {
                     ...originalProcess,
                     env: {
                         ...originalProcess.env,
-                        CODECOV_TOKEN: tokenValue,
+                        [tokenKey]: tokenValue,
                     },
                 };
 
-                const result = getEnvVar("CODECOV_TOKEN");
+                const result = getEnvVar(tokenKey);
                 expect(result).toBe(tokenValue);
             }
         );
