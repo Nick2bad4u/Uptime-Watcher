@@ -215,6 +215,7 @@ export function useSiteDetails({
 
     const {
         activeSiteDetailsTab,
+        closeSiteDetailsForSite,
         setActiveSiteDetailsTab,
         setShowAdvancedMetrics,
         setSiteDetailsChartTimeRange,
@@ -334,6 +335,7 @@ export function useSiteDetails({
     const { handleRemoveMonitor, handleRemoveSite } =
         useSiteDetailsRemovalHandlers(
             clearError,
+            closeSiteDetailsForSite,
             currentSite,
             deleteSite,
             removeMonitorFromSite,

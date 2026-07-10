@@ -706,6 +706,38 @@ describe(useUIStore, () => {
             });
             expect(result.current.selectedSiteIdentifier).toBe("site-2");
         });
+
+        it("should close details when the removed site is still selected", () => {
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.selectSite(mockSite);
+                result.current.setShowSiteDetails(true);
+                result.current.closeSiteDetailsForSite(mockSite.identifier);
+            });
+
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
+            expect(result.current.showSiteDetails).toBeFalsy();
+        });
+
+        it("should preserve a newer selection when an older deletion finishes", () => {
+            const { result } = renderHook(() => useUIStore());
+            const newerSite: Site = {
+                ...mockSite,
+                identifier: "newer-site",
+            };
+
+            act(() => {
+                result.current.selectSite(newerSite);
+                result.current.setShowSiteDetails(true);
+                result.current.closeSiteDetailsForSite(mockSite.identifier);
+            });
+
+            expect(result.current.selectedSiteIdentifier).toBe(
+                newerSite.identifier
+            );
+            expect(result.current.showSiteDetails).toBeTruthy();
+        });
     });
 
     describe("Advanced Metrics Visibility", () => {

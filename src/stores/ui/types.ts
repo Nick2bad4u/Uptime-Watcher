@@ -85,6 +85,13 @@ export interface UIStore {
     activeSiteDetailsTab: SiteDetailsTab;
 
     /**
+     * Closes site details when the specified site is still selected.
+     *
+     * @param siteIdentifier - Identifier of the site being removed.
+     */
+    closeSiteDetailsForSite: (siteIdentifier: string) => void;
+
+    /**
      * Opens an external URL using the system's default browser.
      *
      * @param url - The URL to open externally.

@@ -65,6 +65,7 @@ vi.mock("../../../utils/monitorValidation", () => ({
 // Mock all dependencies
 // Create mock functions that can be accessed in tests
 const mockCheckSiteNow = vi.fn();
+const mockCloseSiteDetailsForSite = vi.fn();
 const mockDeleteSite = vi.fn();
 const mockModifySite = vi.fn();
 const mockRemoveMonitorFromSite = vi.fn();
@@ -105,6 +106,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 vi.mock("../../../stores/ui/useUiStore", () => ({
     useUIStore: vi.fn(() => ({
         activeSiteDetailsTab: "overview",
+        closeSiteDetailsForSite: mockCloseSiteDetailsForSite,
         setActiveSiteDetailsTab: vi.fn(),
         setShowAdvancedMetrics: vi.fn(),
         setSiteDetailsChartTimeRange: vi.fn(),
@@ -519,6 +521,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
         // Reset UI store mock
         (useUIStore as any).mockReturnValue({
             activeSiteDetailsTab: "overview",
+            closeSiteDetailsForSite: mockCloseSiteDetailsForSite,
             setActiveSiteDetailsTab: vi.fn(),
             setShowAdvancedMetrics: vi.fn(),
             setSiteDetailsChartTimeRange: vi.fn(),
@@ -1022,6 +1025,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             });
 
             expect(mockDeleteSite).toHaveBeenCalledWith("site-1");
+            expect(mockCloseSiteDetailsForSite).toHaveBeenCalledWith("site-1");
         });
 
         it("should not delete site when user cancels confirmation", async ({
@@ -1056,6 +1060,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             // Should not delete site when user cancels
             expect(mockDeleteSite).not.toHaveBeenCalled();
+            expect(mockCloseSiteDetailsForSite).not.toHaveBeenCalled();
         });
     });
 

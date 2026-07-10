@@ -454,6 +454,19 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({
             activeSiteDetailsTab: "site-overview",
+            closeSiteDetailsForSite: (siteIdentifier: string): void => {
+                logStoreAction("UIStore", "closeSiteDetailsForSite", {
+                    siteIdentifier,
+                });
+                set((state) =>
+                    state.selectedSiteIdentifier === siteIdentifier
+                        ? {
+                              selectedSiteIdentifier: undefined,
+                              showSiteDetails: false,
+                          }
+                        : {}
+                );
+            },
             openExternal: (
                 url: string,
                 context?: { siteName?: string }

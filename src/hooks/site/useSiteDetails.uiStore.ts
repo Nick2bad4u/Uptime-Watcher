@@ -15,6 +15,7 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 type SiteDetailsUiStoreSlice = Pick<
     UIStore,
     | "activeSiteDetailsTab"
+    | "closeSiteDetailsForSite"
     | "setActiveSiteDetailsTab"
     | "setShowAdvancedMetrics"
     | "setSiteDetailsChartTimeRange"
@@ -32,6 +33,7 @@ const selectSiteDetailsUiStoreSlice = (
     state: UIStore
 ): SiteDetailsUiStoreSlice => ({
     activeSiteDetailsTab: state.activeSiteDetailsTab,
+    closeSiteDetailsForSite: state.closeSiteDetailsForSite,
     setActiveSiteDetailsTab: state.setActiveSiteDetailsTab,
     setShowAdvancedMetrics: state.setShowAdvancedMetrics,
     setSiteDetailsChartTimeRange: state.setSiteDetailsChartTimeRange,
@@ -49,6 +51,7 @@ const selectSiteDetailsUiStoreSlice = (
  */
 export function useSiteDetailsUiStore(): {
     readonly activeSiteDetailsTab: SiteDetailsTab;
+    readonly closeSiteDetailsForSite: UIStore["closeSiteDetailsForSite"];
     readonly setActiveSiteDetailsTab: UIStore["setActiveSiteDetailsTab"];
     readonly setShowAdvancedMetrics: UIStore["setShowAdvancedMetrics"];
     readonly setSiteDetailsChartTimeRange: UIStore["setSiteDetailsChartTimeRange"];

@@ -237,6 +237,7 @@ export function useSiteDetailsNameHandler(
  */
 export function useSiteDetailsRemovalHandlers(
     clearError: () => void,
+    closeSiteDetailsForSite: (siteIdentifier: string) => void,
     currentSite: Site,
     deleteSite: (siteIdentifier: string) => Promise<void>,
     removeMonitorFromSite: (
@@ -255,6 +256,7 @@ export function useSiteDetailsRemovalHandlers(
             async () =>
                 removeSiteWithConfirmation({
                     clearError,
+                    closeSiteDetailsForSite,
                     currentSite,
                     deleteSite,
                     requestConfirmation,
@@ -262,6 +264,7 @@ export function useSiteDetailsRemovalHandlers(
         );
     }, [
         clearError,
+        closeSiteDetailsForSite,
         currentSite,
         deleteSite,
         requestConfirmation,

@@ -75,13 +75,20 @@ export function applySelectedMonitorIdChange(args: {
  */
 export async function removeSiteWithConfirmation(args: {
     readonly clearError: () => void;
+    readonly closeSiteDetailsForSite: (siteIdentifier: string) => void;
     readonly currentSite: Site;
     readonly deleteSite: (siteIdentifier: string) => Promise<void>;
     readonly requestConfirmation: (
         options: ConfirmDialogOptions
     ) => Promise<boolean>;
 }): Promise<void> {
-    const { clearError, currentSite, deleteSite, requestConfirmation } = args;
+    const {
+        clearError,
+        closeSiteDetailsForSite,
+        currentSite,
+        deleteSite,
+        requestConfirmation,
+    } = args;
 
     const isConfirmed = await requestConfirmation({
         cancelLabel: "Keep Site",
@@ -100,6 +107,7 @@ export async function removeSiteWithConfirmation(args: {
     clearError();
 
     await deleteSite(currentSite.identifier);
+    closeSiteDetailsForSite(currentSite.identifier);
     logger.site.removed(currentSite.identifier);
 }
 
