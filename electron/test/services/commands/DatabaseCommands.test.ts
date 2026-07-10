@@ -1386,6 +1386,11 @@ describe("DatabaseCommands", () => {
                 IDataBackupService["restoreDatabaseBackup"]
             >;
         };
+        let siteRepositoryService: {
+            getSitesFromDatabase: Mock<
+                ISiteRepositoryService["getSitesFromDatabase"]
+            >;
+        };
 
         beforeEach(() => {
             payload = {
@@ -1428,11 +1433,14 @@ describe("DatabaseCommands", () => {
             mockServiceFactory.createBackupService.mockReturnValue(
                 backupService as unknown as IDataBackupService
             );
-            mockServiceFactory.createSiteRepositoryService.mockReturnValue({
+            siteRepositoryService = {
                 getSitesFromDatabase: vi
                     .fn()
                     .mockResolvedValue([createTestSite("a")]),
-            });
+            };
+            mockServiceFactory.createSiteRepositoryService.mockReturnValue(
+                siteRepositoryService
+            );
 
             const context: DatabaseCommandContext & {
                 payload: DatabaseRestorePayload;
@@ -1462,12 +1470,34 @@ describe("DatabaseCommands", () => {
             expect(summary.metadata.checksum).toBe(
                 restoreResult.metadata.checksum
             );
-            expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                1,
+                "database:backup-restored",
+                expect.objectContaining({
+                    checksum: restoreResult.metadata.checksum,
+                    fileName: payload.fileName,
+                    timestamp: restoreResult.restoredAt,
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                2,
                 "internal:database:backup-restored",
                 expect.objectContaining({
                     operation: "backup-restored",
                     fileName: payload.fileName,
                 })
+            );
+            expect(
+                siteRepositoryService.getSitesFromDatabase.mock
+                    .invocationCallOrder[0]
+            ).toBeLessThan(
+                vi.mocked(mockCache.replaceAll).mock.invocationCallOrder[0] ?? 0
+            );
+            expect(
+                vi.mocked(mockCache.replaceAll).mock.invocationCallOrder[0]
+            ).toBeLessThan(
+                (mockEventBus.emitTyped as EmitTypedMock).mock
+                    .invocationCallOrder[0] ?? 0
             );
         });
 
@@ -1480,7 +1510,43 @@ describe("DatabaseCommands", () => {
             ).toHaveBeenCalledWith(restoreResult.preRestoreBackup);
         });
 
-        it("preserves the committed restore when completion publication fails", async () => {
+        it("rolls back without publishing success when repository reload fails", async () => {
+            const reloadError = new Error("repository reload failed");
+            siteRepositoryService.getSitesFromDatabase.mockRejectedValueOnce(
+                reloadError
+            );
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).rejects.toBe(reloadError);
+
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).toHaveBeenCalledOnce();
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).toHaveBeenCalledWith(restoreResult.preRestoreBackup);
+            expect(mockEventBus.emitTyped).not.toHaveBeenCalled();
+        });
+
+        it("rolls back without publishing success when cache replacement fails", async () => {
+            const cacheError = new Error("cache replacement failed");
+            vi.mocked(mockCache.replaceAll).mockImplementationOnce(() => {
+                throw cacheError;
+            });
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).rejects.toBe(cacheError);
+
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).toHaveBeenCalledOnce();
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).toHaveBeenCalledWith(restoreResult.preRestoreBackup);
+            expect(mockEventBus.emitTyped).not.toHaveBeenCalled();
+        });
+
+        it("preserves the committed restore when public publication fails", async () => {
             const eventError = new Error("restore publication failed");
             const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
             emitTypedMock.mockRejectedValueOnce(eventError);
@@ -1497,6 +1563,46 @@ describe("DatabaseCommands", () => {
             });
 
             expect(mockCache.getAll()).toEqual([createTestSite("a")]);
+            expect(rollbackSpy).not.toHaveBeenCalled();
+            expect(
+                backupService.applyDatabaseBackupResult
+            ).not.toHaveBeenCalled();
+            expect(emitTypedMock).toHaveBeenNthCalledWith(
+                2,
+                "internal:database:backup-restored",
+                expect.any(Object)
+            );
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "[RestoreBackupCommand] Failed to publish database restore event after commit",
+                eventError
+            );
+
+            loggerSpy.mockRestore();
+        });
+
+        it("preserves the committed restore when internal publication fails", async () => {
+            const eventError = new Error("restore publication failed");
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock
+                .mockResolvedValueOnce(undefined)
+                .mockRejectedValueOnce(eventError);
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockReturnValue(undefined);
+            const rollbackSpy = vi.spyOn(command, "rollback");
+            const executor = new DatabaseCommandExecutor();
+
+            await expect(executor.execute(command)).resolves.toMatchObject({
+                metadata: restoreResult.metadata,
+                preRestoreFileName: restoreResult.preRestoreFileName,
+                restoredAt: restoreResult.restoredAt,
+            });
+
+            expect(emitTypedMock).toHaveBeenNthCalledWith(
+                1,
+                "database:backup-restored",
+                expect.any(Object)
+            );
             expect(rollbackSpy).not.toHaveBeenCalled();
             expect(
                 backupService.applyDatabaseBackupResult

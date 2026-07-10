@@ -897,6 +897,22 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
         );
 
         try {
+            await this.eventEmitter.emitTyped("database:backup-restored", {
+                checksum: metadata.checksum,
+                fileName: metadata.originalPath,
+                schemaVersion: metadata.schemaVersion,
+                size: metadata.sizeBytes,
+                timestamp: restoredAt,
+                triggerType: "manual",
+            });
+        } catch (error: unknown) {
+            backendLogger.error(
+                "[RestoreBackupCommand] Failed to publish database restore event after commit",
+                ensureError(error)
+            );
+        }
+
+        try {
             await this.emitSuccessEvent("internal:database:backup-restored", {
                 fileName: this.payload.fileName ?? "uploaded-backup.sqlite",
                 operation: "backup-restored",

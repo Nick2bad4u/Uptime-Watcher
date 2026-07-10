@@ -519,26 +519,6 @@ export class DataBackupService {
 
                     const restoredAt = Date.now();
 
-                    try {
-                        await this.eventEmitter.emitTyped(
-                            "database:backup-restored",
-                            {
-                                checksum: metadata.checksum,
-                                fileName: metadata.originalPath,
-                                schemaVersion: metadata.schemaVersion,
-                                size: metadata.sizeBytes,
-                                timestamp: restoredAt,
-                                triggerType: "manual",
-                            }
-                        );
-                    } catch (error: unknown) {
-                        this.logger.warn(
-                            "[DataBackupService] Failed to publish database restore event after commit",
-                            ensureError(error),
-                            { operation: "restore-backup" }
-                        );
-                    }
-
                     this.logger.info(
                         "[DataBackupService] Database restored from backup",
                         {
