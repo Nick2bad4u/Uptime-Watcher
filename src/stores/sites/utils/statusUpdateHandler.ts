@@ -175,6 +175,9 @@ export class StatusUpdateManager {
      */
     private isListenerAttached = false;
 
+    /** Monotonic token used to invalidate asynchronous subscription setup. */
+    private subscriptionGeneration = 0;
+
     /**
      * Optional callback for status update notifications.
      *
@@ -299,11 +302,27 @@ export class StatusUpdateManager {
     public async subscribe(): Promise<StatusUpdateSubscriptionResult> {
         // Cleanup existing subscriptions if any
         this.unsubscribe();
+        const subscriptionGeneration = this.subscriptionGeneration;
 
         const errors: string[] = [];
         let listenersAttached = 0;
         const expectedListeners = StatusUpdateManager.EXPECTED_LISTENER_COUNT;
         let isEncounteredListenerFailure = false;
+        const listenerDescriptors: StatusUpdateListenerDescriptor[] =
+            createStatusUpdateListenerDescriptors({
+                handleMonitoringStarted: (event) => {
+                    this.handleMonitoringLifecycleEvent("started", event);
+                },
+                handleMonitoringStopped: (event) => {
+                    this.handleMonitoringLifecycleEvent("stopped", event);
+                },
+                processStatusUpdateCandidate: (candidate, source) => {
+                    this.startStatusUpdateProcessing(candidate, source);
+                },
+            });
+        let listenerStates: ListenerAttachmentState[] =
+            createInitialListenerStates(listenerDescriptors);
+        const pendingCleanupFunctions: (() => void)[] = [];
 
         try {
             await this.fullResyncSites();
@@ -319,21 +338,9 @@ export class StatusUpdateManager {
             );
         }
 
-        const listenerDescriptors: StatusUpdateListenerDescriptor[] =
-            createStatusUpdateListenerDescriptors({
-                handleMonitoringStarted: (event) => {
-                    this.handleMonitoringLifecycleEvent("started", event);
-                },
-                handleMonitoringStopped: (event) => {
-                    this.handleMonitoringLifecycleEvent("stopped", event);
-                },
-                processStatusUpdateCandidate: (candidate, source) => {
-                    this.startStatusUpdateProcessing(candidate, source);
-                },
-            });
-
-        let listenerStates: ListenerAttachmentState[] =
-            createInitialListenerStates(listenerDescriptors);
+        if (subscriptionGeneration !== this.subscriptionGeneration) {
+            return this.getCurrentSubscriptionResult(listenerDescriptors);
+        }
 
         /* eslint-disable no-await-in-loop -- Event listeners must be attached sequentially to preserve registration order */
         for (const [
@@ -346,7 +353,17 @@ export class StatusUpdateManager {
 
             try {
                 const cleanup = await register();
-                this.cleanupFunctions.push(cleanup);
+                if (subscriptionGeneration !== this.subscriptionGeneration) {
+                    this.cleanupListeners([
+                        ...pendingCleanupFunctions,
+                        cleanup,
+                    ]);
+                    return this.getCurrentSubscriptionResult(
+                        listenerDescriptors
+                    );
+                }
+
+                pendingCleanupFunctions.push(cleanup);
                 listenersAttached += 1;
                 listenerStates = listenerStates.map((listenerState, idx) =>
                     idx === index
@@ -366,12 +383,20 @@ export class StatusUpdateManager {
                 );
                 isEncounteredListenerFailure = true;
                 listenersAttached = 0;
-                this.unsubscribe();
+                this.cleanupListeners(pendingCleanupFunctions);
             }
         }
         /* eslint-enable no-await-in-loop -- Sequential registration complete */
 
+        if (subscriptionGeneration !== this.subscriptionGeneration) {
+            this.cleanupListeners(pendingCleanupFunctions);
+            return this.getCurrentSubscriptionResult(listenerDescriptors);
+        }
+
         this.isListenerAttached = listenersAttached === expectedListeners;
+        this.cleanupFunctions = this.isListenerAttached
+            ? pendingCleanupFunctions
+            : [];
 
         return {
             errors,
@@ -524,6 +549,8 @@ export class StatusUpdateManager {
      * ```
      */
     public unsubscribe(): void {
+        this.subscriptionGeneration += 1;
+
         // Reset state first to avoid re-entrancy issues where cleanup handlers
         // indirectly trigger another unsubscribe call.
         this.isListenerAttached = false;
@@ -531,7 +558,10 @@ export class StatusUpdateManager {
         const { cleanupFunctions } = this;
         this.cleanupFunctions = [];
 
-        // Clean up all event listeners (best-effort).
+        this.cleanupListeners(cleanupFunctions);
+    }
+
+    private cleanupListeners(cleanupFunctions: readonly (() => void)[]): void {
         for (const cleanup of cleanupFunctions) {
             try {
                 cleanup();
@@ -542,6 +572,28 @@ export class StatusUpdateManager {
                 );
             }
         }
+    }
+
+    private getCurrentSubscriptionResult(
+        listenerDescriptors: readonly StatusUpdateListenerDescriptor[]
+    ): StatusUpdateSubscriptionResult {
+        const expectedListeners = StatusUpdateManager.EXPECTED_LISTENER_COUNT;
+        const listenersAttached = this.isListenerAttached
+            ? expectedListeners
+            : 0;
+
+        return {
+            errors: [],
+            expectedListeners,
+            listenersAttached,
+            listenerStates: createInitialListenerStates(
+                listenerDescriptors
+            ).map((state) => ({
+                ...state,
+                attached: this.isListenerAttached,
+            })),
+            success: this.isListenerAttached,
+        };
     }
 
     private handleMonitoringLifecycleEvent(

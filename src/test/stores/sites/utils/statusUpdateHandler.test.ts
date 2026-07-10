@@ -73,6 +73,19 @@ const mockIsDevelopment = vi.mocked(isDevelopment);
 const mockEventsService = vi.mocked(EventsService);
 const mockLogger = vi.mocked(logger);
 
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise) => {
+        resolve = resolvePromise;
+    });
+    return { promise, resolve };
+}
+
 describe("StatusUpdateHandler", () => {
     let mockOptions: any;
     let manager: StatusUpdateManager;
@@ -338,6 +351,110 @@ describe("StatusUpdateHandler", () => {
                 manager.unsubscribe();
             }).not.toThrow();
             expect(manager.isSubscribed()).toBeFalsy();
+        });
+
+        it("should not attach listeners after unsubscribing during the initial sync", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Concurrency", "type");
+
+            const initialSync = createDeferred<undefined>();
+            mockfullResyncSites.mockReturnValueOnce(initialSync.promise);
+
+            const subscription = manager.subscribe();
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
+
+            manager.unsubscribe();
+            initialSync.resolve(undefined);
+
+            await expect(subscription).resolves.toMatchObject({
+                listenersAttached: 0,
+                success: false,
+            });
+            expect(
+                mockEventsService.onMonitorStatusChanged
+            ).not.toHaveBeenCalled();
+            expect(
+                mockEventsService.onMonitorCheckCompleted
+            ).not.toHaveBeenCalled();
+            expect(manager.isSubscribed()).toBeFalsy();
+        });
+
+        it("should clean up a listener that resolves after unsubscribe", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Concurrency", "type");
+
+            const listenerRegistration = createDeferred<() => void>();
+            const cleanup = vi.fn();
+            mockEventsService.onMonitorStatusChanged.mockReturnValueOnce(
+                listenerRegistration.promise
+            );
+
+            const subscription = manager.subscribe();
+            await Promise.resolve();
+            await Promise.resolve();
+            expect(
+                mockEventsService.onMonitorStatusChanged
+            ).toHaveBeenCalledTimes(1);
+
+            manager.unsubscribe();
+            listenerRegistration.resolve(cleanup);
+
+            await subscription;
+
+            expect(cleanup).toHaveBeenCalledTimes(1);
+            expect(
+                mockEventsService.onMonitorCheckCompleted
+            ).not.toHaveBeenCalled();
+            expect(manager.isSubscribed()).toBeFalsy();
+        });
+
+        it("should preserve a newer subscription when an older initial sync resolves", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Concurrency", "type");
+
+            const firstSync = createDeferred<undefined>();
+            const cleanup = vi.fn();
+            mockfullResyncSites
+                .mockReturnValueOnce(firstSync.promise)
+                .mockResolvedValueOnce(undefined);
+            mockEventsService.onMonitorStatusChanged.mockResolvedValue(cleanup);
+            mockEventsService.onMonitorCheckCompleted.mockResolvedValue(
+                cleanup
+            );
+            mockEventsService.onMonitoringStarted.mockResolvedValue(cleanup);
+            mockEventsService.onMonitoringStopped.mockResolvedValue(cleanup);
+
+            const firstSubscription = manager.subscribe();
+            const secondResult = await manager.subscribe();
+
+            expect(secondResult.success).toBeTruthy();
+            expect(manager.isSubscribed()).toBeTruthy();
+            expect(cleanup).not.toHaveBeenCalled();
+
+            firstSync.resolve(undefined);
+            const firstResult = await firstSubscription;
+
+            expect(firstResult.success).toBeTruthy();
+            expect(manager.isSubscribed()).toBeTruthy();
+            expect(cleanup).not.toHaveBeenCalled();
+
+            manager.unsubscribe();
+            expect(cleanup).toHaveBeenCalledTimes(4);
         });
     });
 
