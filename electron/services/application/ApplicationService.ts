@@ -181,6 +181,16 @@ export class ApplicationService {
             const services = this.serviceContainer.getInitializedServices();
             const getInitializedService = (serviceName: string): unknown =>
                 services.find(({ name }) => name === serviceName)?.service;
+            const cleanupErrors: Error[] = [];
+            const attemptCleanup = async (
+                operation: () => unknown
+            ): Promise<void> => {
+                try {
+                    await operation();
+                } catch (error: unknown) {
+                    cleanupErrors.push(ensureError(error));
+                }
+            };
 
             for (const { name } of services) {
                 logger.debug(
@@ -203,7 +213,9 @@ export class ApplicationService {
 
             // Stop scheduler callbacks and drain any provider operation before
             // tearing down IPC, monitoring, or database dependencies.
-            await this.serviceContainer.shutdownCloudSyncScheduler();
+            await attemptCleanup(async () => {
+                await this.serviceContainer.shutdownCloudSyncScheduler();
+            });
 
             const autoUpdaterService =
                 getInitializedService("AutoUpdaterService");
@@ -212,7 +224,9 @@ export class ApplicationService {
                     autoUpdaterService,
                     "cleanup"
                 );
-                cleanupAutoUpdater?.call(autoUpdaterService);
+                await attemptCleanup(() =>
+                    cleanupAutoUpdater?.call(autoUpdaterService)
+                );
             }
 
             // Cleanup IPC handlers
@@ -224,7 +238,7 @@ export class ApplicationService {
                     ipcService,
                     "cleanup"
                 );
-                cleanupIpc?.call(ipcService);
+                await attemptCleanup(() => cleanupIpc?.call(ipcService));
             }
 
             // Stop monitoring and detach orchestrator subscriptions.
@@ -234,7 +248,9 @@ export class ApplicationService {
                     orchestrator,
                     "shutdown"
                 );
-                await shutdownOrchestrator?.call(orchestrator);
+                await attemptCleanup(async () => {
+                    await shutdownOrchestrator?.call(orchestrator);
+                });
             }
 
             // Close windows
@@ -246,14 +262,16 @@ export class ApplicationService {
                     windowService,
                     "closeMainWindow"
                 );
-                closeMainWindow?.call(windowService);
+                await attemptCleanup(() =>
+                    closeMainWindow?.call(windowService)
+                );
             }
 
             const databaseService = getInitializedService("DatabaseService");
             if (databaseService) {
                 const serviceCandidate = databaseService;
 
-                try {
+                await attemptCleanup(() => {
                     const closeDatabase = getCallableDataProperty(
                         serviceCandidate,
                         "close"
@@ -263,12 +281,18 @@ export class ApplicationService {
                     } else {
                         this.serviceContainer.getDatabaseService().close();
                     }
-                } catch (error) {
-                    logger.error(
-                        LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
-                        ensureError(error)
-                    );
-                }
+                });
+            }
+
+            if (cleanupErrors.length === 1) {
+                throw ensureError(cleanupErrors[0]);
+            }
+            if (cleanupErrors.length > 1) {
+                throw new AggregateError(
+                    cleanupErrors,
+                    "Multiple application cleanup stages failed",
+                    { cause: ensureError(cleanupErrors[0]) }
+                );
             }
 
             logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_COMPLETE);

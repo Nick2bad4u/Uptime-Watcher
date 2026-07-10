@@ -689,6 +689,36 @@ describe(ApplicationService, () => {
                 "APPLICATION_CLEANUP_ERROR",
                 error
             );
+            expect(mockWindowService.closeMainWindow).toHaveBeenCalledOnce();
+            expect(mockDatabaseService.close).toHaveBeenCalledOnce();
+        });
+
+        it("attempts every cleanup stage and aggregates multiple failures", async () => {
+            const schedulerError = new Error("scheduler cleanup failed");
+            const orchestratorError = new Error("orchestrator cleanup failed");
+            mockServiceContainer.shutdownCloudSyncScheduler.mockRejectedValueOnce(
+                schedulerError
+            );
+            mockUptimeOrchestrator.shutdown.mockRejectedValueOnce(
+                orchestratorError
+            );
+
+            try {
+                await applicationService.cleanup();
+                throw new Error("Expected cleanup to reject");
+            } catch (error: unknown) {
+                expect(error).toBeInstanceOf(AggregateError);
+                const aggregate = error as AggregateError;
+                expect(aggregate.errors).toEqual([
+                    schedulerError,
+                    orchestratorError,
+                ]);
+            }
+
+            expect(mockAutoUpdaterService.cleanup).toHaveBeenCalledOnce();
+            expect(mockIpcService.cleanup).toHaveBeenCalledOnce();
+            expect(mockWindowService.closeMainWindow).toHaveBeenCalledOnce();
+            expect(mockDatabaseService.close).toHaveBeenCalledOnce();
         });
 
         it("should handle cleanup cancellation gracefully", async ({
