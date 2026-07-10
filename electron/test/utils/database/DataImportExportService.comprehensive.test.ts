@@ -227,6 +227,7 @@ const createMockRepositories = () => {
                     ),
                     delete: vi.fn(() => false),
                     deleteAll: vi.fn(() => siteDeleteAllInternal(database)),
+                    findAll: vi.fn(() => []),
                     upsert: vi.fn(),
                 })
             ),

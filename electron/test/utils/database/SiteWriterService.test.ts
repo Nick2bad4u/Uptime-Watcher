@@ -101,6 +101,13 @@ const createSiteAdapter = () =>
         bulkInsert: vi.fn(),
         delete: vi.fn().mockReturnValue(true),
         deleteAll: vi.fn(),
+        findAll: vi.fn().mockReturnValue([
+            {
+                identifier: "test-site",
+                monitoring: false,
+                name: "Test Site",
+            },
+        ]),
         upsert: vi.fn(),
     }) satisfies SiteRepositoryTransactionAdapter;
 
@@ -523,7 +530,7 @@ describe("SiteWriterService", () => {
             );
         });
 
-        it("should delete all sites and return snapshot", async ({
+        it("should delete persisted sites when the cache is empty", async ({
             task,
             annotate,
         }) => {
@@ -532,11 +539,12 @@ describe("SiteWriterService", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Deletion", "type");
 
-            mockSitesCache.getAll.mockReturnValue([mockSite]);
+            mockSitesCache.getAll.mockReturnValue([]);
 
             const result =
                 await siteWriterService.deleteAllSites(mockSitesCache);
 
+            expect(mockSitesCache.getAll).not.toHaveBeenCalled();
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
                 mockMonitorRepository.createTransactionAdapter
@@ -553,7 +561,7 @@ describe("SiteWriterService", () => {
             ]);
         });
 
-        it("should short-circuit when no sites exist", async ({
+        it("should still execute and clear the cache when no sites exist", async ({
             task,
             annotate,
         }) => {
@@ -562,18 +570,32 @@ describe("SiteWriterService", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockSitesCache.getAll.mockReturnValue([]);
+            siteAdapter.findAll.mockReturnValue([]);
 
             const result =
                 await siteWriterService.deleteAllSites(mockSitesCache);
 
             expect(result).toEqual({ deletedCount: 0, deletedSites: [] });
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[SiteWriterService] No sites available for bulk deletion"
+                "[SiteWriterService] No persisted sites found during bulk deletion"
             );
             expect(
                 mockDatabaseService.executeTransaction
-            ).not.toHaveBeenCalled();
+            ).toHaveBeenCalledOnce();
+            expect(monitorAdapter.deleteAll).toHaveBeenCalledOnce();
+            expect(siteAdapter.deleteAll).toHaveBeenCalledOnce();
+            expect(mockSitesCache.clear).toHaveBeenCalledOnce();
+        });
+
+        it("should preserve the cache when the database transaction fails", async () => {
+            mockDatabaseService.executeTransaction.mockRejectedValue(
+                new Error("bulk delete failed")
+            );
+
+            await expect(
+                siteWriterService.deleteAllSites(mockSitesCache)
+            ).rejects.toThrow("bulk delete failed");
+
             expect(mockSitesCache.clear).not.toHaveBeenCalled();
         });
     });

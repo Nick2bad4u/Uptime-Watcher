@@ -70,6 +70,7 @@ describe(SiteManager, () => {
             bulkInsert: vi.fn(),
             delete: vi.fn().mockReturnValue(true),
             deleteAll: vi.fn(),
+            findAll: vi.fn().mockReturnValue([]),
             upsert: vi.fn(),
         } satisfies SiteRepositoryTransactionAdapter;
 

@@ -92,6 +92,13 @@ const createRepositoryBundle = (
                 deleteAll: vi.fn(() => {
                     sites.clear();
                 }),
+                findAll: vi.fn(() =>
+                    Array.from(sites.values(), (site) => ({
+                        identifier: site.identifier,
+                        monitoring: site.monitoring,
+                        name: site.name,
+                    }))
+                ),
                 upsert: vi.fn(),
             } satisfies SiteRepositoryTransactionAdapter;
             siteAdapters.push(adapter);

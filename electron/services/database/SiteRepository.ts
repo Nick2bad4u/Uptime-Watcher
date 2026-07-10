@@ -112,6 +112,8 @@ export interface SiteRepositoryTransactionAdapter {
     delete: (identifier: string) => boolean;
     /** Delete all sites within the active transaction. */
     deleteAll: () => void;
+    /** Read all site rows within the active transaction. */
+    findAll: () => SiteRow[];
     /** Upsert a site record within the active transaction. */
     upsert: (site: Pick<SiteRow, SiteRowUpsertFields>) => void;
 }
@@ -479,6 +481,9 @@ export class SiteRepository {
             this.deleteAllInternal(db);
         };
 
+        const findAll: SiteRepositoryTransactionAdapter["findAll"] = () =>
+            this.fetchAllSitesInternal(db);
+
         const upsert: SiteRepositoryTransactionAdapter["upsert"] = (site) => {
             this.upsertInternal(db, site);
         };
@@ -487,6 +492,7 @@ export class SiteRepository {
             bulkInsert,
             delete: deleteSite,
             deleteAll,
+            findAll,
             upsert,
         } satisfies SiteRepositoryTransactionAdapter;
     }

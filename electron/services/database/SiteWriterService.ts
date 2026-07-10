@@ -15,6 +15,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
 import {
@@ -319,42 +320,42 @@ export class SiteWriterService {
         /** Immutable snapshot of sites deleted during the operation */
         deletedSites: Site[];
     }> {
-        const sitesToDelete = sitesCache.getAll();
+        return withDatabaseOperation(async () => {
+            const sitesToDelete = await this.withSiteMonitorTransaction(
+                ({ monitorTx, siteTx }) => {
+                    const persistedSites = siteTx.findAll().map((site) => ({
+                        identifier: site.identifier,
+                        monitoring: site.monitoring ?? true,
+                        monitors: monitorTx.findBySiteIdentifier(
+                            site.identifier
+                        ),
+                        name: site.name ?? DEFAULT_SITE_NAME,
+                    }));
 
-        if (isEmpty(sitesToDelete)) {
-            this.logger.debug(
-                "[SiteWriterService] No sites available for bulk deletion"
+                    monitorTx.deleteAll();
+                    siteTx.deleteAll();
+
+                    return persistedSites;
+                }
             );
-            return {
-                deletedCount: 0,
-                deletedSites: [],
-            };
-        }
 
-        return withDatabaseOperation(
-            async () => {
-                await this.withSiteMonitorTransaction(
-                    ({ monitorTx, siteTx }) => {
-                        monitorTx.deleteAll();
-                        siteTx.deleteAll();
-                    }
+            sitesCache.clear();
+
+            if (isEmpty(sitesToDelete)) {
+                this.logger.debug(
+                    "[SiteWriterService] No persisted sites found during bulk deletion"
                 );
-
-                sitesCache.clear();
-
+            } else {
                 this.logger.info("Sites deleted from database", {
                     deletedCount: sitesToDelete.length,
                 });
+            }
 
-                return {
-                    deletedCount: sitesToDelete.length,
-                    deletedSites: sitesToDelete,
-                };
-            },
-            "site-writer-delete-all",
-            undefined,
-            { deletedCount: sitesToDelete.length }
-        );
+            return {
+                deletedCount: sitesToDelete.length,
+                deletedSites: sitesToDelete,
+            };
+        }, "site-writer-delete-all");
     }
 
     /**
