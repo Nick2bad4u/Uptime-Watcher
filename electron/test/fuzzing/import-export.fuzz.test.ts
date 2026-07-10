@@ -187,7 +187,7 @@ const createMockConfig = () => ({
             bulkInsertInternal: vi.fn(),
             createTransactionAdapter: vi.fn(),
             deleteAllInternal: vi.fn(),
-            getAllInternal: vi.fn(() => ({})),
+            getAllInternal: vi.fn((_database: unknown) => ({})),
             getAll: vi.fn().mockResolvedValue({}),
         },
         site: {
