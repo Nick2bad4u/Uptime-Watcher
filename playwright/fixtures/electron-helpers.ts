@@ -11,6 +11,7 @@ import type { ElectronApplication, Page } from "@playwright/test";
 import type { ChildProcess } from "node:child_process";
 
 import { _electron as electron } from "@playwright/test";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { execFileSync } from "node:child_process";
 import { createWriteStream, type WriteStream } from "node:fs";
 import {
@@ -39,13 +40,13 @@ const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [
 ] as const;
 
 const isBusyFileSystemError = (error: unknown): boolean => {
-    const code =
-        typeof error === "object" && error !== null && "code" in error
-            ? Reflect.get(error, "code")
-            : undefined;
+    const code = tryGetErrorCode(error);
 
     return code === "EBUSY" || code === "ENOTEMPTY" || code === "EPERM";
 };
+
+const isMissingFileSystemError = (error: unknown): boolean =>
+    tryGetErrorCode(error) === "ENOENT";
 
 const waitForDelay = async (delayMs: number): Promise<void> => {
     if (delayMs <= 0) {
@@ -321,9 +322,19 @@ export async function launchElectronApp(
                     directory: string,
                     relativePrefix: string
                 ): Promise<void> => {
-                    const entries = await readdir(directory, {
-                        withFileTypes: true,
-                    });
+                    const entries = await (async () => {
+                        try {
+                            return await readdir(directory, {
+                                withFileTypes: true,
+                            });
+                        } catch (error) {
+                            if (isMissingFileSystemError(error)) {
+                                return [];
+                            }
+
+                            throw error;
+                        }
+                    })();
 
                     await Promise.all(
                         entries.map(async (entry) => {
@@ -356,7 +367,10 @@ export async function launchElectronApp(
                                 });
                                 await copyFile(source, destination);
                             } catch (error) {
-                                if (isBusyFileSystemError(error)) {
+                                if (
+                                    isBusyFileSystemError(error) ||
+                                    isMissingFileSystemError(error)
+                                ) {
                                     return;
                                 }
 
