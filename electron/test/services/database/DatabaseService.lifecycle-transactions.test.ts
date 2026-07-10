@@ -376,6 +376,116 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
         instance.close();
     });
 
+    it("should serialize database-file maintenance with transactions", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        let isInTransaction = false;
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
+        dbInstance!.run.mockImplementation((sql: string) => {
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+            } else if (sql === "COMMIT" || sql === "ROLLBACK") {
+                isInTransaction = false;
+            }
+
+            return undefined;
+        });
+
+        let notifyTransactionStarted!: () => void;
+        const transactionStarted = new Promise<void>((resolve) => {
+            notifyTransactionStarted = resolve;
+        });
+        let releaseTransaction!: () => void;
+        const transactionGate = new Promise<void>((resolve) => {
+            releaseTransaction = resolve;
+        });
+
+        const firstTransaction = instance.executeTransaction(async () => {
+            notifyTransactionStarted();
+            await transactionGate;
+        });
+        await transactionStarted;
+
+        let notifyMaintenanceStarted!: () => void;
+        const maintenanceStarted = new Promise<void>((resolve) => {
+            notifyMaintenanceStarted = resolve;
+        });
+        let releaseMaintenance!: () => void;
+        const maintenanceGate = new Promise<void>((resolve) => {
+            releaseMaintenance = resolve;
+        });
+        const maintenanceOperation = vi.fn(async () => {
+            notifyMaintenanceStarted();
+            await maintenanceGate;
+        });
+        const maintenance = instance.executeExclusiveOperation(
+            "restore-backup",
+            maintenanceOperation
+        );
+
+        await Promise.resolve();
+        expect(maintenanceOperation).not.toHaveBeenCalled();
+
+        releaseTransaction();
+        await firstTransaction;
+        await maintenanceStarted;
+
+        const queuedTransactionOperation = vi.fn(async () => "queued");
+        const queuedTransaction = instance.executeTransaction(
+            queuedTransactionOperation
+        );
+
+        await Promise.resolve();
+        expect(queuedTransactionOperation).not.toHaveBeenCalled();
+
+        releaseMaintenance();
+        await maintenance;
+        await expect(queuedTransaction).resolves.toBe("queued");
+        expect(maintenanceOperation).toHaveBeenCalledOnce();
+        expect(queuedTransactionOperation).toHaveBeenCalledOnce();
+
+        instance.close();
+    });
+
+    it("should reject transactions started by exclusive maintenance", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        await expect(
+            instance.executeExclusiveOperation("restore-backup", async () => {
+                await instance.executeTransaction(async () => undefined);
+            })
+        ).rejects.toThrow(
+            "Cannot start a database transaction during an exclusive database-file operation"
+        );
+
+        instance.close();
+    });
+
     it("should continue queued transactions after a rollback", async () => {
         vi.resetModules();
 

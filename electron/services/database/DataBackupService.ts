@@ -93,8 +93,6 @@ export class DataBackupService {
 
     private readonly logger: Logger;
 
-    private databaseFileOperationInProgress: null | string = null;
-
     private readonly downloadDatabaseBackupSingleFlight: () => Promise<DatabaseBackupResult>;
 
     /**
@@ -112,18 +110,10 @@ export class DataBackupService {
         operationName: string,
         operation: () => Promise<T>
     ): Promise<T> {
-        if (this.databaseFileOperationInProgress) {
-            throw new Error(
-                `[DataBackupService] Refusing to start ${operationName} while ${this.databaseFileOperationInProgress} is in progress`
-            );
-        }
-
-        this.databaseFileOperationInProgress = operationName;
-        try {
-            return await operation();
-        } finally {
-            this.databaseFileOperationInProgress = null;
-        }
+        return this.databaseService.executeExclusiveOperation(
+            operationName,
+            operation
+        );
     }
 
     public async downloadDatabaseBackup(): Promise<DatabaseBackupResult> {

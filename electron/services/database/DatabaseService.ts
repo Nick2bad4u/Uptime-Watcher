@@ -111,8 +111,12 @@ export class DatabaseService {
     private readonly transactionContext =
         new AsyncLocalStorage<DatabaseTransactionContext>();
 
-    /** Serializes independent top-level transactions on the shared connection. */
-    private transactionQueue: Promise<void> = Promise.resolve();
+    /** Identifies database-file maintenance that already owns the queue. */
+    private readonly exclusiveOperationContext =
+        new AsyncLocalStorage<boolean>();
+
+    /** Serializes top-level transactions and database-file maintenance. */
+    private exclusiveOperationQueue: Promise<void> = Promise.resolve();
 
     /**
      * Gets the singleton database service instance.
@@ -170,12 +174,18 @@ export class DatabaseService {
     public async executeTransaction<T>(
         operation: DatabaseTransactionOperation<T>
     ): Promise<T> {
+        if (this.exclusiveOperationContext.getStore()) {
+            throw new Error(
+                "Cannot start a database transaction during an exclusive database-file operation"
+            );
+        }
+
         const activeContext = this.transactionContext.getStore();
         if (activeContext?.active) {
             return this.executeNestedTransaction(activeContext.db, operation);
         }
 
-        return this.enqueueTopLevelTransaction(async () => {
+        return this.enqueueExclusiveOperation(async () => {
             const db = this.getDatabase();
             const executeSingleAttempt = async (): Promise<T> => {
                 try {
@@ -274,16 +284,45 @@ export class DatabaseService {
         });
     }
 
-    private async enqueueTopLevelTransaction<T>(
+    /**
+     * Runs database-file maintenance without overlapping transactions or other
+     * maintenance callers.
+     *
+     * @param operationName - Stable diagnostic name for the maintenance work.
+     * @param operation - Work that may close, reinitialize, or replace the
+     *   database connection or file.
+     */
+    public async executeExclusiveOperation<T>(
+        operationName: string,
+        operation: () => Promise<T> | T
+    ): Promise<T> {
+        if (this.transactionContext.getStore()?.active) {
+            throw new Error(
+                `Cannot start exclusive database operation ${operationName} during an active transaction`
+            );
+        }
+
+        if (this.exclusiveOperationContext.getStore()) {
+            return operation();
+        }
+
+        return this.enqueueExclusiveOperation(() =>
+            this.exclusiveOperationContext.run(true, () =>
+                Promise.resolve(operation())
+            )
+        );
+    }
+
+    private async enqueueExclusiveOperation<T>(
         operation: () => Promise<T>
     ): Promise<T> {
-        const precedingTransaction = this.transactionQueue;
+        const precedingOperation = this.exclusiveOperationQueue;
         let releaseQueue: () => void = () => {};
-        this.transactionQueue = new Promise<void>((resolve) => {
+        this.exclusiveOperationQueue = new Promise<void>((resolve) => {
             releaseQueue = resolve;
         });
 
-        await precedingTransaction;
+        await precedingOperation;
         try {
             return await operation();
         } finally {
