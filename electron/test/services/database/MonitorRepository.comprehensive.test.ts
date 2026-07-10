@@ -6,53 +6,53 @@
 
 import type { Site } from "@shared/types";
 
-import {
-    afterEach,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    type MockedObject,
-    vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 
+const createMockDatabase = () => ({
+    all: vi.fn(),
+    close: vi.fn(),
+    exec: vi.fn(),
+    get: vi.fn(),
+    prepare: vi.fn(() => ({
+        all: vi.fn(),
+        finalize: vi.fn(),
+        get: vi.fn(),
+        run: vi.fn(),
+    })),
+    run: vi.fn(),
+});
+
+type MockDatabase = ReturnType<typeof createMockDatabase>;
+
+const createMockDatabaseService = (database: MockDatabase) => ({
+    close: vi.fn(),
+    executeTransaction: vi
+        .fn()
+        .mockImplementation(
+            async (callback: (transaction: MockDatabase) => unknown) =>
+                callback(database)
+        ),
+    getDatabase: vi.fn(() => database),
+    initialize: vi.fn(),
+});
+
+type MockDatabaseService = ReturnType<typeof createMockDatabaseService>;
+
 describe("MonitorRepository - Comprehensive Coverage", () => {
     let repository: MonitorRepository;
-    let mockDatabaseService: MockedObject<DatabaseService>;
-    let mockDatabase: any;
+    let mockDatabaseService: MockDatabaseService;
+    let mockDatabase: MockDatabase;
 
     beforeEach(() => {
-        // Mock database instance with all required methods
-        mockDatabase = {
-            all: vi.fn(),
-            get: vi.fn(),
-            run: vi.fn(),
-            prepare: vi.fn(() => ({
-                all: vi.fn(),
-                get: vi.fn(),
-                run: vi.fn(),
-                finalize: vi.fn(),
-            })),
-            exec: vi.fn(),
-            close: vi.fn(),
-        };
-
-        // Mock DatabaseService with transaction support
-        mockDatabaseService = {
-            getDatabase: vi.fn(() => mockDatabase),
-            executeTransaction: vi.fn(async (callback) =>
-                callback(mockDatabase)
-            ),
-            initialize: vi.fn(),
-            close: vi.fn(),
-        } as any;
+        mockDatabase = createMockDatabase();
+        mockDatabaseService = createMockDatabaseService(mockDatabase);
 
         repository = new MonitorRepository({
-            databaseService: mockDatabaseService,
+            databaseService: mockDatabaseService as unknown as DatabaseService,
         });
     });
     afterEach(() => {

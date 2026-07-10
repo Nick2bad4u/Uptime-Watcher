@@ -14,6 +14,12 @@ import type { MonitorFieldDefinition } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { DatabaseFieldDefinition } from "../../../../services/database/utils/schema/dynamicSchema";
+
+const unusedServiceFactory = (): never => {
+    throw new Error("The dynamic schema test does not instantiate monitors");
+};
+
 // Mock monitor type configurations that use camelCase field names
 const mockMonitorConfigs = [
     {
@@ -25,7 +31,7 @@ const mockMonitorConfigs = [
             { name: "timeout", type: "number", required: false },
             { name: "url", type: "string", required: true },
         ] as MonitorFieldDefinition[],
-        serviceFactory: () => ({}) as any,
+        serviceFactory: unusedServiceFactory,
     },
     {
         type: "TestCamelCaseMonitor",
@@ -36,7 +42,7 @@ const mockMonitorConfigs = [
             { name: "maxRetryCount", type: "number", required: false },
             { name: "someUrlEndpoint", type: "string", required: true },
         ] as MonitorFieldDefinition[],
-        serviceFactory: () => ({}) as any,
+        serviceFactory: unusedServiceFactory,
     },
 ];
 
@@ -46,7 +52,7 @@ vi.mock("../../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 describe("DynamicSchema Regex Mutations", () => {
-    let generateDatabaseFieldDefinitions: () => any[];
+    let generateDatabaseFieldDefinitions: () => DatabaseFieldDefinition[];
 
     beforeEach(async () => {
         // Clear mocks

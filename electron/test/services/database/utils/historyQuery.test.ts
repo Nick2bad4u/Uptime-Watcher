@@ -349,7 +349,7 @@ describe("historyQuery utilities", () => {
 
                     (
                         rowToHistoryEntry as ReturnType<typeof vi.fn>
-                    ).mockImplementation((row: any) => {
+                    ).mockImplementation((row: DatabaseHistoryRow) => {
                         const { timestamp, status, responseTime, details } =
                             row;
                         return {
@@ -445,7 +445,7 @@ describe("historyQuery utilities", () => {
                     ).mockReturnValue(mockRows);
                     (
                         rowToHistoryEntry as ReturnType<typeof vi.fn>
-                    ).mockImplementation((row: any) => ({
+                    ).mockImplementation((row: DatabaseHistoryRow) => ({
                         status: row.status,
                         timestamp: row.timestamp,
                         responseTime: row.responseTime,

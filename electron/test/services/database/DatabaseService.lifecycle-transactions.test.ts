@@ -512,7 +512,7 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
                     async (mockPath) => {
                         // Mock the app.getPath to return our test path
                         const { app } = await import("electron");
-                        (app.getPath as any).mockReturnValue(mockPath);
+                        vi.mocked(app.getPath).mockReturnValue(mockPath);
 
                         const { DatabaseService } =
                             await import("../../../services/database/DatabaseService");
@@ -726,7 +726,7 @@ describe("DatabaseService lifecycle and transaction behavior", () => {
                                     const error = new Error(
                                         `Mock ${errorType} error`
                                     );
-                                    (error as any).code = errorType;
+                                    Reflect.set(error, "code", errorType);
                                     throw error;
                                 });
 

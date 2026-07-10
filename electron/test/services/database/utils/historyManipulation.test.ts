@@ -13,12 +13,14 @@ import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import functions to test
+import { isDev } from "../../../../electronUtils";
 import {
     addHistoryEntry,
     deleteAllHistory,
     deleteHistoryByMonitorId,
     pruneHistoryForMonitor,
 } from "../../../../services/database/utils/maintenance/historyManipulation";
+import { logger } from "../../../../utils/logger";
 
 // Mock dependencies
 vi.mock("../../../../electronUtils", () => ({
@@ -53,10 +55,11 @@ vi.mock("../../../../../shared/utils/logTemplates", () => ({
     },
 }));
 
+const mockIsDev = vi.mocked(isDev);
+const mockLogger = vi.mocked(logger);
+
 describe("History Manipulation Utilities", () => {
     let mockDb: Database;
-    let mockLogger: any;
-    let mockIsDev: any;
 
     const sampleStatusHistory: StatusHistory = {
         timestamp: Date.now(),
@@ -75,20 +78,9 @@ describe("History Manipulation Utilities", () => {
     const getSafeMonitorId = (identifier: string): string =>
         getSafeIdentifierForLogging(identifier) ?? identifier;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
-
-        // Get mocked dependencies
-        const loggerModule = await import("../../../../utils/logger");
-        mockLogger = vi.mocked(loggerModule.logger);
-
-        const electronUtilsModule = await import("../../../../electronUtils");
-        mockIsDev = vi.mocked(electronUtilsModule.isDev);
-
-        const logTemplatesModule =
-            await import("../../../../../shared/utils/logTemplates");
-        vi.mocked(logTemplatesModule.interpolateLogTemplate);
 
         // Create mock database
         mockDb = {
