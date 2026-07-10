@@ -31,17 +31,6 @@ const current = fc.readConfigureGlobal() ?? {};
 const baseNumRuns = safeCastTo<{ numRuns?: number }>(current).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
-// Optional: example custom reporter (uncomment + adapt if you want structured output)
-// const jsonReporter = (runDetails: any) => {
-//   // e.g., write to a log file or console as JSON for CI parsing
-//   // import appendFileSync from node:fs at module scope if file output is needed.
-//   // appendFileSync("fc-report.json", `${JSON.stringify(runDetails)}\n`);
-//   if (runDetails.failed) {
-//     // default behavior is to throw; you can customize here if you prefer
-//     throw new Error(`Property failed: seed=${runDetails.seed} path=${runDetails.path}`);
-//   }
-// };
-
 fc.configureGlobal({
     ...current,
     ...fastCheckOverrides,
@@ -67,9 +56,6 @@ fc.configureGlobal({
 
     // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
-    // Replace reporter if you want custom behavior:
-    // reporter: jsonReporter,
-    // asyncReporter: async (runDetails) => { /* async reporting */ },
 });
 
 // Enhanced DOM polyfills for comprehensive testing support
