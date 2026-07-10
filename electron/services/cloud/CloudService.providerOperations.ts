@@ -49,6 +49,14 @@ export async function disconnect(
     ctx: CloudServiceOperationContext
 ): Promise<CloudStatusSummary> {
     return ctx.runCloudOperation("disconnect", async () => {
+        const disconnectErrors: Error[] = [];
+        const attemptSettingClear = async (key: string): Promise<void> => {
+            try {
+                await ctx.settings.set(key, "");
+            } catch (error: unknown) {
+                disconnectErrors.push(ensureError(error));
+            }
+        };
         const provider = await ctx.settings.get(SETTINGS_KEY_PROVIDER);
 
         if (provider === "dropbox") {
@@ -79,15 +87,16 @@ export async function disconnect(
             await tokenManager.revoke().catch((error: unknown) => {
                 logTokenRevocationFailure(provider, error);
             });
-
-            await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
         }
 
-        // Do not run these in parallel; settings are transaction-backed.
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "");
-        await ctx.settings.set(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY, "");
-        await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_MODE, "");
-        await ctx.settings.set(SETTINGS_KEY_ENCRYPTION_SALT, "");
+        // Do not run these in parallel; settings are transaction-backed. Keep
+        // attempting later clears when one write fails so disconnect leaves as
+        // little active state as possible.
+        await attemptSettingClear(SETTINGS_KEY_PROVIDER);
+        await attemptSettingClear(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY);
+        await attemptSettingClear(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL);
+        await attemptSettingClear(SETTINGS_KEY_ENCRYPTION_MODE);
+        await attemptSettingClear(SETTINGS_KEY_ENCRYPTION_SALT);
 
         await deleteProviderSecretsBestEffort({
             operationLabel: "disconnect",
@@ -98,6 +107,14 @@ export async function disconnect(
             ],
             secretStore: ctx.secretStore,
         });
+
+        if (disconnectErrors.length > 0) {
+            throw new AggregateError(
+                disconnectErrors,
+                "Cloud provider disconnect could not clear all persisted settings",
+                { cause: disconnectErrors[0] }
+            );
+        }
 
         logger.info("[CloudService] Disconnected cloud provider");
         return ctx.buildStatusSummary();

@@ -866,4 +866,69 @@ describe("CloudService.providerOperations", () => {
             secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
         ).resolves.toBe(undefined);
     });
+
+    it("attempts all disconnect cleanup when one settings clear fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const baseSettings = createSettingsAdapter({
+            [SETTINGS_KEY_ENCRYPTION_MODE]: "passphrase",
+            [SETTINGS_KEY_ENCRYPTION_SALT]: "salt",
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "stale-label",
+            [SETTINGS_KEY_PROVIDER]: "dropbox",
+        });
+        const providerClearError = new Error("provider clear failed");
+        const settings: CloudServiceOperationContext["settings"] = {
+            ...baseSettings,
+            set: async (key, value) => {
+                if (key === SETTINGS_KEY_PROVIDER && value === "") {
+                    throw providerClearError;
+                }
+                await baseSettings.set(key, value);
+            },
+        };
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "dropbox");
+        await secretStore.setSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS, "google");
+
+        const ctx = createOperationContext({
+            loadDropboxDeps: async () =>
+                ({
+                    DropboxTokenManager: class {
+                        public async revokeStoredTokens(): Promise<void> {}
+                    },
+                }) as never,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        const result = disconnect(ctx);
+        await expect(result).rejects.toThrow(AggregateError);
+        await expect(result).rejects.toThrow(
+            "Cloud provider disconnect could not clear all persisted settings"
+        );
+
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+            "dropbox"
+        );
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("");
+        await expect(
+            settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+        ).resolves.toBe("");
+        await expect(settings.get(SETTINGS_KEY_ENCRYPTION_MODE)).resolves.toBe(
+            ""
+        );
+        await expect(settings.get(SETTINGS_KEY_ENCRYPTION_SALT)).resolves.toBe(
+            ""
+        );
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_GOOGLE_DRIVE_TOKENS)
+        ).resolves.toBeUndefined();
+    });
 });
