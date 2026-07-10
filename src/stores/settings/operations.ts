@@ -222,8 +222,6 @@ export const createSettingsOperationsSlice = (
         persistHistoryLimit: async (limit: number): Promise<void> => {
             logStoreAction("SettingsStore", "persistHistoryLimit", { limit });
 
-            await ensureHistoryLimitSubscription();
-
             const currentSettings = getState().settings;
             const sanitizedLimit: number = normalizeHistoryLimit(
                 limit,
@@ -239,6 +237,8 @@ export const createSettingsOperationsSlice = (
                 await previousWrite;
                 await currentWrite;
             })();
+
+            await ensureHistoryLimitSubscription();
 
             // Inline ErrorHandlingFrontendStore context: in addition to updating
             // error/loading state, this operation must revert the optimistic
@@ -308,24 +308,42 @@ export const createSettingsOperationsSlice = (
             message: string;
             success: boolean;
         }> => {
+            const resetGeneration = ++historyLimitWriteGeneration;
+            const previousWrite = historyLimitWriteQueue;
+            let releaseReset: () => void = () => undefined;
+            const currentReset = new Promise<void>((resolve) => {
+                releaseReset = resolve;
+            });
+            historyLimitWriteQueue = (async (): Promise<void> => {
+                await previousWrite;
+                await currentReset;
+            })();
+
             const result = await withErrorHandling(
                 async () => {
-                    await SettingsService.resetSettings();
-                    const historyLimit =
-                        await SettingsService.getHistoryLimit();
+                    try {
+                        await previousWrite;
+                        await SettingsService.resetSettings();
+                        const historyLimit =
+                            await SettingsService.getHistoryLimit();
 
-                    setState({
-                        settings: normalizeAppSettings({
-                            historyLimit,
-                        }),
-                    });
+                        if (resetGeneration === historyLimitWriteGeneration) {
+                            setState({
+                                settings: normalizeAppSettings({
+                                    historyLimit,
+                                }),
+                            });
+                        }
 
-                    await ensureHistoryLimitSubscription();
+                        await ensureHistoryLimitSubscription();
 
-                    return {
-                        message: "Settings successfully reset to defaults",
-                        success: true,
-                    } as const;
+                        return {
+                            message: "Settings successfully reset to defaults",
+                            success: true,
+                        } as const;
+                    } finally {
+                        releaseReset();
+                    }
                 },
                 createStoreErrorHandler("settings", "resetSettings")
             );

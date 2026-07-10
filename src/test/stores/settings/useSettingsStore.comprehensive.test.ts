@@ -925,23 +925,21 @@ describe(useSettingsStore, () => {
             mockElectronAPI.settings.updateHistoryLimit
                 .mockReturnValueOnce(firstRequest.promise)
                 .mockReturnValueOnce(secondRequest.promise);
-            const { result } = renderHook(() => useSettingsStore());
+            const settingsStore = useSettingsStore.getState();
 
-            const olderWrite = result.current.persistHistoryLimit(600);
-            const newerWrite = result.current.persistHistoryLimit(700);
+            const olderWrite = settingsStore.persistHistoryLimit(600);
+            const newerWrite = settingsStore.persistHistoryLimit(700);
             const olderOutcome = olderWrite.catch((error: unknown) => error);
 
-            await act(async () => {
-                firstRequest.reject(new Error("older request failed"));
-                await olderOutcome;
-                secondRequest.resolve(700);
-                await newerWrite;
-            });
+            firstRequest.reject(new Error("older request failed"));
+            await olderOutcome;
+            secondRequest.resolve(700);
+            await newerWrite;
 
             await expect(olderOutcome).resolves.toMatchObject({
                 message: "older request failed",
             });
-            expect(result.current.settings.historyLimit).toBe(700);
+            expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
             expect(mockErrorStore.setStoreError).not.toHaveBeenCalledWith(
                 "settings",
                 "older request failed"
@@ -954,10 +952,10 @@ describe(useSettingsStore, () => {
             mockElectronAPI.settings.updateHistoryLimit
                 .mockReturnValueOnce(firstRequest.promise)
                 .mockReturnValueOnce(secondRequest.promise);
-            const { result } = renderHook(() => useSettingsStore());
+            const settingsStore = useSettingsStore.getState();
 
-            const olderWrite = result.current.persistHistoryLimit(600);
-            const newerWrite = result.current.persistHistoryLimit(700);
+            const olderWrite = settingsStore.persistHistoryLimit(600);
+            const newerWrite = settingsStore.persistHistoryLimit(700);
 
             await vi.waitFor(() => {
                 expect(
@@ -968,17 +966,73 @@ describe(useSettingsStore, () => {
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenNthCalledWith(1, 600);
 
-            await act(async () => {
-                firstRequest.resolve(600);
-                await olderWrite;
-                secondRequest.resolve(700);
-                await newerWrite;
-            });
+            firstRequest.resolve(600);
+            await olderWrite;
+            secondRequest.resolve(700);
+            await newerWrite;
 
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenNthCalledWith(2, 700);
-            expect(result.current.settings.historyLimit).toBe(700);
+            expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
+        });
+
+        it("should serialize resets between older and newer history limit writes", async () => {
+            const olderRequest = createDeferred<number>();
+            const resetRequest = createDeferred<undefined>();
+            const newerRequest = createDeferred<number>();
+            mockElectronAPI.settings.updateHistoryLimit
+                .mockReturnValueOnce(olderRequest.promise)
+                .mockReturnValueOnce(newerRequest.promise);
+            mockElectronAPI.settings.resetSettings.mockReturnValueOnce(
+                resetRequest.promise
+            );
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(300);
+            const settingsStore = useSettingsStore.getState();
+
+            const olderWrite = settingsStore.persistHistoryLimit(600);
+            const reset = settingsStore.resetSettings();
+            const newerWrite = settingsStore.persistHistoryLimit(700);
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.updateHistoryLimit
+                ).toHaveBeenCalledTimes(1);
+            });
+            expect(
+                mockElectronAPI.settings.resetSettings
+            ).not.toHaveBeenCalled();
+
+            olderRequest.resolve(600);
+            await olderWrite;
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.resetSettings
+                ).toHaveBeenCalledTimes(1);
+            });
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).toHaveBeenCalledTimes(1);
+
+            resetRequest.resolve(undefined);
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.updateHistoryLimit
+                ).toHaveBeenCalledTimes(2);
+            });
+
+            newerRequest.resolve(700);
+            await Promise.all([reset, newerWrite]);
+
+            const updateOrders =
+                mockElectronAPI.settings.updateHistoryLimit.mock
+                    .invocationCallOrder;
+            const resetOrder =
+                mockElectronAPI.settings.resetSettings.mock
+                    .invocationCallOrder[0];
+            expect(updateOrders[0]).toBeLessThan(resetOrder ?? 0);
+            expect(resetOrder).toBeLessThan(updateOrders[1] ?? 0);
+            expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
         });
     });
 
