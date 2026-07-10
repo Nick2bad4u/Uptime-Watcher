@@ -393,6 +393,43 @@ describe(useErrorStore, () => {
             expect(
                 result.current.getOperationLoading("fetchSites")
             ).toBeTruthy();
+            expect(result.current.isLoading).toBeTruthy();
+        });
+
+        it("should remain globally loading until all operations finish", () => {
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setOperationLoading("fetchSites", true);
+                result.current.setOperationLoading("saveSite", true);
+                result.current.setOperationLoading("fetchSites", false);
+            });
+
+            expect(result.current.isLoading).toBeTruthy();
+
+            act(() => {
+                result.current.setOperationLoading("saveSite", false);
+            });
+
+            expect(result.current.isLoading).toBeFalsy();
+        });
+
+        it("should preserve explicit loading while operations settle", () => {
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setLoading(true);
+                result.current.setOperationLoading("fetchSites", true);
+                result.current.setOperationLoading("fetchSites", false);
+            });
+
+            expect(result.current.isLoading).toBeTruthy();
+
+            act(() => {
+                result.current.setLoading(false);
+            });
+
+            expect(result.current.isLoading).toBeFalsy();
         });
 
         it("should get operation loading state", async ({ task, annotate }) => {

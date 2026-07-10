@@ -34,7 +34,7 @@
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
-import { isPresent, objectEntries } from "ts-extras";
+import { isPresent, objectEntries, objectValues } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -53,6 +53,10 @@ const createOperationLoadingMap = (): ErrorStore["operationLoading"] =>
 
 const createStoreErrorMap = (): ErrorStore["storeErrors"] =>
     createNullPrototypeObject<ErrorStore["storeErrors"]>();
+
+const hasActiveOperation = (
+    operationLoading: ErrorStore["operationLoading"]
+): boolean => objectValues(operationLoading).includes(true);
 
 const setOperationLoadingEntry = (
     target: ErrorStore["operationLoading"],
@@ -120,66 +124,76 @@ const cloneStoreErrors = (
  * @public
  */
 export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
-    create<ErrorStore>()((set, get) => ({
-        // Actions
-        clearAllErrors: (): void => {
-            logStoreAction("ErrorStore", "clearAllErrors");
-            set({
-                lastError: undefined,
-                storeErrors: createStoreErrorMap(),
-                // Note: isLoading and operationLoading are NOT cleared as they track loading states, not errors
-            });
-        },
-        clearError: (): void => {
-            logStoreAction("ErrorStore", "clearError");
-            set({ lastError: undefined });
-        },
-        clearStoreError: (store: string): void => {
-            logStoreAction("ErrorStore", "clearStoreError", { store });
-            set((state) => {
-                const remainingErrors = cloneStoreErrors(state.storeErrors);
-                Reflect.deleteProperty(remainingErrors, store);
-                return { storeErrors: remainingErrors };
-            });
-        },
-        getOperationLoading: (operation: string): boolean => {
-            const loading = get().operationLoading;
+    create<ErrorStore>()((set, get) => {
+        let explicitLoading = false;
 
-            return loading[operation] ?? false;
-        },
-        getStoreError: (store: string): string | undefined => {
-            const raw = get().storeErrors[store] as unknown;
+        return {
+            // Actions
+            clearAllErrors: (): void => {
+                logStoreAction("ErrorStore", "clearAllErrors");
+                set({
+                    lastError: undefined,
+                    storeErrors: createStoreErrorMap(),
+                    // Note: isLoading and operationLoading are NOT cleared as they track loading states, not errors
+                });
+            },
+            clearError: (): void => {
+                logStoreAction("ErrorStore", "clearError");
+                set({ lastError: undefined });
+            },
+            clearStoreError: (store: string): void => {
+                logStoreAction("ErrorStore", "clearStoreError", { store });
+                set((state) => {
+                    const remainingErrors = cloneStoreErrors(state.storeErrors);
+                    Reflect.deleteProperty(remainingErrors, store);
+                    return { storeErrors: remainingErrors };
+                });
+            },
+            getOperationLoading: (operation: string): boolean => {
+                const loading = get().operationLoading;
 
-            if (typeof raw === "string") {
-                return normalizeStoredErrorMessage(raw);
-            }
+                return loading[operation] ?? false;
+            },
+            getStoreError: (store: string): string | undefined => {
+                const raw = get().storeErrors[store] as unknown;
 
-            if (isPresent(raw)) {
-                return getUserFacingErrorDetail(raw);
-            }
+                if (typeof raw === "string") {
+                    return normalizeStoredErrorMessage(raw);
+                }
 
-            return undefined;
-        },
-        // State
-        isLoading: false,
-        lastError: undefined,
-        operationLoading: createOperationLoadingMap(),
-        setError: (error: string | undefined): void => {
-            const lastError = normalizeStoredErrorMessage(error);
-            logStoreAction("ErrorStore", "setError", { error: lastError });
-            set({ lastError });
-        },
-        setLoading: (loading: boolean): void => {
-            logStoreAction("ErrorStore", "setLoading", { loading });
-            set({ isLoading: loading });
-        },
-        setOperationLoading: (operation: string, loading: boolean): void => {
-            logStoreAction("ErrorStore", "setOperationLoading", {
-                loading,
-                operation,
-            });
-            set((state) => ({
-                operationLoading: (() => {
+                if (isPresent(raw)) {
+                    return getUserFacingErrorDetail(raw);
+                }
+
+                return undefined;
+            },
+            // State
+            isLoading: false,
+            lastError: undefined,
+            operationLoading: createOperationLoadingMap(),
+            setError: (error: string | undefined): void => {
+                const lastError = normalizeStoredErrorMessage(error);
+                logStoreAction("ErrorStore", "setError", { error: lastError });
+                set({ lastError });
+            },
+            setLoading: (loading: boolean): void => {
+                logStoreAction("ErrorStore", "setLoading", { loading });
+                explicitLoading = loading;
+                set((state) => ({
+                    isLoading:
+                        explicitLoading ||
+                        hasActiveOperation(state.operationLoading),
+                }));
+            },
+            setOperationLoading: (
+                operation: string,
+                loading: boolean
+            ): void => {
+                logStoreAction("ErrorStore", "setOperationLoading", {
+                    loading,
+                    operation,
+                });
+                set((state) => {
                     const operationLoading = cloneOperationLoading(
                         state.operationLoading
                     );
@@ -188,23 +202,29 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                         operation,
                         loading
                     );
-                    return operationLoading;
-                })(),
-            }));
-        },
-        setStoreError: (store: string, error: string | undefined): void => {
-            const storeError = normalizeStoredErrorMessage(error);
-            logStoreAction("ErrorStore", "setStoreError", {
-                error: storeError,
-                store,
-            });
-            set((state) => ({
-                storeErrors: (() => {
-                    const storeErrors = cloneStoreErrors(state.storeErrors);
-                    setStoreErrorEntry(storeErrors, store, storeError);
-                    return storeErrors;
-                })(),
-            }));
-        },
-        storeErrors: createStoreErrorMap(),
-    }));
+
+                    return {
+                        isLoading:
+                            explicitLoading ||
+                            hasActiveOperation(operationLoading),
+                        operationLoading,
+                    };
+                });
+            },
+            setStoreError: (store: string, error: string | undefined): void => {
+                const storeError = normalizeStoredErrorMessage(error);
+                logStoreAction("ErrorStore", "setStoreError", {
+                    error: storeError,
+                    store,
+                });
+                set((state) => ({
+                    storeErrors: (() => {
+                        const storeErrors = cloneStoreErrors(state.storeErrors);
+                        setStoreErrorEntry(storeErrors, store, storeError);
+                        return storeErrors;
+                    })(),
+                }));
+            },
+            storeErrors: createStoreErrorMap(),
+        };
+    });
