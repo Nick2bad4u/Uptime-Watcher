@@ -8,7 +8,6 @@ import type { SettingsStore } from "./types";
 
 import { UI_DELAYS } from "../../constants";
 import { logger } from "../../services/logger";
-import { SettingsService } from "../../services/SettingsService";
 import { fireAndForget } from "../../utils/async/fireAndForget";
 import { defaultSettings, normalizeAppSettings } from "./state";
 
@@ -103,18 +102,11 @@ export const syncSettingsAfterRehydration = (
                     logger.info(
                         "[SettingsHydration] fetching history limit for sync"
                     );
-                    const historyLimit =
-                        await SettingsService.getHistoryLimit();
+                    await state.syncFromBackend();
                     if (generation !== settingsSyncState.generation) {
                         return;
                     }
-                    logger.debug(
-                        "[SettingsHydration] applying backend history limit",
-                        {
-                            historyLimit,
-                        }
-                    );
-                    state.updateSettings({ historyLimit });
+                    logger.debug("[SettingsHydration] backend sync completed");
                 } catch (error) {
                     if (generation !== settingsSyncState.generation) {
                         return;
@@ -123,15 +115,6 @@ export const syncSettingsAfterRehydration = (
                         "Failed to sync settings after rehydration:",
                         ensureError(error)
                     );
-                    logger.debug(
-                        "[SettingsHydration] applying fallback history limit",
-                        {
-                            historyLimit: defaultSettings.historyLimit,
-                        }
-                    );
-                    state.updateSettings({
-                        historyLimit: defaultSettings.historyLimit,
-                    });
                 }
             },
             {

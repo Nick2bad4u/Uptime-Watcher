@@ -248,6 +248,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)
             );
+            expect(result.current.settings.historyLimit).toBe(1000);
         });
     });
 

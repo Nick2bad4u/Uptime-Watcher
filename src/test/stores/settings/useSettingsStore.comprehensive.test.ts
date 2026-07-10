@@ -620,7 +620,9 @@ describe(useSettingsStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Event Handling", "type");
 
-            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
+            mockElectronAPI.settings.getHistoryLimit
+                .mockResolvedValueOnce(500)
+                .mockResolvedValue(650);
 
             let capturedHandler:
                 | Parameters<ElectronAPI["events"]["onHistoryLimitUpdated"]>[0]
@@ -662,7 +664,9 @@ describe(useSettingsStore, () => {
                 capturedHandler!(eventPayload);
             });
 
-            expect(result.current.settings.historyLimit).toBe(650);
+            await vi.waitFor(() => {
+                expect(result.current.settings.historyLimit).toBe(650);
+            });
             expect(mockLogStoreAction).toHaveBeenCalledWith(
                 "SettingsStore",
                 "historyLimitUpdatedEvent",
@@ -974,6 +978,46 @@ describe(useSettingsStore, () => {
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenNthCalledWith(2, 700);
+            expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
+        });
+
+        it("should not apply a stale backend sync over a newer write", async () => {
+            const backendRead = createDeferred<number>();
+            const backendWrite = createDeferred<number>();
+            mockElectronAPI.settings.getHistoryLimit.mockReturnValue(
+                backendRead.promise
+            );
+            mockElectronAPI.settings.updateHistoryLimit.mockReturnValue(
+                backendWrite.promise
+            );
+            const settingsStore = useSettingsStore.getState();
+
+            const sync = settingsStore.syncFromBackend();
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.getHistoryLimit
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            const write = settingsStore.persistHistoryLimit(700);
+            await vi.waitFor(() => {
+                expect(useSettingsStore.getState().settings.historyLimit).toBe(
+                    700
+                );
+            });
+
+            backendRead.resolve(300);
+            await sync;
+            expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.updateHistoryLimit
+                ).toHaveBeenCalledWith(700);
+            });
+            backendWrite.resolve(700);
+            await write;
+
             expect(useSettingsStore.getState().settings.historyLimit).toBe(700);
         });
 

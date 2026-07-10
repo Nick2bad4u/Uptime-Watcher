@@ -13,6 +13,7 @@ import type { SettingsStore } from "./types";
 import { EventsService } from "../../services/EventsService";
 import { logger } from "../../services/logger";
 import { SettingsService } from "../../services/SettingsService";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
@@ -60,21 +61,49 @@ export const createSettingsOperationsSlice = (
     | "resetSettings"
     | "syncFromBackend"
 > => {
-    let historyLimitWriteQueue: Promise<void> = Promise.resolve();
+    let historyLimitOperationQueue: Promise<void> = Promise.resolve();
     let historyLimitWriteGeneration = 0;
 
-    const loadBackendHistoryLimit = async (): Promise<void> => {
-        const historyLimit = await SettingsService.getHistoryLimit();
-        const currentSettings = getState().settings;
-        const updatedSettings = normalizeAppSettings(
-            {
-                ...currentSettings,
-                historyLimit,
-            },
-            currentSettings
-        );
+    const reserveHistoryLimitOperation = (): {
+        previousOperation: Promise<void>;
+        release: () => void;
+    } => {
+        const previousOperation = historyLimitOperationQueue;
+        let release: () => void = () => undefined;
+        const currentOperation = new Promise<void>((resolve) => {
+            release = resolve;
+        });
+        historyLimitOperationQueue = (async (): Promise<void> => {
+            await previousOperation;
+            await currentOperation;
+        })();
+        return { previousOperation, release };
+    };
 
-        setState({ settings: updatedSettings });
+    const loadBackendHistoryLimit = async (): Promise<void> => {
+        const readGeneration = historyLimitWriteGeneration;
+        const { previousOperation, release } = reserveHistoryLimitOperation();
+
+        try {
+            await previousOperation;
+            const historyLimit = await SettingsService.getHistoryLimit();
+            if (readGeneration !== historyLimitWriteGeneration) {
+                return;
+            }
+
+            const currentSettings = getState().settings;
+            const updatedSettings = normalizeAppSettings(
+                {
+                    ...currentSettings,
+                    historyLimit,
+                },
+                currentSettings
+            );
+
+            setState({ settings: updatedSettings });
+        } finally {
+            release();
+        }
     };
 
     const ensureHistoryLimitSubscription = async (): Promise<void> => {
@@ -106,7 +135,7 @@ export const createSettingsOperationsSlice = (
                             );
 
                             logger.debug(
-                                "[SettingsStore] Applying history limit update from backend",
+                                "[SettingsStore] Reconciling history limit update from backend",
                                 {
                                     limit: event.limit,
                                     previousLimit: event.previousLimit,
@@ -114,14 +143,13 @@ export const createSettingsOperationsSlice = (
                                 }
                             );
 
-                            setState({
-                                settings: normalizeAppSettings(
-                                    {
-                                        ...currentSettings,
-                                        historyLimit: event.limit,
-                                    },
-                                    currentSettings
-                                ),
+                            fireAndForget(loadBackendHistoryLimit, {
+                                onError: (error) => {
+                                    logger.error(
+                                        "[SettingsStore] Failed to reconcile history limit update",
+                                        ensureError(error)
+                                    );
+                                },
                             });
                         }
                     );
@@ -228,15 +256,8 @@ export const createSettingsOperationsSlice = (
                 DEFAULT_HISTORY_LIMIT_RULES
             );
             const writeGeneration = ++historyLimitWriteGeneration;
-            const previousWrite = historyLimitWriteQueue;
-            let releaseWrite: () => void = () => undefined;
-            const currentWrite = new Promise<void>((resolve) => {
-                releaseWrite = resolve;
-            });
-            historyLimitWriteQueue = (async (): Promise<void> => {
-                await previousWrite;
-                await currentWrite;
-            })();
+            const { previousOperation: previousWrite, release: releaseWrite } =
+                reserveHistoryLimitOperation();
 
             await ensureHistoryLimitSubscription();
 
@@ -309,15 +330,8 @@ export const createSettingsOperationsSlice = (
             success: boolean;
         }> => {
             const resetGeneration = ++historyLimitWriteGeneration;
-            const previousWrite = historyLimitWriteQueue;
-            let releaseReset: () => void = () => undefined;
-            const currentReset = new Promise<void>((resolve) => {
-                releaseReset = resolve;
-            });
-            historyLimitWriteQueue = (async (): Promise<void> => {
-                await previousWrite;
-                await currentReset;
-            })();
+            const { previousOperation: previousWrite, release: releaseReset } =
+                reserveHistoryLimitOperation();
 
             const result = await withErrorHandling(
                 async () => {
