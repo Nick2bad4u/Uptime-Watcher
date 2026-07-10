@@ -3,22 +3,61 @@
  *   coordination, lifecycle management, and event handling
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
+import type { App, BrowserWindow } from "electron";
+
+import type { UptimeEvents } from "../../../events/eventTypes";
+import type { EventKey } from "../../../events/TypedEventBus";
+import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
+import type { DatabaseService } from "../../../services/database/DatabaseService";
+import type { RendererEventBridge } from "../../../services/events/RendererEventBridge";
+import type { IpcService } from "../../../services/ipc/IpcService";
+import type { NotificationService } from "../../../services/notifications/NotificationService";
+import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
+import type { WindowService } from "../../../services/window/WindowService";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApplicationService } from "../../../services/application/ApplicationService";
 
+type ApplicationAppEvent =
+    | "activate"
+    | "ready"
+    | "window-all-closed";
+type ApplicationAppEventHandler = () => Promise<void> | void;
+type ApplicationWindow = Pick<BrowserWindow, "id">;
+
+const mockApp = vi.hoisted(() => ({
+    isReady: vi.fn<App["isReady"]>(() => false),
+    off: vi.fn(
+        (_event: ApplicationAppEvent, _listener: ApplicationAppEventHandler) =>
+            undefined
+    ),
+    on: vi.fn(
+        (_event: ApplicationAppEvent, _listener: ApplicationAppEventHandler) =>
+            undefined
+    ),
+    quit: vi.fn<App["quit"]>(),
+    removeAllListeners: vi.fn<App["removeAllListeners"]>(),
+}));
+
+function getAppEventHandler(
+    event: ApplicationAppEvent
+): ApplicationAppEventHandler | undefined {
+    return mockApp.on.mock.calls.find(([registeredEvent]) =>
+        Object.is(registeredEvent, event)
+    )?.[1];
+}
+
 // Mock Electron app
 vi.mock("electron", () => ({
-    app: {
-        isReady: vi.fn(() => false),
-        on: vi.fn(),
-        off: vi.fn(),
-        quit: vi.fn(),
-        removeAllListeners: vi.fn(),
-    },
+    app: mockApp,
     BrowserWindow: {
         getAllWindows: vi.fn(() => []),
     },
@@ -119,77 +158,111 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
 
 // Create mock service instances
 const mockIpcService = {
-    cleanup: vi.fn(),
-};
+    cleanup: vi.fn<IpcService["cleanup"]>(),
+} satisfies Pick<IpcService, "cleanup">;
 
 const mockUptimeOrchestrator = {
-    stopMonitoring: vi.fn(),
-    onTyped: vi.fn(),
-    removeAllListeners: vi.fn(),
-};
+    onTyped: vi.fn<UptimeOrchestrator["onTyped"]>(),
+    removeAllListeners: vi.fn<UptimeOrchestrator["removeAllListeners"]>(),
+    stopMonitoring: vi.fn<UptimeOrchestrator["stopMonitoring"]>(),
+} satisfies Pick<
+    UptimeOrchestrator,
+    | "onTyped"
+    | "removeAllListeners"
+    | "stopMonitoring"
+>;
+
+const monitoringStopSummary = {
+    alreadyInactive: false,
+    attempted: 0,
+    failed: 0,
+    isMonitoring: false,
+    partialFailures: false,
+    siteCount: 0,
+    skipped: 0,
+    succeeded: 0,
+} satisfies MonitoringStopSummary;
+
+type RawUptimeEventHandler = (payload: unknown) => unknown;
+
+function getUptimeEventHandler<K extends EventKey<UptimeEvents>>(
+    event: K
+): RawUptimeEventHandler | undefined {
+    const handler: unknown = mockUptimeOrchestrator.onTyped.mock.calls.find(
+        ([registeredEvent]) => registeredEvent === event
+    )?.[1];
+
+    if (typeof handler !== "function") {
+        return undefined;
+    }
+
+    return (payload) =>
+        Reflect.apply(handler, mockUptimeOrchestrator, [payload]);
+}
 
 const mockDatabaseService = {
-    close: vi.fn(),
-};
+    close: vi.fn<DatabaseService["close"]>(),
+} satisfies Pick<DatabaseService, "close">;
 
 const mockWindowService = {
-    closeMainWindow: vi.fn(),
-    getAllWindows: vi.fn(() => [] as any[]),
-    createMainWindow: vi.fn(),
+    closeMainWindow: vi.fn<WindowService["closeMainWindow"]>(),
+    createMainWindow: vi.fn<() => void>(),
+    getAllWindows: vi.fn<() => ApplicationWindow[]>(() => []),
 };
 
 const mockRendererEventBridge = {
-    sendToRenderers: vi.fn(),
-    sendStateSyncEvent: vi.fn(),
-};
+    sendStateSyncEvent: vi.fn<RendererEventBridge["sendStateSyncEvent"]>(),
+    sendToRenderers: vi.fn<RendererEventBridge["sendToRenderers"]>(),
+} satisfies Pick<RendererEventBridge, "sendStateSyncEvent" | "sendToRenderers">;
 
 const mockAutoUpdaterService = {
-    cleanup: vi.fn(),
-    setStatusCallback: vi.fn(),
-    initialize: vi.fn(),
-    checkForUpdates: vi.fn(() => Promise.resolve()),
-};
+    checkForUpdates: vi.fn<AutoUpdaterService["checkForUpdates"]>(
+        async () => undefined
+    ),
+    cleanup: vi.fn<AutoUpdaterService["cleanup"]>(),
+    initialize: vi.fn<AutoUpdaterService["initialize"]>(),
+    setStatusCallback: vi.fn<AutoUpdaterService["setStatusCallback"]>(),
+} satisfies Pick<
+    AutoUpdaterService,
+    | "checkForUpdates"
+    | "cleanup"
+    | "initialize"
+    | "setStatusCallback"
+>;
 
 const mockNotificationService = {
-    notifyMonitorUp: vi.fn(),
-    notifyMonitorDown: vi.fn(),
-};
+    notifyMonitorDown: vi.fn<NotificationService["notifyMonitorDown"]>(),
+    notifyMonitorUp: vi.fn<NotificationService["notifyMonitorUp"]>(),
+} satisfies Pick<NotificationService, "notifyMonitorDown" | "notifyMonitorUp">;
 
 // Mock ServiceContainer
+const mockServiceContainer = vi.hoisted(() => ({
+    getAutoUpdaterService: vi.fn(),
+    getDatabaseService: vi.fn(),
+    getInitializedServices: vi.fn(),
+    getInstance: vi.fn(),
+    getIpcService: vi.fn(),
+    getNotificationService: vi.fn(),
+    getRendererEventBridge: vi.fn(),
+    getUptimeOrchestrator: vi.fn(),
+    getWindowService: vi.fn(),
+    initialize: vi.fn(),
+}));
+
 vi.mock("../../../services/ServiceContainer", () => ({
-    ServiceContainer: {
-        getInstance: vi.fn(),
-        initialize: vi.fn(),
-        getInitializedServices: vi.fn(() => [
-            { name: "IpcService", service: mockIpcService },
-            {
-                name: "UptimeOrchestrator",
-                service: mockUptimeOrchestrator,
-            },
-            { name: "WindowService", service: mockWindowService },
-            { name: "DatabaseService", service: mockDatabaseService },
-            { name: "AutoUpdaterService", service: mockAutoUpdaterService },
-        ]),
-        getIpcService: vi.fn(() => mockIpcService),
-        getUptimeOrchestrator: vi.fn(() => mockUptimeOrchestrator),
-        getWindowService: vi.fn(() => mockWindowService),
-        getRendererEventBridge: vi.fn(() => mockRendererEventBridge),
-        getAutoUpdaterService: vi.fn(() => mockAutoUpdaterService),
-        getNotificationService: vi.fn(() => mockNotificationService),
-        getDatabaseService: vi.fn(() => mockDatabaseService),
-    },
+    ServiceContainer: mockServiceContainer,
 }));
 
 describe(ApplicationService, () => {
     let applicationService: ApplicationService;
-    let mockApp: any;
-    let mockServiceContainer: any;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         vi.clearAllMocks();
 
         mockUptimeOrchestrator.stopMonitoring.mockReset();
-        mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
+        mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
+            monitoringStopSummary
+        );
         mockUptimeOrchestrator.onTyped.mockReset();
         mockUptimeOrchestrator.removeAllListeners.mockReset();
 
@@ -198,20 +271,20 @@ describe(ApplicationService, () => {
         mockWindowService.closeMainWindow.mockReset();
         mockDatabaseService.close.mockReset();
 
-        // Get the mocked ServiceContainer reference
-        const serviceContainerModule =
-            await import("../../../services/ServiceContainer");
-        mockServiceContainer = vi.mocked(
-            serviceContainerModule.ServiceContainer
-        );
-
-        // Get the mocked app reference
-        const electron = await import("electron");
-        mockApp = vi.mocked(electron).app;
         mockApp.isReady.mockReturnValue(false);
 
         // Setup mock returns
         mockServiceContainer.getInstance.mockReturnValue(mockServiceContainer);
+        mockServiceContainer.getInitializedServices.mockReturnValue([
+            { name: "IpcService", service: mockIpcService },
+            {
+                name: "UptimeOrchestrator",
+                service: mockUptimeOrchestrator,
+            },
+            { name: "WindowService", service: mockWindowService },
+            { name: "DatabaseService", service: mockDatabaseService },
+            { name: "AutoUpdaterService", service: mockAutoUpdaterService },
+        ]);
         mockServiceContainer.getIpcService.mockReturnValue(mockIpcService);
         mockServiceContainer.getUptimeOrchestrator.mockReturnValue(
             mockUptimeOrchestrator
@@ -386,9 +459,7 @@ describe(ApplicationService, () => {
 
             // Arrange
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
 
             // Act
             await readyHandler?.();
@@ -413,9 +484,7 @@ describe(ApplicationService, () => {
 
             // Arrange
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
 
             // Act
             await readyHandler?.();
@@ -483,7 +552,9 @@ describe(ApplicationService, () => {
             );
 
             // Arrange
-            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
+            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
+                monitoringStopSummary
+            );
 
             // Simulate cleanup with signal monitoring
             const cleanupPromise = applicationService.cleanup();
@@ -571,7 +642,7 @@ describe(ApplicationService, () => {
                 new Promise((resolve, reject) => {
                     // Simulate async operation that can be cancelled
                     const timeout = setTimeout(() => {
-                        resolve(undefined);
+                        resolve(monitoringStopSummary);
                     }, 1000);
 
                     // Handle cancellation properly
@@ -603,7 +674,9 @@ describe(ApplicationService, () => {
             expect(signal.aborted).toBeFalsy();
 
             // Ensure subsequent tests start with resolved cleanup behavior
-            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
+            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(
+                monitoringStopSummary
+            );
         });
         it("should cleanup IPC service if cleanup method exists", async ({
             task,
@@ -757,9 +830,8 @@ describe(ApplicationService, () => {
                     value: "win32",
                     writable: true,
                 });
-                const windowAllClosedHandler = mockApp.on.mock.calls.find(
-                    (call: any[]) => call[0] === "window-all-closed"
-                )?.[1];
+                const windowAllClosedHandler =
+                    getAppEventHandler("window-all-closed");
 
                 // Act
                 windowAllClosedHandler?.();
@@ -785,9 +857,8 @@ describe(ApplicationService, () => {
                     value: "darwin",
                     writable: true,
                 });
-                const windowAllClosedHandler = mockApp.on.mock.calls.find(
-                    (call: any[]) => call[0] === "window-all-closed"
-                )?.[1];
+                const windowAllClosedHandler =
+                    getAppEventHandler("window-all-closed");
 
                 // Act
                 windowAllClosedHandler?.();
@@ -809,9 +880,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 mockWindowService.getAllWindows.mockReturnValue([]);
-                const activateHandler = mockApp.on.mock.calls.find(
-                    (call: any[]) => call[0] === "activate"
-                )?.[1];
+                const activateHandler = getAppEventHandler("activate");
 
                 // Act
                 activateHandler?.();
@@ -838,10 +907,11 @@ describe(ApplicationService, () => {
                 await annotate("Component: ApplicationService", "component");
 
                 // Arrange
-                mockWindowService.getAllWindows.mockReturnValue([{ id: 1 }]);
-                const activateHandler = mockApp.on.mock.calls.find(
-                    (call: any[]) => call[0] === "activate"
-                )?.[1];
+                const existingWindow = { id: 1 } satisfies ApplicationWindow;
+                mockWindowService.getAllWindows.mockReturnValue([
+                    existingWindow,
+                ]);
+                const activateHandler = getAppEventHandler("activate");
 
                 // Act
                 activateHandler?.();
@@ -862,9 +932,7 @@ describe(ApplicationService, () => {
     describe("Auto Updater Setup", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
             await readyHandler?.();
         });
         it("should setup auto updater status callback", async ({
@@ -883,7 +951,7 @@ describe(ApplicationService, () => {
             // Arrange
             const statusCallback =
                 mockAutoUpdaterService.setStatusCallback.mock.calls[0]?.[0];
-            const statusData = { status: "checking-for-update" };
+            const statusData = { status: "checking" } as const;
 
             // Act
             statusCallback?.(statusData);
@@ -916,9 +984,7 @@ describe(ApplicationService, () => {
 
             // Create new instance to trigger the error
             new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
 
             // Act
             await readyHandler?.();
@@ -971,9 +1037,7 @@ describe(ApplicationService, () => {
 
             // Create new instance
             new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
 
             // Act - Start ready handler and cancel update check
             const readyPromise = readyHandler?.();
@@ -998,9 +1062,7 @@ describe(ApplicationService, () => {
     describe("Uptime Monitoring Event Handlers", () => {
         beforeEach(async () => {
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
             await readyHandler?.();
         });
         describe("monitor:up event", () => {
@@ -1012,10 +1074,7 @@ describe(ApplicationService, () => {
                 await annotate("Component: ApplicationService", "component");
 
                 // Arrange
-                const monitorUpHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:up"
-                    )?.[1];
+                const monitorUpHandler = getUptimeEventHandler("monitor:up");
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -1041,10 +1100,7 @@ describe(ApplicationService, () => {
                 await annotate("Component: ApplicationService", "component");
 
                 // Arrange
-                const monitorUpHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:up"
-                    )?.[1];
+                const monitorUpHandler = getUptimeEventHandler("monitor:up");
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -1076,9 +1132,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitorDownHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:down"
-                    )?.[1];
+                    getUptimeEventHandler("monitor:down");
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -1105,9 +1159,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitorDownHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:down"
-                    )?.[1];
+                    getUptimeEventHandler("monitor:down");
                 const eventData = {
                     site: { identifier: "site-1", name: "Test Site" },
                     monitor: { id: "monitor-1" },
@@ -1137,10 +1189,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const manualCheckHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:check-completed"
-                    )?.[1];
+                const manualCheckHandler = getUptimeEventHandler(
+                    "monitor:check-completed"
+                );
 
                 const monitor: Monitor = {
                     activeOperations: [],
@@ -1200,10 +1251,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const manualCheckHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitor:check-completed"
-                    )?.[1];
+                const manualCheckHandler = getUptimeEventHandler(
+                    "monitor:check-completed"
+                );
 
                 const monitor: Monitor = {
                     activeOperations: [],
@@ -1264,10 +1314,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const historyLimitHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "settings:history-limit-updated"
-                    )?.[1];
+                const historyLimitHandler = getUptimeEventHandler(
+                    "settings:history-limit-updated"
+                );
 
                 const eventData = {
                     limit: 750,
@@ -1301,10 +1350,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const historyLimitHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "settings:history-limit-updated"
-                    )?.[1];
+                const historyLimitHandler = getUptimeEventHandler(
+                    "settings:history-limit-updated"
+                );
 
                 const eventData = {
                     limit: 600,
@@ -1335,9 +1383,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const systemErrorHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "system:error"
-                    )?.[1];
+                    getUptimeEventHandler("system:error");
                 const eventData = {
                     context: "database",
                     error: new Error("Database connection failed"),
@@ -1363,9 +1409,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitoringStartedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitoring:started"
-                    )?.[1];
+                    getUptimeEventHandler("monitoring:started");
                 const eventData = { siteIdentifier: "site-1" };
 
                 // Act
@@ -1385,9 +1429,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitoringStartedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitoring:started"
-                    )?.[1];
+                    getUptimeEventHandler("monitoring:started");
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
                 mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
@@ -1415,9 +1457,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitoringStoppedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitoring:stopped"
-                    )?.[1];
+                    getUptimeEventHandler("monitoring:stopped");
                 const eventData = { siteIdentifier: "site-1" };
 
                 // Act
@@ -1437,9 +1477,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const monitoringStoppedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "monitoring:stopped"
-                    )?.[1];
+                    getUptimeEventHandler("monitoring:stopped");
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
                 mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
@@ -1465,10 +1503,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const stateSyncHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "sites:state-synchronized"
-                    )?.[1];
+                const stateSyncHandler = getUptimeEventHandler(
+                    "sites:state-synchronized"
+                );
                 const eventData = {
                     action: STATE_SYNC_ACTION.UPDATE,
                     siteIdentifier: "site-1",
@@ -1498,10 +1535,9 @@ describe(ApplicationService, () => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: ApplicationService", "component");
 
-                const stateSyncHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "sites:state-synchronized"
-                    )?.[1];
+                const stateSyncHandler = getUptimeEventHandler(
+                    "sites:state-synchronized"
+                );
                 const eventData = {
                     action: STATE_SYNC_ACTION.UPDATE,
                     siteIdentifier: "site-1",
@@ -1541,9 +1577,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const cacheInvalidatedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "cache:invalidated"
-                    )?.[1];
+                    getUptimeEventHandler("cache:invalidated");
                 const eventData = {
                     identifier: "site-1",
                     reason: "manual",
@@ -1567,9 +1601,7 @@ describe(ApplicationService, () => {
 
                 // Arrange
                 const cacheInvalidatedHandler =
-                    mockUptimeOrchestrator.onTyped.mock.calls.find(
-                        (call) => call[0] === "cache:invalidated"
-                    )?.[1];
+                    getUptimeEventHandler("cache:invalidated");
                 const eventData = {
                     identifier: "site-1",
                     reason: "manual",
@@ -1645,10 +1677,7 @@ describe(ApplicationService, () => {
 
             // Arrange
             applicationService = new ApplicationService();
-            const monitorUpHandler =
-                mockUptimeOrchestrator.onTyped.mock.calls.find(
-                    (call) => call[0] === "monitor:up"
-                )?.[1];
+            const monitorUpHandler = getUptimeEventHandler("monitor:up");
 
             // Act & Assert - Should not throw
             expect(() => monitorUpHandler?.(null)).not.toThrow();
@@ -1708,9 +1737,7 @@ describe(ApplicationService, () => {
 
             // Act
             applicationService = new ApplicationService();
-            const readyHandler = mockApp.on.mock.calls.find(
-                (call: any[]) => call[0] === "ready"
-            )?.[1];
+            const readyHandler = getAppEventHandler("ready");
             await readyHandler?.();
 
             // Assert - Verify services are initialized in correct order
