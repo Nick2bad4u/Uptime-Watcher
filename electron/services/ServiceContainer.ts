@@ -229,6 +229,15 @@ export class ServiceContainer {
 
     private cloudSyncScheduler?: CloudSyncScheduler;
 
+    /** Prevents scheduler cloud work from starting once shutdown begins. */
+    private cloudSyncSchedulerAcceptingWork = true;
+
+    /** In-flight cloud operations started by the scheduler. */
+    private readonly cloudSyncSchedulerOperations = new Set<Promise<unknown>>();
+
+    /** Shared scheduler shutdown task for idempotent cleanup. */
+    private cloudSyncSchedulerShutdownPromise: Promise<void> | undefined;
+
     private syncEngine?: SyncEngine;
 
     /**
@@ -373,7 +382,7 @@ export class ServiceContainer {
     public getCloudSyncScheduler(): CloudSyncScheduler {
         if (!this.cloudSyncScheduler) {
             this.cloudSyncScheduler = new CloudSyncScheduler({
-                cloudService: this.getCloudService(),
+                cloudService: this.createCloudSyncSchedulerCloudService(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created CloudSyncScheduler");
@@ -381,6 +390,87 @@ export class ServiceContainer {
         }
 
         return this.cloudSyncScheduler;
+    }
+
+    /**
+     * Stops cloud sync scheduling and waits for its active cloud operation.
+     *
+     * @remarks
+     * Shutdown is idempotent. New scheduler operations are rejected before the
+     * timer is stopped, and an already-running provider call is allowed to
+     * settle before dependent services are disposed.
+     */
+    public async shutdownCloudSyncScheduler(): Promise<void> {
+        this.cloudSyncSchedulerShutdownPromise ??=
+            this.performCloudSyncSchedulerShutdown();
+        await this.cloudSyncSchedulerShutdownPromise;
+    }
+
+    private createCloudSyncSchedulerCloudService(): CloudService {
+        const cloudService = this.getCloudService();
+
+        return new Proxy(cloudService, {
+            get: (target, property) => {
+                if (property === "getStatus") {
+                    return (): ReturnType<CloudService["getStatus"]> =>
+                        this.trackCloudSyncSchedulerOperation(() =>
+                            target.getStatus()
+                        );
+                }
+
+                if (property === "requestSyncNow") {
+                    return (): ReturnType<CloudService["requestSyncNow"]> =>
+                        this.trackCloudSyncSchedulerOperation(() =>
+                            target.requestSyncNow()
+                        );
+                }
+
+                const value: unknown = Reflect.get(target, property, target);
+                if (typeof value !== "function") {
+                    return value;
+                }
+
+                return (...args: unknown[]): unknown =>
+                    Reflect.apply(value, target, args);
+            },
+        });
+    }
+
+    private async performCloudSyncSchedulerShutdown(): Promise<void> {
+        this.cloudSyncSchedulerAcceptingWork = false;
+
+        let didStopFail = false;
+        let stopError: unknown;
+        try {
+            this.cloudSyncScheduler?.stop();
+        } catch (error) {
+            didStopFail = true;
+            stopError = error;
+        }
+
+        await Promise.allSettled(this.cloudSyncSchedulerOperations);
+
+        if (didStopFail) {
+            throw stopError;
+        }
+    }
+
+    private async trackCloudSyncSchedulerOperation<T>(
+        operation: () => Promise<T>
+    ): Promise<T> {
+        if (!this.cloudSyncSchedulerAcceptingWork) {
+            throw new Error(
+                "Cloud sync scheduler is shutting down and cannot start new work"
+            );
+        }
+
+        const operationPromise = operation();
+        this.cloudSyncSchedulerOperations.add(operationPromise);
+        try {
+            return await operationPromise;
+        } finally {
+            this.cloudSyncSchedulerOperations.delete(operationPromise);
+        }
     }
 
     /**

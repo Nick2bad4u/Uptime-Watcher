@@ -247,6 +247,7 @@ const mockServiceContainer = vi.hoisted(() => ({
     getUptimeOrchestrator: vi.fn(),
     getWindowService: vi.fn(),
     initialize: vi.fn(),
+    shutdownCloudSyncScheduler: vi.fn<() => Promise<void>>(),
 }));
 
 vi.mock("../../../services/ServiceContainer", () => ({
@@ -270,6 +271,10 @@ describe(ApplicationService, () => {
         mockAutoUpdaterService.cleanup.mockReset();
         mockWindowService.closeMainWindow.mockReset();
         mockDatabaseService.close.mockReset();
+        mockServiceContainer.shutdownCloudSyncScheduler.mockReset();
+        mockServiceContainer.shutdownCloudSyncScheduler.mockResolvedValue(
+            undefined
+        );
 
         mockApp.isReady.mockReturnValue(false);
 
@@ -572,6 +577,9 @@ describe(ApplicationService, () => {
             expect(
                 mockServiceContainer.getInitializedServices
             ).toHaveBeenCalledTimes(1);
+            expect(
+                mockServiceContainer.shutdownCloudSyncScheduler
+            ).toHaveBeenCalledTimes(1);
             expect(mockAutoUpdaterService.cleanup).toHaveBeenCalledTimes(1);
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
             expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
@@ -582,6 +590,38 @@ describe(ApplicationService, () => {
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_COMPLETE"
             );
+        });
+        it("should drain the cloud scheduler before dependent cleanup", async () => {
+            let releaseScheduler!: () => void;
+            mockServiceContainer.shutdownCloudSyncScheduler.mockImplementation(
+                () =>
+                    new Promise<void>((resolve) => {
+                        releaseScheduler = resolve;
+                    })
+            );
+
+            const cleanupPromise = applicationService.cleanup();
+
+            await vi.waitFor(() => {
+                expect(
+                    mockServiceContainer.shutdownCloudSyncScheduler
+                ).toHaveBeenCalledTimes(1);
+            });
+            expect(mockAutoUpdaterService.cleanup).not.toHaveBeenCalled();
+            expect(mockIpcService.cleanup).not.toHaveBeenCalled();
+            expect(
+                mockUptimeOrchestrator.stopMonitoring
+            ).not.toHaveBeenCalled();
+            expect(mockDatabaseService.close).not.toHaveBeenCalled();
+
+            releaseScheduler();
+            await cleanupPromise;
+
+            expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
+            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
+                1
+            );
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });
         it("should handle cleanup errors properly", async ({
             task,

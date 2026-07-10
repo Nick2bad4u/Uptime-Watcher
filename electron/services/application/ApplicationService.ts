@@ -186,6 +186,10 @@ export class ApplicationService {
                 suppressErrors: true,
             });
 
+            // Stop scheduler callbacks and drain any provider operation before
+            // tearing down IPC, monitoring, or database dependencies.
+            await this.serviceContainer.shutdownCloudSyncScheduler();
+
             const autoUpdaterService =
                 getInitializedService("AutoUpdaterService");
             if (autoUpdaterService) {
