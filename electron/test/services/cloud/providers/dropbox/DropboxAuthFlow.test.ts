@@ -338,6 +338,66 @@ describe(DropboxAuthFlow, () => {
         expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
     });
 
+    it("does not abandon a callback promise when browser launch fails", async () => {
+        let callbackPort: number | undefined;
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi.fn(
+                async (redirectUri: string, state?: string) => {
+                    callbackPort = Number(new URL(redirectUri).port);
+                    const url = new URL(
+                        "https://www.dropbox.com/oauth2/authorize"
+                    );
+                    url.searchParams.set("redirect_uri", redirectUri);
+                    url.searchParams.set("state", state ?? "");
+                    return url.toString();
+                }
+            ),
+            getAccessTokenFromCode: vi.fn(),
+        };
+        openExternalMock.mockRejectedValue(new Error("browser unavailable"));
+        const unhandledRejection = vi.fn();
+        process.on("unhandledRejection", unhandledRejection);
+
+        try {
+            const flow = new DropboxAuthFlow({
+                appKey: "app-key",
+                authFactory: () => auth,
+                loopbackPort: 0,
+            });
+
+            await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow(
+                "Failed to open Dropbox OAuth URL"
+            );
+            await new Promise((resolve) => setImmediate(resolve));
+
+            expect(unhandledRejection).not.toHaveBeenCalled();
+            expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
+            if (callbackPort === undefined || callbackPort === 0) {
+                throw new Error("Expected an ephemeral callback port");
+            }
+
+            const probeAuth = {
+                setClientId: vi.fn(),
+                getAuthenticationUrl: vi.fn(
+                    async () => "https://example.test/oauth2"
+                ),
+                getAccessTokenFromCode: vi.fn(),
+            };
+            const probeFlow = new DropboxAuthFlow({
+                appKey: "app-key",
+                authFactory: () => probeAuth,
+                loopbackPort: callbackPort,
+            });
+
+            await expect(
+                probeFlow.connect({ timeoutMs: 5000 })
+            ).rejects.toThrow(/unexpected dropbox oauth url host/iu);
+        } finally {
+            process.off("unhandledRejection", unhandledRejection);
+        }
+    });
+
     it("rejects unexpected authorization URL hosts before opening the browser", async () => {
         const auth = {
             setClientId: vi.fn(),

@@ -1,4 +1,3 @@
-import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -15,6 +14,7 @@ import {
 import { normalizeProviderOAuthLoopbackError } from "../../oauth/oauthLoopbackError";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
 import { calculateOAuthTokenExpiresAtEpochMs } from "../oauthTokenExpiry";
+import { openExternalOrThrow } from "../../../shell/openExternalUtils";
 
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
@@ -121,23 +121,23 @@ export class DropboxAuthFlow {
                     url: authorizeUrl,
                 });
 
-            const callbackPromise = server.waitForCallback({
-                expectedState: args.state,
-                timeoutMs: args.timeoutMs,
-            });
-
             await openExternalOrThrow({
                 failureMessagePrefix: "Failed to open Dropbox OAuth URL",
                 normalizedUrl,
                 safeUrlForLogging: authorizeUrlForLog,
             });
 
-            const callback = await callbackPromise.catch((error: unknown) => {
-                throw normalizeProviderOAuthLoopbackError({
-                    error,
-                    providerName: "Dropbox",
+            const callback = await server
+                .waitForCallback({
+                    expectedState: args.state,
+                    timeoutMs: args.timeoutMs,
+                })
+                .catch((error: unknown) => {
+                    throw normalizeProviderOAuthLoopbackError({
+                        error,
+                        providerName: "Dropbox",
+                    });
                 });
-            });
 
             return { code: callback.code, redirectUri };
         } catch (error: unknown) {
