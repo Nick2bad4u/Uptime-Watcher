@@ -4,6 +4,7 @@ import type { ValidationResult } from "@shared/types/validation";
  * Operational slice containing async monitor type actions.
  */
 import { withErrorHandling } from "@shared/utils/errorHandling";
+import { createSingleFlight } from "@shared/utils/singleFlight";
 import { assertPresent } from "ts-extras";
 
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
@@ -15,6 +16,80 @@ import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
 const isStringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+
+const createMonitorTypesLoadingOperations = (
+    setState: MonitorTypesStoreSetter,
+    getState: MonitorTypesStoreGetter
+): Pick<MonitorTypesStore, "loadMonitorTypes" | "refreshMonitorTypes"> => {
+    let isLoadInFlight = false;
+
+    const loadMonitorTypes = createSingleFlight(async (): Promise<void> => {
+        if (getState().isLoaded) {
+            return;
+        }
+
+        isLoadInFlight = true;
+        try {
+            await withErrorHandling(
+                async () => {
+                    logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
+
+                    // MonitorTypesService already validates the payload via shared
+                    // Zod schemas (validateMonitorTypeConfigArray). The store
+                    // intentionally trusts the service boundary to avoid
+                    // duplicating validation logic and creating diverging
+                    // codepaths.
+                    const configs = await MonitorTypesService.getMonitorTypes();
+
+                    const fieldMap: MonitorTypesStore["fieldConfigs"] = {};
+                    for (const config of configs) {
+                        fieldMap[config.type] = config.fields;
+                    }
+
+                    setState({
+                        fieldConfigs: fieldMap,
+                        isLoaded: true,
+                        monitorTypes: configs,
+                    });
+
+                    logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
+                        success: true,
+                        typesCount: configs.length,
+                    });
+                },
+                createStoreErrorHandler(
+                    "monitor-types",
+                    "monitorTypes.loadTypes"
+                )
+            );
+        } finally {
+            isLoadInFlight = false;
+        }
+    });
+
+    return {
+        loadMonitorTypes,
+        refreshMonitorTypes: async (): Promise<void> => {
+            logStoreAction("MonitorTypesStore", "refreshMonitorTypes", {});
+
+            if (isLoadInFlight) {
+                try {
+                    await loadMonitorTypes();
+                } catch {
+                    // The pending load already reported its error. Refresh should
+                    // still make a fresh attempt after that request settles.
+                }
+            }
+
+            setState({
+                fieldConfigs: {},
+                isLoaded: false,
+                monitorTypes: [],
+            });
+            await loadMonitorTypes();
+        },
+    };
+};
 
 /**
  * Creates the operational slice wiring monitor type service calls.
@@ -105,52 +180,7 @@ export const createMonitorTypesOperationsSlice = (
                 "monitorTypes.formatMonitorTitleSuffix"
             )
         ),
-    loadMonitorTypes: async (): Promise<void> => {
-        const state = getState();
-
-        if (state.isLoaded) {
-            return;
-        }
-
-        await withErrorHandling(
-            async () => {
-                logStoreAction("MonitorTypesStore", "loadMonitorTypes", {});
-
-                // MonitorTypesService already validates the payload via shared
-                // Zod schemas (validateMonitorTypeConfigArray). The store
-                // intentionally trusts the service boundary to avoid
-                // duplicating validation logic and creating diverging
-                // codepaths.
-                const configs = await MonitorTypesService.getMonitorTypes();
-
-                const fieldMap: MonitorTypesStore["fieldConfigs"] = {};
-                for (const config of configs) {
-                    fieldMap[config.type] = config.fields;
-                }
-
-                setState({
-                    fieldConfigs: fieldMap,
-                    isLoaded: true,
-                    monitorTypes: configs,
-                });
-
-                logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
-                    success: true,
-                    typesCount: configs.length,
-                });
-            },
-            createStoreErrorHandler("monitor-types", "monitorTypes.loadTypes")
-        );
-    },
-    refreshMonitorTypes: async (): Promise<void> => {
-        logStoreAction("MonitorTypesStore", "refreshMonitorTypes", {});
-        setState({
-            fieldConfigs: {},
-            isLoaded: false,
-            monitorTypes: [],
-        });
-        await getState().loadMonitorTypes();
-    },
+    ...createMonitorTypesLoadingOperations(setState, getState),
     validateMonitorData: async (type, data) =>
         withErrorHandling(
             async () => {

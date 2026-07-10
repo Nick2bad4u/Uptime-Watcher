@@ -69,6 +69,24 @@ const mockElectronAPI = {
 } as const;
 
 let restoreElectronApi: (() => void) | undefined;
+
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly reject: (reason?: unknown) => void;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let reject: Deferred<T>["reject"] = () => undefined;
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+        reject = rejectPromise;
+        resolve = resolvePromise;
+    });
+
+    return { promise, reject, resolve };
+}
+
 const createMonitorTypeConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => ({
@@ -388,6 +406,75 @@ describe(useMonitorTypesStore, () => {
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
             ).toHaveBeenCalledTimes(1);
+        });
+
+        it("waits for an active load before fetching fresh monitor types", async () => {
+            const initialTypes = [createMonitorTypeConfig()];
+            const refreshedTypes = [
+                createMonitorTypeConfig({
+                    displayName: "HTTP refreshed",
+                }),
+            ];
+            const initialRequest = createDeferred<MonitorTypeConfig[]>();
+            mockElectronAPI.monitorTypes.getMonitorTypes
+                .mockReturnValueOnce(initialRequest.promise)
+                .mockResolvedValueOnce(refreshedTypes);
+
+            const { loadMonitorTypes, refreshMonitorTypes } =
+                useMonitorTypesStore.getState();
+            const loadPromise = loadMonitorTypes();
+            const refreshPromise = refreshMonitorTypes();
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.monitorTypes.getMonitorTypes
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            initialRequest.resolve(initialTypes);
+            await Promise.all([loadPromise, refreshPromise]);
+
+            expect(
+                mockElectronAPI.monitorTypes.getMonitorTypes
+            ).toHaveBeenCalledTimes(2);
+            expect(useMonitorTypesStore.getState().monitorTypes).toEqual(
+                refreshedTypes
+            );
+        });
+
+        it("retries when the active load fails", async () => {
+            const refreshedTypes = [createMonitorTypeConfig()];
+            const initialRequest = createDeferred<MonitorTypeConfig[]>();
+            mockElectronAPI.monitorTypes.getMonitorTypes
+                .mockReturnValueOnce(initialRequest.promise)
+                .mockResolvedValueOnce(refreshedTypes);
+
+            const { loadMonitorTypes, refreshMonitorTypes } =
+                useMonitorTypesStore.getState();
+            const loadPromise = loadMonitorTypes();
+            const refreshPromise = refreshMonitorTypes();
+            const failedLoad = (async (): Promise<void> => {
+                await expect(loadPromise).rejects.toThrow(
+                    "Initial load failed"
+                );
+            })();
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.monitorTypes.getMonitorTypes
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            initialRequest.reject(new Error("Initial load failed"));
+            await Promise.all([failedLoad, refreshPromise]);
+
+            expect(
+                mockElectronAPI.monitorTypes.getMonitorTypes
+            ).toHaveBeenCalledTimes(2);
+            expect(useMonitorTypesStore.getState().monitorTypes).toEqual(
+                refreshedTypes
+            );
+            expect(useMonitorTypesStore.getState().isLoaded).toBeTruthy();
         });
     });
 
@@ -977,47 +1064,25 @@ describe(useMonitorTypesStore, () => {
                 }),
             ];
 
-            // Delay the first call
+            const request = createDeferred<MonitorTypeConfig[]>();
             mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
-                new Promise((resolve) =>
-                    setTimeout(() => {
-                        resolve(mockMonitorTypes);
-                    }, 100)
-                )
+                request.promise
             );
 
-            const { result } = renderHook(() => useMonitorTypesStore());
+            const { loadMonitorTypes } = useMonitorTypesStore.getState();
+            const firstLoad = loadMonitorTypes();
+            const secondLoad = loadMonitorTypes();
 
-            // Start multiple concurrent calls
-            const promise1 = act(async () => {
-                await result.current.loadMonitorTypes();
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.monitorTypes.getMonitorTypes
+                ).toHaveBeenCalledTimes(1);
             });
 
-            const promise2 = act(async () => {
-                await result.current.loadMonitorTypes();
-            });
+            request.resolve(mockMonitorTypes);
+            await Promise.all([firstLoad, secondLoad]);
 
-            await Promise.all([promise1, promise2]);
-
-            // Should only call the API once due to isLoaded check
-            expect(
-                mockElectronAPI.monitorTypes.getMonitorTypes
-            ).toHaveBeenCalledTimes(2); // Changed from 1 to 2 - concurrent calls both execute
-            expect(result.current.isLoaded).toBeTruthy();
-
-            // Clean up after concurrent test to prevent interference
-            await act(async () => {
-                useMonitorTypesStore.setState({
-                    monitorTypes: [],
-                    fieldConfigs: {},
-                    isLoaded: false,
-                });
-                useErrorStore.getState().clearStoreError("monitor-types");
-                useErrorStore
-                    .getState()
-                    .setOperationLoading("monitorTypes.loadTypes", false);
-                await new Promise((resolve) => setTimeout(resolve, 50));
-            });
+            expect(useMonitorTypesStore.getState().isLoaded).toBeTruthy();
         });
 
         it("should handle malformed monitor type data", async () => {
@@ -1032,55 +1097,12 @@ describe(useMonitorTypesStore, () => {
                 malformedData as any
             );
 
-            // First, completely reset the store to a known state
-            const initialState = {
-                monitorTypes: [],
-                fieldConfigs: {},
-                isLoaded: false,
-            };
+            await expect(
+                useMonitorTypesStore.getState().loadMonitorTypes()
+            ).rejects.toThrow("invalid payload");
 
-            useMonitorTypesStore.setState(initialState);
-            useErrorStore.getState().clearStoreError("monitor-types");
-            useErrorStore
-                .getState()
-                .setOperationLoading("monitorTypes.loadTypes", false);
-
-            // Give the store time to settle
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            const { result, unmount } = renderHook(() =>
-                useMonitorTypesStore()
-            );
-
-            // Simple wait for hook to be ready
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 50));
-            });
-
-            // If the hook didn't initialize properly, this is a test environment timing issue
-            // We'll assert that at minimum, the filter logic in the store works correctly
-            if (
-                !result.current ||
-                typeof result.current.loadMonitorTypes !== "function"
-            ) {
-                // Test the store filtering logic directly since hook rendering had timing issues
-                const storeState = useMonitorTypesStore.getState();
-                expect(storeState).toBeDefined();
-                expect(storeState.isLoaded).toBeFalsy(); // Should start not loaded
-                unmount();
-                return;
-            }
-
-            await act(async () => {
-                await result.current.loadMonitorTypes();
-            });
-
-            // Should handle malformed data gracefully
-            expect(result.current.isLoaded).toBeTruthy();
-            // The store should filter out invalid entries and keep only valid ones
-            expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
-
-            unmount();
+            expect(useMonitorTypesStore.getState().isLoaded).toBeFalsy();
+            expect(useMonitorTypesStore.getState().monitorTypes).toEqual([]);
         });
     });
 });
