@@ -9,24 +9,6 @@ import {
     createMockSite,
 } from "../../../utils/mockFactories";
 
-// Mock theme components
-vi.mock("../../../../theme/components", async (importOriginal) => {
-    const actual = await importOriginal<Record<string, unknown>>();
-    return {
-        ...actual,
-        ThemedBox: ({ children, ...props }: any) => (
-            <div data-testid="themed-box" {...props}>
-                {children}
-            </div>
-        ),
-        ThemedText: ({ children, ...props }: any) => (
-            <span data-testid="themed-text" {...props}>
-                {children}
-            </span>
-        ),
-    };
-});
-
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     SiteCardHistory: () => (
         <div data-testid="site-card-history">Site History</div>
