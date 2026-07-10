@@ -601,6 +601,10 @@ describe(SiteManager, () => {
             const updateSpy = vi
                 .spyOn(manager["siteWriterService"], "updateSite")
                 .mockResolvedValue(persistedSite);
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue([persistedSite]);
 
             const result = await manager.removeMonitor(site.identifier, "mon1");
 
@@ -681,6 +685,10 @@ describe(SiteManager, () => {
             const updateSpy = vi
                 .spyOn(manager["siteWriterService"], "updateSite")
                 .mockResolvedValue(persistedSite);
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue([persistedSite]);
 
             const result = await manager.removeMonitor(site.identifier, "mon1");
 

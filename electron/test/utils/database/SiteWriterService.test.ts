@@ -986,7 +986,7 @@ describe("SiteWriterService", () => {
         });
     });
 
-    describe("handleMonitorIntervalChanges", () => {
+    describe("handleMonitorSchedulingChanges", () => {
         let mockMonitoringConfig: MonitoringConfigMock;
 
         beforeEach(() => {
@@ -1020,7 +1020,7 @@ describe("SiteWriterService", () => {
                 }),
             ];
 
-            await siteWriterService.handleMonitorIntervalChanges(
+            await siteWriterService.handleMonitorSchedulingChanges(
                 "test-site",
                 originalSite,
                 newMonitors,
@@ -1036,13 +1036,50 @@ describe("SiteWriterService", () => {
                 "monitor-1"
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Monitor interval changed",
+                "Monitor scheduling changed",
                 {
                     monitorId: "monitor-1",
                     nextInterval: 60_000,
+                    nextTimeout: 5000,
                     previousInterval: 30_000,
+                    previousTimeout: 5000,
                     siteIdentifier: "test-site",
                 }
+            );
+        });
+
+        it("should restart monitoring when only the timeout changes", async () => {
+            const originalSite = {
+                ...mockSite,
+                monitors: [
+                    createCompleteMonitor({
+                        id: "monitor-1",
+                        monitoring: true,
+                        timeout: 5000,
+                    }),
+                ],
+            };
+            const newMonitors = [
+                createCompleteMonitor({
+                    id: "monitor-1",
+                    timeout: 60_000,
+                }),
+            ];
+
+            await siteWriterService.handleMonitorSchedulingChanges(
+                "test-site",
+                originalSite,
+                newMonitors,
+                mockMonitoringConfig
+            );
+
+            expect(mockMonitoringConfig.stopMonitoring).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
+            expect(mockMonitoringConfig.startMonitoring).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
             );
         });
 
@@ -1073,7 +1110,7 @@ describe("SiteWriterService", () => {
                 }),
             ];
 
-            await siteWriterService.handleMonitorIntervalChanges(
+            await siteWriterService.handleMonitorSchedulingChanges(
                 "test-site",
                 originalSite,
                 newMonitors,
@@ -1104,7 +1141,7 @@ describe("SiteWriterService", () => {
                 }),
             ];
 
-            await siteWriterService.handleMonitorIntervalChanges(
+            await siteWriterService.handleMonitorSchedulingChanges(
                 "test-site",
                 originalSite,
                 newMonitors,
@@ -1142,7 +1179,7 @@ describe("SiteWriterService", () => {
 
             // Should not throw
             await expect(
-                siteWriterService.handleMonitorIntervalChanges(
+                siteWriterService.handleMonitorSchedulingChanges(
                     "test-site",
                     originalSite,
                     newMonitors,
@@ -1151,7 +1188,7 @@ describe("SiteWriterService", () => {
             ).resolves.not.toThrow();
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to handle monitor interval changes",
+                "Failed to handle monitor scheduling changes",
                 error,
                 { siteIdentifier: "test-site" }
             );
@@ -1169,7 +1206,7 @@ describe("SiteWriterService", () => {
             const originalSite = { ...mockSite };
             const newMonitors = [...mockSite.monitors]; // Same intervals
 
-            await siteWriterService.handleMonitorIntervalChanges(
+            await siteWriterService.handleMonitorSchedulingChanges(
                 "test-site",
                 originalSite,
                 newMonitors,

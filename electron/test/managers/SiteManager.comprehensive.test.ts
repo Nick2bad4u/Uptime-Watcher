@@ -180,7 +180,7 @@ const siteWriterMocks = vi.hoisted(() => {
         createSite: vi.fn(),
         updateSite: vi.fn(),
         deleteSite: vi.fn(),
-        handleMonitorIntervalChanges: vi.fn(),
+        handleMonitorSchedulingChanges: vi.fn(),
         detectNewMonitors: vi.fn().mockReturnValue([]),
     };
 
@@ -234,7 +234,7 @@ describe("SiteManager - Comprehensive", () => {
         mockSiteWriterServiceInstance.createSite.mockResolvedValue(undefined);
         mockSiteWriterServiceInstance.updateSite.mockResolvedValue(undefined);
         mockSiteWriterServiceInstance.deleteSite.mockResolvedValue(undefined);
-        mockSiteWriterServiceInstance.handleMonitorIntervalChanges.mockResolvedValue(
+        mockSiteWriterServiceInstance.handleMonitorSchedulingChanges.mockResolvedValue(
             undefined
         );
         mockSiteWriterServiceInstance.detectNewMonitors.mockReturnValue([]);
@@ -881,6 +881,9 @@ describe("SiteManager - Comprehensive", () => {
             mockSiteWriterServiceInstance.updateSite.mockResolvedValue(
                 updatedSite
             );
+            mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue(
+                [updatedSite]
+            );
 
             const result = await siteManager.removeMonitor(
                 siteWithTwoMonitors.identifier,
@@ -1149,6 +1152,85 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
+        it("should stop removed monitors before persisting the site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
+            const mockCache = siteManager["sitesCache"];
+            const mockSiteWriterService = siteManager["siteWriterService"];
+            const originalSite = {
+                ...mockSite,
+                monitors: [
+                    ...mockSite.monitors,
+                    createMockMonitor({ id: "monitor-2" }),
+                ],
+            };
+            const updates = { monitors: mockSite.monitors };
+            const updatedSite = { ...originalSite, ...updates };
+
+            vi.mocked(mockCache.get)
+                .mockReturnValueOnce(originalSite)
+                .mockReturnValueOnce(updatedSite);
+            vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
+                updatedSite
+            );
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
+
+            await siteManager.updateSite("site-1", updates);
+
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledWith("site-1", "monitor-2");
+            expect(
+                mockMonitoringOperations.stopMonitoringForSite
+            ).toHaveBeenCalledBefore(mockSiteWriterService.updateSite);
+            expect(
+                mockMonitoringOperations.startMonitoringForSite
+            ).not.toHaveBeenCalledWith("site-1", "monitor-2");
+        });
+
+        it("should restore removed monitors when persistence fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const mockCache = siteManager["sitesCache"];
+            const mockSiteWriterService = siteManager["siteWriterService"];
+            const originalSite = {
+                ...mockSite,
+                monitors: [
+                    ...mockSite.monitors,
+                    createMockMonitor({ id: "monitor-2" }),
+                ],
+            };
+            const updates = { monitors: mockSite.monitors };
+            const error = new Error("database update failed");
+
+            vi.mocked(mockCache.get).mockReturnValue(originalSite);
+            vi.mocked(mockSiteWriterService.updateSite).mockRejectedValue(
+                error
+            );
+
+            await expect(
+                siteManager.updateSite("site-1", updates)
+            ).rejects.toBe(error);
+
+            expect(
+                mockMonitoringOperations.startMonitoringForSite
+            ).toHaveBeenCalledWith("site-1", "monitor-2");
+        });
+
         it("should ignore accessor-backed and identity update fields", async ({
             task,
             annotate,
@@ -1194,7 +1276,7 @@ describe("SiteManager - Comprehensive", () => {
                 expect.objectContaining({ monitoring: false })
             );
             expect(
-                mockSiteWriterService.handleMonitorIntervalChanges
+                mockSiteWriterService.handleMonitorSchedulingChanges
             ).not.toHaveBeenCalled();
             expect(result).toEqual(updatedSite);
             expect(result).not.toBe(updatedSite);
@@ -1292,7 +1374,7 @@ describe("SiteManager - Comprehensive", () => {
             const result = await siteManager.updateSite("site-1", updates);
 
             expect(
-                mockSiteWriterService.handleMonitorIntervalChanges
+                mockSiteWriterService.handleMonitorSchedulingChanges
             ).toHaveBeenCalled();
             expect(
                 mockMonitoringOperations.setupNewMonitors
@@ -1441,9 +1523,9 @@ describe("SiteManager - Comprehensive", () => {
                 updatedSite
             );
 
-            // Mock handleMonitorIntervalChanges to call setHistoryLimit which should throw
+            // Mock handleMonitorSchedulingChanges to call setHistoryLimit which should throw
             vi.mocked(
-                mockSiteWriterService.handleMonitorIntervalChanges
+                mockSiteWriterService.handleMonitorSchedulingChanges
             ).mockImplementation(
                 async (
                     _id: string,

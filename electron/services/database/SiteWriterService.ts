@@ -359,10 +359,9 @@ export class SiteWriterService {
     }
 
     /**
-     * Handle monitoring state changes when monitor intervals are modified. Side
-     * effect operation separated from data updates.
+     * Reconcile scheduled jobs when scheduler-owned monitor fields change.
      */
-    public async handleMonitorIntervalChanges(
+    public async handleMonitorSchedulingChanges(
         identifier: string,
         originalSite: Site,
         newMonitors: Site["monitors"],
@@ -379,12 +378,16 @@ export class SiteWriterService {
 
                 const isIntervalChanged =
                     originalMonitor?.checkInterval !== newMonitor.checkInterval;
+                const isTimeoutChanged =
+                    originalMonitor?.timeout !== newMonitor.timeout;
 
-                if (isIntervalChanged && newMonitor.id) {
-                    this.logger.debug("Monitor interval changed", {
+                if ((isIntervalChanged || isTimeoutChanged) && newMonitor.id) {
+                    this.logger.debug("Monitor scheduling changed", {
                         monitorId: newMonitor.id,
                         nextInterval: newMonitor.checkInterval,
+                        nextTimeout: newMonitor.timeout,
                         previousInterval: originalMonitor?.checkInterval,
+                        previousTimeout: originalMonitor?.timeout,
                         siteIdentifier: identifier,
                     });
 
@@ -407,7 +410,7 @@ export class SiteWriterService {
             }
         } catch (error) {
             this.logger.error(
-                "Failed to handle monitor interval changes",
+                "Failed to handle monitor scheduling changes",
                 error,
                 {
                     siteIdentifier: identifier,

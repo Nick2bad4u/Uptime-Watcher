@@ -91,6 +91,7 @@ import {
     type UpdateSitesCacheOptions,
 } from "./siteManager/updateSitesCache";
 import { validateSite as validateSiteHelper } from "./siteManager/validateSite";
+import { withRemovedMonitorsStopped } from "./siteManager/withRemovedMonitorsStopped";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
 
 const getSafeIdentifier = (identifier: string): string =>
@@ -578,30 +579,7 @@ export class SiteManager {
             .filter((monitor) => monitor.id !== monitorId)
             .map((monitor) => structuredClone(monitor));
 
-        const validationCandidate: Site = {
-            ...structuredClone(siteSnapshot),
-            monitors: updatedMonitors,
-        };
-
-        await this.validateSite(validationCandidate);
-
-        const updatedSite = await this.siteWriterService.updateSite(
-            this.sitesCache,
-            siteIdentifier,
-            { monitors: updatedMonitors }
-        );
-
-        const timestamp = Date.now();
-
-        await this.emitSiteUpdatedAndStateSynchronized({
-            identifier: siteIdentifier,
-            previousSite: siteSnapshot,
-            site: updatedSite,
-            timestamp,
-            updatedFields: ["monitors"],
-        });
-
-        return structuredClone(updatedSite);
+        return this.updateSite(siteIdentifier, { monitors: updatedMonitors });
     }
 
     /**
@@ -636,16 +614,26 @@ export class SiteManager {
         const monitoringConfig = this.createMonitoringConfig();
 
         // Perform the update using SiteWriterService directly
-        const updatedSite = await this.siteWriterService.updateSite(
-            this.sitesCache,
-            identifier,
-            sanitizedUpdates
-        );
+        const persistUpdate = async (): Promise<Site> =>
+            this.siteWriterService.updateSite(
+                this.sitesCache,
+                identifier,
+                sanitizedUpdates
+            );
+        const updatedSite = sanitizedUpdates.monitors
+            ? await withRemovedMonitorsStopped({
+                  identifier,
+                  monitoringConfig,
+                  nextMonitors: sanitizedUpdates.monitors,
+                  operation: persistUpdate,
+                  originalMonitors: originalSite.monitors,
+              })
+            : await persistUpdate();
 
         // Handle monitoring changes if monitors were updated (replaces
         // orchestrator logic)
         if (sanitizedUpdates.monitors) {
-            await this.siteWriterService.handleMonitorIntervalChanges(
+            await this.siteWriterService.handleMonitorSchedulingChanges(
                 identifier,
                 originalSite,
                 sanitizedUpdates.monitors,
