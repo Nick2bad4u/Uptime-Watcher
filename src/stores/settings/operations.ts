@@ -60,6 +60,9 @@ export const createSettingsOperationsSlice = (
     | "resetSettings"
     | "syncFromBackend"
 > => {
+    let historyLimitWriteQueue: Promise<void> = Promise.resolve();
+    let historyLimitWriteGeneration = 0;
+
     const loadBackendHistoryLimit = async (): Promise<void> => {
         const historyLimit = await SettingsService.getHistoryLimit();
         const currentSettings = getState().settings;
@@ -222,6 +225,20 @@ export const createSettingsOperationsSlice = (
             await ensureHistoryLimitSubscription();
 
             const currentSettings = getState().settings;
+            const sanitizedLimit: number = normalizeHistoryLimit(
+                limit,
+                DEFAULT_HISTORY_LIMIT_RULES
+            );
+            const writeGeneration = ++historyLimitWriteGeneration;
+            const previousWrite = historyLimitWriteQueue;
+            let releaseWrite: () => void = () => undefined;
+            const currentWrite = new Promise<void>((resolve) => {
+                releaseWrite = resolve;
+            });
+            historyLimitWriteQueue = (async (): Promise<void> => {
+                await previousWrite;
+                await currentWrite;
+            })();
 
             // Inline ErrorHandlingFrontendStore context: in addition to updating
             // error/loading state, this operation must revert the optimistic
@@ -230,39 +247,59 @@ export const createSettingsOperationsSlice = (
             // on when inline contexts are appropriate.
             await withErrorHandling(
                 async () => {
-                    const sanitizedLimit: number = normalizeHistoryLimit(
-                        limit,
-                        DEFAULT_HISTORY_LIMIT_RULES
-                    );
+                    try {
+                        getState().updateSettings({
+                            historyLimit: sanitizedLimit,
+                        });
 
-                    getState().updateSettings({
-                        historyLimit: sanitizedLimit,
-                    });
+                        await previousWrite;
 
-                    const persistedLimit =
-                        await SettingsService.updateHistoryLimit(
-                            sanitizedLimit
-                        );
+                        const persistedLimit =
+                            await SettingsService.updateHistoryLimit(
+                                sanitizedLimit
+                            );
 
-                    getState().updateSettings({
-                        historyLimit: persistedLimit,
-                    });
+                        if (writeGeneration === historyLimitWriteGeneration) {
+                            getState().updateSettings({
+                                historyLimit: persistedLimit,
+                            });
+                        }
+                    } finally {
+                        releaseWrite();
+                    }
                 },
                 {
                     clearError: (): void => {
-                        useErrorStore.getState().clearStoreError("settings");
+                        if (writeGeneration === historyLimitWriteGeneration) {
+                            useErrorStore
+                                .getState()
+                                .clearStoreError("settings");
+                        }
                     },
                     setError: (error: string | undefined): void => {
+                        if (writeGeneration !== historyLimitWriteGeneration) {
+                            return;
+                        }
+
                         const errorStore = useErrorStore.getState();
                         errorStore.setStoreError("settings", error);
-                        getState().updateSettings({
-                            historyLimit: currentSettings.historyLimit,
-                        });
+                        if (
+                            getState().settings.historyLimit === sanitizedLimit
+                        ) {
+                            getState().updateSettings({
+                                historyLimit: currentSettings.historyLimit,
+                            });
+                        }
                     },
                     setLoading: (loading: boolean): void => {
-                        useErrorStore
-                            .getState()
-                            .setOperationLoading("updateHistoryLimit", loading);
+                        if (writeGeneration === historyLimitWriteGeneration) {
+                            useErrorStore
+                                .getState()
+                                .setOperationLoading(
+                                    "updateHistoryLimit",
+                                    loading
+                                );
+                        }
                     },
                 }
             );

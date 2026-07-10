@@ -158,6 +158,22 @@ afterAll(() => {
 const createSettings = (overrides: Partial<AppSettings> = {}): AppSettings =>
     normalizeAppSettings({ ...defaultSettings, ...overrides });
 
+interface Deferred<T> {
+    readonly promise: Promise<T>;
+    readonly reject: (reason?: unknown) => void;
+    readonly resolve: (value: T | PromiseLike<T>) => void;
+}
+
+function createDeferred<T>(): Deferred<T> {
+    let reject: Deferred<T>["reject"] = () => undefined;
+    let resolve: Deferred<T>["resolve"] = () => undefined;
+    const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+        reject = rejectPromise;
+        resolve = resolvePromise;
+    });
+    return { promise, reject, resolve };
+}
+
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -901,6 +917,68 @@ describe(useSettingsStore, () => {
 
             // The error handler should revert to the value that was captured at the start (300)
             expect(result.current.settings.historyLimit).toBe(1000); // Reverted to previous value
+        });
+
+        it("should preserve the newer limit when an older request fails later", async () => {
+            const firstRequest = createDeferred<number>();
+            const secondRequest = createDeferred<number>();
+            mockElectronAPI.settings.updateHistoryLimit
+                .mockReturnValueOnce(firstRequest.promise)
+                .mockReturnValueOnce(secondRequest.promise);
+            const { result } = renderHook(() => useSettingsStore());
+
+            const olderWrite = result.current.persistHistoryLimit(600);
+            const newerWrite = result.current.persistHistoryLimit(700);
+            const olderOutcome = olderWrite.catch((error: unknown) => error);
+
+            await act(async () => {
+                firstRequest.reject(new Error("older request failed"));
+                await olderOutcome;
+                secondRequest.resolve(700);
+                await newerWrite;
+            });
+
+            await expect(olderOutcome).resolves.toMatchObject({
+                message: "older request failed",
+            });
+            expect(result.current.settings.historyLimit).toBe(700);
+            expect(mockErrorStore.setStoreError).not.toHaveBeenCalledWith(
+                "settings",
+                "older request failed"
+            );
+        });
+
+        it("should serialize backend writes in invocation order", async () => {
+            const firstRequest = createDeferred<number>();
+            const secondRequest = createDeferred<number>();
+            mockElectronAPI.settings.updateHistoryLimit
+                .mockReturnValueOnce(firstRequest.promise)
+                .mockReturnValueOnce(secondRequest.promise);
+            const { result } = renderHook(() => useSettingsStore());
+
+            const olderWrite = result.current.persistHistoryLimit(600);
+            const newerWrite = result.current.persistHistoryLimit(700);
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.settings.updateHistoryLimit
+                ).toHaveBeenCalledTimes(1);
+            });
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).toHaveBeenNthCalledWith(1, 600);
+
+            await act(async () => {
+                firstRequest.resolve(600);
+                await olderWrite;
+                secondRequest.resolve(700);
+                await newerWrite;
+            });
+
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).toHaveBeenNthCalledWith(2, 700);
+            expect(result.current.settings.historyLimit).toBe(700);
         });
     });
 
