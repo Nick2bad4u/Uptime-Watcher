@@ -114,7 +114,27 @@ export class ApplicationService {
         fireAndForgetLogged({
             logger,
             message: LOG_TEMPLATES.errors.APPLICATION_INITIALIZATION_ERROR,
-            task: () => initializationPromise,
+            task: async () => {
+                try {
+                    await initializationPromise;
+                } catch (error: unknown) {
+                    const initializationError = ensureError(error);
+                    let errorToReport: Error = initializationError;
+
+                    try {
+                        await this.cleanup();
+                    } catch (cleanupError: unknown) {
+                        errorToReport = new AggregateError(
+                            [initializationError, ensureError(cleanupError)],
+                            "Application initialization and rollback cleanup failed",
+                            { cause: cleanupError }
+                        );
+                    }
+
+                    app.exit(1);
+                    throw errorToReport;
+                }
+            },
         });
     };
 

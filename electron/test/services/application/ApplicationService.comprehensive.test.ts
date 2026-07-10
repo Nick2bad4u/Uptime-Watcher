@@ -29,6 +29,7 @@ type ApplicationAppEventHandler = () => Promise<void> | void;
 type ApplicationWindow = Pick<BrowserWindow, "id">;
 
 const mockApp = vi.hoisted(() => ({
+    exit: vi.fn<App["exit"]>(),
     isReady: vi.fn<App["isReady"]>(() => false),
     off: vi.fn(
         (_event: ApplicationAppEvent, _listener: ApplicationAppEventHandler) =>
@@ -567,6 +568,33 @@ describe(ApplicationService, () => {
                 mockServiceContainer.initialize.mock.invocationCallOrder[0]
             ).toBeLessThan(
                 mockUptimeOrchestrator.shutdown.mock.invocationCallOrder[0] ?? 0
+            );
+        });
+
+        it("cleans up partial startup and exits when initialization fails", async () => {
+            const initializationError = new Error("initialization failed");
+            mockServiceContainer.initialize.mockRejectedValueOnce(
+                initializationError
+            );
+            const readyHandler = getAppEventHandler("ready");
+
+            readyHandler?.();
+
+            await vi.waitFor(() => {
+                expect(mockApp.exit).toHaveBeenCalledWith(1);
+            });
+
+            expect(mockWindowService.createMainWindow).not.toHaveBeenCalled();
+            expect(
+                mockServiceContainer.shutdownCloudSyncScheduler
+            ).toHaveBeenCalledOnce();
+            expect(mockIpcService.cleanup).toHaveBeenCalledOnce();
+            expect(mockUptimeOrchestrator.shutdown).toHaveBeenCalledOnce();
+            expect(mockWindowService.closeMainWindow).toHaveBeenCalledOnce();
+            expect(mockDatabaseService.close).toHaveBeenCalledOnce();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "APPLICATION_INITIALIZATION_ERROR",
+                initializationError
             );
         });
 
