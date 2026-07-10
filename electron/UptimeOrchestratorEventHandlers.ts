@@ -9,15 +9,11 @@ import type {
     UpdateSitesCacheRequestData,
 } from "./UptimeOrchestrator.types";
 
-import { fireAndForgetLogged } from "./utils/fireAndForget";
-import { logger } from "./utils/logger";
-
 /**
  * Dependency contract for {@link UptimeOrchestratorEventHandlers}.
  */
 export interface UptimeOrchestratorEventHandlersOptions {
     readonly monitoringLifecycleCoordinator: MonitoringLifecycleCoordinator;
-    readonly onDatabaseInitialized: () => Promise<void>;
     readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
 }
 
@@ -33,28 +29,13 @@ export interface UptimeOrchestratorEventHandlersOptions {
 export class UptimeOrchestratorEventHandlers {
     private readonly monitoringLifecycleCoordinator: MonitoringLifecycleCoordinator;
 
-    private readonly onDatabaseInitialized: () => Promise<void>;
-
     private readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
 
     public constructor(options: UptimeOrchestratorEventHandlersOptions) {
         this.monitoringLifecycleCoordinator =
             options.monitoringLifecycleCoordinator;
-        this.onDatabaseInitialized = options.onDatabaseInitialized;
         this.snapshotSyncCoordinator = options.snapshotSyncCoordinator;
     }
-
-    /** Event handler for database initialization completion. */
-    public readonly handleDatabaseInitializedEvent = (): void => {
-        fireAndForgetLogged({
-            logger,
-            message:
-                "[UptimeOrchestrator] Error handling internal:database:initialized:",
-            task: async () => {
-                await this.onDatabaseInitialized();
-            },
-        });
-    };
 
     /** Event handler for retrieving sites from cache. */
     public readonly handleGetSitesFromCacheRequestedEvent = (): void => {

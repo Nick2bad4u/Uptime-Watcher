@@ -246,9 +246,29 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
             await expect(orchestrator.initialize()).resolves.not.toThrow();
             expect(mockDatabaseManager.initialize).toHaveBeenCalled();
             expect(mockSiteManager.initialize).toHaveBeenCalled();
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    operation: "initialize",
+                    success: true,
+                })
+            );
+        });
+
+        it("should preserve completed startup when readiness publication fails", async () => {
+            vi.spyOn(orchestrator, "emitTyped").mockRejectedValueOnce(
+                new Error("readiness event failed")
+            );
+
+            await expect(orchestrator.initialize()).resolves.toBeUndefined();
+
+            expect(mockDatabaseManager.initialize).toHaveBeenCalledOnce();
+            expect(mockSiteManager.initialize).toHaveBeenCalledOnce();
         });
 
         it("should handle initialization errors", async ({
@@ -263,6 +283,7 @@ describe(UptimeOrchestrator, () => {
             vi.mocked(mockDatabaseManager.initialize).mockRejectedValueOnce(
                 new Error("Init failed")
             );
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
 
             const error = (await orchestrator
                 .initialize()
@@ -275,6 +296,10 @@ describe(UptimeOrchestrator, () => {
             });
             expect(error.cause).toBeInstanceOf(Error);
             expect((error.cause as Error).message).toBe("Init failed");
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({ operation: "initialize" })
+            );
         });
 
         it("should validate initialization and throw for missing database manager method", async ({
@@ -1396,79 +1421,6 @@ describe(UptimeOrchestrator, () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
-        });
-
-        it("should handle database initialized event", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: UptimeOrchestrator", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Initialization", "type");
-
-            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
-
-            // Emit internal database event
-            orchestrator.emitTyped("internal:database:initialized", {
-                operation: "initialized",
-                success: true,
-                timestamp: Date.now(),
-            });
-
-            // Wait for async processing
-            await new Promise((resolve) => setTimeout(resolve, 10));
-
-            expect(emitTypedSpy).toHaveBeenCalledWith(
-                "database:transaction-completed",
-                expect.objectContaining({
-                    operation: "initialize",
-                    success: true,
-                })
-            );
-        });
-
-        it("should handle database initialized event with errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: UptimeOrchestrator", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Initialization", "type");
-
-            // Mock emitTyped to throw an error specifically for "database:transaction-completed"
-            const originalEmitTyped = orchestrator.emitTyped.bind(orchestrator);
-            const emitTypedSpy = vi
-                .spyOn(orchestrator, "emitTyped")
-                .mockImplementation((event, data) => {
-                    if (event === "database:transaction-completed") {
-                        throw new Error("Emit failed");
-                    }
-                    return originalEmitTyped(event, data);
-                });
-
-            // Emit internal database event - this should trigger the error catch block
-            orchestrator.emitTyped("internal:database:initialized", {
-                operation: "initialized",
-                success: true,
-                timestamp: Date.now(),
-            });
-
-            // Wait for async processing to complete and handle the error
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            // Verify that emitTyped was called and the error was caught
-            expect(emitTypedSpy).toHaveBeenCalledWith(
-                "database:transaction-completed",
-                expect.objectContaining({
-                    operation: "initialize",
-                    success: true,
-                })
-            );
-
-            // Restore the spy
-            emitTypedSpy.mockRestore();
         });
 
         it("should handle internal site added events", async ({

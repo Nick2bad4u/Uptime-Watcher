@@ -91,6 +91,7 @@ import {
     type StateSyncAction,
     type StateSyncSource,
 } from "@shared/types/stateSync";
+import { ensureError } from "@shared/utils/errorHandling";
 import { objectKeys } from "ts-extras";
 
 import type { DatabaseManager } from "./managers/DatabaseManager";
@@ -411,6 +412,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
                     // Step 4: Validate that managers are properly initialized
                     this.validateInitialization();
+
+                    // Publish readiness only after every required startup
+                    // phase has completed. Event delivery is observational and
+                    // must not convert successful startup into a failure.
+                    await this.publishInitializationCompleted();
 
                     logger.info(
                         "[UptimeOrchestrator] Initialization completed successfully"
@@ -736,12 +742,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         );
     }
 
-    /**
-     * Handles the database initialized event asynchronously.
-     *
-     * @returns Promise that resolves when the event handling is complete
-     */
-    private async handleDatabaseInitialized(): Promise<void> {
+    /** Publishes the orchestrator-level readiness signal after startup. */
+    private async publishInitializationCompleted(): Promise<void> {
         // NOTE: DatabaseManager.initialize() already emits a
         // "database:transaction-completed" event with operation
         // "database:initialize" for the low-level schema/setup work. This
@@ -751,12 +753,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // wiring). Consumers that care about a specific phase should filter
         // on the `operation` field rather than assuming a single
         // initialization emission.
-        await this.emitTyped("database:transaction-completed", {
-            duration: 0,
-            operation: "initialize",
-            success: true,
-            timestamp: Date.now(),
-        });
+        try {
+            await this.emitTyped("database:transaction-completed", {
+                duration: 0,
+                operation: "initialize",
+                success: true,
+                timestamp: Date.now(),
+            });
+        } catch (error: unknown) {
+            logger.error(
+                "[UptimeOrchestrator] Failed to publish initialization completion event",
+                ensureError(error)
+            );
+        }
     }
 
     /**
@@ -939,8 +948,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         this.eventHandlers = new UptimeOrchestratorEventHandlers({
             monitoringLifecycleCoordinator: this.monitoringLifecycleCoordinator,
-            onDatabaseInitialized: async (): Promise<void> =>
-                this.handleDatabaseInitialized(),
             snapshotSyncCoordinator: this.snapshotSyncCoordinator,
         });
 

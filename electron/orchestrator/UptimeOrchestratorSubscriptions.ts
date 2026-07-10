@@ -81,11 +81,6 @@ export class UptimeOrchestratorSubscriptions {
             this.eventHandlers.handleGetSitesFromCacheRequestedEvent
         );
 
-        this.eventBus.on(
-            "internal:database:initialized",
-            this.eventHandlers.handleDatabaseInitializedEvent
-        );
-
         this.historyLimitCoordinator.register();
         this.eventForwardingCoordinator.register();
 
@@ -143,11 +138,6 @@ export class UptimeOrchestratorSubscriptions {
             "internal:database:get-sites-from-cache-requested",
             this.eventHandlers.handleGetSitesFromCacheRequestedEvent
         );
-        this.eventBus.off(
-            "internal:database:initialized",
-            this.eventHandlers.handleDatabaseInitializedEvent
-        );
-
         this.eventBus.off(
             "internal:monitor:manual-check-completed",
             this.eventHandlers.handleManualCheckCompletedEvent

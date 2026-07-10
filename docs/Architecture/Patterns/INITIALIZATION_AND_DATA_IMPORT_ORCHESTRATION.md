@@ -105,8 +105,8 @@ settings hydration, and initial site loading.
    `monitoring` flag is also `true`.
 4. Validates that all managers expose their required methods.
 
-When the orchestrator receives the internal `internal:database:initialized`
-event, it emits a second `database:transaction-completed` event:
+After those four phases complete, the orchestrator emits a second
+`database:transaction-completed` event directly:
 
 ```ts
 await this.emitTyped("database:transaction-completed", {

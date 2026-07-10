@@ -598,12 +598,6 @@ Examples (see `electron/events/eventTypes.ts`):
 
 ```typescript
 interface InternalUptimeEvents {
- "internal:database:initialized": {
-  operation: "initialized";
-  success: boolean;
-  timestamp: number;
- };
-
  "internal:database:history-limit-updated": {
   limit: number;
   operation: "history-limit-updated";

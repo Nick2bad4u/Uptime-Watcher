@@ -289,7 +289,6 @@ renderer must react.
 
 **Internal Database Events:**
 
-- `internal:database:initialized` - Database initialization completion
 - `internal:database:data-exported` - Data export completion
 - `internal:database:data-imported` - Data import completion
 - `internal:database:backup-downloaded` - Backup download completion

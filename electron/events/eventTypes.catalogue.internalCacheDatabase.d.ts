@@ -317,31 +317,6 @@ declare module "./eventTypes" {
         };
 
         /**
-         * Emitted when the database is initialized.
-         *
-         * @param operation - The operation type (always "initialized").
-         * @param success - Whether initialization was successful.
-         * @param timestamp - Unix timestamp (ms) when initialization completed.
-         */
-        "internal:database:initialized": {
-            /**
-             * The operation type (always "initialized").
-             */
-            operation: "initialized";
-            /**
-             * Whether initialization was successful.
-             *
-             * @remarks
-             * Boolean flag indicating the outcome of the operation.
-             */
-            success: boolean;
-            /**
-             * Unix timestamp (ms) when initialization completed.
-             */
-            timestamp: number;
-        };
-
-        /**
          * Emitted when the sites cache is refreshed in the database.
          *
          * @param operation - The operation type (always "sites-refreshed").
