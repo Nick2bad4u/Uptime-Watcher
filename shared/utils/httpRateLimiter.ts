@@ -101,6 +101,29 @@ export interface HttpRateLimiterConfig {
 }
 
 /**
+ * Raised when an operation cannot acquire a rate-limiter slot before its
+ * configured queue deadline.
+ *
+ * @public
+ */
+export class HttpRateLimitQueueTimeoutError extends Error {
+    /** Safe limiter key associated with the queued operation. */
+    public readonly key: string;
+
+    /** Time spent waiting for capacity before rejection. */
+    public readonly waitedMs: number;
+
+    public constructor(key: string, waitedMs: number) {
+        super(
+            `HTTP rate limiter queue timed out for ${key} after ${waitedMs}ms`
+        );
+        this.name = "HttpRateLimitQueueTimeoutError";
+        this.key = key;
+        this.waitedMs = waitedMs;
+    }
+}
+
+/**
  * A small rate limiter designed for HTTP monitor workloads.
  *
  * @remarks
@@ -148,21 +171,11 @@ export class HttpRateLimiter {
             }
 
             const waitedMs = Date.now() - startWaitMs;
-            if (waitedMs > this.maxWaitMs) {
-                // Respect cancellation even when failing open.
+            if (waitedMs >= this.maxWaitMs) {
                 assertNotAborted(signal);
 
                 this.config.onMaxWaitExceeded?.({ key, waitedMs });
-
-                // Fail-open: proceed rather than risking deadlock.
-                this.active += 1;
-                this.lastInvocationByKey.set(key, Date.now());
-                try {
-                    // eslint-disable-next-line no-await-in-loop -- retry loop requires sequential awaits
-                    return await operation();
-                } finally {
-                    this.active = Math.max(0, this.active - 1);
-                }
+                throw new HttpRateLimitQueueTimeoutError(key, waitedMs);
             }
 
             const waitForMs = canStartKey

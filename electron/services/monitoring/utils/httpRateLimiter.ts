@@ -41,7 +41,7 @@ const sharedRateLimiter = new HttpRateLimiter({
         waitedMs: number;
     }): void => {
         logger.warn(
-            `[HttpRateLimiter] Max wait time exceeded for ${key} after ${waitedMs}ms; proceeding`
+            `[HttpRateLimiter] Max wait time exceeded for ${key} after ${waitedMs}ms; rejecting queued check`
         );
     },
     toKey: (url: string): string => {

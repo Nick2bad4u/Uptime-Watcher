@@ -1,6 +1,9 @@
 import type { HttpRateLimiterConfig } from "@shared/utils/httpRateLimiter";
 
-import { HttpRateLimiter } from "@shared/utils/httpRateLimiter";
+import {
+    HttpRateLimiter,
+    HttpRateLimitQueueTimeoutError,
+} from "@shared/utils/httpRateLimiter";
 import { describe, expect, it, vi } from "vitest";
 
 describe("HttpRateLimiter abort support", () => {
@@ -53,7 +56,7 @@ describe("HttpRateLimiter abort support", () => {
         expect(getterCalls).toBe(0);
     });
 
-    it("redacts malformed URL keys before reporting max wait telemetry", async () => {
+    it("redacts malformed URL keys before rejecting at the queue deadline", async () => {
         vi.useFakeTimers();
 
         try {
@@ -88,22 +91,96 @@ describe("HttpRateLimiter abort support", () => {
                 fastOperation
             );
 
-            await vi.advanceTimersByTimeAsync(25);
-
-            await expect(second).resolves.toBe("fast");
-            expect(onMaxWaitExceeded).toHaveBeenCalledWith({
+            await expect(second).rejects.toMatchObject({
                 key: "[unparseable-url]",
-                waitedMs: 25,
+                name: "HttpRateLimitQueueTimeoutError",
             });
+            expect(onMaxWaitExceeded).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    key: "[unparseable-url]",
+                })
+            );
             expect(onMaxWaitExceeded).not.toHaveBeenCalledWith(
                 expect.objectContaining({
                     key: expect.stringContaining("secret-token"),
                 })
             );
-            expect(fastOperation).toHaveBeenCalledTimes(1);
+            expect(fastOperation).not.toHaveBeenCalled();
 
             resolveSlow();
             await expect(first).resolves.toBe("slow");
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("never exceeds max concurrency when queued operations time out", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const limiter = new HttpRateLimiter({
+                maxConcurrent: 1,
+                maxWaitMs: 50,
+                minIntervalMs: 0,
+            });
+            let activeOperations = 0;
+            let maxActiveOperations = 0;
+            let releaseFirst: () => void = () => {};
+            const firstBarrier = new Promise<void>((resolve) => {
+                releaseFirst = resolve;
+            });
+
+            const first = limiter.schedule(
+                "https://example.com/first",
+                async () => {
+                    activeOperations += 1;
+                    maxActiveOperations = Math.max(
+                        maxActiveOperations,
+                        activeOperations
+                    );
+                    await firstBarrier;
+                    activeOperations -= 1;
+                    return "first";
+                }
+            );
+            const queuedOperations = Array.from({ length: 10 }, (_, index) =>
+                limiter
+                    .schedule(
+                        `https://example.com/queued-${index}`,
+                        async () => {
+                            activeOperations += 1;
+                            maxActiveOperations = Math.max(
+                                maxActiveOperations,
+                                activeOperations
+                            );
+                            activeOperations -= 1;
+                            return index;
+                        }
+                    )
+                    .then((value) => ({
+                        status: "fulfilled" as const,
+                        value,
+                    }))
+                    .catch((error: unknown) => ({
+                        reason: error,
+                        status: "rejected" as const,
+                    }))
+            );
+
+            await vi.advanceTimersByTimeAsync(50);
+
+            const settledQueued = await Promise.all(queuedOperations);
+            expect(
+                settledQueued.every(
+                    (result) =>
+                        result.status === "rejected" &&
+                        result.reason instanceof HttpRateLimitQueueTimeoutError
+                )
+            ).toBeTruthy();
+            expect(maxActiveOperations).toBe(1);
+
+            releaseFirst();
+            await expect(first).resolves.toBe("first");
         } finally {
             vi.useRealTimers();
         }
