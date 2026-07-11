@@ -52,8 +52,58 @@ jobs:
                   mkdir -p release-dist
                   gh release download "$release_tag" --dir release-dist
 
+            - name: "Select assets requiring VirusTotal analysis"
+              env:
+                  VT_API_KEY: "${{ secrets.VT_API_KEY }}"
+              run: |
+                  set -euo pipefail
+                  mkdir -p virustotal-upload
+
+                  while IFS= read -r -d '' file; do
+                    digest=$(sha256sum "$file" | awk '{print $1}')
+                    status=""
+
+                    for attempt in 1 2 3 4; do
+                      if ! status=$(curl \
+                          --silent \
+                          --show-error \
+                          --output /dev/null \
+                          --write-out '%{http_code}' \
+                          --header "x-apikey: ${VT_API_KEY}" \
+                          "https://www.virustotal.com/api/v3/files/${digest}"); then
+                        status="000"
+                      fi
+
+                      if [ "$status" != "000" ] && [ "$status" != "429" ] && [[ "$status" != 5* ]]; then
+                        break
+                      fi
+
+                      if [ "$attempt" -eq 4 ]; then
+                        break
+                      fi
+
+                      echo "VirusTotal lookup returned HTTP $status; retrying attempt $attempt/4"
+                      sleep 15
+                    done
+
+                    case "$status" in
+                      200)
+                        echo "Already analyzed: $(basename "$file")"
+                        ;;
+                      404)
+                        ln "$file" "virustotal-upload/$(basename "$file")"
+                        echo "Queued for analysis: $(basename "$file")"
+                        ;;
+                      *)
+                        echo "::error::VirusTotal lookup failed for $(basename "$file") with HTTP $status"
+                        exit 1
+                        ;;
+                    esac
+                  done < <(find release-dist -maxdepth 1 -type f -print0 | sort -z)
+
             - name: "VirusTotal Scan"
               uses: "crazy-max/ghaction-virustotal@936d8c5c00afe97d3d9a1af26d017cfdf26800a2" # v5.0.0
               with:
                   vt_api_key: "${{ secrets.VT_API_KEY }}"
-                  files: "release-dist/**/*"
+                  request_rate: 4
+                  files: "virustotal-upload/*"

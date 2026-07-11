@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 - 🛠️ [fix] Repair git-cliff TOML parsing for post-release changelog generation
 - 🛠️ [fix] Prevent duplicate VirusTotal submissions from overlapping asset globs
+- 🛠️ [fix] Skip release assets whose hashes already have VirusTotal reports
 
 ## [23.9.0] - 2026-07-10
 
