@@ -5,6 +5,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### 👷 CI/CD
+
+- 🛠️ [fix] Repair git-cliff TOML parsing for post-release changelog generation
+
 ## [23.9.0] - 2026-07-10
 
 ### 👷 CI/CD

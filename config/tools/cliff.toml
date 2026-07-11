@@ -72,18 +72,9 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
         { pattern = '\[dependency\]', replace = "test" },
         { pattern = "merge branch", replace = "[chore] Merge Branch" },                                                                                                                            # replace merge branch commit messages
         # Clean up Dependabot messages - remove verbose table content
-        {
-            pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
-            replace = "[dependency] Update dependency group"
-        },
-        {
-            pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
-            replace = "[dependency] Update npm dependencies"
-        },
-        {
-            pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
-            replace = "[dependency] Update dependencies"
-        },
+        { pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependency group" },
+        { pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update npm dependencies" },
+        { pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependencies" },
 
         # Clean up individual package bump messages
         { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
