@@ -159,6 +159,12 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 **👉 [Download Latest Release](https://github.com/Nick2bad4u/Uptime-Watcher/releases/latest)**
 
+> **Code signing status:** The current Windows and macOS downloads are unsigned.
+> The project is applying for free Windows signing through SignPath Foundation;
+> signing remains pending approval and will be identified explicitly in a future
+> release. See the [Code Signing Policy](CODE_SIGNING_POLICY.md) and
+> [Privacy Policy](PRIVACY.md).
+
 #### **Option 2: Build from source**
 
 ```bash
