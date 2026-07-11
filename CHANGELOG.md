@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### 👷 CI/CD
 
 - 🛠️ [fix] Repair git-cliff TOML parsing for post-release changelog generation
+- 🛠️ [fix] Prevent duplicate VirusTotal submissions from overlapping asset globs
 
 ## [23.9.0] - 2026-07-10
 
