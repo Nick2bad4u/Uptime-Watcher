@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-027: Auto-Update Strategy and Release Channels"
 summary: "Documents the auto-update implementation in Electron main, the update feed expectations, and how GitHub Releases artifacts map to update channels."
 created: "2025-12-15"
-last_reviewed: "2026-02-11"
+last_reviewed: "2026-07-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -108,17 +108,22 @@ Pre-release channels can be introduced later, but must have explicit rules for:
 
 Stable must remain the default.
 
-### 4) Signature verification requirements
+### 4) Integrity and unsigned update limitations
 
-Production auto-updates must only install signed builds.
+The project publishes unsigned Windows and macOS builds. Update metadata must
+retain valid SHA-512 hashes so the updater can reject corrupted or mismatched
+downloads, but hashes do not authenticate the publisher.
 
-Requirements:
+Consequences:
 
-- Windows installers must be Authenticode signed and the updater must verify
-  signatures against the expected publisher identity.
-- macOS builds must be code signed and notarized.
-- If signing is not available for a build, that build must not be marked as the
-  latest release for auto-update consumption.
+- Windows may show unknown-publisher or SmartScreen warnings during update
+  installation.
+- macOS may block installation or require manual approval, and seamless
+  auto-update installation is not guaranteed for unsigned apps.
+- The updater and release notes must not claim Authenticode, Developer ID, or
+  notarization verification.
+- A future move to signed updates must restore platform signature verification
+  before signed artifacts are described as trusted.
 
 ## Implementation notes
 

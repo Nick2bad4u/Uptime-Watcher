@@ -1,30 +1,6 @@
 /* eslint-disable unicorn/filename-case -- electron-builder expects this conventional root config filename. */
 import type { Configuration } from "electron-builder";
 
-const isOfficialRelease =
-    process.env["UPTIME_WATCHER_OFFICIAL_RELEASE"] === "true";
-const windowsPublisherName = process.env["WINDOWS_PUBLISHER_NAME"]?.trim();
-
-if (
-    isOfficialRelease &&
-    process.platform === "win32" &&
-    !windowsPublisherName
-) {
-    throw new Error("Official Windows releases require WINDOWS_PUBLISHER_NAME");
-}
-
-if (
-    isOfficialRelease &&
-    process.platform === "darwin" &&
-    (!process.env["APPLE_API_KEY"] ||
-        !process.env["APPLE_API_KEY_ID"] ||
-        !process.env["APPLE_API_ISSUER"])
-) {
-    throw new Error(
-        "Official macOS releases require App Store Connect API credentials"
-    );
-}
-
 /**
  * Electron Builder configuration for the Uptime-Watcher application.
  *
@@ -87,7 +63,7 @@ const config: Configuration = {
     flatpak: {
         artifactName: `Uptime-Watcher-flatpak-\${arch}-\${version}.\${ext}`,
     },
-    forceCodeSigning: isOfficialRelease,
+    forceCodeSigning: false,
     framework: "electron",
     freebsd: {
         artifactName: `Uptime-Watcher-freebsd-\${arch}-\${version}.\${ext}`,
@@ -121,10 +97,11 @@ const config: Configuration = {
     },
     mac: {
         category: "public.app-category.productivity",
-        gatekeeperAssess: true,
-        hardenedRuntime: true,
-        ...(isOfficialRelease && { notarize: true }),
+        gatekeeperAssess: false,
+        hardenedRuntime: false,
+        identity: null,
         icon: "src/components/icons/favicon-512x512.icns",
+        notarize: false,
         target: [
             "dmg",
             "zip",
@@ -186,9 +163,6 @@ const config: Configuration = {
     win: {
         icon: "src/components/icons/icon.ico",
         legalTrademarks: "Uptime Watcher",
-        ...(windowsPublisherName && {
-            publisherName: [windowsPublisherName],
-        }),
         requestedExecutionLevel: "asInvoker",
         target: [
             "nsis",

@@ -20,7 +20,7 @@ permissions:
     contents: "read"
 jobs:
     bump-version:
-        name: "Validate release version and signing credentials"
+        name: "Validate release version"
         runs-on: "ubuntu-latest"
         timeout-minutes: 15
         defaults:
@@ -102,43 +102,6 @@ jobs:
                     echo "new_version=$requested_version"
                     echo "bump_sha=$(git rev-parse HEAD)"
                   } >> "$GITHUB_OUTPUT"
-
-            - name: "Verify release signing credentials"
-              shell: "bash"
-              env:
-                  WINDOWS_CSC_LINK: "${{ secrets.WINDOWS_CSC_LINK }}"
-                  WINDOWS_CSC_KEY_PASSWORD: "${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}"
-                  WINDOWS_PUBLISHER_NAME: "${{ secrets.WINDOWS_PUBLISHER_NAME }}"
-                  MACOS_CSC_LINK: "${{ secrets.MACOS_CSC_LINK }}"
-                  MACOS_CSC_KEY_PASSWORD: "${{ secrets.MACOS_CSC_KEY_PASSWORD }}"
-                  APPLE_API_KEY: "${{ secrets.APPLE_API_KEY }}"
-                  APPLE_API_KEY_ID: "${{ secrets.APPLE_API_KEY_ID }}"
-                  APPLE_API_ISSUER: "${{ secrets.APPLE_API_ISSUER }}"
-              run: |
-                  set -euo pipefail
-
-                  required_secrets=(
-                    WINDOWS_CSC_LINK
-                    WINDOWS_CSC_KEY_PASSWORD
-                    WINDOWS_PUBLISHER_NAME
-                    MACOS_CSC_LINK
-                    MACOS_CSC_KEY_PASSWORD
-                    APPLE_API_KEY
-                    APPLE_API_KEY_ID
-                    APPLE_API_ISSUER
-                  )
-                  missing_secrets=()
-
-                  for secret_name in "${required_secrets[@]}"; do
-                    if [ -z "${!secret_name:-}" ]; then
-                      missing_secrets+=("$secret_name")
-                    fi
-                  done
-
-                  if [ "${#missing_secrets[@]}" -gt 0 ]; then
-                    printf '::error::Official releases require configured signing secrets: %s\n' "${missing_secrets[*]}"
-                    exit 1
-                  fi
 
     build:
         name: "Build release artifacts"
@@ -329,13 +292,7 @@ jobs:
                   DEBUG_DEMB: true
                   CI: true
                   DEBUG: "@malept/flatpak-bundler"
-                  UPTIME_WATCHER_OFFICIAL_RELEASE: "true"
-                  WINDOWS_PUBLISHER_NAME: "${{ runner.os == 'Windows' && secrets.WINDOWS_PUBLISHER_NAME || '' }}"
-                  CSC_LINK: "${{ runner.os == 'Windows' && secrets.WINDOWS_CSC_LINK || runner.os == 'macOS' && secrets.MACOS_CSC_LINK || '' }}"
-                  CSC_KEY_PASSWORD: "${{ runner.os == 'Windows' && secrets.WINDOWS_CSC_KEY_PASSWORD || runner.os == 'macOS' && secrets.MACOS_CSC_KEY_PASSWORD || '' }}"
-                  APPLE_API_KEY: "${{ runner.os == 'macOS' && secrets.APPLE_API_KEY || '' }}"
-                  APPLE_API_KEY_ID: "${{ runner.os == 'macOS' && secrets.APPLE_API_KEY_ID || '' }}"
-                  APPLE_API_ISSUER: "${{ runner.os == 'macOS' && secrets.APPLE_API_ISSUER || '' }}"
+                  CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
             - name: "Generate CycloneDX production SBOM"
               if: "matrix.os == 'ubuntu-latest' && matrix.arch == 'x64'"
@@ -361,63 +318,6 @@ jobs:
                   ' \
                     "release/Uptime-Watcher-sbom-${{ needs.bump-version.outputs.new_version }}.cdx.json" \
                     "${{ needs.bump-version.outputs.new_version }}"
-
-            - name: "Verify Windows release signatures"
-              if: "runner.os == 'Windows'"
-              shell: "pwsh"
-              env:
-                  WINDOWS_PUBLISHER_NAME: "${{ secrets.WINDOWS_PUBLISHER_NAME }}"
-              run: |
-                  $ErrorActionPreference = 'Stop'
-                  $signedFiles = @(
-                    Get-ChildItem -LiteralPath 'release' -Recurse -File |
-                      Where-Object { $_.Extension -in @('.exe', '.msi') }
-                  )
-
-                  if ($signedFiles.Count -eq 0) {
-                    throw 'No Windows executables or installers were produced for signature verification.'
-                  }
-
-                  foreach ($file in $signedFiles) {
-                    $signature = Get-AuthenticodeSignature -LiteralPath $file.FullName
-                    if ($signature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
-                      throw "Invalid Authenticode signature for $($file.Name): $($signature.Status)"
-                    }
-
-                    if (-not $signature.SignerCertificate.Subject.Contains($env:WINDOWS_PUBLISHER_NAME, [System.StringComparison]::OrdinalIgnoreCase)) {
-                      throw "Unexpected Authenticode publisher for $($file.Name)."
-                    }
-                  }
-
-            - name: "Verify macOS signatures and notarization"
-              if: "runner.os == 'macOS'"
-              shell: "bash"
-              run: |
-                  set -euo pipefail
-
-                  apps=()
-                  while IFS= read -r -d '' app_bundle; do
-                    apps+=("$app_bundle")
-                  done < <(find release -type d -name '*.app' -print0)
-
-                  distributables=()
-                  while IFS= read -r -d '' distributable; do
-                    distributables+=("$distributable")
-                  done < <(find release -type f \( -name '*.dmg' -o -name '*.pkg' \) -print0)
-
-                  if [ "${#apps[@]}" -eq 0 ] || [ "${#distributables[@]}" -eq 0 ]; then
-                    echo "::error::Expected signed app bundles and notarized macOS distributables were not produced."
-                    exit 1
-                  fi
-
-                  for app_bundle in "${apps[@]}"; do
-                    codesign --verify --deep --strict --verbose=2 "$app_bundle"
-                    spctl --assess --verbose --type exec "$app_bundle"
-                  done
-
-                  for distributable in "${distributables[@]}"; do
-                    xcrun stapler validate "$distributable"
-                  done
 
             - name: "Print Windows distributable hash (debug, Windows)"
               id: "print_hash_windows"

@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ADR-031: Packaging, Signing, and Notarization Policy"
 summary: "Documents how Uptime Watcher is packaged for Windows/macOS/Linux, what is officially supported, and the current signing/notarization posture."
 created: "2025-12-15"
-last_reviewed: "2026-02-12"
+last_reviewed: "2026-07-10"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -24,7 +24,7 @@ tags:
 
 ## Status
 
-✅ Accepted (packaging implemented; release signing + notarization mandated)
+✅ Accepted (packaging implemented; releases intentionally unsigned)
 
 ## Context
 
@@ -39,8 +39,10 @@ experience and, in practice, for frictionless installation and updates.
 
 1. **Broad distribution**: users install on Windows/macOS/Linux.
 2. **Operational simplicity**: CI must produce consistent artifacts.
-3. **Security**: signing keys must never be committed.
-4. **User trust**: signed builds reduce warnings and improve install experience.
+3. **Operational cost**: publishing must not depend on paid platform developer
+   accounts or managed signing services.
+4. **Transparency**: users must not be led to believe unsigned artifacts have a
+   verified publisher identity.
 
 ## Decision
 
@@ -76,83 +78,28 @@ Asset naming and upload rules are governed by:
 
 ### 3) Code signing / notarization posture
 
-#### 3.1) Current implementation reality (as of this review)
+#### 3.1) Current implementation
 
-- The repo config enables macOS hardened runtime (`hardenedRuntime: true`) and
-  Gatekeeper assessment (`gatekeeperAssess: true`).
-- Developer and ordinary CI builds may remain unsigned.
-- The release workflow sets `UPTIME_WATCHER_OFFICIAL_RELEASE=true`, which makes
-  `electron-builder` require code signing and enables macOS notarization.
-- Release dispatch validates every required credential before creating or
-  pushing the version tag.
-- Windows artifacts are checked with `Get-AuthenticodeSignature` against the
-  configured publisher identity. macOS app bundles and distributables are
-  checked with `codesign`, Gatekeeper, and `stapler` before upload.
+- Windows and macOS release artifacts are intentionally unsigned.
+- Electron Builder has code-signing enforcement disabled. The macOS identity is
+  explicitly `null`, notarization is disabled, and CI disables certificate
+  auto-discovery so runner state cannot change the result.
+- The release workflow does not require signing secrets or claim that uploaded
+  artifacts have a verified publisher identity.
+- Release artifacts still include updater SHA-512 metadata, GitHub asset
+  digests, and a CycloneDX SBOM. These detect corruption and identify release
+  contents, but they do not provide publisher authentication.
 
-The release environment must define these repository secrets:
+#### 3.2) Unsigned release policy
 
-- `WINDOWS_CSC_LINK`
-- `WINDOWS_CSC_KEY_PASSWORD`
-- `WINDOWS_PUBLISHER_NAME`
-- `MACOS_CSC_LINK`
-- `MACOS_CSC_KEY_PASSWORD`
-- `APPLE_API_KEY`
-- `APPLE_API_KEY_ID`
-- `APPLE_API_ISSUER`
-
-Missing credentials fail the workflow before a release tag is created. Invalid
-or mismatched signatures fail the platform build before artifacts reach the
-release job.
-
-#### 3.2) Mandated posture for official releases
-
-Policy:
-
-- **Official release assets must be signed** (Windows) and **signed + notarized**
-  (macOS). Unsigned builds must not be published as “latest” for auto-update
-  consumption (see ADR-027).
-- Signing/notarization credentials must be stored as CI secrets (or managed
-  signing services) and must never be committed.
-- Workflow changes that affect signing/notarization must be documented and
-  reviewed.
-
-##### Windows (Authenticode + Windows App SDK mandate)
-
-Minimum requirements for any Windows artifact distributed to end users:
-
-- Authenticode-sign the primary executables (installer + shipped app binaries).
-- Use SHA-256 signatures and timestamping.
-
-Accepted approaches:
-
-- Traditional PFX/P12 certificate provided to CI (as a secret) and used via
-  `signtool.exe`.
-- Managed signing (recommended for long-term hardening), e.g. Azure Trusted
-  Signing / Key Vault-backed signing, with CI using OIDC.
-
-Windows App SDK mandate (packaging direction):
-
-- When distributing via enterprise policy / modern Windows install flows, the
-  app must ship an **MSIX** package (or App Installer) produced via a Windows
-  App SDK-compatible pipeline and signed with a trusted publisher identity.
-- Until MSIX packaging is implemented, NSIS/MSI remain supported, but they must
-  still be signed.
-
-##### macOS (Developer ID + Notary Service)
-
-Minimum requirements for any macOS artifact distributed to end users:
-
-- Code sign the `.app` bundle with a **Developer ID Application** certificate.
-- If distributing `.pkg` installers, sign them with a **Developer ID Installer**
-  certificate.
-- Notarize with Apple Notary Service and **staple** the notarization ticket.
-- Hardened runtime must remain enabled.
-
-Credential handling (modern, preferred):
-
-- Prefer App Store Connect API keys (not Apple ID + password) for notarization.
-- CI must use an ephemeral keychain and must remove certificates/keys at the end
-  of the job.
+- Windows users should expect an unknown-publisher or SmartScreen warning.
+- macOS users should expect Gatekeeper to block or warn on first launch and may
+  need to approve the app manually in system settings.
+- Seamless macOS auto-update installation is not guaranteed for unsigned apps.
+- Release notes and documentation must not describe these artifacts as signed,
+  notarized, or publisher-verified.
+- Adding signing later is an opt-in policy change that requires credentials,
+  restored platform verification steps, and an ADR update.
 
 ##### Linux
 
@@ -171,9 +118,11 @@ Flatpak is treated as an additional distribution format with its own build pipel
 ## Consequences
 
 - **Pro**: broad platform coverage from a single configuration source.
-- **Pro**: clear security boundary for signing keys.
-- **Con**: official releases cannot run until all signing and notarization
-  secrets are configured.
+- **Pro**: releases do not depend on paid signing accounts or external signing
+  services.
+- **Con**: users receive operating-system trust warnings and cannot verify the
+  publisher through an Authenticode or Apple Developer ID signature.
+- **Con**: macOS installation and auto-update behavior has additional friction.
 
 ## Related ADRs
 
