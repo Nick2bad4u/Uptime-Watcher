@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
   - Remove signing-secret and signature-verification release gates
   - Disable certificate discovery and macOS notarization deterministically
   - Document platform trust warnings and unsigned auto-update limitations
+- 🛠️ [fix] Stream concise release notes from a file to avoid process argument limits
 
 ## [23.8.0] - 2026-05-06
 
