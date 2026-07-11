@@ -387,7 +387,7 @@ jobs:
                   echo "| ${{ needs.bump-version.outputs.new_version }} | ${{ matrix.os }} | ${{ matrix.arch }} | Build Status: $STATUS |" >> "$GITHUB_STEP_SUMMARY"
 
     release:
-        name: "Publish release and update changelogs"
+        name: "Publish release and validate changelog"
         needs: ["build", "bump-version"]
         if: "${{ needs.build.result == 'success' && needs.bump-version.result == 'success' }}"
         runs-on: "ubuntu-latest"
@@ -974,145 +974,32 @@ jobs:
               env:
                   GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-            - name: "Checkout repository branch for changelog updates"
+            - name: "Checkout tagged release for changelog validation"
               uses: "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" # v6.0.3
               with:
-                  ref: "${{ github.ref_name }}"
+                  ref: "v${{ needs.bump-version.outputs.new_version }}"
                   fetch-depth: 0
                   fetch-tags: true
-
-            - name: "Create Check Run"
-              continue-on-error: true
-              id: "create_check"
-              env:
-                  GH_TOKEN: "${{ github.token }}"
-              run: |
-                  CHECKID=$(gh api -X POST -H "Accept: application/vnd.github+json" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    -f name='Update ChangeLogs' \
-                    -f head_sha='${{ github.sha }}' \
-                    -f status='in_progress' \
-                    -f 'output[title]=Update ChangeLogs' \
-                    -f 'output[summary]=Changelog update in progress' \
-                    --jq '.id' \
-                    /repos/${{ github.repository }}/check-runs)
-                  echo "CHECKID=$CHECKID" >> "$GITHUB_ENV"
 
             - name: "Set up Node.js"
               uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
               with:
                   node-version-file: ".node-version"
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
 
-            - name: "Install git-cliff"
-              run: "npm install -g git-cliff --force"
+            - name: "Install pinned git-cliff"
+              run: "npm install --global git-cliff@2.13.1 --force"
 
-            - name: "Generate CHANGELOG.md files"
+            - name: "Validate tagged changelog preview"
               run: |
-                  echo "Starting changelog generation with git-cliff..."
-                  echo "Current directory: $(pwd)"
-                  echo "Available files: $(ls -la)"
+                  PREVIEW="$RUNNER_TEMP/release-changelog.md"
+                  git-cliff \
+                    --config config/tools/cliff.toml \
+                    --current \
+                    --strip all \
+                    --output "$PREVIEW"
 
-                  echo "Generating root CHANGELOG.md..."
-                  npx git-cliff --config config/tools/cliff.toml --output CHANGELOG.md --verbose
-                  echo "Root CHANGELOG.md generated, size: $(stat -c%s CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating src CHANGELOG.md..."
-                  cd src && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo "src CHANGELOG.md generated, size: $(stat -c%s src/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating shared CHANGELOG.md..."
-                  cd shared && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo "shared CHANGELOG.md generated, size: $(stat -c%s shared/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating docs CHANGELOG.md..."
-                  cd docs && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo "docs CHANGELOG.md generated, size: $(stat -c%s docs/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating config CHANGELOG.md..."
-                  cd config && npx git-cliff --config ./tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo "screenshots CHANGELOG.md generated, size: $(stat -c%s config/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "Generating electron CHANGELOG.md..."
-                  cd electron && npx git-cliff --config ../config/tools/cliff.toml --output CHANGELOG.md --verbose && cd ..
-                  echo "utils CHANGELOG.md generated, size: $(stat -c%s electron/CHANGELOG.md 2>/dev/null || echo 'file not found')"
-
-                  echo "All changelog generation completed."
-                  echo "Final directory listing:"
-                  find . -name "CHANGELOG.md" -exec echo "Found: {}" \; -exec wc -l {} \;
-
-            - name: "Commit and push changelog updates"
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-                  # Add all CHANGELOG.md files
-                  git add CHANGELOG.md src/CHANGELOG.md shared/CHANGELOG.md docs/CHANGELOG.md config/CHANGELOG.md electron/CHANGELOG.md
-                  # Check if there are any changes to commit
-                  if git diff --staged --quiet; then
-                    echo "No changelog changes to commit"
-                  else
-                    git commit -m "chore: update changelogs for v${{ needs.bump-version.outputs.new_version }} [skip ci]"
-                    git push origin ${{ github.ref_name }}
-                    echo "Changelogs updated and pushed to repository"
-                  fi
-
-            - name: "Update Check Run - Changelogs Generated"
-              continue-on-error: true
-              if: "success()"
-              env:
-                  GH_TOKEN: "${{ github.token }}"
-              run: |
-                  echo '{
-                    "status": "in_progress",
-                    "output": {
-                      "title": "Update ChangeLogs",
-                      "summary": "Changelogs generated for v${{ needs.bump-version.outputs.new_version }} and committed to repository"
-                    }
-                  }' | gh api -X PATCH -H "Accept: application/vnd.github+json" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    /repos/${{ github.repository }}/check-runs/"$CHECKID" --input -
-
-            - name: "Complete Check Run"
-              continue-on-error: true
-              if: "always()"
-              env:
-                  GH_TOKEN: "${{ github.token }}"
-              run: |
-                  CONCLUSION="success"
-                  if [ "${{ job.status }}" != "success" ]; then
-                    CONCLUSION="failure"
-                  fi
-                  echo '{
-                    "conclusion": "'$CONCLUSION'",
-                    "output": {
-                      "title": "Update ChangeLogs",
-                      "summary": "Changelog update workflow completed with status: ${{ job.status }}"
-                    }
-                  }' | gh api -X PATCH -H "Accept: application/vnd.github+json" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    /repos/${{ github.repository }}/check-runs/"$CHECKID" --input -
-
-            - name: "Add Changelog Job Summary"
-              if: "always()"
-              run: |
-                  {
-                    echo "## 📝 Changelog Update Summary"
-                    echo "- **Version**: v${{ needs.bump-version.outputs.new_version }}"
-                    echo "- **CHANGELOG.md files** generated for root and all subdirectories"
-                    echo "- **Changes committed** directly to repository (no PR required)"
-                    echo "- **Status**: ${{ job.status }}"
-                    echo ""
-                    echo "### Files Updated:"
-                    echo "- \`/CHANGELOG.md\`"
-                    echo "- \`/.CHANGELOG.md\`"
-                    echo "- \`/.icons/CHANGELOG.md\`"
-                    echo "- \`/.libs/CHANGELOG.md\`"
-                    echo "- \`/config/CHANGELOG.md\`"
-                    echo "- \`/docs/CHANGELOG.md\`"
-                    echo "- \`/electron/CHANGELOG.md\`"
-                  } >> "$GITHUB_STEP_SUMMARY"
+                  test -s "$PREVIEW"
+                  echo "Generated $(wc -l < "$PREVIEW") lines ($(stat -c%s "$PREVIEW") bytes) for v${{ needs.bump-version.outputs.new_version }}."
 
             - name: "Add release job summary"
               if: "always()"
@@ -1126,6 +1013,6 @@ jobs:
                     echo "- **Builds executed** for multiple OS and architectures."
                     echo "- **Build artifacts uploaded** for each platform."
                     echo "- **Release creation/update** was attempted after artifact verification."
-                    echo "- **Changelogs were generated** and any resulting changes were pushed directly to the repository."
+                    echo "- **Changelog configuration** was validated against the tagged release without modifying the repository."
                     echo "- Workflow completed with status: ${{ job.status }}"
                   } >> "$GITHUB_STEP_SUMMARY"

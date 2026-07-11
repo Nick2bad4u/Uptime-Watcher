@@ -15,13 +15,44 @@ All notable changes to this project will be documented in this file.
 
 ## [23.9.0] - 2026-07-10
 
-### 👷 CI/CD
+### Features
 
-- 👷 [ci] Restore explicitly unsigned Windows and macOS release packaging
-  - Remove signing-secret and signature-verification release gates
-  - Disable certificate discovery and macOS notarization deterministically
-  - Document platform trust warnings and unsigned auto-update limitations
-- 🛠️ [fix] Stream concise release notes from a file to avoid process argument limits
+- Added a degraded-status filter to monitor history views.
+
+### Reliability And Data Integrity
+
+- Serialized monitor checks, settings writes, database transactions, and cloud
+  operations to prevent stale state and race conditions.
+- Hardened backup, restore, import, and synchronization behavior so failed or
+  concurrent operations preserve committed data and report rollback failures.
+- Improved Google Drive and Dropbox synchronization, OAuth token rotation, and
+  cloud-secret persistence across reconnects and application restarts.
+- Made startup, shutdown, cleanup, and updater status transitions deterministic.
+
+### Security
+
+- Fail closed when Electron window security initialization cannot be completed.
+- Tightened URL, IPC, filesystem, backup path, and imported-data validation.
+- Protected persisted cloud credentials and reduced secret exposure in logs and
+  temporary buffers.
+
+### Performance
+
+- Bounded monitor startup, database graph reads, imports, CDN edge checks, and
+  other high-fanout operations.
+- Avoided redundant settings and renderer state updates.
+
+### Packaging And Tooling
+
+- Restored explicitly unsigned Windows and macOS packages without requiring
+  platform signing accounts. Platform trust warnings and macOS auto-update
+  limitations are documented in the release notes.
+- Published concise release notes from a file to avoid command-line size limits.
+- Migrated repository linting and formatting to the shared configuration packages.
+- Added validated updater metadata, CycloneDX SBOM output, Flatpak packages, and
+  VirusTotal asset scanning.
+
+[Full comparison](https://github.com/Nick2bad4u/Uptime-Watcher/compare/v23.8.0...v23.9.0)
 
 ## [23.8.0] - 2026-05-06
 

@@ -49,7 +49,6 @@ const knipConfig: KnipConfig = {
         // extends resolution rather than a normal import.
         "@commitlint/config-conventional",
         // Loaded by package-script config paths rather than JavaScript imports.
-        "gitcliff-config-nick2bad4u",
         "jscpd-config-nick2bad4u",
         "lychee-config-nick2bad4u",
         // Invoked as package-script binaries that Knip cannot map to their
