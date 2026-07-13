@@ -54,16 +54,39 @@ jobs:
 
                   echo "repo=${TARGET_REPO}" >> "${GITHUB_OUTPUT}"
 
-            - name: "Validate required token"
+            - name: "Validate required deploy key"
               shell: "bash"
+              env:
+                  MIRROR_SSH_KEY: "${{ secrets['ESLINT_PLUGIN_MIRROR_SSH_KEY'] }}"
               run: |
                   set -euo pipefail
 
-                  if [[ -z "${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}" ]]; then
-                      echo "Missing secret ESLINT_PLUGIN_MIRROR_TOKEN." >&2
-                      echo "Create a fine-grained PAT with contents:read/write on the target repo." >&2
+                  if [[ -z "${MIRROR_SSH_KEY}" ]]; then
+                      echo "Missing secret ESLINT_PLUGIN_MIRROR_SSH_KEY." >&2
+                      echo "Create a write-enabled deploy key on the target repo and store its private key in this secret." >&2
                       exit 1
                   fi
+
+            - name: "Configure mirror deploy key"
+              shell: "bash"
+              env:
+                  MIRROR_SSH_KEY: "${{ secrets['ESLINT_PLUGIN_MIRROR_SSH_KEY'] }}"
+              run: |
+                  set -euo pipefail
+
+                  mkdir -p "${HOME}/.ssh"
+                  printf '%s\n' "${MIRROR_SSH_KEY}" > "${HOME}/.ssh/eslint_plugin_mirror"
+                  chmod 600 "${HOME}/.ssh/eslint_plugin_mirror"
+                  ssh-keyscan github.com >> "${HOME}/.ssh/known_hosts"
+                  chmod 600 "${HOME}/.ssh/known_hosts"
+                  {
+                      echo "Host github.com"
+                      echo "    HostName github.com"
+                      echo "    User git"
+                      echo "    IdentityFile ${HOME}/.ssh/eslint_plugin_mirror"
+                      echo "    IdentitiesOnly yes"
+                  } >> "${HOME}/.ssh/config"
+                  chmod 600 "${HOME}/.ssh/config"
 
             - name: "Prepare mirror working directory"
               shell: "bash"
@@ -80,7 +103,6 @@ jobs:
                   SOURCE_DIR: "${{ env.SOURCE_DIR }}"
                   TARGET_REPO: "${{ steps.target.outputs.repo }}"
                   TARGET_BRANCH: "main"
-                  MIRROR_TOKEN: "${{ secrets['ESLINT_PLUGIN_MIRROR_TOKEN'] }}"
               run: |
                   set -euo pipefail
 
@@ -90,8 +112,7 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-                  # NOTE: Do not echo the remote URL; it contains credentials.
-                  git remote add origin "https://x-access-token:${MIRROR_TOKEN}@github.com/${TARGET_REPO}.git"
+                  git remote add origin "git@github.com:${TARGET_REPO}.git"
 
                   # If the branch exists, fetch it so we can append a commit normally.
                   if git ls-remote --exit-code --heads origin "${TARGET_BRANCH}" >/dev/null 2>&1; then
@@ -101,17 +122,21 @@ jobs:
                       git checkout -B "${TARGET_BRANCH}"
                   fi
 
-                  # IMPORTANT: populate the mirror repo AFTER checking out the
-                  # target branch. If we copy files before checkout they are
-                  # untracked and `git checkout` aborts with:
-                  #   "untracked working tree files would be overwritten by checkout"
-                  #
-                  # Keep `.git/` intact, wipe everything else, then copy the
-                  # plugin sources from the main repo workspace.
-                  find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf -- {} +
-                  cp -a "${GITHUB_WORKSPACE}/${SOURCE_DIR}/." .
+                  # Synchronize implementation-owned paths while preserving the
+                  # standalone repository's package/config/lock files. Those files
+                  # deliberately differ from the monorepo workspace package.
+                  for directory in _internal docs rules test; do
+                      mkdir -p "${directory}"
+                      rsync -a --delete \
+                          "${GITHUB_WORKSPACE}/${SOURCE_DIR}/${directory}/" \
+                          "./${directory}/"
+                  done
 
-                  # Also include the stable wrapper file (handy for internal consumers).
+                  for file in README.md plugin.cjs plugin.d.cts plugin.d.mts plugin.mjs; do
+                      cp -a "${GITHUB_WORKSPACE}/${SOURCE_DIR}/${file}" "./${file}"
+                  done
+
+                  # Include the stable wrapper used by external consumers.
                   cp -a "${GITHUB_WORKSPACE}/config/linting/plugins/uptime-watcher.mjs" ./uptime-watcher.mjs
 
                   git add -A
