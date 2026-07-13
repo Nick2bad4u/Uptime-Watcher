@@ -53,6 +53,7 @@ const defaultSiteTableColumnWidths = {
 
 const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     activeSiteDetailsTab: "site-overview",
+    closeSiteDetailsForSite: vi.fn(),
     openExternal: (_url: string, _context?: { siteName?: string }) => {},
     selectedSiteIdentifier: undefined,
     selectSite: (_site: Site | undefined) => {},

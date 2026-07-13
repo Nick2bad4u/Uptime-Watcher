@@ -64,6 +64,7 @@ const defaultSiteTableColumnWidths = {
  */
 const createMockUiStoreState = (): UIStore => ({
     activeSiteDetailsTab: "site-overview",
+    closeSiteDetailsForSite: vi.fn(),
     openExternal: vi.fn(),
     selectedSiteIdentifier: undefined,
     selectSite: vi.fn(),

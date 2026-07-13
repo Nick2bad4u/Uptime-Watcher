@@ -76,7 +76,7 @@ export class WindowSessionSecurity {
                 >;
                 const handleDisplayMediaRequest: DisplayMediaRequestHandler = (
                     _request,
-                    callback
+                    respond
                 ) => {
                     if (!this.hasLoggedDisplayMediaDenial) {
                         this.hasLoggedDisplayMediaDenial = true;
@@ -85,7 +85,7 @@ export class WindowSessionSecurity {
                         );
                     }
 
-                    callback({});
+                    respond({});
                 };
                 session.setDisplayMediaRequestHandler(
                     handleDisplayMediaRequest
@@ -124,7 +124,7 @@ export class WindowSessionSecurity {
             >;
             const onHeadersReceived: OnHeadersReceivedHandler = (
                 details,
-                callback
+                respond
             ) => {
                 const { resourceType, responseHeaders } = details;
                 if (
@@ -132,7 +132,7 @@ export class WindowSessionSecurity {
                     resourceType !== "mainFrame" &&
                     resourceType !== "subFrame"
                 ) {
-                    callback(
+                    respond(
                         responseHeaders
                             ? { cancel: false, responseHeaders }
                             : { cancel: false }
@@ -140,7 +140,7 @@ export class WindowSessionSecurity {
                     return;
                 }
 
-                callback({
+                respond({
                     cancel: false,
                     responseHeaders: applyProductionDocumentSecurityHeaders({
                         productionCsp,

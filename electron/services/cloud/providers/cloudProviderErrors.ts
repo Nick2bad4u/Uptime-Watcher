@@ -49,10 +49,7 @@ export interface CloudProviderOperationErrorOptions extends ErrorOptions {
  * This error standardizes attribution for cloud-provider failures (provider
  * kind and operation), while preserving a cause chain.
  */
-export class CloudProviderOperationError
-    extends Error
-    implements NodeJS.ErrnoException
-{
+export class CloudProviderOperationError extends Error {
     public readonly code?: NodeJS.ErrnoException["code"] | undefined;
 
     public readonly operation: CloudProviderOperation;

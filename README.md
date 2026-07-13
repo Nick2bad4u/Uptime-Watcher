@@ -7,10 +7,10 @@
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
 </a>
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-v41.5.0-47848F?logo=electron" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-v43.1.0-47848F?logo=electron" alt="Electron">
 </a>
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-v19.2.5-61DAFB?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/React-v19.2.7-61DAFB?logo=react" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
   <img src="https://img.shields.io/badge/TypeScript-v6.0.3-3178C6?logo=typescript" alt="TypeScript">
@@ -104,7 +104,7 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 ### <strong>Frontend Architecture</strong>
 
 <a href="https://reactjs.org/">
-  <img src="https://img.shields.io/badge/React-19.2.5-61DAFB?logo=react&amp;logoColor=white" alt="React">
+  <img src="https://img.shields.io/badge/React-19.2.7-61DAFB?logo=react&amp;logoColor=white" alt="React">
 </a>
 <a href="https://www.typescriptlang.org/">
   <img src="https://img.shields.io/badge/TypeScript-6.0.3-3178C6?logo=typescript&amp;logoColor=white" alt="TypeScript">
@@ -113,13 +113,13 @@ Uptime Watcher is a desktop application built with modern web technologies that 
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&amp;logoColor=white" alt="Tailwind CSS">
 </a>
 <a href="https://vitejs.dev/">
-  <img src="https://img.shields.io/badge/Vite-8.0.16-646CFF?logo=vite&amp;logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Vite-8.1.4-646CFF?logo=vite&amp;logoColor=white" alt="Vite">
 </a>
 
 ### <strong>Desktop Framework</strong>
 
 <a href="https://www.electronjs.org/">
-  <img src="https://img.shields.io/badge/Electron-41.5.0-47848F?logo=electron&amp;logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/Electron-43.1.0-47848F?logo=electron&amp;logoColor=white" alt="Electron">
 </a>
 <a href="https://nodejs.org/">
    <img src="https://img.shields.io/badge/Node.js-24.18.0-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
@@ -222,7 +222,7 @@ npm run dist
 | Requirement              | Version                                  | Download                                    |
 | ------------------------ | ---------------------------------------- | ------------------------------------------- |
 | <strong>Node.js</strong> | 24.18.0 (recommended; >=24.8.0 required) | <a href="https://nodejs.org/">Download</a>  |
-| <strong>npm</strong>     | 11.16.0 (from packageManager)            | <a href="https://www.npmjs.com/">Docs</a>   |
+| <strong>npm</strong>     | 12.0.1 (from packageManager)             | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                           | <a href="https://git-scm.com/">Download</a> |
 
 > **💡 Tip**: Check out the [Developer Quick Start Guide](./docs/Guides/DEVELOPER_QUICK_START.md) for detailed setup instructions and architecture overview.

@@ -708,6 +708,7 @@ const electronAPIMockDefinition = {
         ...stateSyncBase,
     },
     system: {
+        getUpdateStatus: async () => ({ revision: 0, status: "idle" }),
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
         quitAndInstall: async (): Promise<boolean> => true,

@@ -33,7 +33,7 @@ This documentation site is part of the main Uptime Watcher project and serves as
 ### Prerequisites
 
 - **Node.js**: 24.18.0 (recommended; >=24.8.0 required)
-- **npm**: 11.16.0 (declared by `packageManager`)
+- **npm**: 12.0.1 (declared by `packageManager`)
 - **Git**: Latest version
 
 ### Development Setup
