@@ -76,7 +76,7 @@ graph TD
 
     subgraph AuxTools["Auxiliary analyzers"]
         Madge["madge --circular src/ electron/ shared/"]
-        Actionlint["actionlint -c config/linting/ActionLintConfig.yaml"]
+        Actionlint["actionlint -c .github/actionlint.yaml"]
         Commitlint["commitlint --config config/linting/commitlint.config.mjs"]
         Knip["knip -- include unused exports"]
         Yamllint["yamllint -c .yamllint"]

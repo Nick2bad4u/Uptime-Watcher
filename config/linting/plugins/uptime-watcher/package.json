@@ -51,10 +51,10 @@
     "module": "./plugin.mjs",
     "types": "./plugin.d.cts",
     "scripts": {
-        "lint": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx",
-        "lint:fix": "eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx --fix",
-        "test": "cd ../../../../ && vitest run --config vitest.linting.config.ts",
-        "test:watch": "cd ../../../../ && vitest --config vitest.linting.config.ts"
+        "lint": "npx eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx",
+        "lint:fix": "npx eslint ../.. --config ./eslint.config.mjs --ext .js,.cjs,.mjs,.ts,.mts,.cts,.tsx --fix",
+        "test": "cd ../../../../ && npx vitest run --config vitest.linting.config.ts",
+        "test:watch": "cd ../../../../ && npx vitest --config vitest.linting.config.ts"
     },
     "dependencies": {
         "eslint": "^10.7.0"

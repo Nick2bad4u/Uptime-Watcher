@@ -989,8 +989,42 @@ jobs:
             - name: "Install pinned git-cliff"
               run: "npm install --global git-cliff@2.13.1 --force"
 
-            - name: "Validate tagged changelog preview"
+            - name: "Validate expected release tag"
+              env:
+                  EXPECTED_TAG: "v${{ needs.bump-version.outputs.new_version }}"
               run: |
+                  set -euo pipefail
+
+                  if [ -z "$EXPECTED_TAG" ]; then
+                    echo "::error::The bump-version job did not provide an expected tag."
+                    exit 1
+                  fi
+
+                  tag_ref="refs/tags/${EXPECTED_TAG}"
+                  if ! git show-ref --verify --quiet "$tag_ref"; then
+                    echo "::error::Expected release tag ${EXPECTED_TAG} does not exist in the local checkout."
+                    exit 1
+                  fi
+
+                  tag_commit=$(git rev-parse "${tag_ref}^{commit}")
+                  head_commit=$(git rev-parse HEAD)
+                  if [ "$tag_commit" != "$head_commit" ]; then
+                    echo "::error::Expected release tag ${EXPECTED_TAG} points to ${tag_commit}, but HEAD is ${head_commit}."
+                    exit 1
+                  fi
+
+                  head_tags=$(git tag --points-at HEAD --sort=refname)
+                  if [ "$head_tags" != "$EXPECTED_TAG" ]; then
+                    echo "::error::HEAD must have exactly the expected release tag ${EXPECTED_TAG}; found: ${head_tags:-<none>}."
+                    exit 1
+                  fi
+
+            - name: "Validate tagged changelog preview"
+              env:
+                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+              run: |
+                  set -euo pipefail
+
                   PREVIEW="$RUNNER_TEMP/release-changelog.md"
                   git-cliff \
                     --config config/tools/cliff.toml \

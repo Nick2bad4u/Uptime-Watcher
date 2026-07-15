@@ -97,7 +97,7 @@
         ".checkov.yml",
         ".github/**",
         ".vscodeignore",
-        "config/tools/ActionLintConfig.yaml",
+        ".github/actionlint.yaml",
         "_config.yml",
         "config/tools/flatpak-build.yml",
         "config/tools/kics.yaml",
