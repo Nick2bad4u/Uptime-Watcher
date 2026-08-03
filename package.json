@@ -895,7 +895,7 @@
         "open-cli": "^9.0.0",
         "picocolors": "^1.1.1",
         "playwright": "^1.61.1",
-        "postcss": "^8.5.19",
+        "postcss": "^8.5.25",
         "postcss-assets": "^6.0.0",
         "postcss-clamp": "^4.1.0",
         "postcss-combine-duplicated-selectors": "^10.0.3",
