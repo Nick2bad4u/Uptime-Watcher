@@ -1,77 +1,48 @@
 # yaml-language-server: $schema=https://www.schemastore.org/pull-request-labeler.json
 #
 # =============================================================================
-# PR Labeler Configuration + Label Bootstrap Helper
+# PR Labeler Configuration
 # =============================================================================
 #
 # This file configures automatic PR labeling rules (GitHub Action / labeler).
 # It also serves as the *source of label names* if you choose.
-#
-# -----------------------------------------------------------------------------
-# Bootstrap labels (GitHub CLI)
-# -----------------------------------------------------------------------------
-# Quick start (embedded standard label set, create/update):
-#   pwsh ./scripts/bootstrap-labels.ps1
-#
-# Use this file's top-level keys as the label *name* list:
-#   pwsh ./scripts/bootstrap-labels.ps1 -FromLabelerYml
-#
-# Enforce that every key in this file exists in the embedded label definitions:
-#   pwsh ./scripts/bootstrap-labels.ps1 -FromLabelerYml -Strict
-#
-# Safety switches:
-#   -WhatIf    : preview commands without changes
-#   -AuditOnly : report missing/extra/different labels without changes
-#   -NoForce   : create-only (do not update existing labels)
-#   -Repo      : target a specific repo: -Repo "OWNER/REPO"
-#
-# Important:
-# - labeler.yml does NOT contain colors/descriptions. The script uses embedded
-#   defaults for known labels, and (unless -Strict) a fallback for unknown labels.
-# =============================================================================
+# actions/labeler does not inspect PR titles or bodies. Keyword-based labels
+# therefore match the repository's required type/description head branches.
+
+# Limit changed-files based labels to 5
+changed-files-labels-limit: 5
+
+# Limit changed-files based labels to 100 files changed (default is 1000)
+max-files-changed: 100
+
 CI/CD:
     - changed-files:
           - any-glob-to-any-file:
                 - ".github/workflows/**"
                 - ".github/actions/**"
-                - "**/*.yml"
-                - "**/*.yaml"
-
-backend:
-    - changed-files:
-          - any-glob-to-any-file:
-                - "electron/**/*"
-                - "server/**/*"
-                - "api/**/*"
+                - ".github/*.yml"
+                - ".github/*.yaml"
 
 breaking change:
-    - body:
-          - pattern: "(?i)breaking change"
-          - pattern: "(?i)breaking"
-          - pattern: "(?i)major version"
-    - title:
-          - pattern: "(?i)breaking"
-          - pattern: "(?i)major"
+    - head-branch:
+          - "^(?:breaking|major)/"
 
 bug:
-    - body:
-          - pattern: "(?i)\\b(fix|fixes|bug|error|issue)\\b"
-    - title:
-          - pattern: "(?i)\\b(fix|bug|hotfix|patch)\\b"
+    - head-branch:
+          - "^(?:bug|fix|hotfix|patch)/"
 
 build:
-    - changed-files:
-          - any-glob-to-any-file:
-                - "build/**/*"
-                - "dist/**/*"
-                - "webpack*"
-                - "rollup*"
-                - "esbuild*"
-                - "vite*"
-    - title:
-          - pattern: "(?i)build"
-          - pattern: "(?i)bundle"
-          - pattern: "(?i)compile"
+    - any:
+          - changed-files:
+                - any-glob-to-any-file:
+                      - "dist/**/*"
+                      - "plugin.mjs"
+                      - "plugin.d.mts"
+                      - "scripts/**/*"
+                      - "tsconfig.build.json"
+                      - "vite.config.ts"
+          - head-branch:
+                - "^(?:build|bundle|compile)/"
 
 configuration:
     - changed-files:
@@ -82,129 +53,76 @@ configuration:
                 - "*.yaml"
                 - ".eslint*"
                 - ".prettier*"
+                - ".github/labeler.yml"
+                - ".github/actionlint.yaml"
+                - "cliff.toml"
+                - "knip.config.ts"
+                - "node.config.json"
+                - "stryker.config.mjs"
                 - "tsconfig*.json"
-                - "vite.config.*"
-                - "vitest.config.*"
+                - "vite.config.ts"
 
 dependencies:
     - changed-files:
           - any-glob-to-any-file:
                 - "package.json"
                 - "package-lock.json"
-                - "yarn.lock"
-                - "pnpm-lock.yaml"
                 - "**/package.json"
 
 documentation:
-    - body:
-          - pattern: "(?i)documentation"
-          - pattern: "(?i)readme"
-          - pattern: "(?i)docs"
-    - changed-files:
-          - any-glob-to-any-file:
-                - "**/*.md"
-                - "docs/**/*"
-                - "README*"
-    - title:
-          - pattern: "(?i)docs"
-          - pattern: "(?i)documentation"
-          - pattern: "(?i)readme"
+    - any:
+          - changed-files:
+                - any-glob-to-any-file:
+                      - "**/*.md"
+                      - "docs/**/*"
+                      - "README*"
+                      - "CHANGELOG.md"
+                      - "RELEASING.md"
+          - head-branch:
+                - "^(?:docs|documentation|readme)/"
 
 enhancement:
-    - body:
-          - pattern: "(?i)feature"
-          - pattern: "(?i)enhancement"
-          - pattern: "(?i)improve"
-          - pattern: "(?i)add"
-    - title:
-          - pattern: "(?i)feat"
-          - pattern: "(?i)feature"
-          - pattern: "(?i)enhancement"
-          - pattern: "(?i)improve"
-
-frontend:
-    - changed-files:
-          - any-glob-to-any-file:
-                - "src/**/*.{tsx,jsx,ts,js}"
-                - "src/components/**/*"
-                - "src/pages/**/*"
+    - head-branch:
+          - "^(?:enhancement|feat|feature|improve)/"
 
 good first issue:
-    - body:
-          - pattern: "(?i)good first issue"
-          - pattern: "(?i)beginner friendly"
-          - pattern: "(?i)easy"
-    - title:
-          - pattern: "(?i)good first issue"
-          - pattern: "(?i)beginner"
-          - pattern: "(?i)starter"
+    - head-branch:
+          - "^(?:beginner|good-first-issue|starter)/"
 
 help wanted:
-    - body:
-          - pattern: "(?i)help wanted"
-          - pattern: "(?i)looking for help"
-          - pattern: "(?i)assistance needed"
-    - title:
-          - pattern: "(?i)help wanted"
-          - pattern: "(?i)help"
+    - head-branch:
+          - "^(?:help|help-wanted)/"
 
 performance:
-    - body:
-          - pattern: "(?i)performance"
-          - pattern: "(?i)optimize"
-          - pattern: "(?i)faster"
-          - pattern: "(?i)speed"
-          - pattern: "(?i)memory"
-    - title:
-          - pattern: "(?i)perf"
-          - pattern: "(?i)performance"
-          - pattern: "(?i)optimize"
-          - pattern: "(?i)speed"
+    - head-branch:
+          - "^(?:optimize|perf|performance)/"
 
 refactor:
-    - body:
-          - pattern: "(?i)refactor"
-          - pattern: "(?i)cleanup"
-          - pattern: "(?i)code quality"
-          - pattern: "(?i)restructure"
-    - title:
-          - pattern: "(?i)refactor"
-          - pattern: "(?i)refactoring"
-          - pattern: "(?i)cleanup"
-          - pattern: "(?i)clean"
+    - head-branch:
+          - "^(?:cleanup|refactor)/"
 
-security:
-    - body:
-          - pattern: "(?i)security"
-          - pattern: "(?i)vulnerability"
-          - pattern: "(?i)exploit"
-          - pattern: "(?i)cve"
-    - title:
-          - pattern: "(?i)security"
-          - pattern: "(?i)vuln"
-          - pattern: "(?i)cve"
-
-style:
-    - body:
-          - pattern: "(?i)formatting"
-          - pattern: "(?i)style"
-          - pattern: "(?i)linting"
-          - pattern: "(?i)prettier"
-          - pattern: "(?i)eslint"
-    - title:
-          - pattern: "(?i)style"
-          - pattern: "(?i)formatting"
-          - pattern: "(?i)lint"
-
-testing:
+rules:
     - changed-files:
           - any-glob-to-any-file:
-                - "**/*.test.{js,ts,tsx}"
-                - "**/*.spec.{js,ts,tsx}"
-                - "tests/**/*"
-                - "test/**/*"
-                - "__tests__/**/*"
-    - title:
-          - pattern: "(?i)test"
-          - pattern: "(?i)tests"
-          - pattern: "(?i)testing"
+                - "src/rules/**/*.ts"
+                - "src/_internal/**/*.ts"
+                - "src/plugin.ts"
+
+security:
+    - head-branch:
+          - "^(?:cve|security|vuln|vulnerability)/"
+
+style:
+    - head-branch:
+          - "^(?:format|formatting|lint|style)/"
+
+testing:
+    - any:
+          - changed-files:
+                - any-glob-to-any-file:
+                      - "**/*.test.{js,ts,tsx}"
+                      - "**/*.spec.{js,ts,tsx}"
+                      - "test/**/*"
+                      - "__tests__/**/*"
+          - head-branch:
+                - "^(?:test|testing|tests)/"
