@@ -749,7 +749,7 @@
         "cspell": "^10.0.1",
         "cssnano": "^8.0.2",
         "cssnano-preset-advanced": "^8.0.2",
-        "electron": "^43.1.0",
+        "electron": "^43.5.0",
         "electron-builder": "^26.15.3",
         "electron-builder-squirrel-windows": "^26.15.3",
         "electron-debug": "^4.1.0",
