@@ -658,7 +658,7 @@
         "type-fest": "^5.8.0",
         "validator": "^13.15.35",
         "ws": "^8.21.0",
-        "zod": "^4.4.3",
+        "zod": "^4.6.6",
         "zustand": "^5.0.14"
     },
     "devDependencies": {
@@ -884,7 +884,7 @@
         "madge": "^8.0.0",
         "markdown-link-check": "^3.14.2",
         "markdownlint-cli": "^0.50.0",
-        "minimatch": "^10.2.5",
+        "minimatch": "^11.0.1",
         "msw": "^2.15.0",
         "msw-storybook-addon": "^2.0.7",
         "ncu-config-nick2bad4u": "^0.2.0",
